@@ -15,7 +15,7 @@ Python 3 modernization and maintenance:
 
     This fork has been updated and maintained for Python 3 compatibility by
 
-    bigbrosci and Whitehare2023.
+    Bigbrosci and Whitehare2023.
 
 The modifications include:
 
