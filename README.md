@@ -15,7 +15,9 @@ Python 3 modernization and maintenance:
 
     This fork has been updated and maintained for Python 3 compatibility by
 
-    Bigbrosci and Whitehare2023.
+    Bigbrosci      (GitHub username)
+
+    Whitehare2023  (GitHub username)
 
 The modifications include:
 
@@ -50,7 +52,7 @@ Run:
 Starting:
 --------------------------
 
-Start with: `p4v`
+Start with the magic `p4v` command:
 
 Add the following alias to your shell configuration file.
 
