@@ -49,14 +49,12 @@ Run:
    $ bash macos-start.sh 
 ```
 
-Starting:
+Starting with the magic `p4v` command
 --------------------------
-
-Start with the magic `p4v` command:
 
 Add the following alias to your shell configuration file.
 
-macOS (zsh)
+**macOS (zsh)**
 
 -----------
 
@@ -72,9 +70,9 @@ Then reload the shell:
 
     source ~/.zshrc
 
-Ubuntu / Linux (bash)
-
 ---------------------
+
+**Ubuntu / Linux (bash)**
 
 Edit:
 
