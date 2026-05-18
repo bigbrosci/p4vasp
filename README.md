@@ -54,9 +54,9 @@ Starting with the magic `p4v` command
 
 Add the following alias to your shell configuration file.
 
-**macOS (zsh)**
-
 -----------
+
+**macOS (zsh)**
 
 Edit:
 
