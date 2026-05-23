@@ -41,6 +41,14 @@ Run:
 ```
    $ bash ubuntu-start.sh 
 ```
+Other Linux Installation
+--------------------------
+
+Run:
+```
+   $ bash ubuntu-start.sh --skip-apt
+```
+
 Mac Installation
 --------------------------
 
