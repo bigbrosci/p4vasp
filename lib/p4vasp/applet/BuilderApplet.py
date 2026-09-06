@@ -210,7 +210,18 @@ class BuilderApplet(Applet):#p4vasp.Selection.SelectionListener
         self.text_button.join_group(self.table_button)
         self.direct_button.set_active(1)
         self.table_button.set_active(1)
+        # The frame is sometimes refreshed with show_all() while switching
+        # applets.  Keep the inactive text editor hidden in that case; its
+        # empty allocation otherwise creates a large blank area beside the
+        # coordinate table.
+        if hasattr(self.text_editor, "set_no_show_all"):
+            self.text_editor.set_no_show_all(True)
         self.text_editor.hide()
+        self.table_editor.show()
+        if hasattr(self.table_editor, "set_hexpand"):
+            self.table_editor.set_hexpand(True)
+        if hasattr(self.table_editor, "set_vexpand"):
+            self.table_editor.set_vexpand(True)
         self.model=StructureTreeModel(self)
         self.treeview,self.treeviewscrolled=self.make_treeview(self.model,self.xml.get_widget("treeview"))
         self.table_editor.pack_start(self.treeviewscrolled,True,True,0)

@@ -279,6 +279,7 @@ class XML:
 
     def _new_widget(self, class_name, elem, parent=None, internal_child=None):
         props = _properties(elem)
+        widget_id = elem.attrib.get("id", "")
         if isinstance(parent, gtk.FileSelection):
             if internal_child == "ok_button":
                 return parent.ok_button
@@ -294,7 +295,8 @@ class XML:
             return Gtk.Dialog()
         if class_name == "GtkFileSelection":
             title = props.get("title", "")
-            return gtk.FileSelection(title=title)
+            action = Gtk.FileChooserAction.SAVE if widget_id.startswith("save_") else Gtk.FileChooserAction.OPEN
+            return gtk.FileSelection(title=title, action=action)
         if class_name in ("GtkVBox",):
             return Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         if class_name in ("GtkHBox",):

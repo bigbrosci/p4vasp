@@ -1112,7 +1112,7 @@
 				      <property name="digits">0</property>
 				      <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
 				      <property name="inverted">False</property>
-				      <property name="adjustment">0 0 0 0 0 0</property>
+				      <property name="adjustment">1 1 10 1 0 0</property>
 				    </widget>
 				    <packing>
 				      <property name="left_attach">1</property>
@@ -1204,7 +1204,7 @@
 				      <property name="digits">0</property>
 				      <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
 				      <property name="inverted">False</property>
-				      <property name="adjustment">0 0 10 1 0 0</property>
+				      <property name="adjustment">1 1 10 1 0 0</property>
 				      <signal name="state_changed" handler="on_hscale1"/>
 				      <signal name="client_event" handler="on_hscale1"/>
 				      <signal name="drag_data_get" handler="on_hscale1"/>
@@ -1228,7 +1228,7 @@
 				      <property name="digits">0</property>
 				      <property name="update_policy">GTK_UPDATE_CONTINUOUS</property>
 				      <property name="inverted">False</property>
-				      <property name="adjustment">0 0 0 0 0 0</property>
+				      <property name="adjustment">1 1 10 1 0 0</property>
 				    </widget>
 				    <packing>
 				      <property name="left_attach">1</property>

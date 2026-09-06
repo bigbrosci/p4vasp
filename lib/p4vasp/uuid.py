@@ -22,10 +22,9 @@ OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __version__ = "0.3.2"
 
 import calendar as _calendar
-import md5 as _md5
+import hashlib as _hashlib
 import random as _random
 import re as _re
-import sha as _sha
 import sys as _sys
 import time as _time
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -184,11 +183,11 @@ class UuidGen(object):
 
 
     def uuid_md5(self, nsuuid, name):
-        return self._format_uuid_v3or5(nsuuid, name, _md5, 3)
+        return self._format_uuid_v3or5(nsuuid, name, _hashlib.md5, 3)
 
 
     def uuid_sha1(self, nsuuid, name):
-        return self._format_uuid_v3or5(nsuuid, name, _sha, 5)
+        return self._format_uuid_v3or5(nsuuid, name, _hashlib.sha1, 5)
 
 
     # helper methods --------------------------------------------------------
@@ -198,17 +197,17 @@ class UuidGen(object):
 
 
     def _int_to_bytes(self, num):
-        out = ''
+        out = bytearray()
         while num:
             num, tail = divmod(num, 256)
-            out += chr(tail)
-        return out[-1::-1]
+            out.append(tail)
+        return bytes(out[::-1])
 
 
     def _bytes_to_int(self, bytes):
         num = 0
         for char in bytes:
-            num = (num << 8) + ord(char)
+            num = (num << 8) + (ord(char) if isinstance(char, str) else char)
         return num
 
 
@@ -224,11 +223,11 @@ class UuidGen(object):
         time_hi_and_version = _htons(int(nsuuid[14:18], 16))
 
         # hash the stuff
-        h = hasher.new()
+        h = hasher()
         h.update(self._int_to_bytes(time_low))
         h.update(self._int_to_bytes(time_mid))
         h.update(self._int_to_bytes(time_hi_and_version))
-        h.update(name)
+        h.update(name.encode("utf-8") if isinstance(name, str) else name)
         hash_ = h.digest()[:16]
 
         # convert hash to back to host byte order

@@ -160,10 +160,17 @@ class Property:
                 self.status=self.READY
                 return self.value
             except:
+                # Preserve the original parsing exception.  Calling the
+                # application message driver here can re-enter property
+                # loading (especially during GUI activation), masking the
+                # useful error with a RecursionError.
                 if print_exceptions:
                     traceback.print_exc()
-                msg().error("Error reading property %s"%self.name)
-                msg().exception()
+                try:
+                    msg().error("Error reading property %s"%self.name)
+                    msg().exception()
+                except Exception:
+                    pass
                 self.value=None
                 self.status=self.ERROR
 

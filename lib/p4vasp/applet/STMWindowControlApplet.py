@@ -496,7 +496,8 @@ class STMWindowControlApplet(Applet):
         self.getSWinApplet().pin_status=self.pin_status
 
     def destroy(self):
-        applets().notify_on_activate.remove(self.applet_activated)
+        if self.applet_activated in applets().notify_on_activate:
+            applets().notify_on_activate.remove(self.applet_activated)
 
 #  def on_structuremenu_clicked_handler(self,*arg):
 #    print "structure changed",arg

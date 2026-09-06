@@ -204,9 +204,9 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
             sw=a.swin
             if sw is not None:
                 i,j,k=sw.getMultiple()
-                self.csadj1.value=float(i)
-                self.csadj2.value=float(j)
-                self.csadj3.value=float(k)
+                self.csadj1.set_value(float(i))
+                self.csadj2.set_value(float(j))
+                self.csadj3.set_value(float(k))
                 self.ass_adj.value=float(sw.getArrowsScale())
                 self.sss_adj.value=float(sw.getRadiusFactor()*2.0)
             self.xml.get_widget("dsx_entry").set_text(str(sw.dsx))
@@ -221,12 +221,24 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         cs1=self.xml.get_widget("cell_scale1")
         cs2=self.xml.get_widget("cell_scale2")
         cs3=self.xml.get_widget("cell_scale3")
-        self.csadj1=gtk.Adjustment(1,1,10,1,0,0)
-        self.csadj2=gtk.Adjustment(1,1,10,1,0,0)
-        self.csadj3=gtk.Adjustment(1,1,10,1,0,0)
+        # Cell replication is an integer operation: only 1, 2, ..., 10
+        # are valid values.  Use named arguments so the constraint remains
+        # unambiguous across GTK compatibility layers.
+        self.csadj1=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
+        self.csadj2=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
+        self.csadj3=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
         cs1.set_adjustment(self.csadj1)
         cs2.set_adjustment(self.csadj2)
         cs3.set_adjustment(self.csadj3)
+        cs1.set_digits(0)
+        cs2.set_digits(0)
+        cs3.set_digits(0)
         self.csadj1.connect("value-changed",self.on_cell_scale_changed)
         self.csadj2.connect("value-changed",self.on_cell_scale_changed)
         self.csadj3.connect("value-changed",self.on_cell_scale_changed)
@@ -345,7 +357,9 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         a.cell_centering=a.CELL_CENTERING_INSIDE
         a.updateSeq()
     def on_cell_scale_changed(self,*arg):
-        self.swin().setMultiple(self.csadj1.value,self.csadj2.value,self.csadj3.value)
+        self.swin().setMultiple(int(self.csadj1.get_value()),
+                                int(self.csadj2.get_value()),
+                                int(self.csadj3.get_value()))
     def on_sphere_size_scale_changed(self,*arg):
         self.swin().setRadiusFactor(0.5*self.sss_adj.value)
     def on_arrows_size_scale_changed(self,*arg):
@@ -750,7 +764,8 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         self.swin().redraw()
 
     def destroy(self):
-        applets().notify_on_activate.remove(self.applet_activated)
+        if self.applet_activated in applets().notify_on_activate:
+            applets().notify_on_activate.remove(self.applet_activated)
 
 #  def on_structuremenu_clicked_handler(self,*arg):
 #    print "structure changed",arg

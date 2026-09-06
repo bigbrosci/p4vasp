@@ -225,12 +225,22 @@ class StructureApplet(Applet,p4vasp.Selection.SelectionListener):
         cs1=self.xml.get_widget("cell_scale1")
         cs2=self.xml.get_widget("cell_scale2")
         cs3=self.xml.get_widget("cell_scale3")
-        self.csadj1=gtk.Adjustment(1,1,10,1,0,0)
-        self.csadj2=gtk.Adjustment(1,1,10,1,0,0)
-        self.csadj3=gtk.Adjustment(1,1,10,1,0,0)
+        # Cell replication accepts whole-cell counts only: 1 through 10.
+        self.csadj1=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
+        self.csadj2=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
+        self.csadj3=gtk.Adjustment(value=1.0, lower=1.0, upper=10.0,
+                                   step_increment=1.0, page_increment=0.0,
+                                   page_size=0.0)
         cs1.set_adjustment(self.csadj1)
         cs2.set_adjustment(self.csadj2)
         cs3.set_adjustment(self.csadj3)
+        cs1.set_digits(0)
+        cs2.set_digits(0)
+        cs3.set_digits(0)
         self.csadj1.connect("value-changed",self.on_cell_scale_changed)
         self.csadj2.connect("value-changed",self.on_cell_scale_changed)
         self.csadj3.connect("value-changed",self.on_cell_scale_changed)
@@ -353,7 +363,9 @@ class StructureApplet(Applet,p4vasp.Selection.SelectionListener):
         if self.structure is not None:
             self.setStructure(self.structure)
     def on_cell_scale_changed(self,*arg):
-        self.swin.setMultiple(self.csadj1.value,self.csadj2.value,self.csadj3.value)
+        self.swin.setMultiple(int(self.csadj1.get_value()),
+                              int(self.csadj2.get_value()),
+                              int(self.csadj3.get_value()))
     def on_sphere_size_scale_changed(self,*arg):
         self.radius_factor=self.sss_adj.value
         self.swin.structure_drawer.setRadiusFactor(0.5*self.radius_factor)

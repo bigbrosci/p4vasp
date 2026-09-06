@@ -302,13 +302,22 @@ class Applet(AppletTag,p4vasp.SystemPM.SystemListListener):
 
 
     def destroyApplet(self):
-        applets().remove(self)
+        # Applet transitions can be initiated by both repository and GTK
+        # callbacks.  Destruction must therefore be idempotent.
+        if self in applets().data:
+            applets().remove(self)
         if self.panel is not None:
-            self.panel.destroy()
+            try:
+                self.panel.destroy()
+            except ValueError:
+                pass
         self.panel=None
 #    self.hide()
         if self.window is not None:
-            self.window.destroy()
+            try:
+                self.window.destroy()
+            except ValueError:
+                pass
         self.destroy()
 
     def isVisible(self):

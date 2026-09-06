@@ -43,6 +43,8 @@ import gobject
 import os.path
 import os
 import time
+import traceback
+import urllib.parse
 
 try:
     import _cp4vasp
@@ -416,9 +418,25 @@ class Frame(SystemListListener):
 
     def load_system_selected(self,*arg):
         w=self.load_system_fileselection
-        self.last_system_path=w.get_filename()
-        systemlist().activate(getSystem(self.last_system_path))
-        w.hide()
+        path=w.get_filename()
+        if not path:
+            msg().error("No file or directory was selected.")
+            return
+        # GTK3 may return a file URI rather than a local filesystem path.
+        if path.startswith("file:"):
+            path=urllib.parse.unquote(urllib.parse.urlparse(path).path)
+        path=os.path.abspath(path)
+        if not os.path.exists(path):
+            msg().error("Selected path does not exist: %s"%path)
+            return
+        self.last_system_path=path
+        try:
+            systemlist().activate(getSystem(path))
+        except Exception:
+            traceback.print_exc()
+            msg().error("Can not load selected system. See p4vasp.log for details.")
+        finally:
+            w.hide()
 
     def save_system_selected(self,*arg):
         w=self.save_system_fileselection
@@ -479,7 +497,12 @@ class Frame(SystemListListener):
         xml=p4vasp.util.loadGlade(self.gladefile,"save_system_fileselection")
         self.connect_signals(xml)
         self.save_system_fileselection=xml.get_widget("save_system_fileselection")
-        self.save_system_fileselection.set_filename(self.last_system_path)
+        path=self.last_system_path
+        if path and os.path.isdir(path):
+            self.save_system_fileselection.set_current_folder(path)
+        elif path:
+            self.save_system_fileselection.set_filename(path)
+        self.save_system_fileselection.set_current_name("POSCAR")
         self.save_system_fileselection.show()
     def show_about_dialog(self,*arg):
         import p4vasp
@@ -534,13 +557,28 @@ class Frame(SystemListListener):
             v=split(x.get_name())
             if len(v)==2:
                 if v[0]=="astart":
-                    x.connect("clicked",startApplet,v[1],self)
+                    # Bind the applet name and frame explicitly.  The old
+                    # PyGTK user-data callback convention is unreliable in
+                    # the GTK3 compatibility layer and caused toolbar
+                    # buttons to appear clickable without doing anything.
+                    applet_name=v[1]
+                    x.connect(
+                        "clicked",
+                        lambda widget, name=applet_name, frame=self:
+                            startApplet(widget, name, frame),
+                    )
 
     def clearEmbeddedAppletBox(self,keep=None):
         for child in list(self.applet_box.get_children()):
             if child is keep:
                 continue
-            self.applet_box.remove(child)
+            # A previous destroy/reparent callback may already have detached
+            # this child while it was in the snapshot above.
+            if child in self.applet_box.get_children():
+                try:
+                    self.applet_box.remove(child)
+                except ValueError:
+                    pass
 
     def packEmbeddedAppletPanel(self,panel):
         self.clearEmbeddedAppletBox(panel)
@@ -548,7 +586,11 @@ class Frame(SystemListListener):
         if parent is self.applet_box:
             return
         if parent is not None:
-            parent.remove(panel)
+            if hasattr(parent, "get_children") and panel in parent.get_children():
+                try:
+                    parent.remove(panel)
+                except ValueError:
+                    pass
         self.applet_box.pack_start(panel,True,True,0)
 
     def showApplet(self,applet):
@@ -701,11 +743,22 @@ def startApplet(widget,applet,frame):
 #  a=appletfactory().create(applet)
 #  frame.showApplet(a)
 #  applets().getActive(applet)
-    a=applets().findActive(applet)
-    if a is None:
-        a=applets().factory.create(applet)
-    applets().activate(a)
-    frame.showApplet(a)
+    try:
+        a=applets().findActive(applet)
+        was_active=a is not None
+        if a is None:
+            a=applets().factory.create(applet)
+        if a is None:
+            raise RuntimeError("Applet is not registered: %s"%applet)
+        applets().activate(a)
+        # New applets are shown by the repository append notification.
+        # Existing applets need an explicit show to switch back to them.
+        if was_active:
+            frame.showApplet(a)
+    except Exception as exc:
+        traceback.print_exc()
+        msg().error("Can not start applet %s (%s: %s)" %
+                    (applet, type(exc).__name__, exc))
 
 def init():
 #  msg().message("p4vasp init:")

@@ -142,10 +142,14 @@ class StructureWindow:
         return self.isosurface_drawer.getLevel()
 
     def setMultiple(self,a,b,c):
-        self.multiple=(a,b,c)
-        self.structure_drawer.setMultiple(int(a),int(b),int(c))
-        self.isosurface_drawer.setMultiple(int(a),int(b),int(c))
-        self.neg_isosurface_drawer.setMultiple(int(a),int(b),int(c))
+        self.multiple=(int(a),int(b),int(c))
+        self.structure_drawer.setMultiple(*self.multiple)
+        self.isosurface_drawer.setMultiple(*self.multiple)
+        self.neg_isosurface_drawer.setMultiple(*self.multiple)
+        # The drawer setters update their state but do not redraw the
+        # containing window.  Without this, replication changes are not
+        # visible until another operation triggers a repaint.
+        self.redraw()
     def getMultiple(self):
         return self.multiple
     def setStructure(self,structure):

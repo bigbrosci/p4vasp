@@ -88,6 +88,12 @@ WIN_POS_CENTER = _enum(_Gtk.WindowPosition, "CENTER")
 ORIENTATION_HORIZONTAL = _enum(_Gtk.Orientation, "HORIZONTAL")
 ORIENTATION_VERTICAL = _enum(_Gtk.Orientation, "VERTICAL")
 
+# PyGTK 2 selection-mode constants used by the legacy applets.
+SELECTION_NONE = _enum(_Gtk.SelectionMode, "NONE")
+SELECTION_SINGLE = _enum(_Gtk.SelectionMode, "SINGLE")
+SELECTION_BROWSE = _enum(_Gtk.SelectionMode, "BROWSE")
+SELECTION_MULTIPLE = _enum(_Gtk.SelectionMode, "MULTIPLE")
+
 PACK_START = _enum(_Gtk.PackType, "START")
 PACK_END = _enum(_Gtk.PackType, "END")
 
@@ -246,14 +252,13 @@ class FileSelection(_Gtk.FileChooserDialog):
         self._ok_clicked = True
 
     def _on_response(self, _dialog, response_id):
-        if response_id == RESPONSE_CANCEL:
-            self.hide()
-        elif response_id == RESPONSE_OK:
-            if not self._ok_clicked:
-                self.ok_button.emit("clicked")
+        # GtkFileChooserDialog emits ``response`` for both buttons.  Keep
+        # the dialog lifecycle independent from the application callback:
+        # Cancel always closes it, and an exception in an OK callback cannot
+        # leave a non-responsive chooser on screen.
+        if response_id in (RESPONSE_CANCEL, RESPONSE_OK):
             self._ok_clicked = False
-            if self.get_visible():
-                self.hide()
+            self.hide()
 
 
 class GenericTreeModel:
