@@ -245,14 +245,18 @@ class StructureApplet(Applet,p4vasp.Selection.SelectionListener):
         self.csadj2.connect("value-changed",self.on_cell_scale_changed)
         self.csadj3.connect("value-changed",self.on_cell_scale_changed)
 
-        self.sss_adj=gtk.Adjustment(1.0,0.1,5.0,0.1,0,0)
+        self.sss_adj=gtk.Adjustment(value=1.0, lower=0.1, upper=5.0,
+                                    step_increment=0.1, page_increment=0.0,
+                                    page_size=0.0)
         sss=self.xml.get_widget("sphere_size_scale")
         self.levelentry=self.xml.get_widget("levelentry")
         self.subtrentry=self.xml.get_widget("subtrentry")
         sss.set_adjustment(self.sss_adj)
         self.sss_adj.connect("value-changed",self.on_sphere_size_scale_changed)
 
-        self.ass_adj=gtk.Adjustment(1.0,0.1,20.0,0.1,0,0)
+        self.ass_adj=gtk.Adjustment(value=1.0, lower=0.1, upper=20.0,
+                                    step_increment=0.1, page_increment=0.0,
+                                    page_size=0.0)
         ass=self.xml.get_widget("arrows_size_scale")
         ass.set_adjustment(self.ass_adj)
         self.ass_adj.connect("value-changed",self.on_arrows_size_scale_changed)
@@ -367,10 +371,10 @@ class StructureApplet(Applet,p4vasp.Selection.SelectionListener):
                               int(self.csadj2.get_value()),
                               int(self.csadj3.get_value()))
     def on_sphere_size_scale_changed(self,*arg):
-        self.radius_factor=self.sss_adj.value
+        self.radius_factor=self.sss_adj.get_value()
         self.swin.structure_drawer.setRadiusFactor(0.5*self.radius_factor)
     def on_arrows_size_scale_changed(self,*arg):
-        self.swin.setArrowsScale(self.ass_adj.value)
+        self.swin.setArrowsScale(self.ass_adj.get_value())
 
     def on_show_button_clicked_handler(self,*arg):
         if self.system is not None:

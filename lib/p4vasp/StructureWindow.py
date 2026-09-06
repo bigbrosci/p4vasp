@@ -42,7 +42,11 @@ class StructureWindow:
         self.atomtypes=atomtypes
         self.win=cp4vasp.VisWindow(x,y,w,h,title)
         self.navigator           = cp4vasp.VisNavDrawer()
+        # Use a white canvas by default so the structure and black cell
+        # outlines remain visible when the viewer window opens.
+        self.navigator.setBackground(1.0, 1.0, 1.0)
         self.structure_drawer    = cp4vasp.VisStructureDrawer()
+        self.structure_drawer.setCellColor(0.0, 0.0, 0.0)
         self.arrows_drawer       = cp4vasp.VisStructureArrowsDrawer(self.structure_drawer)
         self.arrows_drawer.red   =0.5
         self.arrows_drawer.green =1.0
@@ -177,7 +181,9 @@ class StructureWindow:
     def show(self):
         if not self.visible:
             self.navigator           = cp4vasp.VisNavDrawer()
+            self.navigator.setBackground(1.0, 1.0, 1.0)
             self.structure_drawer    = cp4vasp.VisStructureDrawer()
+            self.structure_drawer.setCellColor(0.0, 0.0, 0.0)
             self.arrows_drawer       = cp4vasp.VisStructureArrowsDrawer(self.structure_drawer)
             self.arrows_drawer.red   =0.5
             self.arrows_drawer.green =1.0

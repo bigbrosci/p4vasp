@@ -228,10 +228,16 @@ class MeasureApplet(Applet,SelectionListener):
         self.updateTable()
 
     def updateTable(self,x=None):
+        # The applet UI is initialized before p4v attaches the active
+        # system.  Do not try to build measurement rows from a None
+        # structure during that short initialization window.
+        s=self.getCurrentStructure()
+        if s is None:
+            return
         if self.showtype==self.DIST_TYPE:
-            self.showDistances(self.getCurrentStructure(),selection())
+            self.showDistances(s,selection())
         else:
-            self.showZMat(self.getCurrentStructure(),selection())
+            self.showZMat(s,selection())
 
     def createStructureItems(self):
         omenu = self.structureopt
@@ -310,21 +316,36 @@ class MeasureApplet(Applet,SelectionListener):
         view.show()
 
     def getCurrentStructure(self):
+        # Use the system assigned to this applet.  The global current-system
+        # accessor can still be None while the applet is being initialized.
+        system=self.system
+        if system is None:
+            return None
         if self.step == -1:
-            return getCurrentSystemPM().INITIAL_STRUCTURE
+            return system.INITIAL_STRUCTURE
         elif self.step == -2:
-            return getCurrentSystemPM().FINAL_STRUCTURE
+            return system.FINAL_STRUCTURE
         elif self.step is None:
             return None
         else:
-            return getCurrentSystemPM().STRUCTURE_SEQUENCE_L[self.step]
+            sequence=system.STRUCTURE_SEQUENCE_L
+            if sequence is None or self.step < 0 or self.step >= len(sequence):
+                return None
+            return sequence[self.step]
 
 
     def initUI(self):
         self.view_box=self.xml.get_widget("view_box")
-        self.model=DistanceTreeModel(self.getCurrentStructure(),selection())
+        # A placeholder model is needed because initUI() runs before
+        # setSystem(); updateTable() replaces it once the structure exists.
+        self.model=DistanceTreeModel(Structure(),[])
         self.treeview,self.treeviewscrolled=self.make_treeview(self.model,self.xml.get_widget("treeview"))
-        self.view_box.add(self.treeviewscrolled)
+        # ``Gtk.Box.add`` does not preserve the expand/fill packing that the
+        # old Glade placeholder had under PyGTK.  It therefore leaves the
+        # table at its natural two-row height even when the applet has spare
+        # vertical space.  Pack it explicitly so three/four atom Z-matrices
+        # show their angle and dihedral rows.
+        self.view_box.pack_start(self.treeviewscrolled,True,True,0)
         self.zmat_button=self.xml.get_widget("zmat_button")
         self.dist_button=self.xml.get_widget("dist_button")
 

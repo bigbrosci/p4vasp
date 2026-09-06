@@ -207,8 +207,8 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
                 self.csadj1.set_value(float(i))
                 self.csadj2.set_value(float(j))
                 self.csadj3.set_value(float(k))
-                self.ass_adj.value=float(sw.getArrowsScale())
-                self.sss_adj.value=float(sw.getRadiusFactor()*2.0)
+                self.ass_adj.set_value(float(sw.getArrowsScale()))
+                self.sss_adj.set_value(float(sw.getRadiusFactor()*2.0))
             self.xml.get_widget("dsx_entry").set_text(str(sw.dsx))
             self.xml.get_widget("dsy_entry").set_text(str(sw.dsy))
             self.xml.get_widget("dsz_entry").set_text(str(sw.dsz))
@@ -243,14 +243,18 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         self.csadj2.connect("value-changed",self.on_cell_scale_changed)
         self.csadj3.connect("value-changed",self.on_cell_scale_changed)
 
-        self.sss_adj=gtk.Adjustment(1.0,0.1,5.0,0.1,0,0)
+        self.sss_adj=gtk.Adjustment(value=1.0, lower=0.1, upper=5.0,
+                                    step_increment=0.1, page_increment=0.0,
+                                    page_size=0.0)
         sss=self.xml.get_widget("sphere_size_scale")
         self.levelentry=self.xml.get_widget("levelentry")
         self.subtrentry=self.xml.get_widget("subtrentry")
         sss.set_adjustment(self.sss_adj)
         self.sss_adj.connect("value-changed",self.on_sphere_size_scale_changed)
 
-        self.ass_adj=gtk.Adjustment(1.0,0.1,20.0,0.1,0,0)
+        self.ass_adj=gtk.Adjustment(value=1.0, lower=0.1, upper=20.0,
+                                    step_increment=0.1, page_increment=0.0,
+                                    page_size=0.0)
         ass=self.xml.get_widget("arrows_size_scale")
         ass.set_adjustment(self.ass_adj)
         self.ass_adj.connect("value-changed",self.on_arrows_size_scale_changed)
@@ -333,7 +337,15 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
     def on_right_button_clicked_handler(self,*arg):
         self.swin().navigator.setRightView()
     def on_top_button_clicked_handler(self,*arg):
-        self.swin().navigator.setTopView()
+        sw=self.swin()
+        sw.navigator.setTopView()
+        sw.redraw()
+    def on_side_button_clicked_handler(self,*arg):
+        # The right view is the conventional side projection of the
+        # structure (looking along the x direction).
+        sw=self.swin()
+        sw.navigator.setRightView()
+        sw.redraw()
     def on_bottom_button_clicked_handler(self,*arg):
         self.swin().navigator.setBottomView()
     def on_home_button_clicked_handler(self,*arg):
@@ -361,9 +373,9 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
                                 int(self.csadj2.get_value()),
                                 int(self.csadj3.get_value()))
     def on_sphere_size_scale_changed(self,*arg):
-        self.swin().setRadiusFactor(0.5*self.sss_adj.value)
+        self.swin().setRadiusFactor(0.5*self.sss_adj.get_value())
     def on_arrows_size_scale_changed(self,*arg):
-        self.swin().setArrowsScale(self.ass_adj.value)
+        self.swin().setArrowsScale(self.ass_adj.get_value())
 
     def on_show_button_clicked_handler(self,*arg):
         if self.system is not None:
