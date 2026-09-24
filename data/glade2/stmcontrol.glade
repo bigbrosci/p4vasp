@@ -200,6 +200,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="pos_entry">
+                          <property name="width_chars">8</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Tip position in Angstroms</property>
 			      <property name="can_focus">True</property>
@@ -787,6 +788,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="limit_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">90</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Highest allowed error in smoothing weights (Press enter to calculate the grid dimensions N1,N2 and N3.)</property>
@@ -811,6 +813,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="sh_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">50</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Sigma for smoothing in the STM plane (Angstroms); 0=no smoothing</property>
@@ -836,6 +839,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="sv_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">40</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Sigma for smoothing in the direction of the STM tip (Angstroms); 0=no smoothing</property>
@@ -861,6 +865,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="n1_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">40</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">First dimension of the smoothing grid</property>
@@ -885,6 +890,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="n3_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">40</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Third dimension of the smoothing grid</property>
@@ -909,6 +915,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="n2_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">40</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Second dimension of the smoothing grid</property>
@@ -1053,6 +1060,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="interpolation_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">70</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Number of points to add between the two adjacent points in each direction.</property>
@@ -1079,6 +1087,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="postsigma_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">70</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Sigma in Angstroms</property>
@@ -1105,6 +1114,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="postn_entry">
+                          <property name="width_chars">8</property>
 			      <property name="width_request">70</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Dimension of the smoothing grid</property>
@@ -1279,7 +1289,7 @@
 		      <property name="top_attach">0</property>
 		      <property name="bottom_attach">4</property>
 		      <property name="x_options">fill</property>
-		      <property name="y_options"></property>
+		      <property name="y_options">fill</property>
 		    </packing>
 		  </child>
 
@@ -1375,6 +1385,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="lo_entry">
+                          <property name="width_chars">8</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Lowest value for coloring</property>
 			      <property name="can_focus">True</property>
@@ -1398,6 +1409,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="hi_entry">
+                          <property name="width_chars">8</property>
 			      <property name="visible">True</property>
 			      <property name="tooltip" translatable="yes">Highest value for coloring</property>
 			      <property name="can_focus">True</property>
@@ -1730,6 +1742,7 @@
 
 			  <child>
 			    <widget class="GtkEntry" id="structure_offset_entry">
+                          <property name="width_chars">8</property>
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="editable">True</property>

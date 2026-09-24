@@ -78,6 +78,7 @@ APT_PACKAGES=(
     python3-cairo
     python3-dev
     python3-gi
+    python3-gi-cairo
     python3-numpy
     python3-opengl
     swig

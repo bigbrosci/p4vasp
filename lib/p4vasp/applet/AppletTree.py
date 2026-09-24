@@ -26,8 +26,8 @@ from p4vasp.store import *
 from collections import UserList
 from types import *
 from string import *
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
 from p4vasp.compat import create_instance_from_name
 
 class AppletNode(UserList):
@@ -55,24 +55,6 @@ class AppletNode(UserList):
 #    cl.appletnode=self
         cl.name=self.name
         return cl
-
-    def createGtkTreeItem(self,parent):
-#    print "create item      name=",self.name,type(self.name)
-#    print "create item classname=",self.classname,type(self.classname)
-        item=gtk.TreeItem(self.name)
-        item.signal_connect("select", self.selected)
-        parent.append(item)
-        item.show()
-        parent.show()
-
-        if len(self):
-            tree=gtk.Tree()
-            item.set_subtree(tree)
-            for x in self:
-                subitem=x.createGtkTreeItem(tree)
-                subitem.expand()
-                subitem.collapse()
-        return item
 
     def isGroupMember(self,applet):
 #    if applet.appletnode is None:
@@ -149,7 +131,7 @@ class AppletTreeModel(gtk.GenericTreeModel):
     def on_iter_children(self, node):
         '''returns the first child of this node'''
         if node == None: # top of tree
-            return self.root[0]
+            return self.root[0] if len(self.root) else None
         if len(node):
             return node[0]
         return None

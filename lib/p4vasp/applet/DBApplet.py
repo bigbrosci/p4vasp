@@ -30,9 +30,9 @@ from p4vasp.SystemPM import *
 from p4vasp.SQLSystemPM import *
 from p4vasp.db import *
 import p4vasp.Selection
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 
 class QueryTreeModel(gtk.GenericTreeModel):
     def __init__(self,query,column_type):
@@ -47,7 +47,7 @@ class QueryTreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
     def on_get_n_columns(self):
         '''returns the number of columns in the model'''
-        return 4
+        return len(self.column_type)
     def on_get_column_type(self, index):
         '''returns the type of a column in the model'''
         return self.column_type[index]
@@ -86,7 +86,7 @@ class QueryTreeModel(gtk.GenericTreeModel):
     def on_iter_children(self, node):
         '''returns the first child of this node'''
         if node == None: # top of tree
-            return 0
+            return 0 if len(self.query) else None
         return None
     def on_iter_has_child(self, node):
         '''returns true if this node has children'''
@@ -175,8 +175,10 @@ class DBApplet(Applet):
         view.show()
 
         # Create scrollbars around the view.
-        scrolled = gtk.ScrolledWindow()
-        scrolled.add(view)
+        scrolled = view.get_parent()
+        if scrolled is None:
+            scrolled = gtk.ScrolledWindow()
+            scrolled.add(view)
         scrolled.show()
 
         return view,scrolled
@@ -222,7 +224,7 @@ class DBApplet(Applet):
                 name,user=self.selected_dbi.fetchone(
                 "SELECT #CALC.name, #USERINFO.username FROM #CALC JOIN #USERINFO ON #CALC.user_id=#USERINFO.id WHERE #CALC.id=%d"%self.selected_id)
                 dialog=gtk.MessageDialog(None,gtk.DIALOG_DESTROY_WITH_PARENT,
-                gtk.MESSAGE_INFO,gtk.BUTTONS_OK_CANCEL ,"Delete %s from the database %s ?"%(name,self.selected_dbi.name))
+                gtk.MESSAGE_INFO,gtk.ButtonsType.OK_CANCEL ,"Delete %s from the database %s ?"%(name,self.selected_dbi.name))
                 if dialog.run() == gtk.RESPONSE_OK:
                     self.selected_dbi.removeCalculation(self.selected_id)
                     self.updateDB()

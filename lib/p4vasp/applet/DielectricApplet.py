@@ -27,7 +27,7 @@
 #from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.applet.GraphWindowApplet import *
-import gtk
+from p4vasp import gtk3 as gtk
 
 class DielectricApplet(GraphWindowApplet):
     menupath=["Electronic","Dielectric function"]

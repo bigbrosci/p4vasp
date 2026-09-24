@@ -22,10 +22,10 @@
 
 
 from p4vasp.graph import *
-import gtk
+from p4vasp import gtk3 as gtk
 
 import p4vasp.piddle.piddle as piddle
-import p4vasp.piddle.piddleGTK2p4 as piddleGTK2p4
+import p4vasp.piddle.piddleGTK3 as piddleGTK3
 import p4vasp.util
 
 class Export:
@@ -215,7 +215,7 @@ def show_exportdata(self,*arg):
     e=Export()
     e.show()
 
-class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
+class GraphCanvas(piddleGTK3.InteractiveCanvas):
     def __init__(self, size=(500,400), name="p4VASP graph", infoline=None,drawing_area=None,top=None,world=None,graphdata=None):
         self.lastmotiontime=0
         width, height = (int(round(size[0])), int(round(size[1])))
@@ -248,12 +248,12 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
         self.graphdata=graphdata
         self.point=-1,-1
         self.selected_begin=None
-        piddleGTK2p4.InteractiveCanvas.__init__(self, da, top)
+        piddleGTK3.InteractiveCanvas.__init__(self, da, top)
         self.onOver  = self.onOverCallback
         self.onClick = self.onClickCallback
         self.onKey   = self.onKeyCallback
 #    top.set_wmclass("canvas", "Canvas")
-        da.realize()
+        # Cairo surfaces can be created before the widget is realized.
         da.set_size_request(width, height)
 #    top.show_all()
 #    top.set_icon_name(name)
@@ -329,6 +329,8 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
 
     def onKeyCallback(self,canvas,key,m):
 #    print "onKeyCallback",repr(key),repr(m)
+        if self.world is None:
+            return
         x,y=self.point
 #    print "point",x,y
         if len(self.world)==1:
@@ -336,7 +338,7 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
         else:
             gi=self.world.identifyGraphIndex(x,y)
         if x==-1 and y==-1:
-            x,y=self.area.window.get_size()
+            x,y=self.area.get_allocated_width(),self.area.get_allocated_height()
             x/=2
             y/=2
 #    print "gi",gi
@@ -378,6 +380,8 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
 
     def resizeCallback(self,x,y):
 #    print "resizeCallback(%d,%d)"%(x,y)
+        if self.world is None:
+            return
         flag=0
         if self.world.page_size_x!=x:
             flag=1
@@ -392,6 +396,8 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
         x,y=self.area_drawable().get_size()
 #    print "updateSize(%d,%d)"%(x,y)
         s=self.area
+        if self.world is None:
+            return
         flag=0
         if self.world.page_size_x!=x:
             flag=1
@@ -414,7 +420,7 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
         self.point=event.x,event.y
         self.onOverCallback(self,event.x,event.y)
     def onClickCallback(self,canvas,x,y,button=1):
-        print(("onClickCallback",x,y,button))
+
         if button==4:
             self.zoomAtPoint(x,y,1.0/1.2)
         elif button==5:
@@ -423,7 +429,7 @@ class GraphCanvas(piddleGTK2p4.InteractiveCanvas):
             self.onOverCallback(self,x,y,button)
 
     def onOverCallback(self,canvas,x,y,button=0):
-        print(("onOverCallback",x,y,button))
+
         if (self.selected_begin is None) and (button==1):
             self.selected_begin=(x,y)
 
@@ -511,7 +517,7 @@ class GraphCanvasWindow(GraphCanvas):
 #    print "GRAPH CANVAS WINDOW"
 #    self.top.set_events(gtk.gdk.ALL_EVENTS_MASK)
 #    self.area.set_events(gtk.gdk.ALL_EVENTS_MASK)
-#    self.area.window.set_events(gtk.gdk.ALL_EVENTS_MASK)
+#    self.area.get_window().set_events(gtk.gdk.ALL_EVENTS_MASK)
         self.export=Export(world,graphdata)
         self.xml.signal_connect("close_window",  self._close_window_handler)
         self.xml.signal_connect("hide_window",   self._hide_window_handler)

@@ -27,7 +27,7 @@ from p4vasp.SystemPM import *
 from p4vasp.applet.Applet import *
 import p4vasp.sellang
 from string import *
-import gtk
+from p4vasp import gtk3 as gtk
 from p4vasp.graph import *
 from p4vasp.GraphPM import *
 from p4vasp.setutils import *

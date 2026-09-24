@@ -26,8 +26,8 @@ from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.Structure import *
 from p4vasp.SystemPM import *
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
 
 
 class MultiplyCellApplet(Applet):

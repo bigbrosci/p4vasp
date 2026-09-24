@@ -83,50 +83,17 @@ for x in ["P4VASP_HOME","PYTHONPATH","PYTHONHOME"]:
 
 
 
-def get_pygtk():
-  print("""You need to get version 2.x of PyGTK for this to work.
-Usually it is located in a python-gtk or python-pygtk package.
-You can get source code from http://www.pygtk.org """)
-  raise SystemExit
-
-
-
 try:
-  import pygtk
-  pygtk.require("2.0")
-except ImportError:
-  try:
-    import gtk
-  except ImportError:
-    get_pygtk()
-  if not hasattr(gtk, "Window"): # renamed in version 2.0
-    get_pygtk()
-  try:
-    import gtk.gdk
-  except ImportError:
-    print("""Your python-gtk instalation is not complete.
-Though the gtk seems to be working, the gtk.gdk is missing.
-You can get complete source code from http://www.pygtk.org
-""")
-  try:
-    import gtk.glade
-  except ImportError:
-    print("""Your python-gtk instalation is not complete.
-Though the gtk seems to be working, the gtk.glade is missing.
-Try to find the corresponding package.
-You can get complete source code from http://www.pygtk.org
-""")
-  try:
-    import pango
-  except ImportError:
-    print("""Your python-gtk instalation is not complete.
-Though the gtk seems to be working, the pango is missing.
-Try to find the corresponding package.
-You can get complete source code from http://www.pygtk.org
-""")
-
-except AssertionError:
-  get_pygtk()
+  import gi
+  gi.require_version("Gtk", "3.0")
+  gi.require_foreign("cairo")
+  from gi.repository import Gtk, Gdk, Pango, PangoCairo
+  import cairo
+  print("GTK %s.%s.%s (PyGObject/Cairo)" % (Gtk.get_major_version(), Gtk.get_minor_version(), Gtk.get_micro_version()))
+except (ImportError, ValueError) as error:
+  print("GTK3 GUI dependencies are missing: %s" % error)
+  print("Ubuntu/Debian: install python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0")
+  raise SystemExit(1)
 
 print()
 s="/usr/include/python/Python.h"

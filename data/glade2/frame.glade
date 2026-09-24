@@ -253,6 +253,21 @@
 		</packing>
 	      </child>
 
+              <child>
+                <widget class="GtkToolButton" id="astart p4vasp.applet.IncarApplet.IncarApplet">
+                  <property name="visible">True</property>
+                  <property name="label">INCAR</property>
+                  <property name="tooltip">Generate an INCAR file using Q-robot presets and the loaded geometry</property>
+                  <property name="stock_id">gtk-edit</property>
+                  <property name="visible_horizontal">True</property>
+                  <property name="visible_vertical">True</property>
+                </widget>
+                <packing>
+                  <property name="expand">False</property>
+                  <property name="homogeneous">True</property>
+                </packing>
+              </child>
+
 	      <child>
 		<widget class="GtkToolButton" id="astart p4vasp.applet.ElectronicApplet.ElectronicApplet">
 		  <property name="visible">True</property>

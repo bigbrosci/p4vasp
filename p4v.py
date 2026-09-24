@@ -4,29 +4,20 @@
 
 
 
-def get_gtk():
-    print("""You need to get version 2.0 (or later) of PyGTK for this to work. You
-             can get source code from http://www.pygtk.org """)
-    raise SystemExit
-
+# GTK3 is the only supported GUI runtime.
 try:
-    import pygtk
-    pygtk.require("2.0")
-except ImportError:
-    try:
-        import gtk
-        import gobject
-    except ImportError:
-        get_gtk()
-    if not hasattr(gtk, "Window"): # renamed in version 2.0
-        get_gtk()
-except AssertionError:
-    get_gtk()
+    import gi
+    gi.require_version("Gtk", "3.0")
+    gi.require_foreign("cairo")
+except (ImportError, ValueError) as error:
+    raise SystemExit("GTK3/PyGObject with Cairo is required. On Ubuntu/Debian run: "
+                     "sudo apt-get install python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0\n"
+                     + str(error))
 
 import sys
 from p4vasp import *
 from   p4vasp.SystemPM import *
-import p4vasp.piddle.piddleGTK2p4 as piddleGTK2p4
+import p4vasp.piddle.piddleGTK3 as piddleGTK3
 #import p4vasp.GraphPM
 from   p4vasp.setupstore import * # dead module
 import p4vasp.util
@@ -38,8 +29,8 @@ from   p4vasp.applet import *
 #from   p4vasp.applet.AppletTree import *
 #import p4vasp.repository as repository
 from   p4vasp.applet.SelectionApplet import *
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
 import os.path
 import os
 import time

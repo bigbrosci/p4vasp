@@ -29,7 +29,7 @@ from p4vasp.setutils import *
 from p4vasp.graph import *
 import time
 
-import gtk
+from p4vasp import gtk3 as gtk
 
 
 orbitals  =list(map(intern,["s","px","py","pz","dxy","dyz","dxz","dz2","dx2",

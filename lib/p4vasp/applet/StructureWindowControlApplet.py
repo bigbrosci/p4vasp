@@ -21,8 +21,8 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
 from p4vasp import *
 from p4vasp.graph import *
 from p4vasp.store import *
@@ -453,7 +453,7 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
     def on_play_clicked_handler(self,w):
         index=self.getSWinApplet().index
         self.play_flag=1
-        self.play_id=gtk.timeout_add(200,self.play_callback)
+        self.play_id=gobject.timeout_add(200,self.play_callback)
 
     def play_callback(self):
         index=self.getSWinApplet().index

@@ -26,8 +26,8 @@ from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.Structure import *
 from p4vasp.SystemPM import *
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
 
 
 class NewApplet(Applet):
@@ -112,7 +112,7 @@ class NewApplet(Applet):
             buff=self.description_textview.get_buffer()
             start=buff.get_start_iter()
             end=buff.get_end_iter()
-            self.creation.DESCRIPTION=str(buff.get_text(start,end))
+            self.creation.DESCRIPTION=str(buff.get_text(start,end,True))
             try:
                 n=int(se)
                 try:

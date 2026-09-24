@@ -27,9 +27,9 @@ from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.Structure import *
 from p4vasp.SystemPM import *
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 from p4vasp.Selection import selection, SelectionListener
 
 class DistanceTreeModel(gtk.GenericTreeModel):

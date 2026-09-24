@@ -473,8 +473,7 @@ class GraphApplet(Applet):
 
         self.xml.signal_connect("open_external_window",self._open_external_window_handler)
         self.graph_area=self.xml.get_widget("graph")
-        if self.graph_area is not None:
-            self.graph_area.connect("motion-notify-event",self._canvas_motion_notify_handler)
+        # The GTK3 canvas installs its own drawing-area event handlers.
 #    print "initUI end"
 
     def _open_external_window_handler(self,*arg):
@@ -533,7 +532,7 @@ class GraphApplet(Applet):
 
     def _canvas_motion_notify_handler(self,*arg):
         if self.canvas is not None:
-            return self.canvas._motion_notify_handler(*arg)
+            return self.canvas._event(*arg)
 
     def show(self):
         if self.window_canvas is not None:

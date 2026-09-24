@@ -25,9 +25,9 @@ from p4vasp.util import ParseException
 from p4vasp import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 
 
 class InfoApplet(Applet):

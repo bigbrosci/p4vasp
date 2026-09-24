@@ -28,9 +28,9 @@ from p4vasp.applet.Applet import *
 from p4vasp.Structure import *
 from p4vasp.SystemPM import *
 import p4vasp.Selection
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 
 class StructureTreeModel(gtk.GenericTreeModel):
     def __init__(self,a):
@@ -107,7 +107,7 @@ class StructureTreeModel(gtk.GenericTreeModel):
     def on_iter_children(self, node):
         '''returns the first child of this node'''
         if node == None: # top of tree
-            return 0
+            return 0 if self.getStructure() is not None and len(self.getStructure()) else None
         return None
     def on_iter_has_child(self, node):
         '''returns true if this node has children'''
@@ -274,6 +274,7 @@ class BuilderApplet(Applet):#p4vasp.Selection.SelectionListener
         if s:
             if s.isSelective():
                 s.selective[int(path)][column]=not s.selective[int(path)][column]
+                systemlist().notifySystemChanged()
 
     def make_treeview(self,model,view):
         # Create the view itself.

@@ -94,3 +94,15 @@ Then reload the shell:
 
     source ~/.bashrc
 
+
+GTK3 GUI runtime
+--------------------------
+
+The GUI now uses GTK3/PyGObject and Cairo. On Ubuntu/Debian, existing installations
+may need the Cairo bridge package:
+
+```bash
+sudo apt-get install python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0
+```
+
+See [GTK3 migration and verification](doc/GTK3-migration.md) for details and GUI tests.

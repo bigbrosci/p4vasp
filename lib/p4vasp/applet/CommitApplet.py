@@ -30,9 +30,9 @@ from p4vasp.SystemPM import *
 from p4vasp.SQLSystemPM import *
 from p4vasp.db import *
 import p4vasp.Selection
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 
 
 class CommitApplet(Applet):
@@ -117,7 +117,7 @@ class CommitApplet(Applet):
         buff=self.description_textview.get_buffer()
         start=buff.get_start_iter()
         end=buff.get_end_iter()
-        description=str(buff.get_text(start,end))
+        description=str(buff.get_text(start,end,True))
 
         date=self.date_entry.get_text()
 

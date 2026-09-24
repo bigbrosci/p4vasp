@@ -231,6 +231,7 @@ PYTHONPATH="$LIB_DIR${PYTHONPATH:+:$PYTHONPATH}" P4VASP_HOME="$ROOT" \
     "$PYTHON" - <<'PY'
 import gi
 gi.require_version("Gtk", "3.0")
+gi.require_foreign("cairo")
 from gi.repository import Gtk
 import _cp4vasp
 import p4vasp

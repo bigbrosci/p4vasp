@@ -72,7 +72,7 @@ class SelectionApplet(p4vasp.applet.Applet.Applet,SelectionListener):
         selection().notify(self)
 
     def getSelectionText(self):
-        return self.entry.get_text(sel)
+        return self.entry.get_text()
 
     def notifyAtomSelection(self,sel,origin):
 #    print "notifyAtomSelection",sel.encodeSimple()

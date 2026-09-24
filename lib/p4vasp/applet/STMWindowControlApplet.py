@@ -21,8 +21,9 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-import gtk
-import gobject
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from math import exp, log, pi, sqrt
 from p4vasp import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
@@ -77,13 +78,13 @@ class STMWindowControlApplet(Applet):
 
             sd=a.sd
             if sd is not None:
-                self.csadj1.value=float(sd.n1)
-                self.csadj2.value=float(sd.n2)
+                self.csadj1.set_value(float(sd.n1))
+                self.csadj2.set_value(float(sd.n2))
             self.updatemode()
 #      if self.getMode()==0:
-#        self.psadj.set_all(a.n,0,a.getMaxN(),1,0,0)
+#        self.psadj.configure(a.n,0,a.getMaxN(),1,0,0)
 #      else:
-#        self.psadj.set_all(a.n,0,1000,1,0,0)
+#        self.psadj.configure(a.n,0,1000,1,0,0)
 
     def initUI(self):
         self.xml.get_widget("toolbar1").set_style(gtk.TOOLBAR_ICONS)
@@ -103,7 +104,7 @@ class STMWindowControlApplet(Applet):
         self.psadj.connect("value-changed",self.on_pos_scale_changed)
 
         applets().notify_on_activate.append(self.applet_activated)
-        self.swin()
+        self.applet_activated(None, self.swin())
 
     def getSWinApplet(self):
         return applets().getActive(p4vasp.applet.STMWindowApplet.STMWindowApplet)
@@ -141,16 +142,18 @@ class STMWindowControlApplet(Applet):
         w=self.swin()
         sd=w.sd
         if sd is not None:
-            sd.n1=int(self.csadj1.value)
-            sd.n2=int(self.csadj2.value)
+            sd.n1=int(self.csadj1.get_value())
+            sd.n2=int(self.csadj2.get_value())
             w.updateOrigin()
             w.redraw()
     def on_pos_scale_changed(self,*arg):
         w=self.swin()
-        val=self.psadj.value
+        val=self.psadj.get_value()
+        if not self.getMode() and not w.getMaxN():
+            return
         if self.getMode()==0:
-            w.setN(int(self.psadj.value))
-            x=self.psadj.value*w.getMaxPos()/w.getMaxN()
+            w.setN(int(self.psadj.get_value()))
+            x=self.psadj.get_value()*w.getMaxPos()/w.getMaxN()
             self.xml.get_widget("pos_entry").set_text(str(x))
             w.updatePlane()
         else:
@@ -159,8 +162,8 @@ class STMWindowControlApplet(Applet):
                 Min=c.getMinimum()
                 Max=c.getMaximum()
                 sigma=c.getSigma()
-#        x=0.0001*sigma*self.psadj.value
-                x=sigma*exp(-0.15*self.psadj.value)
+#        x=0.0001*sigma*self.psadj.get_value()
+                x=sigma*exp(-0.15*self.psadj.get_value())
                 w.value=x
                 self.xml.get_widget("pos_entry").set_text(str(x))
                 w.updatePlane()
@@ -310,11 +313,11 @@ class STMWindowControlApplet(Applet):
         w=self.swin()
         if (m):
             c=w.getCharge()
-            self.psadj.set_all(self.psadj.value,0,100,1,0,0)
+            self.psadj.configure(self.psadj.get_value(),0,100,1,0,0)
             self.xml.get_widget("poslabel").set_text("Isos. density:")
             w.mode=1
         else:
-            self.psadj.set_all(w.n,0,w.getMaxN(),1,0,0)
+            self.psadj.configure(w.n,0,w.getMaxN(),1,0,0)
             self.xml.get_widget("poslabel").set_text("Tip position:")
             w.mode=0
 

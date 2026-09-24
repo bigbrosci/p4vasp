@@ -28,9 +28,9 @@ from p4vasp.applet.Applet import *
 from p4vasp.Structure import *
 from p4vasp.SystemPM import *
 import p4vasp.Selection
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 from p4vasp.Dyna import Dyna,dynaPublisher
 
 class KPathTreeModel(gtk.GenericTreeModel):
@@ -86,7 +86,7 @@ class KPathTreeModel(gtk.GenericTreeModel):
     def on_iter_children(self, node):
         '''returns the first child of this node'''
         if node == None: # top of tree
-            return 0
+            return 0 if len(self.dyna.segments) else None
         return None
     def on_iter_has_child(self, node):
         '''returns true if this node has children'''
@@ -183,10 +183,10 @@ class PhononApplet(Applet):
     def edited_h(self,renderer,path,txt,model,column):
         value = txt
         row=int(path)
-        if column==0:
-            self.model.dyna.labels[row][0]=value
-        if column==4:
-            self.model.dyna.labels[row][1]=value
+        if column in (0,4):
+            labels=list(self.model.dyna.labels[row])
+            labels[0 if column==0 else 1]=value
+            self.model.dyna.labels[row]=tuple(labels)
         if column in (1,2,3):
             value= float(value.replace(",","."))
             newpoint=Vector(self.model.dyna.segments[row][0])

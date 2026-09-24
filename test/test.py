@@ -11,6 +11,7 @@ import testStructure
 import testSelection
 import testAtominfo
 import testDyna
+import testIncarGenerator
 
 if __name__ == '__main__':
     suite_list=[]
@@ -24,5 +25,6 @@ if __name__ == '__main__':
     suite_list.append(unittest.TestLoader().loadTestsFromModule(testSelection))
     suite_list.append(unittest.TestLoader().loadTestsFromModule(testAtominfo))
     suite_list.append(unittest.TestLoader().loadTestsFromModule(testDyna))
+    suite_list.append(unittest.TestLoader().loadTestsFromModule(testIncarGenerator))
     suite=unittest.TestSuite(suite_list)
     unittest.TextTestRunner().run(suite)

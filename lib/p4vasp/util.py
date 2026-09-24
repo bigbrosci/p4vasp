@@ -491,13 +491,13 @@ def loadGlade_old(path,name=None):
         return libglade.GladeXML(path,name)
 
 def loadGlade(path,name=None):
-    import gtk.glade
+    from p4vasp.gtk3 import glade
     import os
     path=p4vasp_home+"%sdata%sglade2%s%s"%(os.sep,os.sep,os.sep,path)
     if name is None:
-        return gtk.glade.XML(path)
+        return glade.XML(path)
     else:
-        return gtk.glade.XML(path,name)
+        return glade.XML(path,name)
 
 def getPathChain():
     import os.path

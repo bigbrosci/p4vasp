@@ -5,6 +5,7 @@ def appletlist():
     'p4vasp.applet.StructureWindowApplet.StructureWindowApplet',
     'p4vasp.applet.CommitApplet.CommitApplet',
     'p4vasp.applet.BuilderApplet.BuilderApplet',
+    'p4vasp.applet.IncarApplet.IncarApplet',
     'p4vasp.applet.DBApplet.DBApplet',
     'p4vasp.applet.EnergyConvergenceApplet.EnergyConvergenceApplet',
     'p4vasp.applet.StructureWindowControlApplet.StructureWindowControlApplet',

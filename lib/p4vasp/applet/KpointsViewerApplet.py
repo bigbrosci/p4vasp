@@ -54,6 +54,9 @@ class KpointsViewerApplet(Applet,DynaListener):
         self.updateSystem()
         return 0
 
+    def createPanel(self):
+        return None
+
     def setExternalMode(self):
         pass
     def setEmbeddedMode(self):

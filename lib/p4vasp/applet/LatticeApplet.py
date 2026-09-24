@@ -27,9 +27,9 @@ from p4vasp.matrix import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.SystemPM import *
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 from math import *
 
 class LatticeApplet(Applet):
@@ -75,23 +75,21 @@ class LatticeApplet(Applet):
             self.toCubic()
 
     def on_parameter_updated_handler(self,*arg):
-        print(("on_parameter_updated",self.allow_parameters_update,self.allow_cell_update))
         if self.allow_parameters_update:
             self.allow_parameters_update=False
-            print("self.allow_parameters_update=False [[[")
-            self.fixParameters()
-            self.updateCell()
-            self.allow_parameters_update=True
-            print("self.allow_parameters_update=True  ]]]")
+            try:
+                self.fixParameters()
+                self.updateCell()
+            finally:
+                self.allow_parameters_update=True
 
     def on_cell_updated_handler(self,*arg):
         if self.allow_cell_update:
-            print(("on_cell_updated_handler",self.allow_cell_update,self.allow_parameters_update))
             self.allow_cell_update=False
-            print("self.allow_cell_update=False       [[[")
-            self.updateParameters()
-            self.allow_cell_update=True
-            print("self.allow_cell_update=True        ]]]")
+            try:
+                self.updateParameters()
+            finally:
+                self.allow_cell_update=True
 
     def on_apply_button_clicked_handler(self,*arg):
         b1,b2,b3 = self.getCell()
@@ -227,21 +225,20 @@ class LatticeApplet(Applet):
     def updateSystem(self,x=None):
         if not self.in_apply:
             s=self.getCurrentStructure()
-            self.setBasis(s.basis)
-            self.updateParameters()
+            if s is not None and self.xml is not None:
+                self.setBasis(s.basis)
+                self.updateParameters()
 
     def setBasis(self,basis):
-        print("setBasis")
-        s=self.getCurrentStructure()
-        self.widgets.a11.set_text("%17.15f"%(basis[0][0]))
-        self.widgets.a12.set_text("%17.15f"%(basis[0][1]))
-        self.widgets.a13.set_text("%17.15f"%(basis[0][2]))
-        self.widgets.a21.set_text("%17.15f"%(basis[1][0]))
-        self.widgets.a22.set_text("%17.15f"%(basis[1][1]))
-        self.widgets.a23.set_text("%17.15f"%(basis[1][2]))
-        self.widgets.a31.set_text("%17.15f"%(basis[2][0]))
-        self.widgets.a32.set_text("%17.15f"%(basis[2][1]))
-        self.widgets.a33.set_text("%17.15f"%(basis[2][2]))
+        previous=self.allow_cell_update
+        self.allow_cell_update=False
+        try:
+            for i in range(3):
+                for j in range(3):
+                    self.xml.get_widget("a%d%d"%(i+1,j+1)).set_text("%17.15f"%basis[i][j])
+        finally:
+            self.allow_cell_update=previous
+
     def getCurrentStructure(self):
         s=getCurrentSystemPM()
         if s is not None:
@@ -252,20 +249,20 @@ class LatticeApplet(Applet):
         b3=Vector(self.getValue("a31"),self.getValue("a32"),self.getValue("a33"))
         return (b1,b2,b3)
     def updateParameters(self):
-        self.widgets.triclinic_radiobutton.set_active(True)
         b1,b2,b3 = self.getCell()
-        a=b1.length()
-        b=b2.length()
-        c=b3.length()
-        alpha=b2.angle(b3)*180/pi
-        beta=b3.angle(b1)*180/pi
-        gamma=b1.angle(b2)*180/pi
-        self.widgets.a_entry.set_text(str(a))
-        self.widgets.b_entry.set_text(str(b))
-        self.widgets.c_entry.set_text(str(c))
-        self.widgets.alpha_entry.set_text(str(alpha))
-        self.widgets.beta_entry.set_text(str(beta))
-        self.widgets.gamma_entry.set_text(str(gamma))
+        a,b,c = b1.length(),b2.length(),b3.length()
+        if min(a,b,c) == 0:
+            return  # A cell entry can be temporarily empty while typing.
+        previous=self.allow_parameters_update
+        self.allow_parameters_update=False
+        try:
+            self.widgets.triclinic_radiobutton.set_active(True)
+            values=(a,b,c,b2.angle(b3)*180/pi,b3.angle(b1)*180/pi,b1.angle(b2)*180/pi)
+            for name,value in zip(("a","b","c","alpha","beta","gamma"),values):
+                self.xml.get_widget(name+"_entry").set_text(str(value))
+        finally:
+            self.allow_parameters_update=previous
+
     def initUI(self):
         pass
 

@@ -31,9 +31,9 @@ from p4vasp.StructureWindow import *
 from p4vasp.util import getAtomtypes
 import p4vasp.applet.StructureWindowApplet
 
-import gtk
-import gobject
-import pango
+from p4vasp import gtk3 as gtk
+from p4vasp.gtk3 import gobject
+from p4vasp.gtk3 import pango
 
 from p4vasp.paint3d.PovrayPaint3D import *
 
@@ -111,8 +111,8 @@ class ExportApplet(Applet):
 
     def select_cb(self, *arg):
         d=gtk.FileChooserDialog(title="File to export to", parent=None,
-            action=gtk.FILE_CHOOSER_ACTION_SAVE,
-            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK), backend=None)
+            action=gtk.FileChooserAction.SAVE,
+            buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OK, gtk.RESPONSE_OK), use_header_bar=False)
         response=d.run()
         if response == gtk.RESPONSE_OK:
             self.fileentry.set_text(d.get_filename())

@@ -21,7 +21,7 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-import gtk
+from p4vasp import gtk3 as gtk
 from p4vasp import *
 from p4vasp.graph import *
 from p4vasp.store import *
