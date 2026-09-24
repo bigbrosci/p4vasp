@@ -1,0 +1,15 @@
+	      <child>
+		<widget class="GtkToolButton" id="astart p4vasp.applet.NewApplet.NewApplet">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes">New</property>
+		  <property name="use_underline">True</property>
+		  <property name="stock_id">gtk-new</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		</widget>
+		<packing>
+		  <property name="expand">False</property>
+		  <property name="homogeneous">True</property>
+		</packing>
+	      </child>
