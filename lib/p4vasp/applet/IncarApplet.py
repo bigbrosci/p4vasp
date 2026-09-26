@@ -74,7 +74,7 @@ class IncarApplet(Applet):
             sections.pack_start(check, False, False, 0)
         frame.add(sections)
         choices.pack_start(frame, False, False, 0)
-        choices.pack_start(self.label("MAGMOM reads the open POSCAR and starts each moment at zero. Edit values using Custom parameters."), False, False, 0)
+        choices.pack_start(self.label("Reads the open POSCAR; MAGMOM/UJ values use data/incar/presets.json."), False, False, 0)
         columns.pack1(self.scrolled(choices), resize=False, shrink=False)
 
         editor = gtk.Box(orientation=gtk.Orientation.VERTICAL, spacing=6)
