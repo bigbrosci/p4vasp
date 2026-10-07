@@ -271,7 +271,9 @@ class MoveApplet(Applet):
                     if i>=0 and i<len(s):
                         l.append((s.speciesIndex(i),s[i]+v))
                 for i,v in l:
-                    s.appendAtom(i,v)
+                    index=s.appendAtom(i,v)
+                    if s.isSelective():
+                        s.selective[index]=[True,True,True]
 
                 msg().status("OK")
                 systemlist().notifySystemChanged()
