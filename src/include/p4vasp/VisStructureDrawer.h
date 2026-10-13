@@ -37,6 +37,11 @@ class AtomId{
 
 
 class VisStructureDrawer : public VisPrimitiveDrawer{
+  bool box_active, box_cancelled, box_projection_valid;
+  int box_x0, box_y0, box_x1, box_y1, box_width, box_height;
+  GLdouble box_model[16], box_projection[16];
+  GLint box_viewport[4];
+  void selectBox();
   long   bondcount;
   int    *bondindex;
   double *bondvec;
@@ -119,7 +124,9 @@ class VisStructureDrawer : public VisPrimitiveDrawer{
 #ifndef SWIG    
   virtual void init();  	    
   virtual void draw();  	    
-  virtual int  handle(int event);    
+  virtual int  handle(int event);
+  int handleBoxSelection(int event);
+  void drawBoxSelection();
 #endif  
   virtual ~VisStructureDrawer();
 

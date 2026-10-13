@@ -65,3 +65,19 @@ context when no valid context”. This is an unresolved GLUT/OpenGL context issu
 not a GTK2 dependency. The default GTK smoke suite excludes this renderer explicitly.
 
 Migration reference: [GTK's GTK2-to-GTK3 migration guide](https://docs.gtk.org/gtk3/migrating-2to3.html).
+
+## Native structure selection regression
+
+After rebuilding the native extension, the Shift + left-drag selection check
+can be run separately with a working display:
+
+```bash
+/usr/bin/python3 test/run_box_selection.py
+```
+
+It compiles a native test using the build's object files and exercises synthetic
+FLTK events against an actual OpenGL structure window. It requires g++,
+fltk-config and Python development libraries. It checks additive rectangle
+selection, periodic images, hidden/occluded atoms, cancellation, camera views,
+and legacy Space/rotation controls. It does not use the separate GLUT viewer
+or validate scientific calculations.

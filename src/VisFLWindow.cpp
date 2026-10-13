@@ -152,8 +152,8 @@ int VisFLWindow::handle(int event){
 
     win->local_unlock();
     
-    if (!win->handle(event)){
-      return Fl_Gl_Window::handle(event);
+    if (win->handle(event)){
+      return 1; // In particular, consumed Escape must not reach window shortcuts.
     }
   }
   return Fl_Gl_Window::handle(event);

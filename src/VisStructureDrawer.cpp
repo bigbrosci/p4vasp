@@ -23,6 +23,10 @@
 #include <p4vasp/VisWindow.h>
 #include <p4vasp/VisStructureDrawer.h>
 #include <math.h>
+#include <algorithm>
+#include <set>
+#include <tuple>
+#include <FL/Fl.H>
 #include <FL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
@@ -39,6 +43,9 @@ AtomId::AtomId(){
 const char *VisStructureDrawer::getClassName(){return "VisStructureDrawer";}
 
 VisStructureDrawer::VisStructureDrawer():VisPrimitiveDrawer(){
+  box_active=false;
+  box_cancelled=false;
+  box_projection_valid=false;
   MUTEX_INIT(select_mutex);
   MUTEX_INIT(structure_mutex);
 #if (!defined(NO_GL_LISTS)) && (!defined(NO_GL_LISTS_S))
@@ -193,6 +200,12 @@ void VisStructureDrawer::draw(){
 #endif
 
   structureLock();
+  // Cache this drawer's transforms while its own GL context is current.
+  // Event handlers must not read another window's current GL matrices.
+  glGetDoublev(GL_MODELVIEW_MATRIX,box_model);
+  glGetDoublev(GL_PROJECTION_MATRIX,box_projection);
+  glGetIntegerv(GL_VIEWPORT,box_viewport);
+  box_projection_valid=true;
 #if VERBOSE>0
   printf("VisStructureDrawer::draw()\n");
 #endif
@@ -242,6 +255,124 @@ void VisStructureDrawer::draw(){
   printf("structure unlock in VisStructureDrawer::draw()\n");
 #endif
   structureUnlock();
+}
+
+// Called before the navigation drawer consumes mouse drags.
+int VisStructureDrawer::handleBoxSelection(int event){
+  if (event==FL_PUSH && getMouseButton()==FL_LEFT_MOUSE &&
+      (Fl::event_state()&FL_SHIFT)){
+    box_active=true;
+    box_cancelled=false;
+    box_x0=box_x1=getMouseX();
+    box_y0=box_y1=getMouseY();
+    box_width=getWidth();
+    box_height=getHeight();
+    return 1;
+  }
+  if (!box_active) return 0;
+  if (event==FL_UNFOCUS || event==FL_HIDE){
+    box_active=false;
+    return 1;
+  }
+  if (getWidth()!=box_width || getHeight()!=box_height ||
+      (event==FL_KEYBOARD && getKey()==FL_Escape)){
+    // Consume the rest of the gesture after cancellation, without rotating.
+    box_cancelled=true;
+  }
+  if (event==FL_DRAG || event==FL_RELEASE){
+    box_x1=getMouseX();
+    box_y1=getMouseY();
+    if (event==FL_RELEASE && getMouseButton()==FL_LEFT_MOUSE){
+      if (!box_cancelled && box_projection_valid &&
+          abs(box_x1-box_x0)>=3 && abs(box_y1-box_y0)>=3) selectBox();
+      box_active=false;
+    }
+    return 1;
+  }
+  // Do not change the selection or camera halfway through a box gesture.
+  return event==FL_PUSH || event==FL_KEYBOARD || event==FL_KEYUP;
+}
+
+void VisStructureDrawer::selectBox(){
+  structureLock();
+  if (structure==NULL || getWidth()<=0 || getHeight()<=0 ||
+      box_viewport[2]<=0 || box_viewport[3]<=0){
+    structureUnlock();
+    return;
+  }
+  const double left=std::min(box_x0,box_x1);
+  const double right=std::max(box_x0,box_x1);
+  const double top=std::min(box_y0,box_y1);
+  const double bottom=std::max(box_y0,box_y1);
+  selectLock();
+  std::set<std::tuple<int,int,int,int> > selected;
+  for (int i=0;i<select_count;i++){
+    const AtomId &a=select_buffer[i];
+    selected.insert(std::make_tuple(a.atom,a.nx,a.ny,a.nz));
+  }
+  int added=-1, ax=0, ay=0, az=0;
+  for (int ix=0;ix<nx;ix++) for (int iy=0;iy<ny;iy++) for (int iz=0;iz<nz;iz++){
+    for (int atom=0;atom<structure->len();atom++){
+      if (info->getRecord(atom)->hidden) continue;
+      double position[3];
+      copy3(position,structure->get(atom));
+      add3(position,ix-nx/2,structure->basis1);
+      add3(position,iy-ny/2,structure->basis2);
+      add3(position,iz-nz/2,structure->basis3);
+      GLdouble x,y,z;
+      if (!gluProject(position[0],position[1],position[2],box_model,
+                      box_projection,box_viewport,&x,&y,&z)) continue;
+      if (z<0.0 || z>1.0) continue;
+      // Convert framebuffer coordinates to FLTK logical window coordinates.
+      x=(x-box_viewport[0])*getWidth()/box_viewport[2];
+      y=getHeight()-(y-box_viewport[1])*getHeight()/box_viewport[3];
+      if (x<0 || x>getWidth() || y<0 || y>getHeight()) continue;
+      if (x>=left && x<=right && y>=top && y<=bottom &&
+          selected.insert(std::make_tuple(atom,ix,iy,iz)).second){
+        appendSelected_nolock(atom,ix,iy,iz);
+        added=atom; ax=ix; ay=iy; az=iz;
+      }
+    }
+  }
+  selectUnlock();
+  // Python reads the complete selection on notification: one event per box.
+  if (added>=0) notifySelected(added,ax,ay,az);
+  structureUnlock();
+}
+
+void VisStructureDrawer::drawBoxSelection(){
+  if (!box_active || box_cancelled || getWidth()<=0 || getHeight()<=0) return;
+  if (getWidth()!=box_width || getHeight()!=box_height){
+    box_cancelled=true;
+    return;
+  }
+  GLint mode;
+  glGetIntegerv(GL_MATRIX_MODE,&mode);
+  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_LINE_BIT|GL_DEPTH_BUFFER_BIT);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_TEXTURE_2D);
+  glDisable(GL_LINE_STIPPLE);
+  glDisable(GL_LINE_SMOOTH);
+  glDisable(GL_BLEND);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix(); glLoadIdentity();
+  glOrtho(0,getWidth(),getHeight(),0,-1,1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix(); glLoadIdentity();
+  // Dark outer stroke and bright inner stroke remain visible on any background.
+  for (int pass=0;pass<2;pass++){
+    glLineWidth(pass ? 1.0f : 3.0f);
+    if (pass) glColor3f(0.2f,0.8f,1.0f); else glColor3f(0.05f,0.05f,0.05f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2i(box_x0,box_y0); glVertex2i(box_x1,box_y0);
+    glVertex2i(box_x1,box_y1); glVertex2i(box_x0,box_y1);
+    glEnd();
+  }
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION); glPopMatrix();
+  glMatrixMode(mode);
+  glPopAttrib();
 }
 
 int VisStructureDrawer::handle(int event){
@@ -445,6 +576,8 @@ void VisStructureDrawer::updateStructure(){
 }
 
 void VisStructureDrawer::setStructure(Structure *s){
+  box_cancelled=true;
+  box_projection_valid=false;
 #if VERBOSE>0
   printf("VisStructureDrawer::setStructure()\n");
 #endif

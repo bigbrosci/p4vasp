@@ -20,6 +20,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <p4vasp/VisStructureDrawer.h>
 #include <stdio.h>
 #include <FL/gl.h>
 
@@ -454,6 +455,11 @@ void VisWindow::draw(){
     glShadeModel(GL_SMOOTH);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
   }
+  // Draw the selection rectangle last, above atoms, arrows and isosurfaces.
+  for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
+    VisStructureDrawer *structure=dynamic_cast<VisStructureDrawer *>(d);
+    if (structure) structure->drawBoxSelection();
+  }
   glFinish();
   local_unlock();  
 #if VERBOSE>0
@@ -463,6 +469,14 @@ void VisWindow::draw(){
 
 int VisWindow::handle(int event){
   local_lock();
+  for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
+    VisStructureDrawer *structure=dynamic_cast<VisStructureDrawer *>(d);
+    if (structure && structure->handleBoxSelection(event)){
+      local_unlock();
+      redraw();
+      return 1;
+    }
+  }
   for (VisDrawer *d=drawer; d!=NULL; d=d->getNext()){
     int r = d->handle(event);
     if (r) {
