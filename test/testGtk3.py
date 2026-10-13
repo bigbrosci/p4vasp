@@ -120,6 +120,46 @@ class TestGtk3(unittest.TestCase):
         self.assertTrue(applet.allow_cell_update)
         applet.panel.destroy()
 
+    def test_builder_views_stay_exclusive_after_resize_and_show_all(self):
+        from io import StringIO
+        from p4vasp.applet.BuilderApplet import BuilderApplet
+        from p4vasp.Structure import Structure
+        structure = Structure()
+        structure.read(StringIO('H test\n1\n1 0 0\n0 1 0\n0 0 1\nH\n1\nDirect\n0 0 0\n'))
+        applet = BuilderApplet()
+        applet.getCurrentStructure = lambda: structure
+        # Isolate layout from live POSCAR parsing during buffer replacement.
+        applet.textview2struct = lambda: None
+        applet.createPanel()
+        applet.initUI()
+        window = gtk.OffscreenWindow()
+        window.add(applet.panel)
+        try:
+            window.show_all()
+            self.assertTrue(applet.table_button.get_active())
+            self.assertFalse(applet.text_editor.get_visible())
+            for width, height in ((800, 600), (1400, 900), (900, 650)):
+                for text_mode in (True, False):
+                    with self.subTest(size=(width, height), text=text_mode):
+                        button = applet.text_button if text_mode else applet.table_button
+                        button.set_active(True)
+                        window.resize(width, height)
+                        # Frame embedding/refresh uses this recursive call.
+                        window.show_all()
+                        while gtk.events_pending():
+                            gtk.main_iteration()
+                        self.assertEqual(applet.text_editor.get_mapped(), text_mode)
+                        self.assertEqual(applet.table_editor.get_mapped(), not text_mode)
+                        active = applet.text_editor if text_mode else applet.table_editor
+                        self.assertGreater(active.get_allocated_width(), 0)
+                        self.assertGreater(active.get_allocated_height(), 0)
+                        self.assertEqual(applet.textview.get_mapped(), text_mode)
+                        self.assertEqual(applet.treeview.get_mapped(), not text_mode)
+                        self.assertTrue(applet.selective_button.get_mapped())
+                        self.assertIsNotNone(window.get_pixbuf())
+        finally:
+            window.destroy()
+
     def test_legacy_imports_use_gtk3_backend(self):
         import gtk as legacy
         from p4vasp.piddle.piddleGTK2p4 import BasicCanvas as old_canvas
