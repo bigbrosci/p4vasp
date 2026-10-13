@@ -269,7 +269,19 @@ int VisStructureDrawer::handleBoxSelection(int event){
     box_height=getHeight();
     return 1;
   }
-  if (!box_active) return 0;
+  if (!box_active){
+    if (event==FL_KEYBOARD && getKey()==FL_Escape){
+      selectLock();
+      const bool changed=select_count>0;
+      AtomId first;
+      if (changed) first=select_buffer[0];
+      select_count=0;
+      selectUnlock();
+      if (changed) notifyDeselected(first.atom,first.nx,first.ny,first.nz);
+      return 1;
+    }
+    return 0;
+  }
   if (event==FL_UNFOCUS || event==FL_HIDE){
     box_active=false;
     return 1;
@@ -310,7 +322,9 @@ void VisStructureDrawer::selectBox(){
     const AtomId &a=select_buffer[i];
     selected.insert(std::make_tuple(a.atom,a.nx,a.ny,a.nz));
   }
-  int added=-1, ax=0, ay=0, az=0;
+  std::set<std::tuple<int,int,int,int> > removed;
+  int changed=-1, ax=0, ay=0, az=0;
+  bool last_selected=false;
   for (int ix=0;ix<nx;ix++) for (int iy=0;iy<ny;iy++) for (int iz=0;iz<nz;iz++){
     for (int atom=0;atom<structure->len();atom++){
       if (info->getRecord(atom)->hidden) continue;
@@ -327,16 +341,29 @@ void VisStructureDrawer::selectBox(){
       x=(x-box_viewport[0])*getWidth()/box_viewport[2];
       y=getHeight()-(y-box_viewport[1])*getHeight()/box_viewport[3];
       if (x<0 || x>getWidth() || y<0 || y>getHeight()) continue;
-      if (x>=left && x<=right && y>=top && y<=bottom &&
-          selected.insert(std::make_tuple(atom,ix,iy,iz)).second){
-        appendSelected_nolock(atom,ix,iy,iz);
-        added=atom; ax=ix; ay=iy; az=iz;
+      if (x>=left && x<=right && y>=top && y<=bottom){
+        const auto id=std::make_tuple(atom,ix,iy,iz);
+        last_selected=selected.count(id)==0;
+        if (last_selected) appendSelected_nolock(atom,ix,iy,iz);
+        else removed.insert(id);
+        changed=atom; ax=ix; ay=iy; az=iz;
       }
     }
   }
+  // Compact once, retaining selection order without repeated array shifts.
+  int kept=0;
+  for (int i=0;i<select_count;i++){
+    const AtomId a=select_buffer[i];
+    if (!removed.count(std::make_tuple(a.atom,a.nx,a.ny,a.nz)))
+      select_buffer[kept++]=a;
+  }
+  select_count=kept;
   selectUnlock();
-  // Python reads the complete selection on notification: one event per box.
-  if (added>=0) notifySelected(added,ax,ay,az);
+  // Both event types cause Python to reload the complete selection, even empty.
+  if (changed>=0){
+    if (last_selected) notifySelected(changed,ax,ay,az);
+    else notifyDeselected(changed,ax,ay,az);
+  }
   structureUnlock();
 }
 

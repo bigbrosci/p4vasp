@@ -74,8 +74,28 @@ int main(int argc,char **argv){
   assert(notifications==1); // One batch refresh, not one per atom.
   assert(nav.getRotMatElement(0,0)==1.0);
   assert(atoms.findSelectedAtom(1,0,0,0)>=0 && atoms.findSelectedAtom(2,0,0,0)>=0);
-  box(w,325,275,275,225); assert(atoms.getSelectedCount()==2); // reversed, duplicate
-  box(w,175,225,225,275); assert(atoms.getSelectedCount()==3); // additive
+  box(w,325,275,275,225); assert(atoms.getSelectedCount()==0); // reversed, toggle off
+  int deselections=0;
+  while(queue->current()){
+    if(queue->current()->type==BE_DESELECTED) deselections++;
+    queue->pop();
+  }
+  assert(deselections==1); // Empty selection still reaches Python.
+  box(w,275,225,325,275); assert(atoms.getSelectedCount()==2);
+  box(w,175,225,225,275); assert(atoms.getSelectedCount()==3); // outside retained
+  box(w,275,225,425,275); // mixed: center off, right on, left unchanged
+  assert(atoms.getSelectedCount()==2);
+  assert(atoms.findSelectedAtom(0,0,0,0)>=0 && atoms.findSelectedAtom(3,0,0,0)>=0);
+  box(w,0,0,600,500); assert(atoms.getSelectedCount()==2); // now only center pair
+  assert(atoms.findSelectedAtom(1,0,0,0)>=0 && atoms.findSelectedAtom(2,0,0,0)>=0);
+  // Cancelling a gesture must preserve the pre-existing selection.
+  event(w,FL_PUSH,0,0,FL_SHIFT|FL_BUTTON1);
+  event(w,FL_DRAG,600,500,FL_SHIFT|FL_BUTTON1);
+  event(w,FL_KEYBOARD,600,500,0,FL_Escape);
+  event(w,FL_RELEASE,600,500); render(w);
+  assert(atoms.getSelectedCount()==2);
+  event(w,FL_KEYBOARD,300,250,0,FL_Escape);
+  assert(atoms.getSelectedCount()==0 && w.win->shown());
   box(w,0,0,600,500); assert(atoms.getSelectedCount()==4); // hidden excluded
   atoms.removeSelectedAll();
   event(w,FL_PUSH,0,0,FL_SHIFT|FL_BUTTON1);
@@ -85,12 +105,14 @@ int main(int argc,char **argv){
   assert(atoms.getSelectedCount()==0);
   box(w,300,250,301,251); assert(atoms.getSelectedCount()==0); // click jitter
   box(w,10,10,30,30); assert(atoms.getSelectedCount()==0); // empty rectangle
+  box(w,275,225,325,275); assert(atoms.getSelectedCount()==2);
   // FLTK may deliver Escape as a shortcut, even after the mouse is released.
   Fl::e_keysym=FL_Escape; Fl::e_state=0;
   int escape_handled=Fl::handle(FL_SHORTCUT,w.win);
   fprintf(stderr,"Idle Escape: handled=%d visible=%d\n",escape_handled,w.win->shown());
   assert(w.win->shown());
   assert(escape_handled==1);
+  assert(atoms.getSelectedCount()==0);
   event(w,FL_KEYBOARD,300,250,0,FL_Escape);
   Fl::e_keysym=FL_Escape;
   assert(w.win->handle(FL_KEYUP)==1);
@@ -124,6 +146,7 @@ int main(int argc,char **argv){
   // Periodic image identity is retained, with no duplicate additions.
   atoms.setMultiple(2,1,1); render(w);
   box(w,0,0,600,500); assert(atoms.getSelectedCount()==7);
+  box(w,0,0,600,500); assert(atoms.getSelectedCount()==0);
   box(w,0,0,600,500); assert(atoms.getSelectedCount()==7);
   bool image=false;
   for(int i=0;i<atoms.getSelectedCount();i++) if(atoms.getSelected(i)->nx==1) image=true;
@@ -154,7 +177,7 @@ int main(int argc,char **argv){
   // The explicit window close callback still works.
   w.win->do_callback();
   assert(!w.win->shown());
-  puts("PASS: box selection, additive/deduplication, hidden/depth/replicas, Esc, resize, Side view, Space and rotation");
+  puts("PASS: box selection, toggle/mixed selection/clear, hidden/depth/replicas, Esc, resize, Side view, Space and rotation");
   fflush(stdout);
   // Native drawer/window ownership is managed by the app in production.
   _Exit(0);

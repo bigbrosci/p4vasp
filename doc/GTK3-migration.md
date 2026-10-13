@@ -77,7 +77,7 @@ can be run separately with a working display:
 
 It compiles a native test using the build's object files and exercises synthetic
 FLTK events against an actual OpenGL structure window. It requires g++,
-fltk-config and Python development libraries. It checks additive rectangle
-selection, periodic images, hidden/occluded atoms, cancellation, camera views,
+fltk-config and Python development libraries. It checks toggle rectangle
+selection, periodic images, hidden/occluded atoms, idle-Escape clearing, drag cancellation, camera views,
 and legacy Space/rotation controls. It does not use the separate GLUT viewer
 or validate scientific calculations.
