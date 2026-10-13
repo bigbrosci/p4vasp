@@ -85,6 +85,34 @@ int main(int argc,char **argv){
   assert(atoms.getSelectedCount()==0);
   box(w,300,250,301,251); assert(atoms.getSelectedCount()==0); // click jitter
   box(w,10,10,30,30); assert(atoms.getSelectedCount()==0); // empty rectangle
+  // FLTK may deliver Escape as a shortcut, even after the mouse is released.
+  Fl::e_keysym=FL_Escape; Fl::e_state=0;
+  int escape_handled=Fl::handle(FL_SHORTCUT,w.win);
+  fprintf(stderr,"Idle Escape: handled=%d visible=%d\n",escape_handled,w.win->shown());
+  assert(w.win->shown());
+  assert(escape_handled==1);
+  event(w,FL_KEYBOARD,300,250,0,FL_Escape);
+  Fl::e_keysym=FL_Escape;
+  assert(w.win->handle(FL_KEYUP)==1);
+  assert(w.win->shown());
+  while(queue->current()){
+    assert(queue->current()->type!=BE_WIN_CLOSE);
+    queue->pop();
+  }
+  // Shortcut delivery during a drag also cancels; repeated Escape stays safe.
+  event(w,FL_PUSH,0,0,FL_SHIFT|FL_BUTTON1);
+  event(w,FL_DRAG,600,500,FL_SHIFT|FL_BUTTON1);
+  Fl::e_keysym=FL_Escape; Fl::e_state=FL_SHIFT;
+  assert(Fl::handle(FL_SHORTCUT,w.win)==1);
+  event(w,FL_RELEASE,600,500); render(w);
+  assert(atoms.getSelectedCount()==0 && w.win->shown());
+  for(int i=0;i<3;i++){
+    Fl::e_keysym=FL_Escape; Fl::e_state=0;
+    assert(Fl::handle(FL_KEYBOARD,w.win)==1);
+    assert(w.win->shown());
+  }
+  box(w,275,225,325,275); assert(atoms.getSelectedCount()==2);
+  atoms.removeSelectedAll();
   // Space still toggles one atom, and unmodified drag still rotates.
   event(w,FL_KEYBOARD,200,250,0,' '); assert(atoms.getSelectedCount()==1);
   event(w,FL_KEYBOARD,200,250,0,' '); assert(atoms.getSelectedCount()==0);
@@ -119,6 +147,13 @@ int main(int argc,char **argv){
   assert(atoms.getSelectedCount()==0);
   // Empty structures must not select or crash.
   atoms.setStructure(NULL); render(w); box(w,0,0,700,550);
+  // Escape is safe before/after a structure drawer is attached too.
+  w.setDrawer(NULL);
+  Fl::e_keysym=FL_Escape; Fl::e_state=0;
+  assert(Fl::handle(FL_SHORTCUT,w.win)==1 && w.win->shown());
+  // The explicit window close callback still works.
+  w.win->do_callback();
+  assert(!w.win->shown());
   puts("PASS: box selection, additive/deduplication, hidden/depth/replicas, Esc, resize, Side view, Space and rotation");
   fflush(stdout);
   // Native drawer/window ownership is managed by the app in production.

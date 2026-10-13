@@ -114,6 +114,8 @@ void VisFLWindow::draw(){
 }
 
 int VisFLWindow::handle(int event){
+  const bool escape=(Fl::event_key()==FL_Escape &&
+      (event==FL_KEYBOARD || event==FL_SHORTCUT || event==FL_KEYUP));
   if (this->win != NULL){
     win->local_lock();
     win->x=x();
@@ -131,7 +133,7 @@ int VisFLWindow::handle(int event){
     else{
       win->mouse_button=0;
     }
-    if (event==FL_KEYBOARD){
+    if (event==FL_KEYBOARD || (escape && event==FL_SHORTCUT)){
       win->key=Fl::event_key();
     }
     else{
@@ -152,9 +154,14 @@ int VisFLWindow::handle(int event){
 
     win->local_unlock();
     
-    if (win->handle(event)){
+    // Shortcut delivery must cancel a box just like a normal key press.
+    const int drawer_event=(escape && event==FL_SHORTCUT) ? FL_KEYBOARD : event;
+    if (win->handle(drawer_event)){
       return 1; // In particular, consumed Escape must not reach window shortcuts.
     }
   }
+  // FLTK's global shortcut fallback closes the window on unhandled Escape.
+  // Consume it even with no active gesture, no drawer, or on key release.
+  if (escape) return 1;
   return Fl_Gl_Window::handle(event);
 }
