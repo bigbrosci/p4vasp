@@ -58,6 +58,12 @@ Last updated: 2026-10-13. This is a repository navigation and handoff document. 
 
 - `lib/p4vasp/applet/MoveApplet.py`: Copy behavior. Preserve original atom flags and translations; new atoms use T T T only when selective dynamics is enabled.
 
+## Accepted selection workflow
+
+- The user accepted the October 13 interaction: orient the model (often Side view), Shift + left drag to toggle every atom in a region, repeat to toggle back, and press Escape outside a drag to clear the complete selection. Keep Space toggling and ordinary rotation.
+- Do not revert to additive-only box selection: that was the initial October 12 implementation and was explicitly superseded by the user's request.
+- Published commits: `e571b1d` introduced box selection, `5764343` prevented Escape-triggered window closing, and `aaeb737` implemented toggle selection and idle-Escape clearing. The detailed bilingual summary is `update_history/update_2026_10_13.md`.
+
 ## Known unresolved issues
 
 Observed during the October 12 checks; not fixed by the view/logging changes:
