@@ -1,5 +1,7 @@
 # p4vasp project guidance
 
+- Read `memory.md` for the update history, code locations, known unresolved issues, and previous verification results before investigating fixes. Keep it current when maintenance work changes this context.
+
 - Open this checkout at `~/opt/p4vasp` and read `doc/GTK3-migration.md` for the current GUI architecture. Use paths relative to the checkout; some older update notes contain a path from another computer.
 - The Python GUI uses PyGObject with GTK3 through `p4vasp.gtk3`. The existing `data/glade2/*.glade` resources remain layout sources loaded through the GTK3 adapter. Native FLTK/OpenGL windows and the separate GLUT k-point viewer have different backends.
 - For a UI change, trace the Glade resource, adapter, applet, and toolbar/menu entry involved. Check the displayed widget and its initial state, not just that resource XML parses. Keep neighboring controls usable when changing layout.
