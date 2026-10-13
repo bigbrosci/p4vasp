@@ -223,7 +223,9 @@ class Frame(SystemListListener):
             return None
         self.xml=xml
 
-        setMessageDriver(FrameMessageDriver(xml,"p4vasp.log"))
+        # Automatic file logging disabled; restore the next line to re-enable it.
+        # setMessageDriver(FrameMessageDriver(xml,"p4vasp.log"))
+        setMessageDriver(FrameMessageDriver(xml))
 
         self.connect_signals(xml)
 #    self.notebook=xml.get_widget("notebook")
@@ -258,7 +260,9 @@ class Frame(SystemListListener):
         self.menubar=xml.get_widget("menubar")
         self.toolbar=xml.get_widget("toolbar")
 
-        setMessageDriver(FrameMessageDriver(xml,"p4vasp.log"))
+        # Automatic file logging disabled; restore the next line to re-enable it.
+        # setMessageDriver(FrameMessageDriver(xml,"p4vasp.log"))
+        setMessageDriver(FrameMessageDriver(xml))
         w.show_all()
         systemlist().addSystemListListener(self)
         return self.root_widget

@@ -7,3 +7,10 @@
 - Run focused checks for changed files, then the relevant commands documented in `doc/GTK3-migration.md` when dependencies and a display are available. Report any GUI checks that could not run; a passing syntax check alone does not establish the visual behavior.
 
 For GTK interface changes or regressions, use the `p4vasp-gtk-ui` skill.
+
+## Update notes and GitHub publishing
+
+- After creating or updating an `update_history/update_*.md` note for completed work, run the relevant checks, commit the note together with its related implementation/test changes, and automatically push to `origin` on branch `p4vasp-py3` (`https://github.com/bigbrosci/p4vasp.git`). This is the user's requested publishing workflow; do not ask for routine confirmation, but respect required tool approval controls and destination-specific approval requirements.
+- Stage only files related to the completed update. Preserve unrelated working-tree changes. Use a normal push; do not force-push or overwrite remote work.
+- If the remote or branch differs from the destination above, or a push is blocked, explain the issue rather than silently publishing elsewhere or claiming success.
+- Report the commit and whether the GitHub push succeeded.
