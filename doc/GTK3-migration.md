@@ -37,7 +37,7 @@ On Ubuntu/Debian:
 
 ```bash
 sudo apt-get install python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0
-./run-p4vasp.sh
+./p4v.sh
 ```
 
 The existing macOS bootstrap installs GTK3, PyGObject, and py3cairo. This migration

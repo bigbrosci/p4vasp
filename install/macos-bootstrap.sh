@@ -171,8 +171,8 @@ fi
 
 if [[ "$LAUNCH" -eq 1 ]]; then
     if [[ "${APP_ARGS+x}" ]] && ((${#APP_ARGS[@]})); then
-        PYTHON="$VENV/bin/python3" exec bash "$ROOT/run-p4vasp.sh" "${APP_ARGS[@]}"
+        PYTHON="$VENV/bin/python3" exec bash "$ROOT/p4v.sh" "${APP_ARGS[@]}"
     else
-        PYTHON="$VENV/bin/python3" exec bash "$ROOT/run-p4vasp.sh"
+        PYTHON="$VENV/bin/python3" exec bash "$ROOT/p4v.sh"
     fi
 fi

@@ -87,10 +87,10 @@ selection; `git pull` alone does not update a locally compiled `_cp4vasp` librar
 Avoid `--skip-build` when upgrading native features.
 
 Linux installation can finish without a graphical display; launch later with
-`bash run-p4vasp.sh`. WSL GUI use needs a working WSLg/X11 display connection.
+`bash p4v.sh`. WSL GUI use needs a working WSLg/X11 display connection.
 
 The obsolete platform-specific entry wrappers have been removed. Use
-`ubuntu_install.sh` for installation and `run-p4vasp.sh` for daily startup.
+`ubuntu_install.sh` for installation and `p4v.sh` for daily startup.
 For dependency-only installation, use `bash ubuntu_install.sh --deps-only`.
 The scripts under `install/` remain internal installation/build backends. Advanced testing can
 set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
@@ -111,7 +111,7 @@ Edit:
 
 and add:
 
-    alias p4v='xxx/p4vasp/run-p4vasp.sh'
+    alias p4v='xxx/p4vasp/p4v.sh'
 
 Then reload the shell:
 
@@ -127,7 +127,7 @@ Edit:
 
 and add:
 
-    alias p4v='xxx/p4vasp/run-p4vasp.sh'
+    alias p4v='xxx/p4vasp/p4v.sh'
 
 Then reload the shell:
 
