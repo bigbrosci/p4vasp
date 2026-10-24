@@ -12,7 +12,7 @@ usage() {
     cat <<'EOF'
 Usage: bash install/ubuntu-bootstrap.sh [options] [p4vasp arguments]
 
-Internal backend. For automatic system detection, use: bash ubuntu_install.sh
+Internal backend. For automatic system detection, use: bash install.sh
 
 Options:
   --skip-apt      Do not run apt-get; assume dependencies are installed.

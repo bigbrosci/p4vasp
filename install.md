@@ -41,10 +41,10 @@ From the checkout root, run the same command on Ubuntu, other Linux distribution
 and macOS (including WSL with a Linux distribution):
 
 ```bash
-bash ubuntu_install.sh
+bash install.sh
 ```
 
-脚本名称保留为 `ubuntu_install.sh`，但它会自动判断系统，无需手动选择 Ubuntu、其他 Linux 或 macOS 脚本。
+统一入口 `install.sh` 会自动判断系统，无需手动选择 Ubuntu、其他 Linux 或 macOS 脚本。
 
 | Detected system / 检测到的系统 | Installation flow / 安装流程 |
 | --- | --- |
@@ -66,13 +66,13 @@ not automatically install Homebrew itself.
 Useful options / 常用选项：
 
 ```bash
-bash ubuntu_install.sh --help
-bash ubuntu_install.sh --dry-run          # Show detection/command only; no changes
-bash ubuntu_install.sh --no-launch        # Install and rebuild without opening GUI
-bash ubuntu_install.sh --build-only       # Rebuild after git pull; no GUI launch
-bash ubuntu_install.sh --skip-deps        # Use existing system packages
-bash ubuntu_install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
-bash ubuntu_install.sh -- '/path with spaces/POSCAR'
+bash install.sh --help
+bash install.sh --dry-run          # Show detection/command only; no changes
+bash install.sh --no-launch        # Install and rebuild without opening GUI
+bash install.sh --build-only       # Rebuild after git pull; no GUI launch
+bash install.sh --skip-deps        # Use existing system packages
+bash install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
+bash install.sh -- '/path with spaces/POSCAR'
 ```
 
 `--skip-apt` and `--skip-brew` are aliases for `--skip-deps` at the unified entry.
@@ -90,8 +90,8 @@ Linux installation can finish without a graphical display; launch later with
 `bash p4v.sh`. WSL GUI use needs a working WSLg/X11 display connection.
 
 The obsolete platform-specific entry wrappers have been removed. Use
-`ubuntu_install.sh` for installation and `p4v.sh` for daily startup.
-For dependency-only installation, use `bash ubuntu_install.sh --deps-only`.
+`install.sh` for installation and `p4v.sh` for daily startup.
+For dependency-only installation, use `bash install.sh --deps-only`.
 The scripts under `install/` remain internal installation/build backends. Advanced testing can
 set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
 reads `/etc/os-release` and identifies the kernel with `uname -s`.

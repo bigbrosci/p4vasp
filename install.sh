@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Unified entry point; retain the requested filename on every supported OS.
+# Unified installation entry point for Linux and macOS.
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 usage() {
     cat <<'HELP'
-Usage: bash ubuntu_install.sh [options] [-- p4vasp arguments]
+Usage: bash install.sh [options] [-- p4vasp arguments]
 
 Automatically selects Ubuntu/Debian, other Linux, or macOS installation.
 Ubuntu/Debian: install apt dependencies, rebuild, then launch if a display exists.

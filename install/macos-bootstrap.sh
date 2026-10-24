@@ -12,7 +12,7 @@ usage() {
     cat <<'EOF'
 Usage: bash install/macos-bootstrap.sh [options] [p4vasp arguments]
 
-Internal backend. For automatic system detection, use: bash ubuntu_install.sh
+Internal backend. For automatic system detection, use: bash install.sh
 
 Options:
   --skip-brew     Do not run brew install; assume dependencies are installed.

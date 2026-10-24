@@ -14,7 +14,7 @@ class UnifiedInstallerTest(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(prefix='p4vasp installer ')
         self.addCleanup(self.tmp.cleanup)
         self.root = Path(self.tmp.name)
-        shutil.copy(ROOT / 'ubuntu_install.sh', self.root)
+        shutil.copy(ROOT / 'install.sh', self.root)
         (self.root / 'bin').mkdir()
         (self.root / 'install').mkdir()
         for backend in ('ubuntu', 'macos'):
@@ -31,7 +31,7 @@ class UnifiedInstallerTest(unittest.TestCase):
         env = dict(os.environ, PATH=str(self.root / 'bin') + ':' + os.environ['PATH'],
                    TEST_KERNEL=kernel, P4VASP_OS_RELEASE=str(release_file),
                    BACKEND_EXIT=str(exitcode))
-        return subprocess.run(['bash', str(self.root / 'ubuntu_install.sh'), *args],
+        return subprocess.run(['bash', str(self.root / 'install.sh'), *args],
                               env=env, cwd='/tmp', capture_output=True, text=True)
 
     def test_debian_family(self):
