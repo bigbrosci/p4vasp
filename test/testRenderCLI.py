@@ -5,7 +5,7 @@ import subprocess
 import tempfile
 import unittest
 import cairo
-from p4vasp.render_cli import load_structure, rotations, transform
+from p4vasp.render_cli import load_structure, rotations, transform, bond_pairs
 
 ROOT = Path(__file__).resolve().parents[1]
 POSCAR = 'Water\n1\n6 0 0\n0 6 0\n0 0 6\nO H\n1 2\nCartesian\n3 3 3\n3.76 3.59 3\n2.24 3.59 3\n'
@@ -71,6 +71,19 @@ class RenderTests(unittest.TestCase):
             self.assertEqual(load_structure(self.source)[1][0], expected)
         self.source.write_text(POSCAR.replace('Cartesian', 'Direct').replace('3 3 3', '.5 .5 .5'))
         self.assertEqual(load_structure(self.source)[1][0], (3, 3, 3))
+
+    def test_bond_detection(self):
+        self.assertEqual(list(bond_pairs([(0, 0, 0), (1, 0, 0), (5, 0, 0)], [.6]*3, 1.15)), [(0, 1)])
+        self.assertEqual(list(bond_pairs([(0, 0, 0), (0, 0, 0)], [.6]*2, 1.15)), [])
+
+    def test_models_and_quality(self):
+        outputs = []
+        for model in ('spheres', 'ball-stick', 'stick', 'space-filling'):
+            self.run_cli('--model', model, '--size', '320x240', '--quality', '3', '--force')
+            outputs.append(self.output.read_bytes())
+        self.assertEqual(len(set(outputs)), 4)
+        self.run_cli('--brightness', '0.7', '--force')
+        self.run_cli('--quality', '4', '--size', '8192x1000', '--force', success=False)
 
     def test_rotation_convention(self):
         p = transform((1, 0, 0), rotations('90z,90x'))

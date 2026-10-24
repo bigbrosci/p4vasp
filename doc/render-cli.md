@@ -33,6 +33,28 @@ No window, display server or ASE is needed. Requires pycairo in the launcher's P
 
 Use `=` for a negative first angle, e.g. `--rotate=-30x`. These rotations affect only the image and use the right-hand rule, which differs from the historical GUI Rotate applet's sign convention. The output filename does not select the view. Views refer to Cartesian axes, not lattice directions in a nonorthogonal cell.
 
-当前使用 Cairo 正交投影，沿用 `data/atomtypes.xml` 的颜色和半径；未知元素显示为灰色。绘制输入原子和晶胞，不自动复制周期镜像，不绘制化学键或文字标签。球体按中心深度排序，晶胞线先绘制，因此不是完整三维遮挡计算，也不是 OpenGL 窗口的逐像素截图。
+## 模型和画质 / Models and image quality
 
-This Cairo renderer uses orthographic projection and project element colors/radii. Unknown elements are gray. It draws input atoms and cell edges, without periodic replicas, bonds or labels. Spheres are sorted by center depth and cell lines drawn first; this is approximate occlusion, not a pixel-identical OpenGL screenshot.
+```bash
+p4v POSCAR -o molecule.png --model ball-stick --no-cell --quality 3
+p4v POSCAR -o sticks.png --model stick --bond-radius 0.08
+p4v POSCAR -o bright.png --model ball-stick --brightness 1.15 --size 1600x1200
+```
+
+- `--model spheres`：默认球体模式，保留原有大小。Original sphere sizes (default).
+- `--model ball-stick`：较小球体＋按两端元素着色的键。Smaller spheres with two-color bonds.
+- `--model stick`：棍状模型，原子位置使用与棍等半径的小球连接。Sticks with small spherical joints.
+- `--model space-filling`：使用项目半径表的较大球体；这是视觉填充模式，并非经过校准的范德华半径模型。Larger project-radius spheres, not a calibrated van der Waals model.
+- `--radius-scale`：所有球体模式的大小倍率；stick 模式由 `--bond-radius` 控制。Sphere size multiplier; stick joints follow bond radius.
+- `--bond-radius`：键半径，默认 0.10 Å。Bond radius in angstroms.
+- `--bond-factor`：成键距离上限为共价半径之和乘此倍率，默认 1.15；仅是显示启发式。Distance cutoff multiplier (default 1.15), a visualization heuristic.
+- `--brightness`：亮度倍率，默认 1.0；提高会逐渐截断高亮颜色。Brightness multiplier; high values clip colors.
+- `--quality 1|2|3|4`：超采样倍率，默认 2；改善球体与键边缘。工作图最多 6400 万像素，超限会提示降低质量或尺寸。Supersampling factor, default 2, limited to 64 million working pixels.
+
+采用较集中的柔和高光、渐变阴影和超采样抗锯齿，默认透明背景。Cairo 正交投影使用 `data/atomtypes.xml` 的颜色、半径和共价半径；未知元素显示为灰色，不自动成键。
+
+Soft localized highlights, shaded bonds and supersampling improve appearance. Transparency remains the default. Colors and radii come from the project table; unknown elements are gray and do not acquire automatic bonds.
+
+仅连接输入文件内的原子，不自动复制周期镜像或跨晶胞连键，不显示标签。使用深度排序近似遮挡，复杂交叠可能存在绘制瑕疵，不是 OpenGL 窗口截图。成键搜索为两两比较，超大结构可能较慢。GUI 未改动。
+
+Only atoms present in the input are connected: no periodic replicas, cross-boundary bonds or labels. Depth sorting approximates occlusion and can show artifacts at complex intersections. This is not an OpenGL screenshot. Pairwise bond search can be slow on large structures. The GUI is unchanged.

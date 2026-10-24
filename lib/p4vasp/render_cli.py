@@ -87,12 +87,24 @@ def atom_styles():
     for row in root.findall('.//r'):
         values = row.text.split()
         radius = float(values[2]) or float(values[3]) or .7
-        styles[values[0]] = (radius, tuple(map(float, values[4:7])))
+        styles[values[0]] = (radius, tuple(map(float, values[4:7])), float(values[3]))
     return styles
 
 
+def bond_pairs(positions, radii, factor):
+    """Distance-based bonds within the supplied atoms, without periodic images."""
+    for i, p in enumerate(positions):
+        for j in range(i+1, len(positions)):
+            if radii[i] <= 0 or radii[j] <= 0:
+                continue
+            distance = sum((p[k]-positions[j][k])**2 for k in range(3))
+            if 1e-12 < distance <= (factor*(radii[i]+radii[j]))**2:
+                yield i, j
+
+
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
-           radius_scale=.5, cell=True, transparent=True, force=False):
+           radius_scale=.5, cell=True, transparent=True, force=False,
+           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2):
     import cairo
     source, output = Path(source).resolve(), Path(output).absolute()
     if output.suffix.lower() != '.png': raise ValueError('output must have a .png extension')
@@ -103,9 +115,15 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
     presets = {'top': [], 'front': [('x', -math.pi/2)], 'side': [('y', -math.pi/2)]}
     turns = presets[view] + list(turns)
     atoms = []
+    covalent = []
     for pos, element in zip(positions, elements):
-        radius, color = styles.get(element, (.7, (.6, .6, .6)))
-        atoms.append((transform(pos, turns), radius*radius_scale, color))
+        radius, color, cov = styles.get(element, (.7, (.6, .6, .6), 0))
+        covalent.append(cov)
+        radius *= radius_scale
+        if model == "ball-stick": radius *= .45
+        if model == "stick": radius = bond_radius
+        if model == "space-filling": radius *= 2
+        atoms.append((transform(pos, turns), radius, color))
     corners = {bits: transform(tuple(sum(bits[i]*basis[i][j] for i in range(3)) for j in range(3)), turns)
                for bits in itertools.product((0, 1), repeat=3)}
     bounds = [(p[0]-r, p[1]-r, p[0]+r, p[1]+r) for p, r, _ in atoms]
@@ -117,8 +135,12 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
     scale = min((width-2*margin)/max(xmax-xmin, 1e-9), (height-2*margin)/max(ymax-ymin, 1e-9))
     def screen(p):
         return width/2+(p[0]-(xmin+xmax)/2)*scale, height/2-(p[1]-(ymin+ymax)/2)*scale
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+    if width*height*quality*quality > 64000000:
+        raise ValueError("quality and size exceed 64 million working pixels; reduce --quality or --size")
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width*quality, height*quality)
     ctx = cairo.Context(surface)
+    ctx.scale(quality, quality)
+    ctx.set_antialias(cairo.ANTIALIAS_BEST)
     if not transparent:
         ctx.set_source_rgb(1, 1, 1); ctx.paint()
     if cell:
@@ -129,15 +151,54 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
                 other = list(bits); other[axis] = 1
                 ctx.move_to(*screen(p)); ctx.line_to(*screen(corners[tuple(other)]))
         ctx.stroke()
-    # Painter's algorithm: nearer atom centers are drawn last.
-    for p, radius, color in sorted(atoms, key=lambda a: a[0][2]):
+    def lit(color, factor):
+        return tuple(min(1, max(0, v*factor*brightness)) for v in color)
+
+    # Split bonds into short depth-sorted pieces to improve crossings with atoms.
+    primitives = [(p[2], 'atom', (p, r, color)) for p, r, color in atoms]
+    if model in ('ball-stick', 'stick'):
+        for i, j in bond_pairs(positions, covalent, bond_factor):
+            p, q = atoms[i][0], atoms[j][0]
+            for part in range(16):
+                a = tuple(p[k]+(q[k]-p[k])*part/16 for k in range(3))
+                b = tuple(p[k]+(q[k]-p[k])*(part+1)/16 for k in range(3))
+                color = atoms[i if part < 8 else j][2]
+                primitives.append(((a[2]+b[2])/2, 'bond', (a, b, color)))
+    for _, kind, data in sorted(primitives, key=lambda item: (item[0], item[1] == 'atom')):
+        if kind == 'bond':
+            a, b, color = data
+            x, y = screen(a); u, v = screen(b)
+            length = math.hypot(u-x, v-y)
+            if length < 1e-8: continue
+            r = bond_radius*scale
+            nx, ny = -(v-y)/length*r, (u-x)/length*r
+            gradient = cairo.LinearGradient(x-nx, y-ny, x+nx, y+ny)
+            for offset, strength in ((0, .4), (.35, 1.15), (1, .45)):
+                gradient.add_color_stop_rgb(offset, *lit(color, strength))
+            ctx.set_source(gradient); ctx.set_line_width(2*r)
+            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            ctx.move_to(x, y); ctx.line_to(u, v); ctx.stroke()
+            continue
+        p, radius, color = data
         x, y = screen(p); radius *= scale
-        gradient = cairo.RadialGradient(x-.3*radius, y-.35*radius, .04*radius, x, y, radius)
-        gradient.add_color_stop_rgb(0, *[.65+.35*v for v in color])
-        gradient.add_color_stop_rgb(.6, *color)
-        gradient.add_color_stop_rgb(1, *[.4*v for v in color])
-        ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(gradient); ctx.fill_preserve()
-        ctx.set_source_rgb(*[.25*v for v in color]); ctx.set_line_width(.7); ctx.stroke()
+        gradient = cairo.RadialGradient(x-.28*radius, y-.32*radius, 0, x, y, radius)
+        for offset, strength in ((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)):
+            gradient.add_color_stop_rgb(offset, *lit(color, strength))
+        ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(gradient); ctx.fill()
+        highlight = cairo.RadialGradient(x-.3*radius, y-.35*radius, 0,
+                                         x-.3*radius, y-.35*radius, .35*radius)
+        highlight.add_color_stop_rgba(0, 1, 1, 1, .40)
+        highlight.add_color_stop_rgba(1, 1, 1, 1, 0)
+        ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(highlight); ctx.fill()
+    if quality > 1:
+        reduced = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+        down = cairo.Context(reduced)
+        down.scale(1/quality, 1/quality)
+        down.set_source_surface(surface)
+        down.get_source().set_filter(cairo.FILTER_BEST)
+        down.get_source().set_extend(cairo.EXTEND_PAD)
+        down.paint()
+        surface = reduced
     # Render completely before publishing the output. Existing files need --force.
     fd, tmp = tempfile.mkstemp(prefix='.p4v-render-', suffix='.png', dir=str(output.parent))
     os.close(fd)
@@ -157,6 +218,11 @@ def main(argv=None):
     parser.add_argument('--rotate', '--rotation', type=rotations, default=[], help='right-handed rotations in order, degrees, e.g. 30x,-20y,10z; use --rotate=-30x for negative first angles')
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
+    parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'), default='spheres')
+    parser.add_argument('--brightness', type=positive, default=1.0)
+    parser.add_argument('--bond-radius', type=positive, default=.10, help='bond radius in angstroms')
+    parser.add_argument('--bond-factor', type=positive, default=1.15, help='covalent-radius sum multiplier')
+    parser.add_argument('--quality', type=int, choices=(1, 2, 3, 4), default=2, help='supersampling factor (default 2)')
     parser.add_argument('--no-cell', action='store_true', help='hide cell and fit atoms only')
     background = parser.add_mutually_exclusive_group()
     background.add_argument('--transparent', dest='transparent', action='store_true', default=True,
@@ -168,7 +234,9 @@ def main(argv=None):
     try:
         render(args.structure, args.output, view=args.view, turns=args.rotate, size=args.size,
                radius_scale=args.radius_scale, cell=not args.no_cell,
-               transparent=args.transparent, force=args.force)
+               transparent=args.transparent, force=args.force, model=args.model,
+               brightness=args.brightness, bond_radius=args.bond_radius,
+               bond_factor=args.bond_factor, quality=args.quality)
     except ImportError as error:
         parser.exit(1, 'Rendering dependency missing (Python Cairo is required): %s\n' % error)
     except Exception as error:

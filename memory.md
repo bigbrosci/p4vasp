@@ -124,3 +124,9 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - Focused checks: `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` — eight tests passed including no-display launcher use, blocked UI imports, scale factors, rotation order and overwrite protection. A generated PNG was visually inspected. macOS and GUI interaction were not exercised for this feature.
 
 - PNG background is now transparent by default (including the render API); `--transparent` remains supported, and `--white-background` selects opaque white. Nine focused renderer tests passed after this default change.
+
+## Export models and quality (2026-10-24)
+
+- `render_cli.py` adds spheres (default), ball-stick, stick and space-filling (project radii, NOT calibrated vdW). Covalent-radius bond heuristic connects input atoms only; periodic bonds remain unsupported. Pair search is quadratic; occlusion remains approximate.
+- Brightness, bond radius/factor and supersampling quality are configurable. Default 2x sampling, bounded to 64M working pixels. Transparent default retained; no GUI changes. See `doc/render-cli.md`.
+- Eleven renderer tests passed, including bond detection, model differences and quality limits. Ball-stick PNG visually inspected.
