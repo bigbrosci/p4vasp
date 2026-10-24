@@ -10,7 +10,9 @@ APP_ARGS=()
 
 usage() {
     cat <<'EOF'
-Usage: bash macos-start.sh [options] [p4vasp arguments]
+Usage: bash install/macos-bootstrap.sh [options] [p4vasp arguments]
+
+Internal backend. For automatic system detection, use: bash ubuntu_install.sh
 
 Options:
   --skip-brew     Do not run brew install; assume dependencies are installed.

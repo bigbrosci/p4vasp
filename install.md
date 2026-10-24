@@ -52,8 +52,7 @@ bash ubuntu_install.sh
 | Other Linux distributions | Skip apt automatically, build using preinstalled dependencies, then launch when a display is available. / 自动跳过 apt，使用已安装的依赖编译并启动。 |
 | macOS | Use the existing Homebrew installation, prepare `.venv-macos`, rebuild, and launch. / 使用原有 Homebrew 流程、准备 Python 环境、重新编译并启动。 |
 
-**Other Linux / 其他 Linux：** This unifies the previous
-`ubuntu-start.sh --skip-apt` workflow; it does not add automatic dnf/pacman/zypper
+**Other Linux / 其他 Linux：** This uses the preinstalled-dependency build workflow; it does not add automatic dnf/pacman/zypper
 package installation. Install your distribution's equivalents of a C++ compiler,
 Python 3 and development headers/config tool, SWIG, FLTK 1.3 development files,
 OpenGL/GLU and X11 development files, GTK3/PyGObject/Cairo (including the GI Cairo
@@ -90,8 +89,10 @@ Avoid `--skip-build` when upgrading native features.
 Linux installation can finish without a graphical display; launch later with
 `bash run-p4vasp.sh`. WSL GUI use needs a working WSLg/X11 display connection.
 
-The old `ubuntu-start.sh` and `macos-start.sh` entry points remain available for
-compatibility; new instructions use `ubuntu_install.sh`. Advanced testing can
+The obsolete platform-specific entry wrappers have been removed. Use
+`ubuntu_install.sh` for installation and `run-p4vasp.sh` for daily startup.
+For dependency-only installation, use `bash ubuntu_install.sh --deps-only`.
+The scripts under `install/` remain internal installation/build backends. Advanced testing can
 set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
 reads `/etc/os-release` and identifies the kernel with `uname -s`.
 
