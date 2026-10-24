@@ -4,6 +4,16 @@
 
 
 
+# Handle PNG export before importing any GTK/FLTK UI modules.
+import sys
+if __name__ == "__main__":
+    cli_args = sys.argv[1:]
+    if any(a in ("-o", "--output", "-h", "--help") or
+           a.startswith("--output=") or (a.startswith("-o") and len(a)>2)
+           for a in cli_args):
+        from p4vasp.render_cli import main as render_main
+        raise SystemExit(render_main(cli_args))
+
 # GTK3 is the only supported GUI runtime.
 try:
     import gi

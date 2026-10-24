@@ -145,3 +145,13 @@ sudo apt-get install python3-gi python3-gi-cairo python3-cairo gir1.2-gtk-3.0
 ```
 
 See [GTK3 migration and verification](doc/GTK3-migration.md) for details and GUI tests.
+
+## 无窗口导出 PNG / Headless PNG export
+
+```bash
+bash p4v.sh POSCAR -o top.png
+bash p4v.sh POSCAR -o rotated.png --rotate=30x,-20y,10z --size 1200x900
+```
+
+配置 `p4v` 别名后也可使用 `p4v POSCAR -o top.png`。无需启动 GUI 或显示服务器；依赖安装流程已包含的 pycairo。更多视角、透明背景和覆盖选项见 [图片导出指南](doc/render-cli.md)。
+With the alias configured, use `p4v POSCAR -o top.png`. No GUI or display server is needed. See the [rendering guide](doc/render-cli.md) for options and rendering limitations.
