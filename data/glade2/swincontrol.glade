@@ -216,9 +216,9 @@
                           <widget class="GtkToolButton" id="foto_button">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="tooltip" translatable="yes">Screenshot</property>
+                            <property name="tooltip" translatable="yes">Export PNG</property>
                             <property name="use_action_appearance">False</property>
-                            <property name="label" translatable="yes">Screenshot</property>
+                            <property name="label" translatable="yes">Export PNG</property>
                             <property name="use_underline">True</property>
                             <property name="icon">foto_i.png</property>
                             <signal name="clicked" handler="on_foto_button_clicked" swapped="no"/>

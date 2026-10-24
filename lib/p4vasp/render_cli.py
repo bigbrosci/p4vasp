@@ -102,15 +102,34 @@ def bond_pairs(positions, radii, factor):
                 yield i, j
 
 
+def camera_point(point, camera):
+    """OpenGL M * scale * position; getRotMatElement returns row,column."""
+    matrix = camera['matrix']
+    return tuple(sum(matrix[i][j]*point[j]*camera['zoom'] for j in range(3))+matrix[i][3]
+                 for i in range(3))
+
+
+def perspective_factor(point, camera):
+    return 10/(20-point[2]) if camera.get('perspective') else 1.0
+
+
+def camera_visible(point, camera):
+    return -30 < point[2] < 10 if camera.get('perspective') else -30 < point[2] < 30
+
+
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
            radius_scale=.5, cell=True, transparent=True, force=True,
-           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="matte"):
+           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="matte", scene=None, camera=None):
     import cairo
-    source, output = Path(source).resolve(), Path(output).absolute()
+    source = Path(source).resolve() if source is not None else None
+    output = Path(output).absolute()
     if output.suffix.lower() != '.png': raise ValueError('output must have a .png extension')
     if source == output.resolve(): raise ValueError('output must not replace the input structure')
     if output.exists() and not force: raise ValueError('output exists; use --force to replace it')
-    basis, positions, elements = load_structure(source)
+    basis, positions, elements = load_structure(source) if scene is None else scene[:3]
+    if not positions:
+        raise ValueError("No visible atoms to export")
+    project = (lambda p: camera_point(p, camera)) if camera else (lambda p: transform(p, turns))
     styles = atom_styles()
     presets = {'top': [], 'front': [('x', -math.pi/2)], 'side': [('x', -math.pi/2)]}
     turns = presets[view] + list(turns)
@@ -123,9 +142,19 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
         if model == "ball-stick": radius *= .45
         if model == "stick": radius = bond_radius
         if model == "space-filling": radius *= 2
-        atoms.append((transform(pos, turns), radius, color))
-    corners = {bits: transform(tuple(sum(bits[i]*basis[i][j] for i in range(3)) for j in range(3)), turns)
+        atoms.append((project(pos), radius*(camera["zoom"] if camera else 1), color))
+    corners = {bits: project(tuple(sum(bits[i]*basis[i][j] for i in range(3)) for j in range(3)))
                for bits in itertools.product((0, 1), repeat=3)}
+    cell_edges = []
+    origins = scene[3] if scene is not None and len(scene) > 3 else [(0, 0, 0)]
+    for origin in origins:
+        points = {bits: project(tuple(origin[j]+sum(bits[i]*basis[i][j] for i in range(3)) for j in range(3)))
+                  for bits in itertools.product((0, 1), repeat=3)}
+        for bits, point in points.items():
+            for axis in range(3):
+                if bits[axis]: continue
+                other = list(bits); other[axis] = 1
+                cell_edges.append((point, points[tuple(other)]))
     bounds = [(p[0]-r, p[1]-r, p[0]+r, p[1]+r) for p, r, _ in atoms]
     if cell: bounds += [(p[0], p[1], p[0], p[1]) for p in corners.values()]
     xmin, ymin = min(b[0] for b in bounds), min(b[1] for b in bounds)
@@ -135,6 +164,12 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
     scale = min((width-2*margin)/max(xmax-xmin, 1e-9), (height-2*margin)/max(ymax-ymin, 1e-9))
     def screen(p):
         return width/2+(p[0]-(xmin+xmax)/2)*scale, height/2-(p[1]-(ymin+ymax)/2)*scale
+    if camera:
+        # Match VisNavDrawer's projection and retain the window's framing.
+        scale = min(width/camera['width'], height/camera['height']) / .04
+        def screen(p):
+            factor = perspective_factor(p, camera)
+            return width/2+p[0]*factor*scale, height/2-p[1]*factor*scale
     if width*height*quality*quality > 64000000:
         raise ValueError("quality and size exceed 64 million working pixels; reduce --quality or --size")
     surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width*quality, height*quality)
@@ -145,11 +180,10 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
         ctx.set_source_rgb(1, 1, 1); ctx.paint()
     if cell:
         ctx.set_source_rgb(.18, .18, .18); ctx.set_line_width(max(1, min(size)/700))
-        for bits, p in corners.items():
-            for axis in range(3):
-                if bits[axis]: continue
-                other = list(bits); other[axis] = 1
-                ctx.move_to(*screen(p)); ctx.line_to(*screen(corners[tuple(other)]))
+        for a, b in cell_edges:
+            if camera and (not camera_visible(a, camera) or not camera_visible(b, camera)):
+                continue
+            ctx.move_to(*screen(a)); ctx.line_to(*screen(b))
         ctx.stroke()
     materials = {
         'classic': (((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)), .35, .40, (.4, 1.15, .45)),
@@ -172,12 +206,16 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
                 color = atoms[i if part < 8 else j][2]
                 primitives.append(((a[2]+b[2])/2, 'bond', (a, b, color)))
     for _, kind, data in sorted(primitives, key=lambda item: (item[0], item[1] == 'atom')):
+        if camera and not camera_visible(data[0], camera):
+            continue
         if kind == 'bond':
             a, b, color = data
+            if camera and not camera_visible(b, camera): continue
             x, y = screen(a); u, v = screen(b)
             length = math.hypot(u-x, v-y)
             if length < 1e-8: continue
             r = bond_radius*scale
+            if camera: r *= camera["zoom"]*perspective_factor(a, camera)
             nx, ny = -(v-y)/length*r, (u-x)/length*r
             gradient = cairo.LinearGradient(x-nx, y-ny, x+nx, y+ny)
             for offset, strength in zip((0, .35, 1), bond_light):
@@ -188,6 +226,7 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
             continue
         p, radius, color = data
         x, y = screen(p); radius *= scale
+        if camera: radius *= perspective_factor(p, camera)
         gradient = cairo.RadialGradient(x-.28*radius, y-.32*radius, 0, x, y, radius)
         for offset, strength in stops:
             gradient.add_color_stop_rgb(offset, *lit(color, strength))

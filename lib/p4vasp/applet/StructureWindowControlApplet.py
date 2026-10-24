@@ -700,6 +700,10 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
 
 
     def on_foto_button_clicked_handler(self,*arg):
+        from p4vasp.export_image import show_export_dialog
+        self.image_export_dialog = show_export_dialog(self.swin)
+
+    def save_legacy_screenshot(self,*arg):
         import os.path
         i=1
         sw=self.swin()

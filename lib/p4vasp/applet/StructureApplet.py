@@ -678,6 +678,10 @@ class StructureApplet(Applet,p4vasp.Selection.SelectionListener):
 #    self.updateIsosurface()
         schedule(self.updateIsosurfaceGen())
     def on_foto_button_clicked_handler(self,*arg):
+        from p4vasp.export_image import show_export_dialog
+        self.image_export_dialog = show_export_dialog(lambda: self.swin)
+
+    def save_legacy_screenshot(self,*arg):
         import os.path
         i=1
         while os.path.exists("p4vasp%04d.tga"%i):

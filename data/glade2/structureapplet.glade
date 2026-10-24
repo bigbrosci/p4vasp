@@ -184,8 +184,8 @@
 		      <child>
 			<widget class="GtkToolButton" id="foto_button">
 			  <property name="visible">True</property>
-			  <property name="tooltip" translatable="yes">Screenshot</property>
-			  <property name="label" translatable="yes">Screenshot</property>
+			  <property name="tooltip" translatable="yes">Export PNG</property>
+			  <property name="label" translatable="yes">Export PNG</property>
 			  <property name="use_underline">True</property>
 			  <property name="icon">foto_i.png</property>
 			  <property name="visible_horizontal">True</property>

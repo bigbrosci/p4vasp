@@ -70,3 +70,20 @@ p4v POSCAR -o glossy.png --view side --model space-filling --material glossy --q
 `--material classic|matte|glossy` controls sphere and bond shading. `matte` is the default, selected after the user compared the previews. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. These are Cairo shading presets, not physical materials or ambient occlusion.
 
 材质选项：`classic` 保留旧版效果；`matte` 为默认，减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。这仍是 Cairo 渐变着色，未新增真实三维光照或接触阴影。
+
+## GUI export from the current view / 从当前视角导出
+
+1. Open a structure, then rotate, zoom and position it in the structure window.
+2. In **Control** (Structure → Control), click the camera button **Export PNG**. The older combined Structure applet has the same entry.
+3. The panel opens with a preview, matte material and transparent background. Choose a model, width, quality or brightness as needed.
+4. Click **Export PNG…** and choose a filename. The actual export captures the latest view, even if you rotated after opening the panel. **Refresh preview** updates the preview after changing the view or numeric settings.
+
+在模型窗口调整角度、缩放和平移后，进入 **Control**，点击相机图标（提示为 **Export PNG**）。面板默认哑光、透明背景，选择文件名即可导出，无需重新设置旋转角度。面板打开后继续旋转时，可以点击 **Refresh preview** 更新预览；实际导出始终读取保存时的最新视角。图片高度按模型窗口比例计算。
+
+The exporter copies the native camera matrix, zoom, translation and projection, plus the currently displayed structure/frame, hidden-atom state and cell repetitions. It preserves framing rather than automatically fitting the structure; atoms outside the window remain outside the output. Cell visibility follows the window. No temporary POSCAR or changes to the original structure are needed. Rendering runs in a background worker; errors remain visible in the panel. GUI file selection confirms replacement of existing files.
+
+导出读取当前显示帧、隐藏原子、晶胞复制数量及边框开关，保持窗口构图，不自动重新居中。模型如果在窗口边缘被裁切，导出也会裁切。渲染在后台运行，错误显示在面板中，原结构不变。
+
+This exports atoms, optional inferred bonds and cell edges using the Cairo renderer, not an OpenGL screenshot. Selection markers, arrows and isosurfaces are omitted. Depth ordering remains approximate; perspective atom radii use center-depth scaling and near/far clipping is approximate. Custom native colors/bond lists are not copied. Transparent pixels may appear white in the GTK preview because the panel behind them is white; saved PNG pixels retain alpha.
+
+当前导出原子、可选的推断键及晶胞，不包括选择标记、箭头、等值面或自定义原生颜色/键列表。遮挡和透视球体轮廓仍为近似。预览背景可能看起来是面板的白色，但 PNG 保留透明通道。
