@@ -34,28 +34,66 @@ All modifications remain distributed under the GNU General Public License v2 (GP
 Source-code distributions
 ==========================
 
-Ubuntu Installation
+Unified installation / 统一安装入口
 --------------------------
 
-Run:
-```
-   $ bash ubuntu-start.sh 
-```
-Other Linux Installation
---------------------------
+From the checkout root, run the same command on Ubuntu, other Linux distributions,
+and macOS (including WSL with a Linux distribution):
 
-Run:
-```
-   $ bash ubuntu-start.sh --skip-apt
+```bash
+bash ubuntu_install.sh
 ```
 
-Mac Installation
---------------------------
+脚本名称保留为 `ubuntu_install.sh`，但它会自动判断系统，无需手动选择 Ubuntu、其他 Linux 或 macOS 脚本。
 
-Run:
+| Detected system / 检测到的系统 | Installation flow / 安装流程 |
+| --- | --- |
+| Ubuntu, Debian and compatible derivatives | Install dependencies with apt, rebuild the native extension, then launch when a display is available. / 使用 apt 安装依赖，重新编译，有图形显示时启动。 |
+| Other Linux distributions | Skip apt automatically, build using preinstalled dependencies, then launch when a display is available. / 自动跳过 apt，使用已安装的依赖编译并启动。 |
+| macOS | Use the existing Homebrew installation, prepare `.venv-macos`, rebuild, and launch. / 使用原有 Homebrew 流程、准备 Python 环境、重新编译并启动。 |
+
+**Other Linux / 其他 Linux：** This unifies the previous
+`ubuntu-start.sh --skip-apt` workflow; it does not add automatic dnf/pacman/zypper
+package installation. Install your distribution's equivalents of a C++ compiler,
+Python 3 and development headers/config tool, SWIG, FLTK 1.3 development files,
+OpenGL/GLU and X11 development files, GTK3/PyGObject/Cairo (including the GI Cairo
+bridge), NumPy, and PyOpenGL first. The build reports missing requirements.
+非 Debian 系 Linux 仍需先通过自身包管理器准备这些依赖；统一入口不会在其上误用 apt。
+
+**macOS：** Install Xcode Command Line Tools (`xcode-select --install`) and
+Homebrew first. The existing bootstrap reports missing prerequisites; it does
+not automatically install Homebrew itself.
+
+Useful options / 常用选项：
+
+```bash
+bash ubuntu_install.sh --help
+bash ubuntu_install.sh --dry-run          # Show detection/command only; no changes
+bash ubuntu_install.sh --no-launch        # Install and rebuild without opening GUI
+bash ubuntu_install.sh --build-only       # Rebuild after git pull; no GUI launch
+bash ubuntu_install.sh --skip-deps        # Use existing system packages
+bash ubuntu_install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
+bash ubuntu_install.sh -- '/path with spaces/POSCAR'
 ```
-   $ bash macos-start.sh 
-```
+
+`--skip-apt` and `--skip-brew` are aliases for `--skip-deps` at the unified entry.
+macOS still prepares its Python environment and OpenGL bindings with
+`--skip-deps` / `--build-only`, as in the existing bootstrap.
+`--deps-only` is rejected on unsupported Linux package-install routes, rather
+than reporting a successful dependency installation.
+
+The default flow **rebuilds the native extension**. After updating source on
+another computer, rebuilding is required for features such as Shift-drag atom
+selection; `git pull` alone does not update a locally compiled `_cp4vasp` library.
+Avoid `--skip-build` when upgrading native features.
+
+Linux installation can finish without a graphical display; launch later with
+`bash run-p4vasp.sh`. WSL GUI use needs a working WSLg/X11 display connection.
+
+The old `ubuntu-start.sh` and `macos-start.sh` entry points remain available for
+compatibility; new instructions use `ubuntu_install.sh`. Advanced testing can
+set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
+reads `/etc/os-release` and identifies the kernel with `uname -s`.
 
 Starting with the magic `p4v` command
 --------------------------

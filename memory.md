@@ -1,6 +1,6 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-10-13. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-10-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
 ## Start here
 
@@ -108,3 +108,10 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - Authorized repository: `https://github.com/bigbrosci/p4vasp.git`, remote `origin`, branch `p4vasp-py3`. Check these before publishing.
 - Confirmed pushed in this session: `076cba0` (Build view fix/test/note) and `793027c` (logging change, note, publishing guidance). Later work may supersede these; inspect Git rather than treating them as a permanent HEAD.
 - An earlier automatic approval review blocked publishing until the user explicitly approved the destination and payload. The user then approved uploading, and the push succeeded. Report actual push results; local commits alone are not published updates.
+
+## Unified installation entry (2026-10-24)
+
+- Use `bash ubuntu_install.sh` from the checkout root on Linux or macOS. The filename is historical; detection uses `uname -s` and Linux os-release ID/ID_LIKE without sourcing shell code.
+- Ubuntu/Debian derivatives route to `install/ubuntu-bootstrap.sh`; other Linux automatically uses its `--skip-apt` path (dependencies must be preinstalled); macOS routes to `install/macos-bootstrap.sh` (Homebrew and Xcode tools required). Existing backend scripts/legacy entry points remain intact.
+- No automatic dnf/pacman/zypper package installation was added. See `install.md` for prerequisites and supported flags. `--dry-run` previews without changes; `--skip-deps` maps to the backend's skip flag. By default native extensions are rebuilt, so source updates take effect on other computers.
+- Run `/usr/bin/python3 test/testUnifiedInstaller.py` for mocked routing/argument tests. Nine tests passed; shell syntax and the local Linux dry run passed. Actual package installation, macOS execution and cross-distribution builds were not performed for this entry-point change.
