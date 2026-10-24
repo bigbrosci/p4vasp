@@ -102,6 +102,14 @@ class RenderTests(unittest.TestCase):
         self.run_cli('--size', '320x240')
         self.assertEqual(outputs[1], self.output.read_bytes())
 
+    def test_renderer_selection(self):
+        self.run_cli('--size', '320x240', '--renderer', 'studio')
+        studio = self.output.read_bytes()
+        self.run_cli('--size', '320x240')
+        self.assertEqual(studio, self.output.read_bytes())
+        self.run_cli('--size', '320x240', '--renderer', 'fast')
+        self.assertNotEqual(studio, self.output.read_bytes())
+
     def test_rotation_convention(self):
         p = transform((1, 0, 0), rotations('90z,90x'))
         for actual, expected in zip(p, (0, 0, 1)):

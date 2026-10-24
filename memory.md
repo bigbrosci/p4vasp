@@ -129,12 +129,12 @@ The launcher selects `.venv-macos/bin/python3` when available, otherwise `/usr/b
 - PNG background is **transparent by default**. The user selected the middle material preview, so **matte is the default**; classic/glossy remain available. Default brightness is 1.0 and supersampling quality is 2.
 - CLI export **replaces existing output by default**, publishing only after successful rendering. `--no-clobber` prevents replacement and `--force` remains compatible. GUI file selection confirms overwrite. Input structures are protected.
 - GUI export must use the **latest user-adjusted camera at save time**: rotation, zoom, translation, projection and viewport aspect ratio. Do not reset to Top/Side, automatically recenter or fit the model. If the window crops atoms, the exported framing also crops them.
-- Real-time OpenGL material upgrades were discussed as future work; only the independent image exporter and its GUI panel have been implemented.
+- User priority: interactive viewing/building must stay responsive; reserve detailed rendering for exported images. Keep the existing lightweight native window, render previews at reduced resolution/sampling, and run final image work off the GTK thread. Do not enable expensive effects on every mouse move.
 
 ### CLI and renderer
 
 - `p4v.py` dispatches `-o`/`--output` and help before GTK imports to `lib/p4vasp/render_cli.py`. Without output options, normal GUI startup remains. `p4v.sh` forwards arguments.
-- `p4v POSCAR -o model.png` renders POSCAR/CONTCAR using pycairo without GTK windows, a display server or ASE. CLI default size is 1000×1000 and model is `spheres`.
+- `p4v POSCAR -o model.png` uses the default export-only `studio` renderer (NumPy plus pycairo), without GTK windows, a display server or ASE. `--renderer fast` retains the earlier gradient implementation. CLI default size is 1000×1000 and model is `spheres`.
 - Models: `spheres`, `ball-stick`, `stick`, `space-filling`. The last uses larger project radii; it is **not a calibrated van der Waals model**. Colors/radii/covalent radii come from `data/atomtypes.xml`; unknown elements are gray and do not acquire inferred bonds.
 - Bonds use a covalent-radius distance heuristic (default multiplier 1.15), with adjustable radius (default 0.10 Å). Pair search is quadratic. CLI connects input atoms only; automatic periodic-image bonds/replicas are not implemented.
 - CLI views: top looks from +z; side rotates −90° about Cartesian x (look from +y, x right, z up), currently matching front. The superseded +90° side change was upside down because screen y is inverted. Preserve the projected-z sign regression.
@@ -146,13 +146,13 @@ The launcher selects `.venv-macos/bin/python3` when available, otherwise `/usr/b
 - Control's camera button **Export PNG** is defined in `data/glade2/swincontrol.glade`; the combined Structure applet uses `structureapplet.glade`. Their `on_foto_button_clicked_handler` methods open `lib/p4vasp/export_image.py`. Original single TGA handlers remain as `save_legacy_screenshot`; animation export is unchanged.
 - `snapshot()` copies the native camera through `getRotMatElement(row,column)`, zoom, viewport/projection and current Cartesian structure/frame. It preserves hidden atoms, repeated cells and cell visibility. Copy native state on the main thread; workers receive Python values only. No temporary POSCAR is written.
 - `render_cli.py` accepts scene/camera for GUI export while retaining CLI presets/autofit. Projection follows `src/VisNavDrawer.cpp`: orthographic .04 world units/pixel; perspective near=10, far=50, eye translation −20. Do not transpose the native matrix or omit its translation/zoom.
-- Panel: preview, model/material, width, quality, brightness, refresh and export chooser. Height follows window aspect ratio. Use **Refresh preview** after changing the model view or numeric settings; actual export always takes a fresh snapshot. Rendering runs in a worker, with errors shown in the still-usable panel.
+- Panel: preview, model/material, width, quality, brightness, refresh and export chooser. Preview uses studio at 520-pixel width and 1x sampling; final output uses selected quality. Closing requests cancellation and cancelled work does not replace existing output. Height follows window aspect ratio. Use **Refresh preview** after changing the model view or numeric settings; actual export always takes a fresh snapshot. Rendering runs in a worker, with errors shown in the still-usable panel.
 - Cairo transparency may appear white against the GTK panel; the PNG retains alpha. GUI background is always transparent.
 
 ### Rendering limitations and future work
 
-- Cairo spheres/bonds use gradients and approximate depth sorting. This is not a full 3D renderer or a pixel-identical OpenGL screenshot; no physical contact shadows/ambient occlusion were added.
-- Sphere perspective uses center-depth radius scaling; depth clipping and complex intersections remain approximate.
+- `lib/p4vasp/render_studio.py` analytically intersects rays with spheres and round-ended cylinders, choosing the nearest surface per sample (including perspective/clipping planes). It uses linear-space normal lighting, controlled specular highlights, sRGB encoding and supersampling. Spatial tiles bound scratch depth/normal memory; NumPy is loaded only when exporting.
+- A local finite-distance contact-darkening heuristic adds depth; this is not physical ambient occlusion, cast shadows, PBR or path tracing. The `fast` fallback retains Cairo gradients, center-depth sorting and approximate perspective radii. PNG output uses Cairo for encoding/downsampling.
 - GUI exports atoms, inferred bonds and cell edges. It omits arrows, isosurfaces, selection markers and custom native colors/bond lists. Explicitly repeated GUI cells are included; this does not imply complete periodic-bond handling.
 - Style comparison previews were local temporary files under `/tmp/p4v-material-preview/`; do not rely on them persisting. The user structure and previews were not published.
 
@@ -164,16 +164,23 @@ The launcher selects `.venv-macos/bin/python3` when available, otherwise `/usr/b
 
 ## Latest verification references (2026-10-24)
 
-These are recorded results from implementation work, not checks rerun by a documentation-only refresh:
+These are recorded implementation checks, not guarantees for another device. The studio update reran the export, basic, GTK startup and full GTK checks; installer results remain from earlier work:
 
 | Check | Recorded result | Command from checkout root |
 | --- | --- | --- |
 | Unified installer routing | 9 passed | `/usr/bin/python3 test/testUnifiedInstaller.py` |
-| Headless image export | 13 passed | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` |
-| Native/GTK export integration | Passed; allocated panel rendering inspected | `/usr/bin/python3 test/testExportImage.py` |
+| Headless image export | 14 passed (studio default/fast fallback included) | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` |
+| Studio surface tests | 6 passed | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderStudio.py` |
+| Native/GTK export integration | Passed; panel inspected; event-loop heartbeat and cancellation checked | `/usr/bin/python3 test/testExportImage.py` |
 | Bundled tests | 57 passed | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/test.py` |
 | GTK applet startup | 31 passed | `/usr/bin/python3 test/run_gtk3_smoke.py` |
 | Full GTK suite | 14 known Glade property failures | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/testGtk3.py` |
 
 - GUI checks need a display and compiled native extension. `testExportImage.py` checks the toolbar entry, native matrix/zoom, hidden/replicated atoms, preview, fresh camera after rotation, perspective, PNG alpha and error recovery. The standalone integration test exits without testing native FLTK worker teardown.
 - macOS installation/rendering, HiDPI behavior and full manual workflows on another computer remain unverified. See the unresolved issues above and [doc/GTK3-migration.md](doc/GTK3-migration.md).
+
+### Studio export evidence (2026-10-24)
+
+- On this Linux checkout with `/usr/bin/python3` and X11, the export integration serviced 104 GTK timer ticks during a 900-pixel, 3x export. This demonstrates event-loop activity, not a measured native-window FPS guarantee.
+- Visually inspected old/new side-view renders of the user's Desktop POSCAR, ball-stick water and the allocated export panel. One local 700×460, 3x example took about 0.17 s (fast) versus 1.27 s (studio); this is a single example, not a general benchmark. User inputs/previews were not published.
+- No native renderer or installed GTK backend changed. Large exports still consume CPU; macOS/HiDPI and real interactive frame rates remain unverified.

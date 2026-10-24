@@ -1,4 +1,4 @@
-"""Display-free, orthographic POSCAR-to-PNG rendering with Cairo."""
+"""Display-free structure PNG export with studio and fast renderers."""
 import argparse
 import itertools
 import math
@@ -119,7 +119,8 @@ def camera_visible(point, camera):
 
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
            radius_scale=.5, cell=True, transparent=True, force=True,
-           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="matte", scene=None, camera=None):
+           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="matte", scene=None, camera=None,
+           renderer="studio", cancelled=None):
     import cairo
     source = Path(source).resolve() if source is not None else None
     output = Path(output).absolute()
@@ -172,84 +173,96 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
             return width/2+p[0]*factor*scale, height/2-p[1]*factor*scale
     if width*height*quality*quality > 64000000:
         raise ValueError("quality and size exceed 64 million working pixels; reduce --quality or --size")
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width*quality, height*quality)
-    ctx = cairo.Context(surface)
-    ctx.scale(quality, quality)
-    ctx.set_antialias(cairo.ANTIALIAS_BEST)
-    if not transparent:
-        ctx.set_source_rgb(1, 1, 1); ctx.paint()
-    if cell:
-        ctx.set_source_rgb(.18, .18, .18); ctx.set_line_width(max(1, min(size)/700))
-        for a, b in cell_edges:
-            if camera and (not camera_visible(a, camera) or not camera_visible(b, camera)):
+    if renderer == 'studio':
+        from p4vasp.render_studio import draw
+        bonds = list(bond_pairs(positions, covalent, bond_factor)) if model in ('ball-stick', 'stick') else []
+        surface = draw(atoms, bonds, cell_edges if cell else [], size=size, quality=quality,
+                       scale=scale, center=((xmin+xmax)/2, (ymin+ymax)/2), camera=camera,
+                       bond_radius=bond_radius, material=material, brightness=brightness,
+                       transparent=transparent, cancelled=cancelled)
+    elif renderer == 'fast':
+        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width*quality, height*quality)
+        ctx = cairo.Context(surface)
+        ctx.scale(quality, quality)
+        ctx.set_antialias(cairo.ANTIALIAS_BEST)
+        if not transparent:
+            ctx.set_source_rgb(1, 1, 1); ctx.paint()
+        if cell:
+            ctx.set_source_rgb(.18, .18, .18); ctx.set_line_width(max(1, min(size)/700))
+            for a, b in cell_edges:
+                if camera and (not camera_visible(a, camera) or not camera_visible(b, camera)):
+                    continue
+                ctx.move_to(*screen(a)); ctx.line_to(*screen(b))
+            ctx.stroke()
+        materials = {
+            'classic': (((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)), .35, .40, (.4, 1.15, .45)),
+            'matte': (((0, 1.02), (.35, .96), (.72, .82), (1, .55)), .45, .10, (.65, 1.0, .65)),
+            'glossy': (((0, 1.10), (.35, 1.0), (.72, .70), (1, .28)), .20, .65, (.35, 1.18, .40)),
+        }
+        stops, highlight_size, highlight_alpha, bond_light = materials[material]
+
+        def lit(color, factor):
+            return tuple(min(1, max(0, v*factor*brightness)) for v in color)
+
+        # Split bonds into short depth-sorted pieces to improve crossings with atoms.
+        primitives = [(p[2], 'atom', (p, r, color)) for p, r, color in atoms]
+        if model in ('ball-stick', 'stick'):
+            for i, j in bond_pairs(positions, covalent, bond_factor):
+                p, q = atoms[i][0], atoms[j][0]
+                for part in range(16):
+                    a = tuple(p[k]+(q[k]-p[k])*part/16 for k in range(3))
+                    b = tuple(p[k]+(q[k]-p[k])*(part+1)/16 for k in range(3))
+                    color = atoms[i if part < 8 else j][2]
+                    primitives.append(((a[2]+b[2])/2, 'bond', (a, b, color)))
+        for _, kind, data in sorted(primitives, key=lambda item: (item[0], item[1] == 'atom')):
+            if camera and not camera_visible(data[0], camera):
                 continue
-            ctx.move_to(*screen(a)); ctx.line_to(*screen(b))
-        ctx.stroke()
-    materials = {
-        'classic': (((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)), .35, .40, (.4, 1.15, .45)),
-        'matte': (((0, 1.02), (.35, .96), (.72, .82), (1, .55)), .45, .10, (.65, 1.0, .65)),
-        'glossy': (((0, 1.10), (.35, 1.0), (.72, .70), (1, .28)), .20, .65, (.35, 1.18, .40)),
-    }
-    stops, highlight_size, highlight_alpha, bond_light = materials[material]
-
-    def lit(color, factor):
-        return tuple(min(1, max(0, v*factor*brightness)) for v in color)
-
-    # Split bonds into short depth-sorted pieces to improve crossings with atoms.
-    primitives = [(p[2], 'atom', (p, r, color)) for p, r, color in atoms]
-    if model in ('ball-stick', 'stick'):
-        for i, j in bond_pairs(positions, covalent, bond_factor):
-            p, q = atoms[i][0], atoms[j][0]
-            for part in range(16):
-                a = tuple(p[k]+(q[k]-p[k])*part/16 for k in range(3))
-                b = tuple(p[k]+(q[k]-p[k])*(part+1)/16 for k in range(3))
-                color = atoms[i if part < 8 else j][2]
-                primitives.append(((a[2]+b[2])/2, 'bond', (a, b, color)))
-    for _, kind, data in sorted(primitives, key=lambda item: (item[0], item[1] == 'atom')):
-        if camera and not camera_visible(data[0], camera):
-            continue
-        if kind == 'bond':
-            a, b, color = data
-            if camera and not camera_visible(b, camera): continue
-            x, y = screen(a); u, v = screen(b)
-            length = math.hypot(u-x, v-y)
-            if length < 1e-8: continue
-            r = bond_radius*scale
-            if camera: r *= camera["zoom"]*perspective_factor(a, camera)
-            nx, ny = -(v-y)/length*r, (u-x)/length*r
-            gradient = cairo.LinearGradient(x-nx, y-ny, x+nx, y+ny)
-            for offset, strength in zip((0, .35, 1), bond_light):
+            if kind == 'bond':
+                a, b, color = data
+                if camera and not camera_visible(b, camera): continue
+                x, y = screen(a); u, v = screen(b)
+                length = math.hypot(u-x, v-y)
+                if length < 1e-8: continue
+                r = bond_radius*scale
+                if camera: r *= camera["zoom"]*perspective_factor(a, camera)
+                nx, ny = -(v-y)/length*r, (u-x)/length*r
+                gradient = cairo.LinearGradient(x-nx, y-ny, x+nx, y+ny)
+                for offset, strength in zip((0, .35, 1), bond_light):
+                    gradient.add_color_stop_rgb(offset, *lit(color, strength))
+                ctx.set_source(gradient); ctx.set_line_width(2*r)
+                ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+                ctx.move_to(x, y); ctx.line_to(u, v); ctx.stroke()
+                continue
+            p, radius, color = data
+            x, y = screen(p); radius *= scale
+            if camera: radius *= perspective_factor(p, camera)
+            gradient = cairo.RadialGradient(x-.28*radius, y-.32*radius, 0, x, y, radius)
+            for offset, strength in stops:
                 gradient.add_color_stop_rgb(offset, *lit(color, strength))
-            ctx.set_source(gradient); ctx.set_line_width(2*r)
-            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-            ctx.move_to(x, y); ctx.line_to(u, v); ctx.stroke()
-            continue
-        p, radius, color = data
-        x, y = screen(p); radius *= scale
-        if camera: radius *= perspective_factor(p, camera)
-        gradient = cairo.RadialGradient(x-.28*radius, y-.32*radius, 0, x, y, radius)
-        for offset, strength in stops:
-            gradient.add_color_stop_rgb(offset, *lit(color, strength))
-        ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(gradient); ctx.fill()
-        highlight = cairo.RadialGradient(x-.3*radius, y-.35*radius, 0,
-                                         x-.3*radius, y-.35*radius, highlight_size*radius)
-        highlight.add_color_stop_rgba(0, 1, 1, 1, highlight_alpha)
-        highlight.add_color_stop_rgba(1, 1, 1, 1, 0)
-        ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(highlight); ctx.fill()
-    if quality > 1:
-        reduced = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-        down = cairo.Context(reduced)
-        down.scale(1/quality, 1/quality)
-        down.set_source_surface(surface)
-        down.get_source().set_filter(cairo.FILTER_BEST)
-        down.get_source().set_extend(cairo.EXTEND_PAD)
-        down.paint()
-        surface = reduced
+            ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(gradient); ctx.fill()
+            highlight = cairo.RadialGradient(x-.3*radius, y-.35*radius, 0,
+                                             x-.3*radius, y-.35*radius, highlight_size*radius)
+            highlight.add_color_stop_rgba(0, 1, 1, 1, highlight_alpha)
+            highlight.add_color_stop_rgba(1, 1, 1, 1, 0)
+            ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(highlight); ctx.fill()
+        if quality > 1:
+            reduced = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+            down = cairo.Context(reduced)
+            down.scale(1/quality, 1/quality)
+            down.set_source_surface(surface)
+            down.get_source().set_filter(cairo.FILTER_BEST)
+            down.get_source().set_extend(cairo.EXTEND_PAD)
+            down.paint()
+            surface = reduced
+    else:
+        raise ValueError('renderer must be studio or fast')
+    if cancelled and cancelled(): raise ValueError('Rendering cancelled')
     # Render completely before publishing the output. Existing files are replaced unless explicitly protected.
     fd, tmp = tempfile.mkstemp(prefix='.p4v-render-', suffix='.png', dir=str(output.parent))
     os.close(fd)
     try:
         surface.write_to_png(tmp)
+        if cancelled and cancelled(): raise ValueError("Rendering cancelled")
         if force: os.replace(tmp, output)
         else: os.link(tmp, output)
     finally:
@@ -265,6 +278,8 @@ def main(argv=None):
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
     parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'), default='spheres')
+    parser.add_argument('--renderer', choices=('studio', 'fast'), default='studio',
+                        help='studio: per-pixel lighting/depth (default); fast: legacy gradients')
     parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), default='matte', help='surface finish (default matte)')
     parser.add_argument('--brightness', type=positive, default=1.0)
     parser.add_argument('--bond-radius', type=positive, default=.10, help='bond radius in angstroms')
@@ -287,9 +302,9 @@ def main(argv=None):
                radius_scale=args.radius_scale, cell=not args.no_cell,
                transparent=args.transparent, force=args.force, model=args.model,
                brightness=args.brightness, bond_radius=args.bond_radius,
-               bond_factor=args.bond_factor, quality=args.quality, material=args.material)
+               bond_factor=args.bond_factor, quality=args.quality, material=args.material, renderer=args.renderer)
     except ImportError as error:
-        parser.exit(1, 'Rendering dependency missing (Python Cairo is required): %s\n' % error)
+        parser.exit(1, 'Rendering dependency missing (NumPy and Python Cairo are required): %s\n' % error)
     except Exception as error:
         parser.exit(1, 'Could not render structure: %s\n' % error)
     print('Saved PNG: %s' % Path(args.output).absolute())

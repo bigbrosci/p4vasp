@@ -12,9 +12,9 @@ p4v POSCAR -o transparent.png --transparent --no-cell --size 1600x1200
 p4v POSCAR -o top.png --force
 ```
 
-无需打开窗口，也不需要 DISPLAY、Wayland 或 ASE。需要当前 Python 环境安装 pycairo（Ubuntu 包为 `python3-cairo`，安装流程已包含）。不带 `-o` 时仍正常启动 GUI。输入支持 POSCAR/CONTCAR，输出当前仅支持 PNG，输入结构不会被修改。
+无需打开窗口，也不需要 DISPLAY、Wayland 或 ASE。需要当前 Python 环境安装 NumPy 和 pycairo（Ubuntu 包为 `python3-numpy python3-cairo`，安装流程已包含）。不带 `-o` 时仍正常启动 GUI。输入支持 POSCAR/CONTCAR，输出当前仅支持 PNG，输入结构不会被修改。
 
-No window, display server or ASE is needed. Requires pycairo in the launcher's Python environment (already included by the installer). Without `-o`, the GUI starts as usual. Input is POSCAR/CONTCAR; output is PNG only. The input structure is never modified.
+No window, display server or ASE is needed. Requires NumPy and pycairo in the launcher's Python environment (already included by the installer). Without `-o`, the GUI starts as usual. Input is POSCAR/CONTCAR; output is PNG only. The input structure is never modified.
 
 | 参数 / Option | 含义 / Meaning |
 | --- | --- |
@@ -52,13 +52,13 @@ p4v POSCAR -o bright.png --model ball-stick --brightness 1.15 --size 1600x1200
 - `--brightness`：亮度倍率，默认 1.0；提高会逐渐截断高亮颜色。Brightness multiplier; high values clip colors.
 - `--quality 1|2|3|4`：超采样倍率，默认 2；改善球体与键边缘。工作图最多 6400 万像素，超限会提示降低质量或尺寸。Supersampling factor, default 2, limited to 64 million working pixels.
 
-采用较集中的柔和高光、渐变阴影和超采样抗锯齿，默认透明背景。Cairo 正交投影使用 `data/atomtypes.xml` 的颜色、半径和共价半径；未知元素显示为灰色，不自动成键。
+默认 studio 导出采用逐像素球面光照、表面深度测试、柔和高光和超采样抗锯齿，保持透明背景。元素属性使用 `data/atomtypes.xml` 的颜色、半径和共价半径；未知元素显示为灰色，不自动成键。
 
-Soft localized highlights, shaded bonds and supersampling improve appearance. Transparency remains the default. Colors and radii come from the project table; unknown elements are gray and do not acquire automatic bonds.
+The default studio renderer computes per-pixel surface lighting and depth, with soft highlights and supersampling. Transparency remains the default. Colors and radii come from the project table; unknown elements are gray and do not acquire automatic bonds.
 
-仅连接输入文件内的原子，不自动复制周期镜像或跨晶胞连键，不显示标签。使用深度排序近似遮挡，复杂交叠可能存在绘制瑕疵，不是 OpenGL 窗口截图。成键搜索为两两比较，超大结构可能较慢。GUI 未改动。
+仅连接输入文件内的原子，不自动复制周期镜像或跨晶胞连键，不显示标签。studio 对球体和圆头键逐像素求交并选择最近表面；不是 OpenGL 窗口截图。成键搜索为两两比较，超大结构可能较慢。交互模型窗口仍使用轻量原生渲染。
 
-Only atoms present in the input are connected: no periodic replicas, cross-boundary bonds or labels. Depth sorting approximates occlusion and can show artifacts at complex intersections. This is not an OpenGL screenshot. Pairwise bond search can be slow on large structures. The GUI is unchanged.
+Only atoms present in the input are connected: no periodic replicas, cross-boundary bonds or labels. Studio uses analytic sphere/capsule intersections and nearest-surface depth for occlusion. This is not an OpenGL screenshot. Pairwise bond search can be slow on large structures. The interactive model window retains its lightweight native renderer.
 
 ## 材质试用 / Material previews
 
@@ -67,9 +67,9 @@ p4v POSCAR -o matte.png --view side --model space-filling --material matte --qua
 p4v POSCAR -o glossy.png --view side --model space-filling --material glossy --quality 3
 ```
 
-`--material classic|matte|glossy` controls sphere and bond shading. `matte` is the default, selected after the user compared the previews. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. These are Cairo shading presets, not physical materials or ambient occlusion.
+`--material classic|matte|glossy` controls sphere and bond shading. `matte` is the default, selected after the user compared the previews. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. Studio applies these material presets to linear-space surface lighting. The fast renderer retains the old Cairo gradients.
 
-材质选项：`classic` 保留旧版效果；`matte` 为默认，减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。这仍是 Cairo 渐变着色，未新增真实三维光照或接触阴影。
+材质选项：`classic` 提供较强的传统高光（精确保留旧渐变需使用 `--renderer fast`）；`matte` 为默认，减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。studio 使用表面法线计算光照并加入轻微的局部接触暗化近似；fast 保留旧 Cairo 渐变。未实现物理路径追踪或投射阴影。
 
 ## GUI export from the current view / 从当前视角导出
 
@@ -84,6 +84,21 @@ The exporter copies the native camera matrix, zoom, translation and projection, 
 
 导出读取当前显示帧、隐藏原子、晶胞复制数量及边框开关，保持窗口构图，不自动重新居中。模型如果在窗口边缘被裁切，导出也会裁切。渲染在后台运行，错误显示在面板中，原结构不变。
 
-This exports atoms, optional inferred bonds and cell edges using the Cairo renderer, not an OpenGL screenshot. Selection markers, arrows and isosurfaces are omitted. Depth ordering remains approximate; perspective atom radii use center-depth scaling and near/far clipping is approximate. Custom native colors/bond lists are not copied. Transparent pixels may appear white in the GTK preview because the panel behind them is white; saved PNG pixels retain alpha.
+This exports atoms, optional inferred bonds and cell edges using the export renderer, not an OpenGL screenshot. Selection markers, arrows and isosurfaces are omitted. Studio computes actual surface depth and perspective sphere intersections with the native clipping planes. Fast retains center-depth sorting and approximate perspective radii. Custom native colors/bond lists are not copied. Transparent pixels may appear white in the GTK preview because the panel behind them is white; saved PNG pixels retain alpha.
 
-当前导出原子、可选的推断键及晶胞，不包括选择标记、箭头、等值面或自定义原生颜色/键列表。遮挡和透视球体轮廓仍为近似。预览背景可能看起来是面板的白色，但 PNG 保留透明通道。
+当前导出原子、可选的推断键及晶胞，不包括选择标记、箭头、等值面或自定义原生颜色/键列表。studio 使用表面深度及透视球面求交；fast 保留近似绘制。预览背景可能看起来是面板的白色，但 PNG 保留透明通道。
+
+## 交互流畅，图片精细 / Responsive editing, detailed export
+
+- **Interactive window:** existing FLTK/OpenGL rendering stays lightweight. Rotating, selecting and building never invokes the studio renderer; its NumPy code is loaded only on export/preview.
+- **GUI preview:** studio at 520-pixel width and 1x sampling, rendered on demand in a worker. Final export uses the chosen width and quality. Closing the panel requests cancellation; failed/cancelled renders do not replace existing output.
+- **Final images:** `--renderer studio` is the default, with analytic sphere and round-ended bond intersections, surface-normal lighting, linear/sRGB conversion, smooth highlight rolloff and supersampling. Local contact darkening is a finite-distance heuristic, not physical ambient occlusion or path tracing.
+- **Fallback:** `--renderer fast` retains the previous Cairo gradients. This option changes exported images only; it is unrelated to native window quality.
+- CPU work is tiled to bound temporary depth/normal memory. Export still consumes CPU and time; very large models or high resolution can take longer and compete for machine resources. GUI event-loop responsiveness is tested, not a guaranteed frame rate on every device.
+
+交互建模以流畅为先，不加载高质量渲染器；只有导出面板预览或实际导出才计算 studio 图像。预览为低分辨率、1 倍采样，最终图片使用所选尺寸和质量。保留当前视角、透明背景、哑光默认值；关闭面板会请求取消，取消或失败不会替换已有图片。CPU 分块处理控制临时内存，但高分辨率/超大模型仍会增加等待时间。
+
+```bash
+p4v POSCAR -o model.png --view side --model space-filling --quality 3
+p4v POSCAR -o quick.png --renderer fast --quality 1
+```

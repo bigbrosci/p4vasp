@@ -2,7 +2,7 @@
 import itertools
 import tempfile
 from pathlib import Path
-from threading import Thread
+from threading import Event, Thread
 
 
 def snapshot(window):
@@ -41,6 +41,7 @@ class ExportImageDialog:
         self.Gtk, self.GdkPixbuf, self.GLib = Gtk, GdkPixbuf, GLib
         self.get_window = get_window
         self.alive, self.busy = True, False
+        self.cancel = Event()
         self.temp = tempfile.TemporaryDirectory(prefix='p4v-preview-')
         self.dialog = Gtk.Dialog(title='Export structure image', transient_for=parent)
         self.dialog.set_default_size(620, 600)
@@ -49,7 +50,7 @@ class ExportImageDialog:
         self.dialog.connect('destroy', self.on_destroy)
         box = self.dialog.get_content_area()
         box.set_spacing(10); box.set_border_width(12)
-        intro = Gtk.Label(label='Current window angle and framing • transparent PNG')
+        intro = Gtk.Label(label='Studio export • current view • transparent PNG')
         box.pack_start(intro, False, False, 0)
         grid = Gtk.Grid(column_spacing=12, row_spacing=8)
         box.pack_start(grid, False, False, 0)
@@ -84,6 +85,7 @@ class ExportImageDialog:
 
     def on_destroy(self, *args):
         self.alive = False
+        self.cancel.set()
         if not self.busy: self.temp.cleanup()
 
     def choose_file(self, *args):
@@ -109,13 +111,14 @@ class ExportImageDialog:
             height = max(32, round(width*state['camera']['height']/state['camera']['width']))
             if height > 8192: raise ValueError('Image is too tall; reduce width or resize the structure window.')
             options = dict(state, model=self.model.get_active_text(), material=self.material.get_active_text(),
-                           size=(width, height), quality=self.quality.get_value_as_int() if output else 2,
-                           brightness=self.brightness.get_value(), transparent=True)
+                           size=(width, height), quality=self.quality.get_value_as_int() if output else 1,
+                           brightness=self.brightness.get_value(), transparent=True,
+                           renderer="studio", cancelled=self.cancel.is_set)
         except Exception as error:
             self.status.set_text(str(error)); return
         self.busy = True
         for widget in (self.refresh, self.save, self.model, self.material): widget.set_sensitive(False)
-        self.status.set_text('Rendering…')
+        self.status.set_text('Rendering studio image… (model interaction remains available)')
         target = output or str(Path(self.temp.name)/'preview.png')
         def work():
             error = None

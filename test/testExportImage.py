@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT/'lib'), str(ROOT/'src')]
 os.environ['P4VASP_HOME'] = str(ROOT)
-from p4vasp.gtk3 import Gtk, Gdk
+from p4vasp.gtk3 import Gtk, Gdk, GLib
 from p4vasp.Structure import Structure
 from p4vasp.StructureWindow import StructureWindow
 from p4vasp.export_image import snapshot, ExportImageDialog
@@ -37,6 +37,7 @@ def main():
     window.navigator.setZoom(2)
     window.setMultiple(2, 1, 1)
     window.setHiddenAtoms([2])
+    assert "p4vasp.render_studio" not in sys.modules, "Studio renderer loaded during interactive setup"
     state = snapshot(window)
     assert len(state['scene'][1]) == 4
     assert state['camera']['zoom'] == 2
@@ -84,6 +85,16 @@ def main():
         pump_until(lambda: not dialog.busy)
         assert 'Saved:' in dialog.status.get_text()
         window.navigator.setPerspective(0)
+        # A higher-quality export must leave the GTK event loop responsive.
+        ticks = []
+        timer = GLib.timeout_add(10, lambda: (ticks.append(time.monotonic()) or True))
+        dialog.width.set_value(900); dialog.quality.set_value(3)
+        dialog.start(output)
+        pump_until(lambda: not dialog.busy)
+        GLib.source_remove(timer)
+        assert ticks, 'GTK did not service timers during export'
+        assert 'Saved:' in dialog.status.get_text()
+        dialog.width.set_value(500); dialog.quality.set_value(2)
         # Errors remain visible and leave the dialog usable.
         dialog.start(str(Path(folder)/'missing'/'file.png'))
         pump_until(lambda: not dialog.busy)
@@ -97,8 +108,14 @@ def main():
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, dialog.dialog.get_allocated_width(), dialog.dialog.get_allocated_height())
         dialog.dialog.draw(cairo.Context(surface))
         surface.write_to_png('/tmp/p4v-export-dialog.png')
+        # Closing the panel cancels a pending render and preserves an old output.
+        Path(output).write_bytes(b'keep previous output')
+        dialog.width.set_value(1600); dialog.quality.set_value(3)
+        dialog.start(output)
         dialog.dialog.destroy()
-    print('PASS: native camera, hidden/replicated atoms, GTK preview, latest-view export, alpha, error recovery', flush=True)
+        pump_until(lambda: not dialog.busy)
+        assert Path(output).read_bytes() == b'keep previous output'
+    print('PASS: native camera, hidden/replicated atoms, GTK preview, latest-view export, alpha, error recovery; %d GTK timer ticks during export' % len(ticks), flush=True)
 
 
 if __name__ == '__main__':
