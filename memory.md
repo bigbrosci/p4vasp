@@ -135,4 +135,4 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 
 - Side export uses −90° about Cartesian x (look from +y), with x horizontal and z upward. The initial +90° correction was upside down because screen y is inverted. Side currently matches front; top/front unchanged. Twelve tests passed, including side/top −90x image equivalence and projected z sign.
 
-- Material trials: `--material classic|matte|glossy` changes sphere and bond shading, retaining classic as default pending user preference. Thirteen renderer tests passed; compared all three on the user Desktop POSCAR, side view, identical settings. Local previews: `/tmp/p4v-material-preview/` (temporary, not published). No actual 3D lighting/occlusion added.
+- Material trials: `--material classic|matte|glossy` changes sphere and bond shading, using matte as the default after the user selected the middle preview; classic/glossy remain available. Thirteen renderer tests passed; compared all three on the user Desktop POSCAR, side view, identical settings. Local previews: `/tmp/p4v-material-preview/` (temporary, not published). No actual 3D lighting/occlusion added.

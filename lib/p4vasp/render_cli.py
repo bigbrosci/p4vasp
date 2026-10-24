@@ -104,7 +104,7 @@ def bond_pairs(positions, radii, factor):
 
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
            radius_scale=.5, cell=True, transparent=True, force=True,
-           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="classic"):
+           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="matte"):
     import cairo
     source, output = Path(source).resolve(), Path(output).absolute()
     if output.suffix.lower() != '.png': raise ValueError('output must have a .png extension')
@@ -226,7 +226,7 @@ def main(argv=None):
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
     parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'), default='spheres')
-    parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), default='classic', help='surface finish (default classic)')
+    parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), default='matte', help='surface finish (default matte)')
     parser.add_argument('--brightness', type=positive, default=1.0)
     parser.add_argument('--bond-radius', type=positive, default=.10, help='bond radius in angstroms')
     parser.add_argument('--bond-factor', type=positive, default=1.15, help='covalent-radius sum multiplier')

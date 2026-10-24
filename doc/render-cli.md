@@ -67,6 +67,6 @@ p4v POSCAR -o matte.png --view side --model space-filling --material matte --qua
 p4v POSCAR -o glossy.png --view side --model space-filling --material glossy --quality 3
 ```
 
-`--material classic|matte|glossy` controls sphere and bond shading. `classic` remains the default. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. These are Cairo shading presets, not physical materials or ambient occlusion.
+`--material classic|matte|glossy` controls sphere and bond shading. `matte` is the default, selected after the user compared the previews. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. These are Cairo shading presets, not physical materials or ambient occlusion.
 
-材质选项：`classic` 保留当前默认效果；`matte` 减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。这仍是 Cairo 渐变着色，未新增真实三维光照或接触阴影。
+材质选项：`classic` 保留旧版效果；`matte` 为默认，减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。这仍是 Cairo 渐变着色，未新增真实三维光照或接触阴影。

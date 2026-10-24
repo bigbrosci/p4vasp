@@ -100,7 +100,7 @@ class RenderTests(unittest.TestCase):
             outputs.append(self.output.read_bytes())
         self.assertEqual(len(set(outputs)), 3)
         self.run_cli('--size', '320x240')
-        self.assertEqual(outputs[0], self.output.read_bytes())
+        self.assertEqual(outputs[1], self.output.read_bytes())
 
     def test_rotation_convention(self):
         p = transform((1, 0, 0), rotations('90z,90x'))
