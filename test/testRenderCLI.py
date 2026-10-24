@@ -47,11 +47,11 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(bytes(surface.get_data()[:4]), b'\0'*4)
         self.assertGreater(len(set(bytes(surface.get_data()))), 20)
 
-    def test_overwrite_requires_force(self):
+    def test_default_overwrite_and_no_clobber(self):
         self.output.write_bytes(b'keep me')
-        self.run_cli(success=False)
+        self.run_cli('--no-clobber', success=False)
         self.assertEqual(self.output.read_bytes(), b'keep me')
-        self.run_cli('--force')
+        self.run_cli()
         self.assertTrue(self.output.read_bytes().startswith(b'\x89PNG'))
 
     def test_invalid_arguments(self):

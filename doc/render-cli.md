@@ -27,7 +27,8 @@ No window, display server or ASE is needed. Requires pycairo in the launcher's P
 | `--no-cell` | 隐藏晶胞边框，仅按原子范围适配画面 / Hide cell and fit atoms |
 | `--transparent` | 透明背景（默认） / Transparent background (default) |
 | `--white-background` | 不透明白色背景 / Opaque white background |
-| `--force` | 允许替换已有 PNG，默认拒绝覆盖 / Allow replacing an existing PNG |
+| `--no-clobber` | 已有文件时拒绝覆盖 / Refuse to overwrite an existing file |
+| `--force` | 替换已有 PNG（默认） / Replace an existing PNG (default) |
 
 旋转角为负数时使用等号，如 `--rotate=-30x`。这里的旋转只影响图片，且采用右手规则；不要与历史 GUI Rotate applet 的角度符号约定混淆。文件名 `top.png` 本身不决定视角。视角对应笛卡尔方向，而不是非正交晶胞的晶格方向。
 

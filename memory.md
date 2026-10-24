@@ -119,7 +119,7 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 ## Headless PNG export (2026-10-24)
 
 - `p4v.py` dispatches `-o`/`--output` before GTK imports to `lib/p4vasp/render_cli.py`; `p4v.sh` forwards arguments as before. Without output options normal GUI startup remains. Help now describes image export.
-- `p4v POSCAR -o top.png` exports via pycairo without a display or ASE. Supports Cartesian top/front/side views, ordered right-handed rotations, size, transparent background, cell visibility and radius scale. Existing PNG replacement requires `--force`; input is protected.
+- `p4v POSCAR -o top.png` exports via pycairo without a display or ASE. Supports Cartesian top/front/side views, ordered right-handed rotations, size, transparent background, cell visibility and radius scale. Existing PNGs are replaced by default; `--no-clobber` prevents replacement. `--force` remains compatible; input is protected.
 - Independent orthographic sphere renderer, using `data/atomtypes.xml`; no bonds/labels/periodic replicas, approximate depth ordering. Not an OpenGL screenshot. CLI rotation signs differ from historical Rotate applet. See `doc/render-cli.md`.
 - Focused checks: `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` — eight tests passed including no-display launcher use, blocked UI imports, scale factors, rotation order and overwrite protection. A generated PNG was visually inspected. macOS and GUI interaction were not exercised for this feature.
 
@@ -130,3 +130,5 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - `render_cli.py` adds spheres (default), ball-stick, stick and space-filling (project radii, NOT calibrated vdW). Covalent-radius bond heuristic connects input atoms only; periodic bonds remain unsupported. Pair search is quadratic; occlusion remains approximate.
 - Brightness, bond radius/factor and supersampling quality are configurable. Default 2x sampling, bounded to 64M working pixels. Transparent default retained; no GUI changes. See `doc/render-cli.md`.
 - Eleven renderer tests passed, including bond detection, model differences and quality limits. Ball-stick PNG visually inspected.
+
+- PNG overwrite default changed at user request: render API and CLI replace existing output atomically after successful rendering. Eleven renderer tests passed, including default replacement and explicit no-clobber protection.

@@ -103,7 +103,7 @@ def bond_pairs(positions, radii, factor):
 
 
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
-           radius_scale=.5, cell=True, transparent=True, force=False,
+           radius_scale=.5, cell=True, transparent=True, force=True,
            model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2):
     import cairo
     source, output = Path(source).resolve(), Path(output).absolute()
@@ -199,7 +199,7 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
         down.get_source().set_extend(cairo.EXTEND_PAD)
         down.paint()
         surface = reduced
-    # Render completely before publishing the output. Existing files need --force.
+    # Render completely before publishing the output. Existing files are replaced unless explicitly protected.
     fd, tmp = tempfile.mkstemp(prefix='.p4v-render-', suffix='.png', dir=str(output.parent))
     os.close(fd)
     try:
@@ -229,7 +229,11 @@ def main(argv=None):
                             help='transparent background (default)')
     background.add_argument('--white-background', dest='transparent', action='store_false',
                             help='opaque white background')
-    parser.add_argument('--force', action='store_true', help='replace an existing output PNG')
+    overwrite = parser.add_mutually_exclusive_group()
+    overwrite.add_argument('--force', dest='force', action='store_true', default=True,
+                           help='replace an existing output PNG (default)')
+    overwrite.add_argument('--no-clobber', dest='force', action='store_false',
+                           help='fail if the output already exists')
     args = parser.parse_args(argv)
     try:
         render(args.structure, args.output, view=args.view, turns=args.rotate, size=args.size,
