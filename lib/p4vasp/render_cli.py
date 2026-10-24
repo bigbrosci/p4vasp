@@ -92,7 +92,7 @@ def atom_styles():
 
 
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
-           radius_scale=.5, cell=True, transparent=False, force=False):
+           radius_scale=.5, cell=True, transparent=True, force=False):
     import cairo
     source, output = Path(source).resolve(), Path(output).absolute()
     if output.suffix.lower() != '.png': raise ValueError('output must have a .png extension')
@@ -158,7 +158,11 @@ def main(argv=None):
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
     parser.add_argument('--no-cell', action='store_true', help='hide cell and fit atoms only')
-    parser.add_argument('--transparent', action='store_true')
+    background = parser.add_mutually_exclusive_group()
+    background.add_argument('--transparent', dest='transparent', action='store_true', default=True,
+                            help='transparent background (default)')
+    background.add_argument('--white-background', dest='transparent', action='store_false',
+                            help='opaque white background')
     parser.add_argument('--force', action='store_true', help='replace an existing output PNG')
     args = parser.parse_args(argv)
     try:

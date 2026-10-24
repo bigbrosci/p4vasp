@@ -25,7 +25,8 @@ No window, display server or ASE is needed. Requires pycairo in the launcher's P
 | `--size 1200x900` | 像素尺寸，默认 1000x1000；每边 32–8192，总计不超过 3200 万像素 / Pixel dimensions and limits |
 | `--radius-scale 0.5` | 原子半径倍率，默认 0.5 / Atom radius multiplier |
 | `--no-cell` | 隐藏晶胞边框，仅按原子范围适配画面 / Hide cell and fit atoms |
-| `--transparent` | 透明背景，默认白色 / Transparent instead of white background |
+| `--transparent` | 透明背景（默认） / Transparent background (default) |
+| `--white-background` | 不透明白色背景 / Opaque white background |
 | `--force` | 允许替换已有 PNG，默认拒绝覆盖 / Allow replacing an existing PNG |
 
 旋转角为负数时使用等号，如 `--rotate=-30x`。这里的旋转只影响图片，且采用右手规则；不要与历史 GUI Rotate applet 的角度符号约定混淆。文件名 `top.png` 本身不决定视角。视角对应笛卡尔方向，而不是非正交晶胞的晶格方向。

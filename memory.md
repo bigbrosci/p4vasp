@@ -122,3 +122,5 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - `p4v POSCAR -o top.png` exports via pycairo without a display or ASE. Supports Cartesian top/front/side views, ordered right-handed rotations, size, transparent background, cell visibility and radius scale. Existing PNG replacement requires `--force`; input is protected.
 - Independent orthographic sphere renderer, using `data/atomtypes.xml`; no bonds/labels/periodic replicas, approximate depth ordering. Not an OpenGL screenshot. CLI rotation signs differ from historical Rotate applet. See `doc/render-cli.md`.
 - Focused checks: `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` — eight tests passed including no-display launcher use, blocked UI imports, scale factors, rotation order and overwrite protection. A generated PNG was visually inspected. macOS and GUI interaction were not exercised for this feature.
+
+- PNG background is now transparent by default (including the render API); `--transparent` remains supported, and `--white-background` selects opaque white. Nine focused renderer tests passed after this default change.

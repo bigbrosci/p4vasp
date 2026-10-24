@@ -34,6 +34,11 @@ class RenderTests(unittest.TestCase):
         self.run_cli('--size', '320x240')
         surface = cairo.ImageSurface.create_from_png(str(self.output))
         self.assertEqual((surface.get_width(), surface.get_height()), (320, 240))
+        self.assertEqual(bytes(surface.get_data()[:4]), b'\0'*4)
+
+    def test_white_background(self):
+        self.run_cli('--white-background')
+        surface = cairo.ImageSurface.create_from_png(str(self.output))
         self.assertEqual(bytes(surface.get_data()[:4]), b'\xff'*4)
 
     def test_transparent_rotated_view(self):
