@@ -104,7 +104,7 @@ def bond_pairs(positions, radii, factor):
 
 def render(source, output, *, view='top', turns=(), size=(1000, 1000),
            radius_scale=.5, cell=True, transparent=True, force=True,
-           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2):
+           model="spheres", brightness=1.0, bond_radius=.10, bond_factor=1.15, quality=2, material="classic"):
     import cairo
     source, output = Path(source).resolve(), Path(output).absolute()
     if output.suffix.lower() != '.png': raise ValueError('output must have a .png extension')
@@ -151,6 +151,13 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
                 other = list(bits); other[axis] = 1
                 ctx.move_to(*screen(p)); ctx.line_to(*screen(corners[tuple(other)]))
         ctx.stroke()
+    materials = {
+        'classic': (((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)), .35, .40, (.4, 1.15, .45)),
+        'matte': (((0, 1.02), (.35, .96), (.72, .82), (1, .55)), .45, .10, (.65, 1.0, .65)),
+        'glossy': (((0, 1.10), (.35, 1.0), (.72, .70), (1, .28)), .20, .65, (.35, 1.18, .40)),
+    }
+    stops, highlight_size, highlight_alpha, bond_light = materials[material]
+
     def lit(color, factor):
         return tuple(min(1, max(0, v*factor*brightness)) for v in color)
 
@@ -173,7 +180,7 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
             r = bond_radius*scale
             nx, ny = -(v-y)/length*r, (u-x)/length*r
             gradient = cairo.LinearGradient(x-nx, y-ny, x+nx, y+ny)
-            for offset, strength in ((0, .4), (.35, 1.15), (1, .45)):
+            for offset, strength in zip((0, .35, 1), bond_light):
                 gradient.add_color_stop_rgb(offset, *lit(color, strength))
             ctx.set_source(gradient); ctx.set_line_width(2*r)
             ctx.set_line_cap(cairo.LINE_CAP_ROUND)
@@ -182,12 +189,12 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
         p, radius, color = data
         x, y = screen(p); radius *= scale
         gradient = cairo.RadialGradient(x-.28*radius, y-.32*radius, 0, x, y, radius)
-        for offset, strength in ((0, 1.18), (.35, 1.05), (.72, .78), (1, .30)):
+        for offset, strength in stops:
             gradient.add_color_stop_rgb(offset, *lit(color, strength))
         ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(gradient); ctx.fill()
         highlight = cairo.RadialGradient(x-.3*radius, y-.35*radius, 0,
-                                         x-.3*radius, y-.35*radius, .35*radius)
-        highlight.add_color_stop_rgba(0, 1, 1, 1, .40)
+                                         x-.3*radius, y-.35*radius, highlight_size*radius)
+        highlight.add_color_stop_rgba(0, 1, 1, 1, highlight_alpha)
         highlight.add_color_stop_rgba(1, 1, 1, 1, 0)
         ctx.arc(x, y, radius, 0, 2*math.pi); ctx.set_source(highlight); ctx.fill()
     if quality > 1:
@@ -219,6 +226,7 @@ def main(argv=None):
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
     parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'), default='spheres')
+    parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), default='classic', help='surface finish (default classic)')
     parser.add_argument('--brightness', type=positive, default=1.0)
     parser.add_argument('--bond-radius', type=positive, default=.10, help='bond radius in angstroms')
     parser.add_argument('--bond-factor', type=positive, default=1.15, help='covalent-radius sum multiplier')
@@ -240,7 +248,7 @@ def main(argv=None):
                radius_scale=args.radius_scale, cell=not args.no_cell,
                transparent=args.transparent, force=args.force, model=args.model,
                brightness=args.brightness, bond_radius=args.bond_radius,
-               bond_factor=args.bond_factor, quality=args.quality)
+               bond_factor=args.bond_factor, quality=args.quality, material=args.material)
     except ImportError as error:
         parser.exit(1, 'Rendering dependency missing (Python Cairo is required): %s\n' % error)
     except Exception as error:

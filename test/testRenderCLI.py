@@ -93,6 +93,15 @@ class RenderTests(unittest.TestCase):
         self.run_cli('--brightness', '0.7', '--force')
         self.run_cli('--quality', '4', '--size', '8192x1000', '--force', success=False)
 
+    def test_materials(self):
+        outputs = []
+        for material in ('classic', 'matte', 'glossy'):
+            self.run_cli('--material', material, '--size', '320x240')
+            outputs.append(self.output.read_bytes())
+        self.assertEqual(len(set(outputs)), 3)
+        self.run_cli('--size', '320x240')
+        self.assertEqual(outputs[0], self.output.read_bytes())
+
     def test_rotation_convention(self):
         p = transform((1, 0, 0), rotations('90z,90x'))
         for actual, expected in zip(p, (0, 0, 1)):

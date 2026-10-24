@@ -59,3 +59,14 @@ Soft localized highlights, shaded bonds and supersampling improve appearance. Tr
 仅连接输入文件内的原子，不自动复制周期镜像或跨晶胞连键，不显示标签。使用深度排序近似遮挡，复杂交叠可能存在绘制瑕疵，不是 OpenGL 窗口截图。成键搜索为两两比较，超大结构可能较慢。GUI 未改动。
 
 Only atoms present in the input are connected: no periodic replicas, cross-boundary bonds or labels. Depth sorting approximates occlusion and can show artifacts at complex intersections. This is not an OpenGL screenshot. Pairwise bond search can be slow on large structures. The GUI is unchanged.
+
+## 材质试用 / Material previews
+
+```bash
+p4v POSCAR -o matte.png --view side --model space-filling --material matte --quality 3
+p4v POSCAR -o glossy.png --view side --model space-filling --material glossy --quality 3
+```
+
+`--material classic|matte|glossy` controls sphere and bond shading. `classic` remains the default. `matte` reduces white reflection and softens edge shadows; `glossy` uses a smaller, stronger highlight. Compare with the same brightness (start at 1.0), size and view. These are Cairo shading presets, not physical materials or ambient occlusion.
+
+材质选项：`classic` 保留当前默认效果；`matte` 减弱白色反光和边缘阴影；`glossy` 使用更小、更强的高光。对比时保持亮度（建议先用 1.0）、尺寸和视角一致。这仍是 Cairo 渐变着色，未新增真实三维光照或接触阴影。
