@@ -352,6 +352,8 @@ class XML:
             return Gtk.MenuBar()
         if class_name == "GtkMenu":
             return gtk.Menu()
+        if class_name == "GtkSeparatorMenuItem":
+            return Gtk.SeparatorMenuItem()
         if class_name == "GtkMenuItem":
             return gtk.MenuItem()
         if class_name == "GtkImageMenuItem":

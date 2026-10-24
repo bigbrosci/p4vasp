@@ -144,3 +144,9 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - `render_cli.py` accepts scene/camera for GUI; retains CLI presets/autofit otherwise. Projection follows VisNavDrawer (orthographic .04 world units/pixel; perspective frustum near=10, far=50, eye translation −20). Preserve framing and aspect ratio; matte/alpha defaults. Approximate sphere depth/near-far clipping; arrows/isosurfaces/selection markers and custom native colors/bond lists not exported.
 - UI has preview, model/material, width/quality/brightness, refresh and file chooser; errors keep panel usable, output chooser confirms overwrite. GUI transparency is fixed on. Details: `doc/render-cli.md` and Chinese interface guide.
 - Verification: 13 CLI tests, 57 bundled tests, 31 GTK applet startup checks passed. `test/testExportImage.py` passed actual native/GTK camera, hidden/replicated atoms, toolbar action, preview, latest-view capture after rotation, perspective, PNG alpha and error recovery; allocated GTK panel rendering inspected. Full GTK suite still has the same 14 known Glade conversion failures. macOS not tested.
+
+## File menu blank item (2026-10-24)
+
+- The blank row below Reload data was `frame.glade`'s unlabeled GtkMenuItem `separator`, not a missing action. Replaced with GtkSeparatorMenuItem and added its missing constructor mapping in `gtk3/glade.py` (unknown classes otherwise fall back to a Box).
+- Verified the actual popup rendering and neighboring labels using GTK on X11; Wayland popup capture hit a display protocol error. No application backend default was changed. The separator now draws as a line.
+- All 31 GTK applet startup checks passed with X11 after the menu fix.
