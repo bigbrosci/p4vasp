@@ -21,6 +21,7 @@ Last updated: 2026-10-24. This is a repository navigation and handoff document. 
 | 2026-10-06 | Copied atoms default to T T T when selective dynamics is enabled; original flags remain unchanged. Moved update notes into `update_history/`. | [October 6](update_history/update_2026_10_06.md) |
 | 2026-10-12 | Fixed simultaneous Build table/text views; disabled automatic log-file writing; added Shift + left-drag additive atom selection. | [October 12](update_history/update_2026_10_12.md) |
 | 2026-10-13 | Shift-drag now toggles each atom inside the box; idle Escape clears the entire selection. | [October 13](update_history/update_2026_10_13.md) |
+| 2026-10-24 | Unified installer/launcher; headless PNG export, model/material controls, current-view GUI export, and File menu separator fix. | [October 24](update_history/update_2026_10_24.md) |
 
 ## Where to investigate
 
@@ -99,54 +100,79 @@ October 12 evidence: 57 bundled tests and 31 applet startup checks passed. The f
 Launch updated code after closing the existing application:
 
 ```bash
-PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
+bash p4v.sh
 ```
+
+The launcher selects `.venv-macos/bin/python3` when available, otherwise `/usr/bin/python3` or `python3`; `PYTHON` overrides this. It sets `P4VASP_HOME` and the library path and forwards application arguments.
 
 ## Publishing preferences and recorded state
 
 - Follow the automatic update-note commit/push workflow in `AGENTS.md`. Stage only related files; preserve unrelated changes; never force-push.
 - Authorized repository: `https://github.com/bigbrosci/p4vasp.git`, remote `origin`, branch `p4vasp-py3`. Check these before publishing.
-- Confirmed pushed in this session: `076cba0` (Build view fix/test/note) and `793027c` (logging change, note, publishing guidance). Later work may supersede these; inspect Git rather than treating them as a permanent HEAD.
+- Recent published implementation commits: `c8cf168` (matte default), `f19070b` (current-view GUI export), and `22c087a` (File menu separator). These identify changes, not a permanent HEAD; check Git for later work.
 - An earlier automatic approval review blocked publishing until the user explicitly approved the destination and payload. The user then approved uploading, and the push succeeded. Report actual push results; local commits alone are not published updates.
 
-## Unified installation entry (2026-10-24)
+## Installation and startup — current state
 
-- Use `bash install.sh` from the checkout root on Linux or macOS. Detection uses `uname -s` and Linux os-release ID/ID_LIKE without sourcing shell code.
-- Ubuntu/Debian derivatives route to `install/ubuntu-bootstrap.sh`; other Linux automatically uses its `--skip-apt` path (dependencies must be preinstalled); macOS routes to `install/macos-bootstrap.sh` (Homebrew and Xcode tools required). Backend scripts remain intact. Obsolete wrappers `ubuntu-start.sh`, `macos-start.sh`, and `install/install-ubuntu-dependencies.sh` were removed with user approval; use the unified entry and its `--deps-only` flag instead. Keep `p4v.sh` for daily startup.
-- No automatic dnf/pacman/zypper package installation was added. See `install.md` for prerequisites and supported flags. `--dry-run` previews without changes; `--skip-deps` maps to the backend's skip flag. By default native extensions are rebuilt, so source updates take effect on other computers.
-- Run `/usr/bin/python3 test/testUnifiedInstaller.py` for mocked routing/argument tests. Nine tests passed; shell syntax and the local Linux dry run passed. Actual package installation, macOS execution and cross-distribution builds were not performed for this entry-point change.
+- Install/build from the checkout root using `bash install.sh`; daily startup is `bash p4v.sh`. `p4v.py` is the Python application/CLI entry, not an installer. If using a `p4v` alias, point it at the current checkout's `p4v.sh`.
+- `install.sh` detects `uname -s` and Linux os-release ID/ID_LIKE without sourcing shell code. Ubuntu/Debian uses `install/ubuntu-bootstrap.sh` with apt; other Linux uses its skip-apt path with preinstalled dependencies. Automatic dnf/pacman/zypper installation is not implemented.
+- macOS uses `install/macos-bootstrap.sh`, Homebrew packages including GTK3/PyGObject/py3cairo, and `.venv-macos` with system site packages. Homebrew and Xcode Command Line Tools must already exist. The Ubuntu apt command in installation documentation is not a macOS command.
+- Default installation rebuilds the native extension, which is required for C++ mouse-selection changes to work on another computer. `--dry-run` previews without changes; `--deps-only` prepares dependencies; `--skip-deps` skips package installation. See [install.md](install.md) for full options.
+- Obsolete wrappers removed with user approval: `ubuntu-start.sh`, `macos-start.sh`, `install/install-ubuntu-dependencies.sh`. `run-p4vasp.sh` was renamed to `p4v.sh`; `ubuntu_install.sh` was renamed to `install.sh`. Keep the backend/build scripts under `install/`.
+- Installer verification: nine mocked routing/argument tests, shell syntax and local Linux dry run passed on October 24. Actual package installation, macOS execution and cross-distribution builds were not performed for the entry-point changes.
 
-## Headless PNG export (2026-10-24)
+## Image export — current state
 
-- `p4v.py` dispatches `-o`/`--output` before GTK imports to `lib/p4vasp/render_cli.py`; `p4v.sh` forwards arguments as before. Without output options normal GUI startup remains. Help now describes image export.
-- `p4v POSCAR -o top.png` exports via pycairo without a display or ASE. Supports Cartesian top/front/side views, ordered right-handed rotations, size, transparent background, cell visibility and radius scale. Existing PNGs are replaced by default; `--no-clobber` prevents replacement. `--force` remains compatible; input is protected.
-- Independent orthographic sphere renderer, using `data/atomtypes.xml`; no bonds/labels/periodic replicas, approximate depth ordering. Not an OpenGL screenshot. CLI rotation signs differ from historical Rotate applet. See `doc/render-cli.md`.
-- Focused checks: `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` — eight tests passed including no-display launcher use, blocked UI imports, scale factors, rotation order and overwrite protection. A generated PNG was visually inspected. macOS and GUI interaction were not exercised for this feature.
+### User-selected behavior
 
-- PNG background is now transparent by default (including the render API); `--transparent` remains supported, and `--white-background` selects opaque white. Nine focused renderer tests passed after this default change.
+- PNG background is **transparent by default**. The user selected the middle material preview, so **matte is the default**; classic/glossy remain available. Default brightness is 1.0 and supersampling quality is 2.
+- CLI export **replaces existing output by default**, publishing only after successful rendering. `--no-clobber` prevents replacement and `--force` remains compatible. GUI file selection confirms overwrite. Input structures are protected.
+- GUI export must use the **latest user-adjusted camera at save time**: rotation, zoom, translation, projection and viewport aspect ratio. Do not reset to Top/Side, automatically recenter or fit the model. If the window crops atoms, the exported framing also crops them.
+- Real-time OpenGL material upgrades were discussed as future work; only the independent image exporter and its GUI panel have been implemented.
 
-## Export models and quality (2026-10-24)
+### CLI and renderer
 
-- `render_cli.py` adds spheres (default), ball-stick, stick and space-filling (project radii, NOT calibrated vdW). Covalent-radius bond heuristic connects input atoms only; periodic bonds remain unsupported. Pair search is quadratic; occlusion remains approximate.
-- Brightness, bond radius/factor and supersampling quality are configurable. Default 2x sampling, bounded to 64M working pixels. Transparent default retained; no GUI changes. See `doc/render-cli.md`.
-- Eleven renderer tests passed, including bond detection, model differences and quality limits. Ball-stick PNG visually inspected.
+- `p4v.py` dispatches `-o`/`--output` and help before GTK imports to `lib/p4vasp/render_cli.py`. Without output options, normal GUI startup remains. `p4v.sh` forwards arguments.
+- `p4v POSCAR -o model.png` renders POSCAR/CONTCAR using pycairo without GTK windows, a display server or ASE. CLI default size is 1000×1000 and model is `spheres`.
+- Models: `spheres`, `ball-stick`, `stick`, `space-filling`. The last uses larger project radii; it is **not a calibrated van der Waals model**. Colors/radii/covalent radii come from `data/atomtypes.xml`; unknown elements are gray and do not acquire inferred bonds.
+- Bonds use a covalent-radius distance heuristic (default multiplier 1.15), with adjustable radius (default 0.10 Å). Pair search is quadratic. CLI connects input atoms only; automatic periodic-image bonds/replicas are not implemented.
+- CLI views: top looks from +z; side rotates −90° about Cartesian x (look from +y, x right, z up), currently matching front. The superseded +90° side change was upside down because screen y is inverted. Preserve the projected-z sign regression.
+- Ordered `--rotate` angles use the right-hand rule and affect only the image. This differs from the historical GUI Rotate applet's sign convention. GUI camera export bypasses CLI view presets.
+- `--quality 1|2|3|4` controls supersampling, capped at 64 million working pixels. Size limits and all options are in [doc/render-cli.md](doc/render-cli.md).
 
-- PNG overwrite default changed at user request: render API and CLI replace existing output atomically after successful rendering. Eleven renderer tests passed, including default replacement and explicit no-clobber protection.
+### GUI panel and camera bridge
 
-- Side export uses −90° about Cartesian x (look from +y), with x horizontal and z upward. The initial +90° correction was upside down because screen y is inverted. Side currently matches front; top/front unchanged. Twelve tests passed, including side/top −90x image equivalence and projected z sign.
+- Control's camera button **Export PNG** is defined in `data/glade2/swincontrol.glade`; the combined Structure applet uses `structureapplet.glade`. Their `on_foto_button_clicked_handler` methods open `lib/p4vasp/export_image.py`. Original single TGA handlers remain as `save_legacy_screenshot`; animation export is unchanged.
+- `snapshot()` copies the native camera through `getRotMatElement(row,column)`, zoom, viewport/projection and current Cartesian structure/frame. It preserves hidden atoms, repeated cells and cell visibility. Copy native state on the main thread; workers receive Python values only. No temporary POSCAR is written.
+- `render_cli.py` accepts scene/camera for GUI export while retaining CLI presets/autofit. Projection follows `src/VisNavDrawer.cpp`: orthographic .04 world units/pixel; perspective near=10, far=50, eye translation −20. Do not transpose the native matrix or omit its translation/zoom.
+- Panel: preview, model/material, width, quality, brightness, refresh and export chooser. Height follows window aspect ratio. Use **Refresh preview** after changing the model view or numeric settings; actual export always takes a fresh snapshot. Rendering runs in a worker, with errors shown in the still-usable panel.
+- Cairo transparency may appear white against the GTK panel; the PNG retains alpha. GUI background is always transparent.
 
-- Material trials: `--material classic|matte|glossy` changes sphere and bond shading, using matte as the default after the user selected the middle preview; classic/glossy remain available. Thirteen renderer tests passed; compared all three on the user Desktop POSCAR, side view, identical settings. Local previews: `/tmp/p4v-material-preview/` (temporary, not published). No actual 3D lighting/occlusion added.
+### Rendering limitations and future work
 
-## GUI transparent image export (2026-10-24)
+- Cairo spheres/bonds use gradients and approximate depth sorting. This is not a full 3D renderer or a pixel-identical OpenGL screenshot; no physical contact shadows/ambient occlusion were added.
+- Sphere perspective uses center-depth radius scaling; depth clipping and complex intersections remain approximate.
+- GUI exports atoms, inferred bonds and cell edges. It omits arrows, isosurfaces, selection markers and custom native colors/bond lists. Explicitly repeated GUI cells are included; this does not imply complete periodic-bond handling.
+- Style comparison previews were local temporary files under `/tmp/p4v-material-preview/`; do not rely on them persisting. The user structure and previews were not published.
 
-- Control camera button in `data/glade2/swincontrol.glade` (and combined `structureapplet.glade`) now opens `lib/p4vasp/export_image.py` via the two applets' `on_foto_button_clicked_handler`. Original single TGA handler retained as `save_legacy_screenshot`; animation unchanged. GTK adapter remains unchanged.
-- `snapshot()` copies native camera rows through `getRotMatElement(i,j)`, zoom, viewport dimensions/projection and current Cartesian structure, hidden atoms, repeated cells and cell visibility. Snapshot is captured on main thread at export time, not when panel opened. Rendering gets only Python values in a worker. No source POSCAR writes.
-- `render_cli.py` accepts scene/camera for GUI; retains CLI presets/autofit otherwise. Projection follows VisNavDrawer (orthographic .04 world units/pixel; perspective frustum near=10, far=50, eye translation −20). Preserve framing and aspect ratio; matte/alpha defaults. Approximate sphere depth/near-far clipping; arrows/isosurfaces/selection markers and custom native colors/bond lists not exported.
-- UI has preview, model/material, width/quality/brightness, refresh and file chooser; errors keep panel usable, output chooser confirms overwrite. GUI transparency is fixed on. Details: `doc/render-cli.md` and Chinese interface guide.
-- Verification: 13 CLI tests, 57 bundled tests, 31 GTK applet startup checks passed. `test/testExportImage.py` passed actual native/GTK camera, hidden/replicated atoms, toolbar action, preview, latest-view capture after rotation, perspective, PNG alpha and error recovery; allocated GTK panel rendering inspected. Full GTK suite still has the same 14 known Glade conversion failures. macOS not tested.
+## File menu separator
 
-## File menu blank item (2026-10-24)
+- The blank row below Reload data was the unlabeled `GtkMenuItem` named `separator` in `data/glade2/frame.glade`. It was intended to be a divider, not a missing action.
+- Changed it to `GtkSeparatorMenuItem` and added the constructor mapping in `lib/p4vasp/gtk3/glade.py`; unknown classes otherwise fall back to a Box. Both resource and adapter changes are needed.
+- Actual popup rendering and neighboring labels were checked on X11, and 31 applet startup checks passed. Wayland popup checking encountered a display protocol error; no application backend default was changed. Use `GDK_BACKEND=x11` as a diagnostic fallback, not an assumed permanent requirement.
 
-- The blank row below Reload data was `frame.glade`'s unlabeled GtkMenuItem `separator`, not a missing action. Replaced with GtkSeparatorMenuItem and added its missing constructor mapping in `gtk3/glade.py` (unknown classes otherwise fall back to a Box).
-- Verified the actual popup rendering and neighboring labels using GTK on X11; Wayland popup capture hit a display protocol error. No application backend default was changed. The separator now draws as a line.
-- All 31 GTK applet startup checks passed with X11 after the menu fix.
+## Latest verification references (2026-10-24)
+
+These are recorded results from implementation work, not checks rerun by a documentation-only refresh:
+
+| Check | Recorded result | Command from checkout root |
+| --- | --- | --- |
+| Unified installer routing | 9 passed | `/usr/bin/python3 test/testUnifiedInstaller.py` |
+| Headless image export | 13 passed | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` |
+| Native/GTK export integration | Passed; allocated panel rendering inspected | `/usr/bin/python3 test/testExportImage.py` |
+| Bundled tests | 57 passed | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/test.py` |
+| GTK applet startup | 31 passed | `/usr/bin/python3 test/run_gtk3_smoke.py` |
+| Full GTK suite | 14 known Glade property failures | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/testGtk3.py` |
+
+- GUI checks need a display and compiled native extension. `testExportImage.py` checks the toolbar entry, native matrix/zoom, hidden/replicated atoms, preview, fresh camera after rotation, perspective, PNG alpha and error recovery. The standalone integration test exits without testing native FLTK worker teardown.
+- macOS installation/rendering, HiDPI behavior and full manual workflows on another computer remain unverified. See the unresolved issues above and [doc/GTK3-migration.md](doc/GTK3-migration.md).
