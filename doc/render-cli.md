@@ -111,11 +111,11 @@ GUI 导出默认勾选 **Save reusable command, view preset and structure snapsh
 | --- | --- |
 | `model.png.POSCAR` | 当前显示帧的基础几何快照，复制和隐藏由配置重放 / Base geometry of the displayed frame, before replicas/hidden filtering |
 | `model.png.view.json` | 相机矩阵、缩放、平移、投影、窗口比例、重复/隐藏及图片设置 / Camera, repetitions/hidden indices and render options |
-| `model.png.command.txt` | 可复制运行的完整命令 / Complete replay command |
+| `command_for_model.sh` | 可复制运行的完整命令 / Complete replay command |
 
 配套文件若已存在，会采用 `.replay-2` 等新前缀，不覆盖既有文件。取消勾选可仅保存 PNG。几何快照用于图片复现，不保存计算设置或选择性动力学标记。
 
-The checkbox is enabled by default. Copy the last successful export command from the panel, or read its `.command.txt` file later. Existing companions are preserved with a new replay suffix. Uncheck the option to save only a PNG. The snapshot contains rendering geometry, not calculation settings or selective-dynamics flags.
+The checkbox is enabled by default. Copy the last successful export command from the panel, or read its `command_for_<image-name>.sh` script later. Existing companions are preserved with a new replay suffix. Uncheck the option to save only a PNG. The snapshot contains rendering geometry, not calculation settings or selective-dynamics flags.
 
 生成的命令优先使用当前 checkout 的绝对 `p4v.sh` 路径，确保从其他目录运行时也能找到程序；已有 `p4v` 别名时可以简写为：
 
@@ -139,3 +139,12 @@ The same snapshot, software environment and preset reproduce the image. For batc
 配置保留固定相机和构图，不自动对齐、居中或适配另一结构。批处理输入应采用可比的坐标方向、位置和尺度；隐藏原子按 **0 起始原子索引** 记录，因此应保持相同的原子顺序。越界隐藏索引会报错；需要保留全部原子时，可将配置中的 `display.hidden` 改为空列表。
 
 Presets retain framing rather than aligning or fitting other structures. Use comparable axes, origin and dimensions. Hidden atoms use zero-based indices and require compatible ordering; out-of-range indices fail. Set `display.hidden` to `[]` when all atoms should be included.
+
+命令脚本直接放在图片同一目录，例如 `model.png` 对应 `command_for_model.sh`：
+
+```bash
+bash command_for_model.sh
+bash command_for_model.sh --quality 3
+```
+
+Scripts are saved beside the image, include a Bash header, and forward extra image options. Name collisions use a replay suffix, for example `command_for_model.replay-2.sh`.

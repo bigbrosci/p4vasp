@@ -171,7 +171,7 @@ These are recorded implementation checks, not guarantees for another device. The
 | Unified installer routing | 9 passed | `/usr/bin/python3 test/testUnifiedInstaller.py` |
 | Headless image export | 14 passed (studio default/fast fallback included) | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` |
 | Studio surface tests | 6 passed | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderStudio.py` |
-| Replay presets | 5 passed; arbitrary-angle byte-identical replay and batch input | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderRecipe.py` |
+| Replay presets | 6 passed; arbitrary-angle byte-identical replay and batch input | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderRecipe.py` |
 | Native/GTK export integration | Passed; panel inspected; event-loop heartbeat and cancellation checked | `/usr/bin/python3 test/testExportImage.py` |
 | Bundled tests | 57 passed | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/test.py` |
 | GTK applet startup | 31 passed | `/usr/bin/python3 test/run_gtk3_smoke.py` |
@@ -188,8 +188,10 @@ These are recorded implementation checks, not guarantees for another device. The
 
 ## Reusable GUI camera commands (2026-10-24)
 
-- Export dialog defaults to saving a replay bundle after successful PNG output: `<image>.POSCAR` (base Cartesian geometry), `<image>.view.json` (versioned data-only camera/render/display state), `<image>.command.txt`. Copy command shows the last successful saved command. Unchecking the recipe option writes only the PNG. Existing companions get a new `.replay-N` prefix; they are not overwritten. Geometry snapshots omit calculation settings/selective-dynamics flags.
+- Export dialog defaults to saving a replay bundle after successful PNG output: `<image>.POSCAR` (base Cartesian geometry), `<image>.view.json` (versioned data-only camera/render/display state), `command_for_<image-stem>.sh`. Copy command shows the last successful saved command. Unchecking the recipe option writes only the PNG. Existing companions get a new `.replay-N` prefix; they are not overwritten. Geometry snapshots omit calculation settings/selective-dynamics flags.
 - New `lib/p4vasp/render_recipe.py`: validation, DEFAULTS, repeat/hidden replay, snapshot serialization, shell-safe command generation and companion publication. `render_cli.py --preset FILE` applies camera/settings and rebuilds visible replicas from the supplied input. Explicit CLI image options override preset settings; --view/--rotate conflict with --preset. Keep DEFAULTS consistent with render() defaults.
 - GUI snapshot copies recipe data only for an actual export with the checkbox enabled; previews avoid that extra copy. Recipes capture save-time state, including edited/current trajectory geometry. CLI replay needs no GTK/display. Other structures retain the same camera, not auto-alignment/fitting; axes/origin/scale should match and hidden indices require matching atom order.
 - GUI controls compacted with a scrollable settings area and fixed export actions; copy command remains accessible at 620×600. User still edits/rotates in the lightweight native window.
 - Verification: 5 recipe tests (byte-identical headless replay, batch input, overrides, validation/conflicts and collision protection), 14 CLI tests, GUI integration including real command execution, clipboard and recipe opt-out, 57 bundled tests and 31 applet startup checks passed. Allocated GTK panel inspected on X11. Full GTK retains 14 known Glade failures; macOS not tested.
+
+- Replay command files now use `command_for_<image-stem>.sh` beside the image (e.g. model.png → command_for_model.sh), with Bash header, executable permission and forwarded CLI options. Existing files remain protected by replay suffixes. Six recipe tests passed, including running the saved script headlessly with option overrides.

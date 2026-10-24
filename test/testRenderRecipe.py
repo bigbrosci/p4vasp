@@ -50,6 +50,21 @@ class RecipeTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertTrue(expected != self.output.read_bytes(), 'Changed batch input should change the image')
 
+    def test_named_shell_script_next_to_image(self):
+        paths = bundle_paths(self.output)
+        self.assertEqual(paths[2],self.output.parent/'command_for_image with spaces.sh')
+        save_bundle(paths,self.output,self.base,self.data)
+        self.assertTrue(paths[2].read_text().startswith('#!/usr/bin/env bash\n'))
+        self.assertTrue(os.access(paths[2],os.X_OK))
+        env = dict(os.environ,PYTHON='/usr/bin/python3',PYTHONDONTWRITEBYTECODE='1')
+        env.pop('DISPLAY',None); env.pop('WAYLAND_DISPLAY',None)
+        result = subprocess.run(['bash',str(paths[2]),'--size','160x120'],env=env,
+                                capture_output=True,text=True,timeout=20)
+        self.assertEqual(result.returncode,0,result.stderr)
+        import cairo
+        image = cairo.ImageSurface.create_from_png(str(self.output))
+        self.assertEqual((image.get_width(),image.get_height()),(160,120))
+
     def test_explicit_size_overrides_preset(self):
         paths = bundle_paths(self.output)
         command = save_bundle(paths,self.output,self.base,self.data)+' --size 160x120'

@@ -98,8 +98,10 @@ def bundle_paths(output):
     """Avoid overwriting unrelated companion files by choosing another prefix."""
     output = Path(output).absolute()
     for index in itertools.count(1):
-        prefix = str(output) if index == 1 else str(output)+'.replay-'+str(index)
-        paths = [Path(prefix+suffix) for suffix in ('.POSCAR','.view.json','.command.txt')]
+        replay = '' if index == 1 else '.replay-'+str(index)
+        prefix = str(output)+replay
+        paths = [Path(prefix+'.POSCAR'), Path(prefix+'.view.json'),
+                 output.parent/('command_for_'+output.stem+replay+'.sh')]
         if not any(path.exists() for path in paths): return paths
 
 
@@ -114,11 +116,14 @@ def save_bundle(paths, output, base, data):
     """Write companions after a successful PNG; filenames are newly reserved names."""
     source, preset, text = paths
     cmd = command(source,output,preset)
-    payloads = (poscar_text(base),json.dumps(data,ensure_ascii=False,indent=2,sort_keys=True)+'\n',cmd+'\n')
+    payloads = (poscar_text(base),json.dumps(data,ensure_ascii=False,indent=2,sort_keys=True)+'\n',
+                '#!/usr/bin/env bash\nset -euo pipefail\n\n'+cmd+' \"$@\"\n')
     for path,payload in zip(paths,payloads):
         fd, temporary = tempfile.mkstemp(prefix='.p4v-recipe-',dir=path.parent)
         try:
-            with os.fdopen(fd,'w',encoding='utf-8') as handle: handle.write(payload)
+            with os.fdopen(fd,'w',encoding='utf-8') as handle:
+                handle.write(payload)
+                if path == text: os.fchmod(handle.fileno(),0o755)
             # Exclusive publication: even a concurrent export cannot replace a companion.
             os.link(temporary,path)
         finally:

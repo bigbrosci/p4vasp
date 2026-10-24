@@ -338,4 +338,4 @@ INCAR 专用保存窗口的覆盖确认，不代表 POSCAR 的 Save system as �
 
 导出面板默认勾选 **Save reusable command, view preset and structure snapshot**。图片保存后，点击 **Copy command**，下次可在终端直接运行，复现同一视角和渲染设置，无需重新打开 GUI。
 
-PNG 旁会保存 `.POSCAR` 几何快照、`.view.json` 配置和 `.command.txt` 命令文本。批量导出时替换命令中的输入结构和输出图片，保留 `--preset` 配置。其他结构应使用一致的坐标方向与位置；隐藏原子通过编号重放，需要相同的原子顺序。取消勾选可只保存图片。详见 [批量导出指南](render-cli.md)。
+PNG 旁会保存 `.POSCAR` 几何快照、`.view.json` 配置和 `command_for_图片名.sh` 命令脚本。批量导出时替换命令中的输入结构和输出图片，保留 `--preset` 配置。其他结构应使用一致的坐标方向与位置；隐藏原子通过编号重放，需要相同的原子顺序。取消勾选可只保存图片。详见 [批量导出指南](render-cli.md)。
