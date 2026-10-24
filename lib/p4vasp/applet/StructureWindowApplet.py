@@ -81,6 +81,8 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
         return None
     def setSystem(self,x=None):
         if not self.pin_status:
+            if x is not self.system and self.swin is not None:
+                self.swin._needs_initial_fit=True
             self.system=x
             self.updateSystem()
 

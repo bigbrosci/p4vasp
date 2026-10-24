@@ -24,6 +24,7 @@
 
 
 
+import math
 import _cp4vasp
 import cp4vasp
 import p4vasp.cStructure
@@ -69,6 +70,8 @@ class StructureWindow:
         self.navigator.append(self.neg_isosurface_drawer)
         self.win.setDrawer(self.navigator)
         self.structure=None
+        self._needs_initial_fit=True
+        self._radius_factor=self.structure_drawer.getRadiusFactor()
         self.visible=1
         self.multiple=(1,1,1)
         self.dsx=2
@@ -156,10 +159,52 @@ class StructureWindow:
         self.redraw()
     def getMultiple(self):
         return self.multiple
+    def fitToStructure(self):
+        """Frame visible atom surfaces, ignoring empty cell/vacuum volume."""
+        if self.structure is None or not len(self.structure): return False
+        nav, drawer = self.navigator, self.structure_drawer
+        if not hasattr(_cp4vasp,"VisNavDrawer_centerOn"):
+            raise RuntimeError("Native extension is out of date; run bash install.sh --build-only and restart p4vasp")
+        rotation = [[nav.getRotMatElement(i,j) for j in range(3)] for i in range(3)]
+        structure = p4vasp.cStructure.Structure(self.structure)
+        structure.setCarthesian()
+        low, high = [float('inf')]*3, [-float('inf')]*3
+        for i, point in enumerate(structure):
+            record = drawer.info.getRecord(i)
+            if record.hidden: continue
+            radius = max(.01, record.radius*drawer.getRadiusFactor())
+            for row in range(3):
+                value = sum(rotation[row][j]*point[j] for j in range(3))
+                low[row] = min(low[row],value-radius)
+                high[row] = max(high[row],value+radius)
+        if not all(math.isfinite(v) for v in low+high): return False
+        counts = (drawer.getMultiple1(),drawer.getMultiple2(),drawer.getMultiple3())
+        for axis, count in enumerate(counts):
+            for row in range(3):
+                step = sum(rotation[row][j]*structure.basis[axis][j] for j in range(3))
+                ends = (-(count//2), count-1-count//2)
+                low[row] += min(ends)*step if step >= 0 else max(ends)*step
+                high[row] += max(ends)*step if step >= 0 else min(ends)*step
+        extent = [max(1e-6,high[j]-low[j]) for j in range(3)]
+        width, height = max(1,self.win.w), max(1,self.win.h)
+        if nav.getPerspective():
+            radius = .5*math.sqrt(sum(v*v for v in extent))
+            zoom = .85*min(9.,20*math.sin(math.atan(.002*width)),
+                            20*math.sin(math.atan(.002*height)))/radius
+        else:
+            zoom = .85*min(.04*width/extent[0],.04*height/extent[1],60./extent[2])
+        center = [(low[j]+high[j])/2 for j in range(3)]
+        # Navigation rotations are orthonormal: inverse is transpose.
+        world_center = [sum(rotation[i][j]*center[i] for i in range(3)) for j in range(3)]
+        nav.setZoom(zoom)
+        nav.centerOn(*world_center)
+        return True
+
     def setStructure(self,structure):
         self.structure=structure
         if structure is None or not len(structure):
             self.structure_drawer.setStructure(None)
+            self._needs_initial_fit=True
         else:
             structure=p4vasp.cStructure.Structure(structure)
 
@@ -177,6 +222,8 @@ class StructureWindow:
                     info.getRecord(i).hidden=1
             self.structure=structure
         self.arrows_drawer.updateStructure()
+        if self._needs_initial_fit and self.fitToStructure():
+            self._needs_initial_fit=False
 
     def show(self):
         if not self.visible:
@@ -205,6 +252,9 @@ class StructureWindow:
             self.navigator.append(self.isosurface_drawer)
             self.navigator.append(self.neg_isosurface_drawer)
             self.win.setDrawer(self.navigator)
+            self.setRadiusFactor(self._radius_factor)
+            self.setMultiple(*self.multiple)
+            self._needs_initial_fit=True
             self.setStructure(self.structure)
             self.win.show()
             self.visible=1
@@ -246,6 +296,7 @@ class StructureWindow:
         return self.structure_drawer.getRadiusFactor()
 
     def setRadiusFactor(self,s):
+        self._radius_factor=s
         return self.structure_drawer.setRadiusFactor(s)
 
     def showCell(self,s):

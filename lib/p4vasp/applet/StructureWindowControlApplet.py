@@ -349,7 +349,10 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
     def on_bottom_button_clicked_handler(self,*arg):
         self.swin().navigator.setBottomView()
     def on_home_button_clicked_handler(self,*arg):
-        self.swin().navigator.setHome()
+        sw=self.swin()
+        sw.navigator.setHome()
+        if hasattr(sw,"fitToStructure"):
+            sw.fitToStructure()
     def on_zoom_11_button_clicked_handler(self,*arg):
         self.swin().navigator.setZoom(1.0)
     def on_zoom_in_button_clicked_handler(self,*arg):

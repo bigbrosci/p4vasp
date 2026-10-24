@@ -91,6 +91,27 @@ double VisNavDrawer::getRotMatElement(int i,int j){
   }
 }
 
+void VisNavDrawer::centerOn(double x,double y,double z){
+  view_center[0]=x; view_center[1]=y; view_center[2]=z;
+  rotmat[12]=-view_zoom*(rotmat[0]*x+rotmat[4]*y+rotmat[8]*z);
+  rotmat[13]=-view_zoom*(rotmat[1]*x+rotmat[5]*y+rotmat[9]*z);
+  rotmat[14]=-view_zoom*(rotmat[2]*x+rotmat[6]*y+rotmat[10]*z);
+  redraw();
+}
+
+void VisNavDrawer::replaceRotation(const double *matrix){
+  double position[3];
+  for (int i=0;i<3;i++){
+    position[i]=rotmat[12+i]+view_zoom*(rotmat[i]*view_center[0]+
+      rotmat[i+4]*view_center[1]+rotmat[i+8]*view_center[2]);
+  }
+  for (int i=0;i<16;i++) rotmat[i]=matrix[i];
+  for (int i=0;i<3;i++){
+    rotmat[12+i]=position[i]-view_zoom*(rotmat[i]*view_center[0]+
+      rotmat[i+4]*view_center[1]+rotmat[i+8]*view_center[2]);
+  }
+}
+
 void VisNavDrawer::draw(){
 #if VERBOSE>1
   printf("VisNavDrawer::draw()\n");
@@ -221,7 +242,7 @@ int  VisNavDrawer::handle(int event){
 	  rotmat[13]-=double(dy)/getWidth()/0.04;
           break;
         case MODE_ZOOM:
-          view_zoom=view_zoom0*exp(0.005*dx);
+          setZoom(view_zoom0*exp(0.005*dx));
           break;
       }
       return 1;
@@ -237,6 +258,7 @@ void VisNavDrawer::setHome(){
                  0.0, 0.0, 1.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
   copy(rotmat,M,16);
+  view_center[0]=view_center[1]=view_center[2]=0.0;
   view_zoom=1.0;
   redraw();
 }
@@ -245,10 +267,7 @@ void VisNavDrawer::setFrontView(){
                  0.0, 1.0, 0.0, 0.0,
                  0.0, 0.0, 1.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 void VisNavDrawer::setBackView(){
@@ -256,10 +275,7 @@ void VisNavDrawer::setBackView(){
                  0.0, 1.0, 0.0, 0.0,
                  0.0, 0.0,-1.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 void VisNavDrawer::setLeftView(){
@@ -267,10 +283,7 @@ void VisNavDrawer::setLeftView(){
                  0.0, 1.0, 0.0, 0.0,
                 -1.0, 0.0, 0.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 void VisNavDrawer::setRightView(){
@@ -278,10 +291,7 @@ void VisNavDrawer::setRightView(){
                  0.0, 1.0, 0.0, 0.0,
                  1.0, 0.0, 0.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 void VisNavDrawer::setTopView(){
@@ -289,10 +299,7 @@ void VisNavDrawer::setTopView(){
                  0.0, 0.0, 1.0, 0.0,
                  0.0,-1.0, 0.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 
@@ -301,10 +308,7 @@ void VisNavDrawer::setBottomView(){
                  0.0, 0.0,-1.0, 0.0,
                  0.0, 1.0, 0.0, 0.0,
                  0.0, 0.0, 0.0, 1.0};
-  double pos[3];
-  copy3(pos,&rotmat[12]);
-  copy(rotmat,M,16);
-  copy3(&rotmat[12],pos);
+  replaceRotation(M);
   redraw();
 }
 
@@ -322,12 +326,15 @@ double VisNavDrawer::getZoom(){
 }
 
 void VisNavDrawer::setZoom(double z){
+  for (int i=0;i<3;i++){
+    rotmat[12+i]-=(z-view_zoom)*(rotmat[i]*view_center[0]+
+      rotmat[i+4]*view_center[1]+rotmat[i+8]*view_center[2]);
+  }
   view_zoom=z;
   redraw();
 }
 
 void VisNavDrawer::mulZoom(double z){
-  view_zoom*=z;
-  redraw();
+  setZoom(view_zoom*z);
 }
 

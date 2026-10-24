@@ -31754,6 +31754,80 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_VisNavDrawer_centerOn(PyObject *self, PyObject *args) {
+  PyObject *resultobj = 0;
+  VisNavDrawer *arg1 = (VisNavDrawer *) 0 ;
+  double arg2 ;
+  double arg3 ;
+  double arg4 ;
+  void *argp1 = 0 ;
+  int res1 = 0 ;
+  double val2 ;
+  int ecode2 = 0 ;
+  double val3 ;
+  int ecode3 = 0 ;
+  double val4 ;
+  int ecode4 = 0 ;
+  PyObject *swig_obj[4] ;
+
+  (void)self;
+  if (!SWIG_Python_UnpackTuple(args, "VisNavDrawer_centerOn", 4, 4, swig_obj)) SWIG_fail;
+  res1 = SWIG_ConvertPtr(swig_obj[0], &argp1,SWIGTYPE_p_VisNavDrawer, 0 |  0 );
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "VisNavDrawer_centerOn" "', argument " "1"" of type '" "VisNavDrawer *""'");
+  }
+  arg1 = reinterpret_cast< VisNavDrawer * >(argp1);
+  ecode2 = SWIG_AsVal_double(swig_obj[1], &val2);
+  if (!SWIG_IsOK(ecode2)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "VisNavDrawer_centerOn" "', argument " "2"" of type '" "double""'");
+  }
+  arg2 = static_cast< double >(val2);
+  ecode3 = SWIG_AsVal_double(swig_obj[2], &val3);
+  if (!SWIG_IsOK(ecode3)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode3), "in method '" "VisNavDrawer_centerOn" "', argument " "3"" of type '" "double""'");
+  }
+  arg3 = static_cast< double >(val3);
+  ecode4 = SWIG_AsVal_double(swig_obj[3], &val4);
+  if (!SWIG_IsOK(ecode4)) {
+    SWIG_exception_fail(SWIG_ArgError(ecode4), "in method '" "VisNavDrawer_centerOn" "', argument " "4"" of type '" "double""'");
+  }
+  arg4 = static_cast< double >(val4);
+  {
+    try{
+      (arg1)->centerOn(arg2,arg3,arg4);
+    }
+    catch(DOMException &e){
+      throwPythonDOMException(e.code,e.what());
+      return NULL;
+    }
+    catch(RangeException e){
+      PyErr_SetString(PyExc_IndexError,e.what());
+      return NULL;
+    }
+    catch(MemoryAllocationException e){
+      PyErr_SetString(PyExc_MemoryError,e.what());
+      return NULL;
+    }
+    catch(NullPointerException e){
+      PyErr_SetString(PyExc_RuntimeError,e.what());
+      return NULL;
+    }
+    catch(Exception e){
+      PyErr_SetString(PyExc_Exception,e.what());
+      return NULL;
+    }
+    catch(exception &e){
+      PyErr_SetString(PyExc_Exception,e.what());
+      return NULL;
+    }
+  }
+  resultobj = SWIG_Py_Void();
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_VisNavDrawer_getRotMatElement(PyObject *self, PyObject *args) {
   PyObject *resultobj = 0;
   VisNavDrawer *arg1 = 0 ;
@@ -51076,6 +51150,7 @@ static PyMethodDef SwigMethods[] = {
 	 { "VisNavDrawer_bg_green_get", _wrap_VisNavDrawer_bg_green_get, METH_O, NULL},
 	 { "VisNavDrawer_bg_blue_get", _wrap_VisNavDrawer_bg_blue_get, METH_O, NULL},
 	 { "new_VisNavDrawer", _wrap_new_VisNavDrawer, METH_NOARGS, NULL},
+	 { "VisNavDrawer_centerOn", _wrap_VisNavDrawer_centerOn, METH_VARARGS, NULL},
 	 { "VisNavDrawer_getRotMatElement", _wrap_VisNavDrawer_getRotMatElement, METH_VARARGS, NULL},
 	 { "VisNavDrawer_setBackground", _wrap_VisNavDrawer_setBackground, METH_VARARGS, NULL},
 	 { "VisNavDrawer_setAntialiasing", _wrap_VisNavDrawer_setAntialiasing, METH_VARARGS, NULL},

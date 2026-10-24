@@ -172,6 +172,7 @@ These are recorded implementation checks, not guarantees for another device. The
 | Headless image export | 14 passed (studio default/fast fallback included) | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderCLI.py` |
 | Studio surface tests | 6 passed | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderStudio.py` |
 | Replay presets | 6 passed; arbitrary-angle byte-identical replay and batch input | `PYTHONPATH=lib P4VASP_HOME="$PWD" /usr/bin/python3 test/testRenderRecipe.py` |
+| Native initial centering | Passed; actual screenshot inspected | `/usr/bin/python3 test/testStructureCenter.py` |
 | Native/GTK export integration | Passed; panel inspected; event-loop heartbeat and cancellation checked | `/usr/bin/python3 test/testExportImage.py` |
 | Bundled tests | 57 passed | `PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 test/test.py` |
 | GTK applet startup | 31 passed | `/usr/bin/python3 test/run_gtk3_smoke.py` |
@@ -195,3 +196,11 @@ These are recorded implementation checks, not guarantees for another device. The
 - Verification: 5 recipe tests (byte-identical headless replay, batch input, overrides, validation/conflicts and collision protection), 14 CLI tests, GUI integration including real command execution, clipboard and recipe opt-out, 57 bundled tests and 31 applet startup checks passed. Allocated GTK panel inspected on X11. Full GTK retains 14 known Glade failures; macOS not tested.
 
 - Replay command files now use `command_for_<image-stem>.sh` beside the image (e.g. model.png → command_for_model.sh), with Bash header, executable permission and forwarded CLI options. Existing files remain protected by replay suffixes. Six recipe tests passed, including running the saved script headlessly with option overrides.
+
+## Center and fit newly opened structure windows (2026-10-24)
+
+- User request: Show should initially center the atom model in the structure window without manual pan/window adjustment. `StructureWindow.fitToStructure()` fits the visible atom surfaces (radius included) and actual native replicas with 15% margin, ignoring empty cell/vacuum bounds. Only camera changes; source coordinates are preserved.
+- `_needs_initial_fit` applies on first nonempty structure, window recreation and a new system in `StructureWindowApplet.setSystem`. Ordinary same-system frame/structure refresh preserves the camera. Recreated windows retain radius factor and repetition settings. Home in both structure control applets restores default rotation then fits; the shared STM control retains its original Home behavior.
+- `VisNavDrawer.centerOn` and private pivot state keep centering stable through zoom/right-drag zoom and standard views. `replaceRotation` preserves the pivot's screen position; Home resets it. Updated native header/source and tracked SWIG wrapper/Python proxies in src and lib. Native rebuild required (`bash install.sh --build-only`); this Linux checkout was rebuilt successfully.
+- `test/testStructureCenter.py` exercises offset/negative coordinates, slab vacuum, 400×300/800×600/900×300 viewports, replicas, radius preservation, view/zoom pivots, new systems, frame preservation, Home/reopening and an actual OpenGL screenshot. Center checked numerically and visually; no geometry centering/wrapping is applied.
+- Passed that focused check, native box-selection regression, GUI export/replay integration, 57 bundled tests and 31 applet startup checks on Linux/X11. Full GTK retains 14 known Glade conversion failures. macOS and HiDPI not verified. Existing saved camera presets still replay their stored framing; export does not re-fit.

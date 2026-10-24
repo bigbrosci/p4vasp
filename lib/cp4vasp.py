@@ -1266,6 +1266,9 @@ class VisNavDrawer(VisDrawer):
     def __init__(self):
         _cp4vasp.VisNavDrawer_swiginit(self, _cp4vasp.new_VisNavDrawer())
 
+    def centerOn(self, x, y, z):
+        return _cp4vasp.VisNavDrawer_centerOn(self, x, y, z)
+
     def getRotMatElement(self, i, j):
         return _cp4vasp.VisNavDrawer_getRotMatElement(self, i, j)
 

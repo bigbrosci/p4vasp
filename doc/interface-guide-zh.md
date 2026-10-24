@@ -41,7 +41,7 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 1. 点击 **Open**。
 2. 进入文件所在目录，选择 POSCAR、CONTCAR 或需要读取的计算结果文件，例如 `vasprun.xml`。
 3. 确认后查看顶部 System，核对打开的是目标系统。
-4. 点击 **Show** 显示三维结构；通过 **Control** 调整显示。
+4. 点击 **Show** 显示三维结构；新窗口会按可见原子范围自动居中并适配大小，通过 **Control** 调整显示。
 
 只有 POSCAR 时，通常只有结构信息，不会因此获得 DOS、能带或完整轨迹。较大的计算结果可能需要解析时间。
 
@@ -339,3 +339,11 @@ INCAR 专用保存窗口的覆盖确认，不代表 POSCAR 的 Save system as �
 导出面板默认勾选 **Save reusable command, view preset and structure snapshot**。图片保存后，点击 **Copy command**，下次可在终端直接运行，复现同一视角和渲染设置，无需重新打开 GUI。
 
 PNG 旁会保存 `.POSCAR` 几何快照、`.view.json` 配置和 `command_for_图片名.sh` 命令脚本。批量导出时替换命令中的输入结构和输出图片，保留 `--preset` 配置。其他结构应使用一致的坐标方向与位置；隐藏原子通过编号重放，需要相同的原子顺序。取消勾选可只保存图片。详见 [批量导出指南](render-cli.md)。
+
+### 初始居中与 Home
+
+新建或重新打开结构窗口、切换到新的数据系统时，按可见原子球体的范围自动居中并缩放，保留少量边距。晶胞真空层不参与确定原子模型中心；原子坐标不变。
+
+Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通结构刷新或轨迹换帧不会自动重置相机；需要重新居中适配时，点击 Control 的 **Home**。Home 同时恢复默认朝向。
+
+本次包含原生接口更新。此电脑已重编译；其他电脑更新代码后需运行 `bash install.sh --build-only` 并重启。

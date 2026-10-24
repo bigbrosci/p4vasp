@@ -30,6 +30,8 @@ class VisNavDrawer : public VisDrawer{
   double rotmat[16];
   double saverotmat[16],matbuff[16];
   double view_zoom, view_zoom0;
+  double view_center[3];
+  void replaceRotation(const double *matrix);
 #endif  
   int view_mode;
   int mousex0,mousey0;
@@ -61,6 +63,8 @@ class VisNavDrawer : public VisDrawer{
   VisNavDrawer();
 
   double getRotMatElement(int i,int j);
+  // Center a world-space point without modifying geometry or view rotation.
+  void centerOn(double x,double y,double z);
 
   void setBackground(double red,double green, double blue){
     bg_red  =red;
