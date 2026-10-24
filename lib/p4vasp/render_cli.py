@@ -270,39 +270,49 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Render POSCAR/CONTCAR to PNG without opening a GUI or requiring a display.')
+    parser = argparse.ArgumentParser(argument_default=argparse.SUPPRESS, description='Render POSCAR/CONTCAR to PNG without opening a GUI or requiring a display.')
     parser.add_argument('structure', help='POSCAR or CONTCAR file')
     parser.add_argument('-o', '--output', required=True, help='output PNG path')
-    parser.add_argument('--view', choices=('top', 'front', 'side'), default='top', help='top: look from +z; front: +y; side: +y (rotate -90 degrees about x, z up)')
-    parser.add_argument('--rotate', '--rotation', type=rotations, default=[], help='right-handed rotations in order, degrees, e.g. 30x,-20y,10z; use --rotate=-30x for negative first angles')
-    parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
-    parser.add_argument('--radius-scale', type=positive, default=.5)
-    parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'), default='spheres')
-    parser.add_argument('--renderer', choices=('studio', 'fast'), default='studio',
+    parser.add_argument('--preset', help='saved GUI camera/render preset JSON; explicit image options override it')
+    parser.add_argument('--view', choices=('top', 'front', 'side'), help='top: look from +z; front: +y; side: +y (rotate -90 degrees about x, z up)')
+    parser.add_argument('--rotate', '--rotation', type=rotations, help='right-handed rotations in order, degrees, e.g. 30x,-20y,10z; use --rotate=-30x for negative first angles')
+    parser.add_argument('--size', type=image_size, help='WIDTHxHEIGHT (default 1000x1000)')
+    parser.add_argument('--radius-scale', type=positive)
+    parser.add_argument('--model', choices=('spheres', 'ball-stick', 'stick', 'space-filling'))
+    parser.add_argument('--renderer', choices=('studio', 'fast'),
                         help='studio: per-pixel lighting/depth (default); fast: legacy gradients')
-    parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), default='matte', help='surface finish (default matte)')
-    parser.add_argument('--brightness', type=positive, default=1.0)
-    parser.add_argument('--bond-radius', type=positive, default=.10, help='bond radius in angstroms')
-    parser.add_argument('--bond-factor', type=positive, default=1.15, help='covalent-radius sum multiplier')
-    parser.add_argument('--quality', type=int, choices=(1, 2, 3, 4), default=2, help='supersampling factor (default 2)')
+    parser.add_argument('--material', choices=('classic', 'matte', 'glossy'), help='surface finish (default matte)')
+    parser.add_argument('--brightness', type=positive)
+    parser.add_argument('--bond-radius', type=positive, help='bond radius in angstroms')
+    parser.add_argument('--bond-factor', type=positive, help='covalent-radius sum multiplier')
+    parser.add_argument('--quality', type=int, choices=(1, 2, 3, 4), help='supersampling factor (default 2)')
     parser.add_argument('--no-cell', action='store_true', help='hide cell and fit atoms only')
     background = parser.add_mutually_exclusive_group()
-    background.add_argument('--transparent', dest='transparent', action='store_true', default=True,
+    background.add_argument('--transparent', dest='transparent', action='store_true',
                             help='transparent background (default)')
     background.add_argument('--white-background', dest='transparent', action='store_false',
                             help='opaque white background')
     overwrite = parser.add_mutually_exclusive_group()
-    overwrite.add_argument('--force', dest='force', action='store_true', default=True,
+    overwrite.add_argument('--force', dest='force', action='store_true',
                            help='replace an existing output PNG (default)')
     overwrite.add_argument('--no-clobber', dest='force', action='store_false',
                            help='fail if the output already exists')
     args = parser.parse_args(argv)
     try:
-        render(args.structure, args.output, view=args.view, turns=args.rotate, size=args.size,
-               radius_scale=args.radius_scale, cell=not args.no_cell,
-               transparent=args.transparent, force=args.force, model=args.model,
-               brightness=args.brightness, bond_radius=args.bond_radius,
-               bond_factor=args.bond_factor, quality=args.quality, material=args.material, renderer=args.renderer)
+        from p4vasp.render_recipe import DEFAULTS, load, scene_from_source
+        values = vars(args)
+        options = dict(DEFAULTS)
+        if 'preset' in values:
+            if 'view' in values or 'rotate' in values:
+                raise ValueError('--preset already contains the camera; do not combine with --view/--rotate')
+            preset = load(args.preset)
+            options.update(preset['render'])
+            options.update(camera=preset['camera'],scene=scene_from_source(args.structure,preset['display']))
+        for key in DEFAULTS:
+            if key in values: options[key] = values[key]
+        if 'rotate' in values: options['turns'] = values['rotate']
+        if 'no_cell' in values: options['cell'] = False
+        render(args.structure, args.output, **options)
     except ImportError as error:
         parser.exit(1, 'Rendering dependency missing (NumPy and Python Cairo are required): %s\n' % error)
     except Exception as error:

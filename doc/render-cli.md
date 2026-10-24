@@ -102,3 +102,40 @@ This exports atoms, optional inferred bonds and cell edges using the export rend
 p4v POSCAR -o model.png --view side --model space-filling --quality 3
 p4v POSCAR -o quick.png --renderer fast --quality 1
 ```
+
+## 生成复现命令与批量导出 / Replay commands and batch export
+
+GUI 导出默认勾选 **Save reusable command, view preset and structure snapshot**。成功后，面板显示最后一次成功导出的命令，点击 **Copy command** 可复制。PNG 旁同时保存：
+
+| 文件示例 / File | 用途 / Purpose |
+| --- | --- |
+| `model.png.POSCAR` | 当前显示帧的基础几何快照，复制和隐藏由配置重放 / Base geometry of the displayed frame, before replicas/hidden filtering |
+| `model.png.view.json` | 相机矩阵、缩放、平移、投影、窗口比例、重复/隐藏及图片设置 / Camera, repetitions/hidden indices and render options |
+| `model.png.command.txt` | 可复制运行的完整命令 / Complete replay command |
+
+配套文件若已存在，会采用 `.replay-2` 等新前缀，不覆盖既有文件。取消勾选可仅保存 PNG。几何快照用于图片复现，不保存计算设置或选择性动力学标记。
+
+The checkbox is enabled by default. Copy the last successful export command from the panel, or read its `.command.txt` file later. Existing companions are preserved with a new replay suffix. Uncheck the option to save only a PNG. The snapshot contains rendering geometry, not calculation settings or selective-dynamics flags.
+
+生成的命令优先使用当前 checkout 的绝对 `p4v.sh` 路径，确保从其他目录运行时也能找到程序；已有 `p4v` 别名时可以简写为：
+
+```bash
+p4v model.png.POSCAR -o model.png --preset model.png.view.json
+```
+
+The generated command uses the absolute launcher/input/preset paths where available and quotes shell arguments safely. With a `p4v` alias, the shorter form above is equivalent. On another machine, copy the snapshot and preset and use that machine's launcher/paths. JSON presets are data only; no command in them is executed.
+
+同一输入快照、同一软件环境及同一配置可复现原图。批量处理类似结构时，替换输入和输出，保留配置文件；显式图片参数可覆盖配置，例如 `--size 1600x1200 --quality 3`。不能将 `--preset` 与 `--view` 或 `--rotate` 混用，因为配置已经保存完整相机。
+
+```bash
+for structure in calculations/*/POSCAR; do
+    [ -f "$structure" ] || continue
+    p4v "$structure" -o "${structure%/POSCAR}/model.png" --preset /path/to/model.png.view.json
+done
+```
+
+The same snapshot, software environment and preset reproduce the image. For batches, replace only input/output while retaining the preset. Explicit image options override stored settings. `--preset` cannot be combined with `--view`/`--rotate`.
+
+配置保留固定相机和构图，不自动对齐、居中或适配另一结构。批处理输入应采用可比的坐标方向、位置和尺度；隐藏原子按 **0 起始原子索引** 记录，因此应保持相同的原子顺序。越界隐藏索引会报错；需要保留全部原子时，可将配置中的 `display.hidden` 改为空列表。
+
+Presets retain framing rather than aligning or fitting other structures. Use comparable axes, origin and dimensions. Hidden atoms use zero-based indices and require compatible ordering; out-of-range indices fail. Set `display.hidden` to `[]` when all atoms should be included.
