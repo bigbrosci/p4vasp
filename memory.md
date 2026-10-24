@@ -132,3 +132,5 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - Eleven renderer tests passed, including bond detection, model differences and quality limits. Ball-stick PNG visually inspected.
 
 - PNG overwrite default changed at user request: render API and CLI replace existing output atomically after successful rendering. Eleven renderer tests passed, including default replacement and explicit no-clobber protection.
+
+- Side export preset corrected at user request: +90° about Cartesian x (look from −y), with slab x horizontal and z upward. Top and front unchanged. Twelve export tests passed, including image equivalence of side and top + 90x.

@@ -65,6 +65,12 @@ class RenderTests(unittest.TestCase):
         self.run_cli('--view', 'front', '--force')
         self.assertNotEqual(first, self.output.read_bytes())
 
+    def test_side_is_positive_x_rotation(self):
+        self.run_cli('--view', 'side', '--size', '320x240')
+        side = self.output.read_bytes()
+        self.run_cli('--view', 'top', '--rotate=90x', '--size', '320x240')
+        self.assertEqual(side, self.output.read_bytes())
+
     def test_scaling(self):
         for scale, expected in [('2', (6, 6, 6)), ('-1728', (6, 6, 6)), ('2 3 4', (6, 9, 12))]:
             self.source.write_text(POSCAR.replace('\n1\n', '\n'+scale+'\n', 1))

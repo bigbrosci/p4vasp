@@ -20,7 +20,7 @@ No window, display server or ASE is needed. Requires pycairo in the launcher's P
 | --- | --- |
 | `--view top` | 默认从 +z 看向原点，x 向右、y 向上 / Default: look from +z, x right, y up |
 | `--view front` | 从 +y 观察，x 向右、z 向下 / Look from +y, x right, z down |
-| `--view side` | 从 +x 观察，z 向左、y 向上 / Look from +x, z left, y up |
+| `--view side` | 绕 x 轴旋转 +90°，从 −y 观察，x 向右、z 向上 / Rotate +90° about x; look from −y, x right, z up |
 | `--rotate=30x,-20y,10z` | 在预设视图之后，按书写顺序绕固定笛卡尔轴旋转，单位度、右手规则 / Apply right-handed rotations about fixed Cartesian axes in written order after the view preset |
 | `--size 1200x900` | 像素尺寸，默认 1000x1000；每边 32–8192，总计不超过 3200 万像素 / Pixel dimensions and limits |
 | `--radius-scale 0.5` | 原子半径倍率，默认 0.5 / Atom radius multiplier |
