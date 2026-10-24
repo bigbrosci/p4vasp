@@ -65,10 +65,12 @@ class RenderTests(unittest.TestCase):
         self.run_cli('--view', 'front', '--force')
         self.assertNotEqual(first, self.output.read_bytes())
 
-    def test_side_is_positive_x_rotation(self):
+    def test_side_is_negative_x_rotation(self):
         self.run_cli('--view', 'side', '--size', '320x240')
         side = self.output.read_bytes()
-        self.run_cli('--view', 'top', '--rotate=90x', '--size', '320x240')
+        # Cairo screen y is inverted: positive z must project to positive view y.
+        self.assertGreater(transform((0, 0, 1), rotations("-90x"))[1], 0)
+        self.run_cli('--view', 'top', '--rotate=-90x', '--size', '320x240')
         self.assertEqual(side, self.output.read_bytes())
 
     def test_scaling(self):

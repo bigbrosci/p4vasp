@@ -112,7 +112,7 @@ def render(source, output, *, view='top', turns=(), size=(1000, 1000),
     if output.exists() and not force: raise ValueError('output exists; use --force to replace it')
     basis, positions, elements = load_structure(source)
     styles = atom_styles()
-    presets = {'top': [], 'front': [('x', -math.pi/2)], 'side': [('x', math.pi/2)]}
+    presets = {'top': [], 'front': [('x', -math.pi/2)], 'side': [('x', -math.pi/2)]}
     turns = presets[view] + list(turns)
     atoms = []
     covalent = []
@@ -214,7 +214,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description='Render POSCAR/CONTCAR to PNG without opening a GUI or requiring a display.')
     parser.add_argument('structure', help='POSCAR or CONTCAR file')
     parser.add_argument('-o', '--output', required=True, help='output PNG path')
-    parser.add_argument('--view', choices=('top', 'front', 'side'), default='top', help='top: look from +z; front: +y; side: -y (rotate +90 degrees about x, z up)')
+    parser.add_argument('--view', choices=('top', 'front', 'side'), default='top', help='top: look from +z; front: +y; side: +y (rotate -90 degrees about x, z up)')
     parser.add_argument('--rotate', '--rotation', type=rotations, default=[], help='right-handed rotations in order, degrees, e.g. 30x,-20y,10z; use --rotate=-30x for negative first angles')
     parser.add_argument('--size', type=image_size, default=(1000, 1000), help='WIDTHxHEIGHT (default 1000x1000)')
     parser.add_argument('--radius-scale', type=positive, default=.5)
