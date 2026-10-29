@@ -6,6 +6,10 @@ ODP_DIR="$ROOT/odpdom"
 SRC_DIR="$ROOT/src"
 LIB_DIR="$ROOT/lib"
 UNAME_S="$(uname -s)"
+WINDOWS_BUILD=0
+case "$UNAME_S" in
+    MINGW*|MSYS*) WINDOWS_BUILD=1 ;;
+esac
 
 if [[ "$UNAME_S" == "Darwin" ]]; then
     CXX="${CXX:-c++}"
@@ -16,7 +20,9 @@ fi
 SWIG="${SWIG:-swig}"
 
 if [[ -z "${PYTHON:-}" ]]; then
-    if [[ "$UNAME_S" == "Darwin" && -x "$ROOT/.venv-macos/bin/python3" ]]; then
+    if [[ "$WINDOWS_BUILD" == 1 ]]; then
+        PYTHON=python
+    elif [[ "$UNAME_S" == "Darwin" && -x "$ROOT/.venv-macos/bin/python3" ]]; then
         PYTHON="$ROOT/.venv-macos/bin/python3"
     elif [[ -x /usr/bin/python3 ]]; then
         PYTHON=/usr/bin/python3
@@ -99,6 +105,8 @@ if [[ "$UNAME_S" == "Darwin" ]]; then
     OPENGL_CXXFLAGS=(-DGL_SILENCE_DEPRECATION "-I$ROOT/install/macos-compat")
     OPENGL_LDFLAGS=(-framework OpenGL)
     PY_LDFLAGS=()
+elif [[ "$WINDOWS_BUILD" == 1 ]]; then
+    OPENGL_LDFLAGS=(-lglu32 -lopengl32)
 fi
 
 mkdir -p "$LIB_DIR"
@@ -136,7 +144,7 @@ for source in "${ODP_SOURCES[@]}"; do
 done
 popd >/dev/null
 
-if [[ ! -f "$SRC_DIR/cp4vasp_wrap.cpp" ]]; then
+if [[ "$WINDOWS_BUILD" == 1 || ! -f "$SRC_DIR/cp4vasp_wrap.cpp" ]]; then
     pushd "$SRC_DIR" >/dev/null
     echo "Generating src/cp4vasp_wrap.cpp"
     "$SWIG" -python -c++ -Wall "${COMMON_DEFINES[@]}" \
@@ -235,7 +243,7 @@ gi.require_foreign("cairo")
 from gi.repository import Gtk
 import _cp4vasp
 import p4vasp
-print("p4vasp Unix build OK")
+print("p4vasp native build OK")
 PY
 
 echo "Built $OUTPUT"

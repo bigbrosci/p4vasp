@@ -1,6 +1,14 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-10-28. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Windows 原生构建检查点（2026-10-29）
+
+- 当前任务：Windows 双击应用的可行性验证；用户要求节省调用。用户已安装 MSYS2 并报告 GTK3 最小窗口正常；不是 p4vasp GUI 验收。
+- 助手实测：通过 WSL 调用 Windows 工具链；Python 3.14.9、GCC 16.2.0、SWIG 4.5.1、FLTK 1.4.5。独立源码快照在本机 `C:\msys64\home\lqlhz\p4vasp-windows`，非 Git checkout，不含后续提交的自动更新；Linux 构建产物未替换。
+- 新入口 `install/build-windows-py3.sh` 复用共享构建脚本，Windows 使用 glu32/opengl32 并重新生成 SWIG wrapper；开发启动器 `p4v-windows.cmd` 尚未运行验证，不是独立 EXE。
+- 实际编译/链接成功，得到 `_cp4vasp.cp314-mingw_x86_64_ucrt_gnu.pyd`。导入被 Windows Application Control 拦截；CodeIntegrity 3077/3033 事件明确指向该文件的签名级别/策略要求。日志在独立目录 `windows-build.log`；没有绕过或修改系统策略。
+- 下一步：由有权限的设备管理员确认允许本项目本地开发模块的合规方式（如策略认可的签名/批准），再测扩展导入、GTK/FLTK 协同、打开/编辑/保存/导出，最后才制作 EXE 包。尚无 p4vasp Windows GUI、干净机打包或安装包验证。详见 [Windows 构建](install.md#windows-native-build--windows-原生构建试验) 和 [October 29](update_history/update_2026_10_29.md)。
 
 ## 接手检查点（2026-10-28）
 

@@ -96,6 +96,33 @@ The scripts under `install/` remain internal installation/build backends. Advanc
 set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
 reads `/etc/os-release` and identifies the kernel with `uname -s`.
 
+## Windows native build / Windows 原生构建试验
+
+当前只提供开发构建入口，尚无验证通过的独立 Windows EXE。请使用独立的 Windows 源码副本，
+不要在 Linux/macOS 工作副本上编译：构建会生成平台专用对象、SWIG wrapper 和 Python proxy。
+
+在 MSYS2 **UCRT64** 终端中，完成 `pacman -Syu` 后安装：
+
+```bash
+pacman -S --needed git make \
+  mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-swig \
+  mingw-w64-ucrt-x86_64-python mingw-w64-ucrt-x86_64-python-gobject \
+  mingw-w64-ucrt-x86_64-gtk3 mingw-w64-ucrt-x86_64-python-cairo \
+  mingw-w64-ucrt-x86_64-python-numpy mingw-w64-ucrt-x86_64-python-pyopengl \
+  mingw-w64-ucrt-x86_64-fltk
+# 在独立 Windows 源码根目录执行：
+bash install/build-windows-py3.sh
+```
+
+构建会检查 GTK/Cairo 和 `_cp4vasp` 导入。通过后可尝试双击 `p4v-windows.cmd`；
+它依赖本机 MSYS2（默认 `C:\msys64`，可用 `P4VASP_MSYS2` 指定其他位置），不是便携安装包。
+失败时保留终端错误；启动器尚未经过实际运行验证。
+
+2026-10-29 本机 Windows 编译和链接成功，但导入被 Application Control 策略拦截。
+CodeIntegrity 日志事件 3077/3033 指向新编译的 `.pyd`。需由有权限的管理员确认签名或批准要求，
+再继续导入和 GUI 测试；不要把这个结果当作 DLL 缺失或 p4vasp 已在 Windows 运行成功。
+本次没有修改安全策略。详细结果见 [更新记录](update_history/update_2026_10_29.md)。
+
 ## Changing computers / 换机接续
 
 从新设备的实际 checkout 根目录开始，先读 [AGENTS.md](AGENTS.md) 和
