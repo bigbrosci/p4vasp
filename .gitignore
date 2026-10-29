@@ -26,3 +26,5 @@ odpdom/cODP_wrap.cpp
 /p4vasp.log
 /structure-window*.log
 /*-screen.png
+/build/windows/
+/dist/windows/

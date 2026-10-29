@@ -6,6 +6,7 @@ import shlex
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 from p4vasp.render_cli import render, transform
 from p4vasp.render_recipe import DEFAULTS, make, save_bundle, bundle_paths, scene_from_source, load
 
@@ -110,6 +111,23 @@ class RecipeTests(unittest.TestCase):
         self.assertEqual(paths[0].read_text(),'unrelated original')
         with self.assertRaises(FileExistsError):
             save_bundle(new_paths,self.output,self.base,self.data)
+
+    def test_windows_frozen_replay_quotes_paths_and_uses_powershell(self):
+        gui = self.output.parent/'p4vasp.exe'
+        console = self.output.parent/'p4vasp-console.exe'
+        console.touch()
+        image = self.output.parent/"image ' & % test.png"
+        with patch('p4vasp.render_recipe.sys.platform', 'win32'), \
+             patch('p4vasp.render_recipe.sys.frozen', True, create=True), \
+             patch('p4vasp.render_recipe.sys.executable', str(gui)):
+            paths = bundle_paths(image)
+            cmd = save_bundle(paths,image,self.base,self.data)
+        self.assertEqual(paths[2].suffix, '.ps1')
+        self.assertIn('p4vasp-console.exe', cmd)
+        self.assertIn("image '' & % test.png", cmd)
+        self.assertTrue(cmd.startswith("& '"))
+        self.assertIn(cmd+' @args', paths[2].read_text())
+        self.assertNotIn('bash', paths[2].read_text())
 
 
 if __name__ == '__main__': unittest.main()

@@ -111,7 +111,7 @@ GUI 导出默认勾选 **Save reusable command, view preset and structure snapsh
 | --- | --- |
 | `model.png.POSCAR` | 当前显示帧的基础几何快照，复制和隐藏由配置重放 / Base geometry of the displayed frame, before replicas/hidden filtering |
 | `model.png.view.json` | 相机矩阵、缩放、平移、投影、窗口比例、重复/隐藏及图片设置 / Camera, repetitions/hidden indices and render options |
-| `command_for_model.sh` | 可复制运行的完整命令 / Complete replay command |
+| `command_for_model.sh`（Windows 为 `.ps1`） | 可复制运行的完整命令 / Complete replay command |
 
 配套文件若已存在，会采用 `.replay-2` 等新前缀，不覆盖既有文件。取消勾选可仅保存 PNG。几何快照用于图片复现，不保存计算设置或选择性动力学标记。
 
@@ -148,3 +148,15 @@ bash command_for_model.sh --quality 3
 ```
 
 Scripts are saved beside the image, include a Bash header, and forward extra image options. Name collisions use a replay suffix, for example `command_for_model.replay-2.sh`.
+
+Windows 使用 `command_for_model.ps1` 和 PowerShell 格式的复制命令；独立版直接调用同目录的
+`p4vasp-console.exe`，不依赖 Bash 或 `p4v` 别名。脚本使用带 BOM 的 UTF-8，支持中文路径；
+空格、单引号等字符以 PowerShell 字面量方式引用。脚本执行受设备策略限制，本机策略目前禁止 `.ps1`，
+不应把脚本生成成功当成已执行成功。直接 EXE 重放已验证，例如在便携版目录的 PowerShell 中执行：
+
+```powershell
+.\p4vasp-console.exe 'model.png.POSCAR' -o 'replayed.png' --preset 'model.png.view.json'
+```
+
+Windows bundles use PowerShell companions and the bundled console EXE. Script execution remains subject to
+device policy; direct EXE preset replay does not require executing a script. The earlier Bash examples apply to Unix.

@@ -4,8 +4,11 @@ Last updated: 2026-10-29. This is a repository navigation and handoff document. 
 
 ## Windows 原生构建检查点（2026-10-29）
 
+- 最新任务已推进至便携目录：用户实际双击开发启动器成功（用户反馈，非助手复测）。新增 `install/package-windows.sh`、`install/windows/p4vasp.spec`/runtime hook/README；PyInstaller 6.22.3 生成 GUI/console 两个 EXE，共享 `_internal`。本机交付目录 `C:\Users\lqlhz\Downloads\p4vasp-portable-20261029`；整目录 ZIP 同级保存。仍未签名/制作安装器，须在干净 Windows 设备验收。
+- 本次助手独立核验：移出 MSYS2 目录并清空开发环境变量后，冻结 EXE 导入所有注册 applet 模块、加载 40 个资源（本机无 property errors）、原生绘制/截图、PNG、POSCAR 标记、直接 CLI preset 重放通过；GUI 截图已检查，运行中 DLL 清单无 `C:\msys64` 来源。报告/截图和模块清单位于交付目录同级 `-checks/`，未发布用户数据。未在冻结版重跑 31 个 applet 的逐项启动或完整 GTK 回归。
+- `lib/p4vasp/windows_check.py` 提供显式 `--check-runtime DIR` / `--check-gui DIR` 合成诊断，进程直接退出，不验证正常 teardown。Windows 重放改为引用本机 Python/冻结版 console EXE 的 PowerShell `.ps1`，修复默认保存脚本对 Bash/fchmod 的依赖；UTF-8 BOM 和单引号转义。7 个 recipe、14 个 CLI、57 个基础测试在 Linux 本次通过。Windows `.ps1` 执行被设备策略拒绝，未绕过；直接 EXE preset 重放通过。下一步用户双击便携 EXE，然后在无 Python/GTK/MSYS2 的 Windows 设备验证，最后再制作安装器。
 - 最新进展：用户报告关闭了拦截功能后，助手重试原有 `.pyd` 导入成功，未重编译或修改安全策略。Windows 下 57 个基础测试和 31 个 GTK applet 启动检查通过；合成分子原生窗口实际绘制、相机快照、当前视角 PNG 导出、POSCAR 保存重读通过。主界面加载合成 POSCAR 成功，主界面与原生截图均已检查。
-- 开发启动器已复制到独立目录 `C:\msys64\home\lqlhz\p4vasp-windows\p4v-windows.cmd`，`--help` 调用通过；主界面是直接用 Windows Python 启动验证，尚待用户双击交互验收。该目录依赖现有 MSYS2，不是独立 EXE；完整退出、真实手动编辑流程、其他设备及干净机仍未验证。原策略拦截记录保留在下文作为历史，已不阻碍本次导入。下一步先验收开发版交互，再做独立打包和签名验证。
+- 开发启动器位于独立目录 `C:\msys64\home\lqlhz\p4vasp-windows\p4v-windows.cmd`，`--help` 通过，随后用户报告双击无错误。该目录依赖现有 MSYS2，便携版进展见本节顶部；完整退出、真实手动编辑流程、其他设备及干净机仍未验证。原策略拦截记录保留在下文作为历史，已不阻碍本次导入。
 - 当前任务：Windows 双击应用的可行性验证；用户要求节省调用。用户已安装 MSYS2 并报告 GTK3 最小窗口正常；不是 p4vasp GUI 验收。
 - 助手实测：通过 WSL 调用 Windows 工具链；Python 3.14.9、GCC 16.2.0、SWIG 4.5.1、FLTK 1.4.5。独立源码快照在本机 `C:\msys64\home\lqlhz\p4vasp-windows`，非 Git checkout，不含后续提交的自动更新；Linux 构建产物未替换。
 - 新入口 `install/build-windows-py3.sh` 复用共享构建脚本，Windows 使用 glu32/opengl32 并重新生成 SWIG wrapper；开发启动器 `p4v-windows.cmd` 尚未运行验证，不是独立 EXE。

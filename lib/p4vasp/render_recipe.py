@@ -5,6 +5,7 @@ import math
 import os
 from pathlib import Path
 import shlex
+import sys
 import tempfile
 
 SCHEMA = 'p4vasp-image-view'
@@ -101,11 +102,21 @@ def bundle_paths(output):
         replay = '' if index == 1 else '.replay-'+str(index)
         prefix = str(output)+replay
         paths = [Path(prefix+'.POSCAR'), Path(prefix+'.view.json'),
-                 output.parent/('command_for_'+output.stem+replay+'.sh')]
+                 output.parent/('command_for_'+output.stem+replay+
+                                ('.ps1' if sys.platform == 'win32' else '.sh'))]
         if not any(path.exists() for path in paths): return paths
 
 
 def command(source, output, preset):
+    if sys.platform == 'win32':
+        if getattr(sys, 'frozen', False):
+            executable = Path(sys.executable).with_name('p4vasp-console.exe')
+            args = [str(executable if executable.is_file() else Path(sys.executable))]
+        else:
+            from p4vasp import p4vasp_home
+            args = [sys.executable, str(Path(p4vasp_home)/'p4v.py')]
+        args += [str(source), '-o', str(output), '--preset', str(preset)]
+        return '& ' + ' '.join("'"+arg.replace("'", "''")+"'" for arg in args)
     from p4vasp import p4vasp_home
     launcher = Path(p4vasp_home)/'p4v.sh'
     args = ['bash',str(launcher.resolve())] if launcher.is_file() else ['p4v']
@@ -116,14 +127,18 @@ def save_bundle(paths, output, base, data):
     """Write companions after a successful PNG; filenames are newly reserved names."""
     source, preset, text = paths
     cmd = command(source,output,preset)
+    script = ("$ErrorActionPreference = 'Stop'\n"+cmd+' @args\nexit $LASTEXITCODE\n'
+              if sys.platform == 'win32' else
+              '#!/usr/bin/env bash\nset -euo pipefail\n\n'+cmd+' \"$@\"\n')
     payloads = (poscar_text(base),json.dumps(data,ensure_ascii=False,indent=2,sort_keys=True)+'\n',
-                '#!/usr/bin/env bash\nset -euo pipefail\n\n'+cmd+' \"$@\"\n')
+                script)
     for path,payload in zip(paths,payloads):
         fd, temporary = tempfile.mkstemp(prefix='.p4v-recipe-',dir=path.parent)
         try:
-            with os.fdopen(fd,'w',encoding='utf-8') as handle:
+            encoding = 'utf-8-sig' if path == text and sys.platform == 'win32' else 'utf-8'
+            with os.fdopen(fd,'w',encoding=encoding) as handle:
                 handle.write(payload)
-                if path == text: os.fchmod(handle.fileno(),0o755)
+                if path == text and sys.platform != 'win32': os.fchmod(handle.fileno(),0o755)
             # Exclusive publication: even a concurrent export cannot replace a companion.
             os.link(temporary,path)
         finally:

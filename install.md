@@ -98,7 +98,8 @@ reads `/etc/os-release` and identifies the kernel with `uname -s`.
 
 ## Windows native build / Windows 原生构建试验
 
-当前只提供开发构建入口，尚无验证通过的独立 Windows EXE。请使用独立的 Windows 源码副本，
+已提供实验性独立目录打包入口，并在本机完成移出 MSYS2 目录后的运行检查；干净机验证尚未完成。
+原生源码构建请使用独立的 Windows 源码副本，
 不要在 Linux/macOS 工作副本上编译：构建会生成平台专用对象、SWIG wrapper 和 Python proxy。
 
 在 MSYS2 **UCRT64** 终端中，完成 `pacman -Syu` 后安装：
@@ -127,6 +128,37 @@ CodeIntegrity 日志事件 3077/3033 指向新编译的 `.pyd`。需由有权限
 主界面加载合成 POSCAR、原生分子绘制、POSCAR 保存重读和当前视角 PNG 导出通过，截图已检查。
 这些是本机开发环境验证，不代表独立 EXE、签名或其他电脑验证通过；助手没有修改系统安全设置。
 本机试用入口为 `C:\msys64\home\lqlhz\p4vasp-windows\p4v-windows.cmd`，路径仅属此设备。
+
+### Portable folder / 独立目录版
+
+在原生扩展已构建通过的 Windows 源码根目录，用 UCRT64 执行：
+
+```bash
+pacman -S --needed mingw-w64-ucrt-x86_64-pyinstaller
+bash install/package-windows.sh
+```
+
+输出为 `dist/windows/p4vasp/`。保留完整目录，双击 `p4vasp.exe`；
+`p4vasp-console.exe` 用于报错和命令行导出。不能只复制 EXE 或删除 `_internal/`。
+构建包含 Python、GTK/Cairo、原生扩展、NumPy、项目资源和依赖许可证；不包含用户计算文件。
+窗口版仅为旧回调提供空输出流，不恢复自动日志文件。
+
+从 Windows PowerShell 可进行合成检查，输出目录必须是新目录或空目录：
+
+```powershell
+.\p4vasp-console.exe --check-runtime C:\实际位置\new-runtime-check
+.\p4vasp-console.exe --check-gui C:\实际位置\new-gui-check
+```
+
+诊断会打开测试窗口、保存截图/合成结构/JSON 报告并退出进程，不验证完整正常退出。
+2026-10-29 已在本机“下载”目录中清空 MSYS2/Python 环境变量后验证：40 个 Glade 资源加载、
+全部注册 applet 模块导入、原生绘制、POSCAR 保存重读、PNG 与 preset 导出、实际 GUI 启动。
+运行中的 GUI 模块清单未发现来自 `C:\msys64` 的 DLL。这不是另一台无开发环境电脑的独立验证。
+
+本机便携版：`C:\Users\lqlhz\Downloads\p4vasp-portable-20261029\p4vasp.exe`，
+同级 ZIP 可用于整目录迁移。尚未代码签名、制作安装器或通过干净 Windows 设备验收；
+GLUT k 点查看器和外部数据库未验证。Windows 图片重放生成 `.ps1`，受 PowerShell 执行策略约束；
+本机策略禁止脚本执行，未修改或绕过。可直接使用控制台 EXE 的 `--preset` 功能。
 
 ## Changing computers / 换机接续
 
