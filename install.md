@@ -116,12 +116,17 @@ bash install/build-windows-py3.sh
 
 构建会检查 GTK/Cairo 和 `_cp4vasp` 导入。通过后可尝试双击 `p4v-windows.cmd`；
 它依赖本机 MSYS2（默认 `C:\msys64`，可用 `P4VASP_MSYS2` 指定其他位置），不是便携安装包。
-失败时保留终端错误；启动器尚未经过实际运行验证。
+失败时保留终端错误。启动器的 `--help` 调用已验证，双击 GUI 交互尚待验收。
 
 2026-10-29 本机 Windows 编译和链接成功，但导入被 Application Control 策略拦截。
 CodeIntegrity 日志事件 3077/3033 指向新编译的 `.pyd`。需由有权限的管理员确认签名或批准要求，
 再继续导入和 GUI 测试；不要把这个结果当作 DLL 缺失或 p4vasp 已在 Windows 运行成功。
 本次没有修改安全策略。详细结果见 [更新记录](update_history/update_2026_10_29.md)。
+
+同日后续：用户报告关闭拦截功能后，原有扩展导入成功，57 个基础测试、31 个 GTK 面板启动检查通过。
+主界面加载合成 POSCAR、原生分子绘制、POSCAR 保存重读和当前视角 PNG 导出通过，截图已检查。
+这些是本机开发环境验证，不代表独立 EXE、签名或其他电脑验证通过；助手没有修改系统安全设置。
+本机试用入口为 `C:\msys64\home\lqlhz\p4vasp-windows\p4v-windows.cmd`，路径仅属此设备。
 
 ## Changing computers / 换机接续
 

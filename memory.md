@@ -4,11 +4,13 @@ Last updated: 2026-10-29. This is a repository navigation and handoff document. 
 
 ## Windows 原生构建检查点（2026-10-29）
 
+- 最新进展：用户报告关闭了拦截功能后，助手重试原有 `.pyd` 导入成功，未重编译或修改安全策略。Windows 下 57 个基础测试和 31 个 GTK applet 启动检查通过；合成分子原生窗口实际绘制、相机快照、当前视角 PNG 导出、POSCAR 保存重读通过。主界面加载合成 POSCAR 成功，主界面与原生截图均已检查。
+- 开发启动器已复制到独立目录 `C:\msys64\home\lqlhz\p4vasp-windows\p4v-windows.cmd`，`--help` 调用通过；主界面是直接用 Windows Python 启动验证，尚待用户双击交互验收。该目录依赖现有 MSYS2，不是独立 EXE；完整退出、真实手动编辑流程、其他设备及干净机仍未验证。原策略拦截记录保留在下文作为历史，已不阻碍本次导入。下一步先验收开发版交互，再做独立打包和签名验证。
 - 当前任务：Windows 双击应用的可行性验证；用户要求节省调用。用户已安装 MSYS2 并报告 GTK3 最小窗口正常；不是 p4vasp GUI 验收。
 - 助手实测：通过 WSL 调用 Windows 工具链；Python 3.14.9、GCC 16.2.0、SWIG 4.5.1、FLTK 1.4.5。独立源码快照在本机 `C:\msys64\home\lqlhz\p4vasp-windows`，非 Git checkout，不含后续提交的自动更新；Linux 构建产物未替换。
 - 新入口 `install/build-windows-py3.sh` 复用共享构建脚本，Windows 使用 glu32/opengl32 并重新生成 SWIG wrapper；开发启动器 `p4v-windows.cmd` 尚未运行验证，不是独立 EXE。
 - 实际编译/链接成功，得到 `_cp4vasp.cp314-mingw_x86_64_ucrt_gnu.pyd`。导入被 Windows Application Control 拦截；CodeIntegrity 3077/3033 事件明确指向该文件的签名级别/策略要求。日志在独立目录 `windows-build.log`；没有绕过或修改系统策略。
-- 下一步：由有权限的设备管理员确认允许本项目本地开发模块的合规方式（如策略认可的签名/批准），再测扩展导入、GTK/FLTK 协同、打开/编辑/保存/导出，最后才制作 EXE 包。尚无 p4vasp Windows GUI、干净机打包或安装包验证。详见 [Windows 构建](install.md#windows-native-build--windows-原生构建试验) 和 [October 29](update_history/update_2026_10_29.md)。
+- 最初受阻时的下一步为管理员确认签名/批准方式；随后验证进展见本节顶部。对外分发时仍需验证签名和安全策略兼容性，不能把本机设置变化当作已解决发布问题。详见 [Windows 构建](install.md#windows-native-build--windows-原生构建试验) 和 [October 29](update_history/update_2026_10_29.md)。
 
 ## 接手检查点（2026-10-28）
 
