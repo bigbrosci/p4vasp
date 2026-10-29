@@ -190,6 +190,11 @@ bash install/update-windows.sh --build-current  # 不拉取，构建当前干净
 Python/C++/资源变化统一重编译打包；本机依赖更新不包含在该脚本内，缺依赖时按前文安装。
 旧构建与 ZIP 会占用磁盘，确认不再需要后再自行清理。
 
+2026-10-29 已在上述新 checkout 实跑完整更新流程成功：构建提交 `877fb28`，
+冻结 runtime/GUI 检查、ZIP CRC/SHA-256 和构建后干净工作树核对通过。
+本机成功版本为 `dist/windows-releases/p4vasp-20261029-003727-877fb283-9k24i9wj/`；
+该结果不替代另一台干净 Windows 电脑的验收。
+
 ## Changing computers / 换机接续
 
 从新设备的实际 checkout 根目录开始，先读 [AGENTS.md](AGENTS.md) 和
