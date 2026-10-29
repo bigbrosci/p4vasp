@@ -48,9 +48,13 @@ def verify(release, reports):
     env['PATH'] = str(windows/'System32') + os.pathsep + str(windows)
     reports.mkdir()
     for option, name in (('--check-runtime', 'runtime'), ('--check-gui', 'gui')):
-        logged([release/'p4vasp-console.exe', option, reports/name],
+        executable = 'p4vasp.exe' if name == 'gui' else 'p4vasp-console.exe'
+        logged([release/executable, option, reports/name],
                tempfile.gettempdir(), reports/(name+'.log'), env=env, timeout=60)
-        report = json.loads((reports/name/'report.json').read_text(encoding='utf-8'))
+        report_path = reports/name/'report.json'
+        if not report_path.is_file():
+            raise RuntimeError(f'{name} process exited without a completion report; see {reports}')
+        report = json.loads(report_path.read_text(encoding='utf-8'))
         if not report.get('ok') or not report.get('frozen'):
             raise RuntimeError(f'Packaged {name} check did not pass; see {reports}')
 
@@ -70,7 +74,8 @@ def main(args=None):
     if not options.build_current:
         subprocess.run(['git', 'pull', '--ff-only', 'origin', BRANCH], cwd=root, check=True)
         # Re-enter the newly pulled implementation instead of continuing an old updater.
-        os.execv(sys.executable, [sys.executable, str(root/'install/windows/update_build.py'), '--build-current'])
+        subprocess.run([sys.executable, str(root/'install/windows/update_build.py'), '--build-current'], check=True)
+        return
     if importlib.util.find_spec('PyInstaller') is None:
         raise RuntimeError('Install mingw-w64-ucrt-x86_64-pyinstaller in UCRT64 first.')
     work_parent = root/'build/windows-update'

@@ -4,6 +4,8 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
+import json
 
 spec = importlib.util.spec_from_file_location('windows_update_build',
     Path(__file__).resolve().parents[1]/'install/windows/update_build.py')
@@ -50,6 +52,25 @@ class CheckoutGuards(unittest.TestCase):
         nested.mkdir()
         with self.assertRaisesRegex(RuntimeError, 'subdirectory'):
             updater.validate_checkout(nested)
+
+    def test_verifier_uses_gui_exe_and_clean_environment(self):
+        calls = []
+        def simulate(command, cwd, log, env, timeout):
+            calls.append((command, env))
+            output = Path(command[2])
+            output.mkdir()
+            (output/'report.json').write_text(json.dumps(dict(ok=True, frozen=True)))
+        reports = self.root/'reports'
+        with patch.object(updater, 'logged', side_effect=simulate):
+            updater.verify(self.root/'release', reports)
+        self.assertEqual(calls[0][0][0].name, 'p4vasp-console.exe')
+        self.assertEqual(calls[1][0][0].name, 'p4vasp.exe')
+        self.assertNotIn('PYTHONPATH', calls[1][1])
+        self.assertNotIn('MSYSTEM', calls[1][1])
+
+    def test_missing_completion_report_is_failure(self):
+        with patch.object(updater, 'logged'), self.assertRaisesRegex(RuntimeError, 'without a completion report'):
+            updater.verify(self.root/'release', self.root/'reports')
 
 
 if __name__ == '__main__':
