@@ -4,6 +4,7 @@ Last updated: 2026-10-29. This is a repository navigation and handoff document. 
 
 ## Windows 原生构建检查点（2026-10-29）
 
+- Git 更新配置：已独立克隆 `origin/p4vasp-py3` 到 Windows `/home/lqlhz/p4vasp-checkout`，旧 `/home/lqlhz/p4vasp-windows` 和 Downloads 便携版保留。新增 `install/update-windows.sh` / `install/windows/update_build.py`，干净仓库 fast-forward 后从提交创建隔离构建副本，检查通过才生成版本目录/ZIP/SHA256；不覆盖旧版。5 个真实临时 Git 仓库保护测试通过；首次 Windows 全流程验证在本次配置任务中继续执行，尚不把脚本实现当作构建成功。用法见 install.md 的 Update from Git。
 - 最新任务已推进至便携目录：用户实际双击开发启动器成功（用户反馈，非助手复测）。新增 `install/package-windows.sh`、`install/windows/p4vasp.spec`/runtime hook/README；PyInstaller 6.22.3 生成 GUI/console 两个 EXE，共享 `_internal`。本机交付目录 `C:\Users\lqlhz\Downloads\p4vasp-portable-20261029`；整目录 ZIP 同级保存。仍未签名/制作安装器，须在干净 Windows 设备验收。
 - 本次助手独立核验：移出 MSYS2 目录并清空开发环境变量后，冻结 EXE 导入所有注册 applet 模块、加载 40 个资源（本机无 property errors）、原生绘制/截图、PNG、POSCAR 标记、直接 CLI preset 重放通过；GUI 截图已检查，运行中 DLL 清单无 `C:\msys64` 来源。报告/截图和模块清单位于交付目录同级 `-checks/`，未发布用户数据。未在冻结版重跑 31 个 applet 的逐项启动或完整 GTK 回归。
 - `lib/p4vasp/windows_check.py` 提供显式 `--check-runtime DIR` / `--check-gui DIR` 合成诊断，进程直接退出，不验证正常 teardown。Windows 重放改为引用本机 Python/冻结版 console EXE 的 PowerShell `.ps1`，修复默认保存脚本对 Bash/fchmod 的依赖；UTF-8 BOM 和单引号转义。7 个 recipe、14 个 CLI、57 个基础测试在 Linux 本次通过。Windows `.ps1` 最初被设备策略拒绝；随后用户报告设置 CurrentUser RemoteSigned，助手实际执行原有脚本成功，含中文/单引号/与号/百分号的路径和 `--size 160x120` 参数通过，输出 PNG 尺寸已核验。未改应用代码或由助手修改策略；直接 EXE preset 重放也通过。下一步用户双击便携 EXE，然后在无 Python/GTK/MSYS2 的 Windows 设备验证，最后再制作安装器。

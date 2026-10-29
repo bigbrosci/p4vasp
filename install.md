@@ -161,6 +161,35 @@ GLUT k 点查看器和外部数据库未验证。Windows 图片重放生成 `.ps
 本机最初禁止脚本执行，用户随后自行设置 CurrentUser RemoteSigned，原有重放脚本实测通过。
 其他设备需独立检查策略；也可直接使用控制台 EXE 的 `--preset` 功能。
 
+### Update from Git / 从 Git 一键更新 Windows 版
+
+先将 Linux 上需要同步的修改提交并推送到 `origin/p4vasp-py3`。Windows 更新只能取得已发布的提交，
+不会读取 Linux 未提交的文件。本机已建立新的 Git checkout：`C:\msys64\home\lqlhz\p4vasp-checkout`。
+原 `p4vasp-windows` 仍为历史源码副本，保留现有可用程序；不要在那个目录运行 `git pull`。
+
+打开 **MSYS2 UCRT64**，执行：
+
+```bash
+cd /home/lqlhz/p4vasp-checkout
+bash install/update-windows.sh
+```
+
+一键入口核对 origin、分支及干净工作树，使用 `git pull --ff-only`；有本地修改、远程/分支不符、
+合并冲突或网络错误时停止，不重置或自动暂存文件。随后从提交创建独立源码副本，重新编译和打包，
+清空开发环境变量后运行合成 runtime/GUI 检查（会短暂打开测试窗口）。成功后在
+`dist/windows-releases/` 保存独立版本目录、ZIP 和 SHA-256，版本目录含 `SOURCE-COMMIT.txt`。
+不覆盖旧版，也不自动替换“下载”文件夹里的便携版。
+
+```bash
+bash install/update-windows.sh --check          # 只读核对，不拉取、不编译
+bash install/update-windows.sh --build-current  # 不拉取，构建当前干净提交
+```
+
+构建日志和源码副本保存在 `build/windows-update/`；失败时保留证据，未通过的目录会标记失败，
+不会作为成功 ZIP 交付。诊断不代表完整人工工作流、正常退出、签名或干净设备验收。
+Python/C++/资源变化统一重编译打包；本机依赖更新不包含在该脚本内，缺依赖时按前文安装。
+旧构建与 ZIP 会占用磁盘，确认不再需要后再自行清理。
+
 ## Changing computers / 换机接续
 
 从新设备的实际 checkout 根目录开始，先读 [AGENTS.md](AGENTS.md) 和
