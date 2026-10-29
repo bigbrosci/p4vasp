@@ -1,6 +1,14 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-10-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-10-28. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 接手检查点（2026-10-28）
+
+- 当前任务：借鉴 PFAS 的交接文档实践；本次只改项目规则、记忆、安装指南和更新记录，不改应用实现。
+- 已完成：补充简短检查点、完整依赖迁移和展示/科学输入边界；换机操作见 [install.md](install.md#changing-computers--换机接续)，详细证据见 [October 28](update_history/update_2026_10_28.md)。现有最近实现及其历史测试仍见下文 October 24 记录。
+- 本次只读核对：当前分支 `p4vasp-py3`，origin 为约定 GitHub 地址，修改前工作树干净。读取了用户指定 PFAS 路径的交接/规则文档及状态、命令索引、记忆相关摘要；没有检查其模拟数据或执行其任务。
+- 未验证：本次没有运行 p4vasp GUI、重编译或复测科学功能；历史 GTK 属性错误、潜在 POSCAR 保存报告等仍未解决，见 Known unresolved issues。另一设备环境仍需独立核验。
+- 下一步：按用户具体目标继续；仅“开工”时做规则规定的只读接手。本文档任务的提交/推送结果以实际 Git 结果为准，不把计划写成已发布。
 
 ## Start here
 
@@ -14,6 +22,7 @@ Last updated: 2026-10-24. This is a repository navigation and handoff document. 
 
 | Date | Completed work | Detailed record |
 | --- | --- | --- |
+| 2026-10-28 | Adopted concise handoff checkpoints, dependency-complete migration and presentation/input boundaries from the PFAS documentation review. Documentation only. | [October 28](update_history/update_2026_10_28.md) |
 | 2026-09-05 | GTK3 replication controls, applet switching/lifecycle, file opening/saving, Python 3 compatibility, and initial Build blank-area fix. | [September 5](update_history/update_2026_09_05.md) |
 | 2026-09-07 | Structure background/cell outlines, element colors, Top/Side controls and sphere sizing; Measure startup, default Z-matrix mode, and missing angle/dihedral rows. | [September 7](update_history/update_2026_09_07.md) |
 | 2026-09-23 | STM controls/layout, native INCAR generator and save/folder dialogs, GTK3 runtime and Cairo plotting migration. | [September 23](update_history/update_2026_09_23.md) |

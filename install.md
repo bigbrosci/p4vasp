@@ -96,6 +96,37 @@ The scripts under `install/` remain internal installation/build backends. Advanc
 set `P4VASP_OS_RELEASE` to an alternate os-release file; normal installation
 reads `/etc/os-release` and identifies the kernel with `uname -s`.
 
+## Changing computers / 换机接续
+
+从新设备的实际 checkout 根目录开始，先读 [AGENTS.md](AGENTS.md) 和
+[memory.md](memory.md) 的接手检查点，再按任务查看历史证据。不要直接照搬旧电脑的绝对路径。
+
+1. 核对 `pwd`、`git status --short`、`git branch --show-current` 和 `git remote get-url origin`。
+   本项目发布目标为 `p4vasp-py3` / `https://github.com/bigbrosci/p4vasp.git`。
+   有本地修改时先保留并核对差异，不自动覆盖或重置。
+2. 获取完整源码与资源；不能只复制一个 applet 或 Python 脚本。保留 `lib/`、`src/`、
+   `data/`、`install/` 和项目入口文件。不要复用另一台机器的 `.venv-macos` 或已编译原生扩展；
+   依照本页安装流程重建。云盘可见文件名不等于内容已离线可读。
+3. 新设备首次安装用 `bash install.sh --no-launch`；依赖已经准备好、仅更新源码时可用
+   `bash install.sh --build-only`。以下为待执行建议，不代表新设备已安装或编译成功。
+4. 安装完成后用 `bash p4v.sh` 检查启动，并按任务运行
+   [GTK3 与原生选择检查](doc/GTK3-migration.md#verification)。无显示环境时可先按
+   [导出指南](doc/render-cli.md) 检查无窗口 PNG；导出成功不能代替 GUI 检查。
+5. 在 memory 接手检查点记录日期、平台/设备（未知写未标识）、实际检查范围、失败或未验证项。
+   Linux 通过不能代替 macOS、HiDPI 或另一台电脑的验证。
+
+迁移用户计算数据时应独立保存所需 POSCAR/CONTCAR、INCAR、KPOINTS、POTCAR 等实际输入，
+不随代码提交这些文件或凭据。图片重放需要配套的 `.POSCAR`、`.view.json` 和
+`command_for_*.sh`，其中结构快照不保存选择性动力学标记或完整计算设置，不能替代计算输入。
+详见 [重放说明](doc/render-cli.md)。
+保存的命令脚本含生成设备的绝对路径，换机后应核对并改用本机入口，例如在新 checkout 根目录运行
+`bash p4v.sh /实际位置/model.png.POSCAR -o /实际位置/replayed.png --preset /实际位置/model.png.view.json`。
+以上路径为待替换示例，不能直接当作本机已有文件。
+
+Rebuild the environment and native extension on the destination machine. Keep complete source/resource
+dependencies and any replay companions together; saved images and replay geometry do not replace
+calculation inputs. Record destination-machine checks separately from historical results.
+
 Starting with the magic `p4v` command
 --------------------------
 
