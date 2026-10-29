@@ -4,6 +4,7 @@ Last updated: 2026-10-29. This is a repository navigation and handoff document. 
 
 ## Windows 原生构建检查点（2026-10-29）
 
+- 日常使用入口已整理为 [Linux → Windows 更新操作流程](doc/windows-update-workflow-zh.md)，同一仓库的 Linux checkout 可直接查阅；install.md 已添加导航。覆盖 Linux 发布、UCRT64 命令、成功/失败判断、输出位置、人工验收及旧版回退。本次仅补文档，未重新构建或改变既有 ZIP；先前构建结果仍为历史证据。
 - Git 更新配置：已独立克隆 `origin/p4vasp-py3` 到 Windows `/home/lqlhz/p4vasp-checkout`，旧 `/home/lqlhz/p4vasp-windows` 和 Downloads 便携版保留。新增 `install/update-windows.sh` / `install/windows/update_build.py`，干净仓库 fast-forward 后从提交创建隔离构建副本，检查通过才生成版本目录/ZIP/SHA256；不覆盖旧版。7 个保护/验证器测试通过。修正 GUI 入口和 Windows 子进程退出码传递后，首次完整成功构建提交 `877fb28`，runtime/GUI、ZIP CRC/SHA256 及构建后干净 Git 状态均核验通过。成功目录为 `dist/windows-releases/p4vasp-20261029-003727-877fb283-9k24i9wj`（相对新 Windows checkout）。此前失败目录保留失败标记，未覆盖旧版。用法见 install.md 的 Update from Git。
 - 最新任务已推进至便携目录：用户实际双击开发启动器成功（用户反馈，非助手复测）。新增 `install/package-windows.sh`、`install/windows/p4vasp.spec`/runtime hook/README；PyInstaller 6.22.3 生成 GUI/console 两个 EXE，共享 `_internal`。本机交付目录 `C:\Users\lqlhz\Downloads\p4vasp-portable-20261029`；整目录 ZIP 同级保存。仍未签名/制作安装器，须在干净 Windows 设备验收。
 - 本次助手独立核验：移出 MSYS2 目录并清空开发环境变量后，冻结 EXE 导入所有注册 applet 模块、加载 40 个资源（本机无 property errors）、原生绘制/截图、PNG、POSCAR 标记、直接 CLI preset 重放通过；GUI 截图已检查，运行中 DLL 清单无 `C:\msys64` 来源。报告/截图和模块清单位于交付目录同级 `-checks/`，未发布用户数据。未在冻结版重跑 31 个 applet 的逐项启动或完整 GTK 回归。

@@ -163,6 +163,9 @@ GLUT k 点查看器和外部数据库未验证。Windows 图片重放生成 `.ps
 
 ### Update from Git / 从 Git 一键更新 Windows 版
 
+完整日常步骤见 [Linux → Windows 更新操作流程](doc/windows-update-workflow-zh.md)，
+包含如何进入目录、确认成功、人工验收、替换和保留旧版。
+
 先将 Linux 上需要同步的修改提交并推送到 `origin/p4vasp-py3`。Windows 更新只能取得已发布的提交，
 不会读取 Linux 未提交的文件。本机已建立新的 Git checkout：`C:\msys64\home\lqlhz\p4vasp-checkout`。
 原 `p4vasp-windows` 仍为历史源码副本，保留现有可用程序；不要在那个目录运行 `git pull`。
