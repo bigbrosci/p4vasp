@@ -151,8 +151,9 @@ Scripts are saved beside the image, include a Bash header, and forward extra ima
 
 Windows 使用 `command_for_model.ps1` 和 PowerShell 格式的复制命令；独立版直接调用同目录的
 `p4vasp-console.exe`，不依赖 Bash 或 `p4v` 别名。脚本使用带 BOM 的 UTF-8，支持中文路径；
-空格、单引号等字符以 PowerShell 字面量方式引用。脚本执行受设备策略限制，本机策略目前禁止 `.ps1`，
-不应把脚本生成成功当成已执行成功。直接 EXE 重放已验证，例如在便携版目录的 PowerShell 中执行：
+空格、单引号等字符以 PowerShell 字面量方式引用。脚本执行受设备策略限制。2026-10-29 本机最初拒绝 `.ps1`，
+用户自行设置 CurrentUser RemoteSigned 后，原有脚本实测通过（含中文及特殊字符路径，输出 160×120 PNG）。
+其他设备仍需独立验证。也可直接调用 EXE，例如在便携版目录的 PowerShell 中执行：
 
 ```powershell
 .\p4vasp-console.exe 'model.png.POSCAR' -o 'replayed.png' --preset 'model.png.view.json'

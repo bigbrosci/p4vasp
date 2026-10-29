@@ -158,7 +158,8 @@ bash install/package-windows.sh
 本机便携版：`C:\Users\lqlhz\Downloads\p4vasp-portable-20261029\p4vasp.exe`，
 同级 ZIP 可用于整目录迁移。尚未代码签名、制作安装器或通过干净 Windows 设备验收；
 GLUT k 点查看器和外部数据库未验证。Windows 图片重放生成 `.ps1`，受 PowerShell 执行策略约束；
-本机策略禁止脚本执行，未修改或绕过。可直接使用控制台 EXE 的 `--preset` 功能。
+本机最初禁止脚本执行，用户随后自行设置 CurrentUser RemoteSigned，原有重放脚本实测通过。
+其他设备需独立检查策略；也可直接使用控制台 EXE 的 `--preset` 功能。
 
 ## Changing computers / 换机接续
 
