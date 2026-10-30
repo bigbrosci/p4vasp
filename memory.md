@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 公众号汇总稿交付（2026-10-29）
+
+- 用户要求整理 10 月 13 日至 29 日全部更新为中文 Markdown，已按 13/24/28/29 日更新记录与当前记忆整理，保存到本机 `$DES`（Windows 桌面）的 `p4vasp_2026年10月13日至29日更新汇总_公众号稿.md`。正文采用最终行为，区分修复、新能力、维护流程及未解决/未验证项；未将 10 月 12 日以前的改动算成本期新增。
+- 文章草稿仅在用户桌面交付，不纳入仓库或发布到公众号；核对来源、中文内容、UTF-8 和桌面副本逐字节一致。本次未改应用、未重跑测试或构建，文中验证均引用历史记录。
+
 ## Windows 原生构建检查点（2026-10-29）
 
 - 日常使用入口已整理为 [Linux → Windows 更新操作流程](doc/windows-update-workflow-zh.md)，同一仓库的 Linux checkout 可直接查阅；install.md 已添加导航。覆盖 Linux 发布、UCRT64 命令、成功/失败判断、输出位置、人工验收及旧版回退。本次仅补文档，未重新构建或改变既有 ZIP；先前构建结果仍为历史证据。
