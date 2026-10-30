@@ -51,6 +51,28 @@ def main(args):
         report['resource_count'] = len(resources)
         report['resource_property_errors'] = property_errors
         report['checks'].append('Glade resources load (property warnings recorded)')
+        from p4vasp.gtk3.file_dialogs import PngSaveDialog, FolderDialog, workarea
+        for destination in (PngSaveDialog(None, out), FolderDialog(None, out)):
+            dialog = destination.dialog
+            dialog.show_all()
+            for _ in range(10):
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
+                time.sleep(.02)
+            width, height = dialog.get_allocated_width(), dialog.get_allocated_height()
+            area = workarea(None)
+            assert width <= area.width and height <= area.height
+            for response in (Gtk.ResponseType.CANCEL, Gtk.ResponseType.OK):
+                button = dialog.get_widget_for_response(response)
+                assert button.get_mapped()
+                x, y = button.translate_coordinates(dialog, 0, 0)
+                assert 0 <= x and x+button.get_allocated_width() <= width
+                assert 0 <= y and y+button.get_allocated_height() <= height
+            surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
+            dialog.draw(cairo.Context(surface))
+            surface.write_to_png(str(out/('save-destination.png' if isinstance(destination, PngSaveDialog) else 'folder-browser.png')))
+            dialog.destroy()
+        report['checks'].append('compact PNG destination/folder dialogs and visible action buttons')
         cp4vasp.VisInit()
         s = Structure()
         s.read(StringIO('Packaged synthetic water\n1\n6 0 0\n0 6 0\n0 0 6\n'

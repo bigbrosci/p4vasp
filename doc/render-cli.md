@@ -105,6 +105,17 @@ p4v POSCAR -o quick.png --renderer fast --quality 1
 
 ## 生成复现命令与批量导出 / Replay commands and batch export
 
+### 选择图片保存位置
+
+点击导出面板的保存按钮后，紧凑窗口提供 **Filename**（文件名）、**Folder**（文件夹）和
+**Browse…**（浏览）。默认文件名为 `structure.png`，未填扩展名时自动补 `.png`。
+可直接输入已有文件夹路径，也可在浏览窗口中双击目录、使用 Up/Home 或输入路径导航，
+再点击 **Select folder**。更换目录会保留已输入的文件名；长目录列表在窗口内滚动。
+
+窗口初始尺寸根据所在显示器的可用工作区调整，取消和导出按钮保持在独立底部操作区。
+已有 PNG 仍需确认覆盖，无效文件名/目录会保留窗口供修改。成功选择后，该导出面板记住上次目录。
+Linux 和 Windows 共用此实现；已有 Windows 便携版需要重新打包后才包含修复。
+
 GUI 导出默认勾选 **Save reusable command, view preset and structure snapshot**。成功后，面板显示最后一次成功导出的命令，点击 **Copy command** 可复制。PNG 旁同时保存：
 
 | 文件示例 / File | 用途 / Purpose |

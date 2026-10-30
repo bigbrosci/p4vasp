@@ -121,19 +121,11 @@ class ExportImageDialog:
         if not self.busy: self.temp.cleanup()
 
     def choose_file(self, *args):
-        Gtk = self.Gtk
-        chooser = Gtk.FileChooserDialog(title='Export transparent PNG', transient_for=self.dialog,
-                                        action=Gtk.FileChooserAction.SAVE)
-        chooser.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Export', Gtk.ResponseType.OK)
-        chooser.set_current_name('structure.png')
-        chooser.set_do_overwrite_confirmation(True)
-        if chooser.run() == Gtk.ResponseType.OK:
-            path = chooser.get_filename()
-            if not Path(path).suffix: path += '.png'
-            chooser.destroy()
+        from p4vasp.gtk3.file_dialogs import PngSaveDialog
+        path = PngSaveDialog(self.dialog, getattr(self, 'export_folder', None)).run()
+        if path:
+            self.export_folder = str(Path(path).parent)
             self.start(path)
-        else:
-            chooser.destroy()
 
     def start(self, output=None):
         if self.busy or not self.alive: return

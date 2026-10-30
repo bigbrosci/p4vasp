@@ -2,6 +2,12 @@
 
 Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## PNG 保存位置窗口修复（2026-10-29）
+
+- 用户截图报告默认 GTK 文件选择窗口超出屏幕，无法点按钮。`ExportImageDialog.choose_file` 已改用 `lib/p4vasp/gtk3/file_dialogs.py` 的紧凑 Filename/Folder/Browse 窗口，初始尺寸按父窗口所在显示器工作区调整，目录列表滚动；文件名补全、目录验证、覆盖确认和取消保留，导出面板记忆目录。
+- Windows 源码专项 5 项在普通及两倍 GTK 缩放通过，640×480 工作区内按钮分配已检查，已查看保存/浏览窗口实际绘制截图。Linux 显示外沙箱专项 5 项及原有 native/GTK 导出集成通过，57 个基础测试通过；最初沙箱内 GUI 因显示不可用跳过，未将其记为通过。macOS、全套 GTK 及完整人工工作流未重测。
+- 冻结版诊断补充实际保存窗口/目录浏览器及操作按钮检查。源码修复和文档先发布，随后在 Windows 一键更新流程重建并核对产物；旧便携版不会自动得到此改动，当前打包结果待本次构建实际完成后补记。
+
 ## 公众号汇总稿交付（2026-10-29）
 
 - 按后续要求另存约 1800 字的特色与使用精简稿到 `$DES/p4vasp_更新特色与使用方法_公众号精简版.md`，保留原长稿。重点为框选、居中、当前视角导出、批量复现、Windows 双击及更新命令；仅桌面交付，未上传文章正文，未重跑应用测试。
