@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 当日收尾与下次接手（2026-10-29）
+
+- 今天已完成 Windows 开发/便携构建与 Git 更新流程、中文操作指南、桌面公众号长短稿，以及 PNG 保存位置窗口的源码修复。详细证据见 [当日更新记录](update_history/update_2026_10_29.md)，不要把各阶段测试计数合并或记为新的测试结果。
+- 最后代码提交：`eedbf98`（紧凑图片保存窗口）、`6cd66f1`（WSL 进程内光标偏好与 Linux 普通箭头），均已发布；本机 Linux 原生扩展已重编译。用户随后认为大鼠标可能是电脑 WSL 环境问题，这是用户判断，根因未确认；未反馈重启后是否改善，不能记为已解决。
+- Windows 打包按用户要求继续暂缓。最近已验证的更新流程产物仍来自 `877fb28`，不含最后两项修复；`eedbf98` 的中断构建已标记未验证，不可当作新版交付。旧成功便携版保留。未经用户重新授权，不恢复打包或修改系统鼠标/桌面设置。
+- 下次“开工”先做有限只读检查，报告上述边界；根据用户意图确认 Linux 保存窗口和重启后的光标实际效果，或继续 Windows 构建。干净 Windows 设备验收、签名/安装器、已知 GTK 属性/解析及潜在保存问题仍未完成。
+- 本次收尾只补记忆和历史，未运行新的应用测试、重编译或启动后台任务。
+
 ## WSL 结构窗口鼠标检查点（2026-10-29）
 
 - 用户确认大鼠标发生在 Linux/WSL 版，要求先处理该问题、暂缓 Windows 打包。已停止上一轮 Windows updater/PyInstaller 进程，未完成目录 `p4vasp-20261029-232315-eedbf98c-fnyq8wqg` 标为中断且未验证，旧成功版本保留；本任务不继续生成 Windows 包。
