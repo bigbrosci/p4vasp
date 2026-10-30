@@ -114,6 +114,10 @@ void VisFLWindow::draw(){
 }
 
 int VisFLWindow::handle(int event){
+#ifdef __linux__
+  // Choose a client cursor instead of inheriting an X11/WSLg root cursor.
+  if (event==FL_ENTER || event==FL_SHOW) cursor(FL_CURSOR_ARROW);
+#endif
   const bool escape=(Fl::event_key()==FL_Escape &&
       (event==FL_KEYBOARD || event==FL_SHORTCUT || event==FL_KEYUP));
   if (this->win != NULL){

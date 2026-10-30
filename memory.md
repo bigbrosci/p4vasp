@@ -2,11 +2,18 @@
 
 Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## WSL 结构窗口鼠标检查点（2026-10-29）
+
+- 用户确认大鼠标发生在 Linux/WSL 版，要求先处理该问题、暂缓 Windows 打包。已停止上一轮 Windows updater/PyInstaller 进程，未完成目录 `p4vasp-20261029-232315-eedbf98c-fnyq8wqg` 标为中断且未验证，旧成功版本保留；本任务不继续生成 Windows 包。
+- 用户截图显示视觉上明显放大的箭头；助手当前实测 GTK 偏好 Adwaita/24、显示缩放 2，Xcursor 默认名义尺寸 16；现有结构窗口及测试窗口的 X11 光标图像为 24×24，未独立复现截图中的物理放大。相似 WSLg 上游报告仅作线索，不能确认本次根因。
+- `lib/p4vasp/gui_environment.py` 在 WSL 中按 GTK 偏好设置本进程 XCURSOR_SIZE/THEME（保留用户显式设置），由 `Frame.init3d` 在原生初始化前调用；`src/VisFLWindow.cpp` 在 Linux 的 SHOW/ENTER 事件明确选择箭头。已完成本机 Linux 原生重编译，不改系统设置。用户正在运行的旧进程须重启；最终屏幕效果待用户反馈，不能宣称视觉问题完全修复。
+- 本次证据：4 项配置测试、实际 Frame.init3d 设置检查、生产窗口普通箭头 24×24 测量、原生框选/旋转/Escape 回归、57 个基础测试和 31 个 GTK applet 启动通过。未重跑完整 GTK/Windows/macOS；未验证所有缩放/显示器。操作说明补充于 doc/interface-guide-zh.md。
+
 ## PNG 保存位置窗口修复（2026-10-29）
 
 - 用户截图报告默认 GTK 文件选择窗口超出屏幕，无法点按钮。`ExportImageDialog.choose_file` 已改用 `lib/p4vasp/gtk3/file_dialogs.py` 的紧凑 Filename/Folder/Browse 窗口，初始尺寸按父窗口所在显示器工作区调整，目录列表滚动；文件名补全、目录验证、覆盖确认和取消保留，导出面板记忆目录。
 - Windows 源码专项 5 项在普通及两倍 GTK 缩放通过，640×480 工作区内按钮分配已检查，已查看保存/浏览窗口实际绘制截图。Linux 显示外沙箱专项 5 项及原有 native/GTK 导出集成通过，57 个基础测试通过；最初沙箱内 GUI 因显示不可用跳过，未将其记为通过。macOS、全套 GTK 及完整人工工作流未重测。
-- 冻结版诊断补充实际保存窗口/目录浏览器及操作按钮检查。源码修复和文档先发布，随后在 Windows 一键更新流程重建并核对产物；旧便携版不会自动得到此改动，当前打包结果待本次构建实际完成后补记。
+- 冻结版诊断补充实际保存窗口/目录浏览器及操作按钮检查。源码修复已发布；其后 Windows 打包因用户要求暂缓而中断，未完成结果不得当成成功版本。旧便携版不会自动得到此改动；待用户重新授权继续打包。
 
 ## 公众号汇总稿交付（2026-10-29）
 

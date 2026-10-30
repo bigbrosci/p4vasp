@@ -148,6 +148,8 @@ class Frame(SystemListListener):
 
     def init3d(self):
         if not self.init3d_flag:
+            from p4vasp.gui_environment import configure_wsl_cursor
+            configure_wsl_cursor(gtk.Gtk.Settings.get_default())
             _cp4vasp.VisInit()
             if _cp4vasp.checkThreadsSupport():
                 _cp4vasp.VisMainLoopInThread()
