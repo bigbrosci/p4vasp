@@ -4,7 +4,9 @@ Last updated: 2026-10-31. This is a repository navigation and handoff document. 
 
 ## Database 隐藏系统／选择栏（2026-10-31）
 
-- 用户要求删除 Database 页面顶部 SYSTEM／SELECTION。ResourceHub 设置 `show_system_selection=False`，`p4v.py Frame.updateContextControls` 根据当前嵌入面板控制 frame.glade 的 table1，仅 Database 隐藏两行，切回 Builder 等嵌入编辑页恢复；设置 no_show_all 防止父级 show_all 再显示，嵌入／外置切换也同步。
+- 后续用户确认 Models 也需隐藏，已补齐 ModelsApplet 显示策略；实际 Frame 的 Models 隐藏／show_all 保护／切回 Builder 恢复专项通过，900×640 四空框截图已查看。本次未重复全套测试。
+
+- 用户要求删除 Database 页面顶部 SYSTEM／SELECTION。ResourceHub 和 ModelsApplet 均设置 `show_system_selection=False`，`p4v.py Frame.updateContextControls` 根据当前嵌入面板控制 frame.glade 的 table1，Database 资源页及 Models 页隐藏两行，切回 Builder 等嵌入编辑页恢复；设置 no_show_all 防止父级 show_all 再显示，嵌入／外置切换也同步。
 - 本机实际 Frame 检查 Database 隐藏、show_all 后仍隐藏、切到 Builder 恢复均通过，900×640 绘制截图已查看；57 基础和 32 applet 启动通过。首次夹具选用默认外置 Lattice，未真正替换主面板，改为嵌入 Builder 后验证；未将此误报为应用问题。其他平台／完整 GTK 套件未测，Windows 打包继续暂停。
 
 ## 完整元素资料与表内单位（2026-10-31，当前状态）

@@ -4,6 +4,7 @@ from p4vasp.applet.Applet import Applet
 
 class ModelsApplet(Applet):
     menupath = ['Database', 'Models']
+    show_system_selection = False
 
     def __init__(self):
         super().__init__()

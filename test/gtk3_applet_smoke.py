@@ -47,7 +47,7 @@ try:
    assert applet.panel is not None and applet.panel.get_parent() is frame.applet_box
  for _ in range(10):
   while gtk.events_pending():gtk.main_iteration()
- if name.endswith('DBApplet.DBApplet'):
+ if name.endswith(('DBApplet.DBApplet', 'ModelsApplet.ModelsApplet')):
   controls=xml.get_widget('table1')
   assert not controls.get_visible(), 'Database must hide System/Selection'
   window.set_size_request(900,640)
@@ -56,7 +56,8 @@ try:
   for _ in range(20):
    while gtk.events_pending():gtk.main_iteration()
    import time;time.sleep(.01)
-  window.get_pixbuf().savev('/tmp/p4vasp-database-no-context.png','png',[],[])
+  capture='/tmp/p4vasp-models-no-context.png' if name.endswith('ModelsApplet.ModelsApplet') else '/tmp/p4vasp-database-no-context.png'
+  window.get_pixbuf().savev(capture,'png',[],[])
   other=appletfactory().create('p4vasp.applet.BuilderApplet.BuilderApplet')
   frame.showApplet(other)
   assert controls.get_visible(), 'Switching back to editing must restore context controls'
