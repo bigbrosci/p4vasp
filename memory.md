@@ -1,6 +1,14 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-10-29. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 当前视角方向键移动原子（2026-10-31）
+
+- 用户要求保留原 Move／Copy，新增选原子、调整视角后用方向键沿屏幕水平/竖直方向移动；确认默认 0.1 Å，可调整。实现只在原生结构窗口普通方向键按下、无修饰键/无鼠标拖动且有选择时发请求。
+- `src/VisWindow.cpp` 捕获按键瞬间相机的屏幕方向及去重原胞原子编号；`VisBackEvent` 增加 BE_ATOM_MOVE 和快照载荷，经 p4v.py 事件队列交给 `lib/p4vasp/atom_movement.py`。Python 按来源窗口定位所属初始结构，更新并刷新同系统面板，最终/轨迹/原胞/STM 视图不编辑。保留相机、选择、晶胞、原坐标模式/比例和选择性动力学标记。原向量按钮实现未改。
+- MoveApplet 在 moveapplet.glade 的现有 vbox 中加入 Arrow-key step (Å)，默认 0.1，范围 0.001–10 Å，当前会话共享。相机逆旋转决定方向，步长不受缩放/透视影响。操作指南新增对应步骤。
+- 本机 Linux 原生构建及 SWIG 绑定已更新（本机 SWIG 4.4.0，仓库此前生成件标记 4.4.1，完整再生成导致生成文件差异较大）。3 项坐标专项含直接/笛卡尔及 4 类比例、重复编号、保存标记；扩展原生回归含四方向、多视角/任意旋转、缩放/透视、周期去重、选择和方向快照、空选择/修饰键，以及原框选/旋转/Esc；均通过。真实 GTK Move 面板步长绑定、所属结构更新、选择/相机保留、只读最终视图和保存重读检查通过，面板已绘制检查；57 个基础测试、31 个 applet 启动通过。
+- 测试基于合成结构；完整人工操作、完整 GTK 已知失败套件和其他平台未重测。用户需关闭旧进程再启动。Windows 打包继续暂停，不生成新版 EXE。详细记录见 [October 31](update_history/update_2026_10_31.md)。
 
 ## 当日收尾与下次接手（2026-10-29）
 

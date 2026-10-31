@@ -725,6 +725,12 @@ def idle_func():
     #      print "selected",sel.encodeSimple()
                 p4vasp.Selection.selection().setSelection(sel)
                 p4vasp.Selection.selection().notify(sd)
+        elif c.type == cp4vasp.BE_ATOM_MOVE:
+            from p4vasp.atom_movement import handle_event
+            try:
+                handle_event(c, applets())
+            except Exception:
+                msg().exception()
         elif c.type == cp4vasp.BE_WIN_CLOSE:
             w=c.getWindow()
             if w is not None:

@@ -27,6 +27,7 @@
 #include "VisDrawer.h"
 #include "VisStructureDrawer.h"
 #include "VisWindow.h"
+#include <vector>
 
 const int BE_NONE           =0;
 const int BE_SELECTED       =1;
@@ -36,9 +37,11 @@ const int BE_WIN_DEACTIVATE =4;
 const int BE_WIN_SHOW       =5;
 const int BE_WIN_HIDE       =6;
 const int BE_WIN_CLOSE      =7;
+const int BE_ATOM_MOVE      =8;
 
 class VisBackEventQueue;
 class VisBackEvent{
+  std::vector<int> moved_atoms;
   protected:
   friend class VisBackEventQueue;
   void *pointer;
@@ -54,12 +57,20 @@ class VisBackEvent{
       nz=0;
       next=NULL;
       pointer=NULL;
+      dx=dy=dz=0.;
     }
   public:
   static VisBackEvent *create(){
     return new VisBackEvent();
   }
 #ifndef SWIG
+  static VisBackEvent *createAtomMove(VisWindow *w, double dx, double dy, double dz,
+                                     const std::vector<int> &atoms){
+    VisBackEvent *e=new VisBackEvent();
+    e->type=BE_ATOM_MOVE; e->pointer=w;
+    e->dx=dx; e->dy=dy; e->dz=dz; e->moved_atoms=atoms;
+    return e;
+  }
   static VisBackEvent *createSelected(int atom, int nx, int ny, int nz,
   VisStructureDrawer *d){
     VisBackEvent *e = new VisBackEvent();
@@ -115,6 +126,9 @@ class VisBackEvent{
 #endif    
 
     int type,index,nx,ny,nz;
+    double dx,dy,dz;
+  int getMovedAtomCount(){return (int)moved_atoms.size();}
+  int getMovedAtom(int i){return i>=0 && i<(int)moved_atoms.size() ? moved_atoms[i] : -1;}
   VisStructureDrawer *getStructureDrawer();
   VisWindow *getWindow();
   

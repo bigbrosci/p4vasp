@@ -57,6 +57,7 @@ VisWindow *VisBackEvent::getWindow()
     case BE_WIN_SHOW: 
     case BE_WIN_HIDE: 
     case BE_WIN_CLOSE:
+    case BE_ATOM_MOVE:
       return (VisWindow *)pointer;
     default:
 #if VERBOSE>0

@@ -23,6 +23,7 @@
 #include <p4vasp/VisStructureDrawer.h>
 #include <stdio.h>
 #include <FL/gl.h>
+#include <FL/Fl.H>
 
 #include <p4vasp/utils.h>
 #include <p4vasp/VisWindow.h>
@@ -30,6 +31,10 @@
 #include <p4vasp/VisDrawer.h>
 #include <p4vasp/Exceptions.h>
 #include <p4vasp/VisMain.h>
+#include <p4vasp/VisNavDrawer.h>
+#include <p4vasp/VisBackEvent.h>
+#include <algorithm>
+#include <cmath>
 
 /* ***************************************************************** *
  *  This is a HACK to compensate that GL_BGR definition is missing   *
@@ -469,6 +474,34 @@ void VisWindow::draw(){
 
 int VisWindow::handle(int event){
   local_lock();
+  if (event==FL_KEYBOARD && !(Fl::event_state()&(FL_CTRL|FL_ALT|FL_META|FL_SHIFT|FL_BUTTONS))){
+    const int key=Fl::event_key();
+    if (key==FL_Left || key==FL_Right || key==FL_Up || key==FL_Down){
+      VisNavDrawer *nav=NULL;
+      VisStructureDrawer *atoms=NULL;
+      for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
+        if (!nav) nav=dynamic_cast<VisNavDrawer *>(d);
+        if (!atoms) atoms=dynamic_cast<VisStructureDrawer *>(d);
+      }
+      if (nav && atoms && atoms->getSelectedCount()){
+        std::vector<int> selected;
+        for (int i=0;i<atoms->getSelectedCount();i++) selected.push_back(atoms->getSelected(i)->atom);
+        std::sort(selected.begin(),selected.end());
+        selected.erase(std::unique(selected.begin(),selected.end()),selected.end());
+        const int row=(key==FL_Left || key==FL_Right) ? 0 : 1;
+        const double sign=(key==FL_Left || key==FL_Down) ? -1. : 1.;
+        double delta[3],length=0.;
+        for (int j=0;j<3;j++){delta[j]=sign*nav->getRotMatElement(row,j);length+=delta[j]*delta[j];}
+        length=sqrt(length);
+        if (length>1e-12){
+          VisBackEventQueue::get()->append(VisBackEvent::createAtomMove(this,
+            delta[0]/length,delta[1]/length,delta[2]/length,selected));
+          local_unlock();
+          return 1;
+        }
+      }
+    }
+  }
   for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
     VisStructureDrawer *structure=dynamic_cast<VisStructureDrawer *>(d);
     if (structure && structure->handleBoxSelection(event)){

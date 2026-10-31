@@ -121,6 +121,20 @@ class MoveApplet(Applet):
         self.gladename="applet_frame"
 
     def initUI(self):
+        from p4vasp import atom_movement
+        from p4vasp.gtk3 import Gtk
+        row=Gtk.Box(spacing=8)
+        row.set_border_width(6)
+        row.pack_start(Gtk.Label(label='Arrow-key step (Å):'),False,False,0)
+        self.arrow_step=Gtk.SpinButton.new_with_range(0.001,10.0,0.01)
+        self.arrow_step.set_digits(3)
+        self.arrow_step.set_value(atom_movement.ARROW_STEP)
+        self.arrow_step.connect('value-changed',lambda spin: atom_movement.set_arrow_step(spin.get_value()))
+        row.pack_start(self.arrow_step,False,False,0)
+        box=self.xml.get_widget('vbox1')
+        box.pack_start(row,False,False,0)
+        box.reorder_child(row,max(0,len(box.get_children())-2))
+        row.show_all()
         self.group_entry=self.xml.get_widget("group_entry")
         self.fromx_entry=self.xml.get_widget("fromx_entry")
         self.fromy_entry=self.xml.get_widget("fromy_entry")

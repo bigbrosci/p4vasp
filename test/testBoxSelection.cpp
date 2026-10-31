@@ -8,6 +8,7 @@
 #include <FL/Fl.H>
 #include <GL/glu.h>
 #include <cassert>
+#include <cmath>
 #include <cstdio>
 #include <vector>
 
@@ -168,6 +169,41 @@ int main(int argc,char **argv){
   event(w,FL_PUSH,0,0,FL_SHIFT|FL_BUTTON1);
   event(w,FL_UNFOCUS,0,0);
   assert(atoms.getSelectedCount()==0);
+  // Screen-relative arrow requests snapshot camera and unique base atoms.
+  atoms.selectAtom(1,0,0,0); atoms.selectAtom(1,1,0,0);
+  for(int view=0;view<3;view++){
+    if(view==0) nav.setHome();
+    if(view==1) nav.setRightView();
+    if(view==2){event(w,FL_PUSH,100,100,FL_BUTTON1);event(w,FL_DRAG,170,135,FL_BUTTON1);event(w,FL_RELEASE,170,135);}
+    nav.setPerspective(view%2); nav.setZoom(.5+view); render(w);
+    const int keys[]={FL_Left,FL_Right,FL_Up,FL_Down};
+    for(int k=0;k<4;k++){
+      while(queue->current()) queue->pop();
+      double rotation[3][3];
+      for(int i=0;i<3;i++)for(int j=0;j<3;j++)rotation[i][j]=nav.getRotMatElement(i,j);
+      Fl::e_keysym=keys[k];Fl::e_state=0;
+      assert(Fl::handle(FL_KEYBOARD,w.win)==1);
+      VisBackEvent *move=queue->current();
+      assert(move && move->type==BE_ATOM_MOVE && move->getWindow()==&w);
+      atoms.removeSelectedAll();
+      assert(move->getMovedAtomCount()==1 && move->getMovedAtom(0)==1);
+      atoms.selectAtom(1,0,0,0); atoms.selectAtom(1,1,0,0);
+      if(k==3) nav.setHome(); // Direction is the camera at keypress, not dispatch.
+      double delta[]={move->dx,move->dy,move->dz};
+      for(int i=0;i<3;i++){
+        double screen=0;for(int j=0;j<3;j++)screen+=rotation[i][j]*delta[j];
+        double expected=(i==(k<2?0:1)) ? ((k==0 || k==3)?-1.:1.) : 0.;
+        assert(fabs(screen-expected)<1e-10);
+      }
+      queue->pop();
+    }
+  }
+  while(queue->current()) queue->pop();
+  Fl::e_keysym=FL_Right;Fl::e_state=FL_CTRL;w.win->handle(FL_KEYBOARD);
+  assert(!queue->current());
+  atoms.removeSelectedAll();
+  while(queue->current()) queue->pop();
+  Fl::e_state=0;w.win->handle(FL_KEYBOARD);assert(!queue->current());
   // Empty structures must not select or crash.
   atoms.setStructure(NULL); render(w); box(w,0,0,700,550);
   // Escape is safe before/after a structure drawer is attached too.
