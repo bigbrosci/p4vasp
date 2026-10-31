@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 数据库卡片仅显示名称（2026-10-31）
+
+- 用户要求去掉 OQ／OQMD 等重复缩写，在线卡片现仅显示网站名称；已移除缩写标签和目录 badge 字段，4×4 排列及下方网址展示／复制保留。当前指南已同步。
+- 本机实际 X11 GTK 集成和 5 项资源测试通过，640×480 绘制截图已查看。未重跑全套测试或其他平台；既有退出析构警告仍在。
+
 ## 元素表 RGB 改为 0–255（2026-10-31）
 
 - 用户要求 RGB 用 255 形式，表格显示与编辑已改为 0–255 整数，单位提示同步。内部 XML 仍为 0–1，保存仅转换实际修改的通道，未编辑的原始颜色精度保留；读入按 255 倍四舍五入显示。

@@ -2,97 +2,81 @@
   {
     "name": "Open Catalyst Project",
     "url": "https://opencatalystproject.org/",
-    "description": "Catalysis · Meta / CMU datasets",
-    "badge": "OC"
+    "description": "Catalysis · Meta / CMU datasets"
   },
   {
     "name": "ioChem-BD",
     "url": "https://www.iochem-bd.org/",
-    "description": "Computational chemistry repositories",
-    "badge": "io"
+    "description": "Computational chemistry repositories"
   },
   {
     "name": "Materials Project",
     "url": "https://materialsproject.org/",
-    "description": "Computed materials properties",
-    "badge": "MP"
+    "description": "Computed materials properties"
   },
   {
     "name": "CRC Handbook",
     "url": "https://hbcp.chemnetbase.com/",
-    "description": "Chemistry & physics reference · subscription",
-    "badge": "CRC"
+    "description": "Chemistry & physics reference · subscription"
   },
   {
     "name": "NIST WebBook",
     "url": "https://webbook.nist.gov/chemistry/",
-    "description": "Thermochemistry & spectra",
-    "badge": "NIST"
+    "description": "Thermochemistry & spectra"
   },
   {
     "name": "NOMAD",
     "url": "https://nomad-lab.eu/",
-    "description": "Materials research data",
-    "badge": "N"
+    "description": "Materials research data"
   },
   {
     "name": "ChemSpider",
     "url": "https://www.chemspider.com/",
-    "description": "Chemical structures & identifiers",
-    "badge": "CS"
+    "description": "Chemical structures & identifiers"
   },
   {
     "name": "Catalysis-Hub",
     "url": "https://www.catalysis-hub.org/",
-    "description": "Surface reactions & adsorption",
-    "badge": "CH"
+    "description": "Surface reactions & adsorption"
   },
   {
     "name": "OQMD",
     "url": "https://oqmd.org/",
-    "description": "Quantum materials & stability",
-    "badge": "OQ"
+    "description": "Quantum materials & stability"
   },
   {
     "name": "AFLOW",
     "url": "https://aflow.org/",
-    "description": "High-throughput materials data",
-    "badge": "AF"
+    "description": "High-throughput materials data"
   },
   {
     "name": "Materials Cloud",
     "url": "https://www.materialscloud.org/",
-    "description": "Materials data & provenance",
-    "badge": "MC"
+    "description": "Materials data & provenance"
   },
   {
     "name": "NIST JARVIS",
     "url": "https://jarvis.nist.gov/",
-    "description": "Materials discovery & properties",
-    "badge": "J"
+    "description": "Materials discovery & properties"
   },
   {
     "name": "PubChem",
     "url": "https://pubchem.ncbi.nlm.nih.gov/",
-    "description": "Molecules & chemical properties",
-    "badge": "PC"
+    "description": "Molecules & chemical properties"
   },
   {
     "name": "COD",
     "url": "https://www.crystallography.net/cod/",
-    "description": "Open crystal structures",
-    "badge": "COD"
+    "description": "Open crystal structures"
   },
   {
     "name": "ICSD",
     "url": "https://icsd.products.fiz-karlsruhe.de/en",
-    "description": "Inorganic crystals · licensed services",
-    "badge": "IC"
+    "description": "Inorganic crystals · licensed services"
   },
   {
     "name": "CCDC Access Structures",
     "url": "https://www.ccdc.cam.ac.uk/structures/",
-    "description": "Crystal structures · advanced search licensed",
-    "badge": "CC"
+    "description": "Crystal structures · advanced search licensed"
   }
 ]

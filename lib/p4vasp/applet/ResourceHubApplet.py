@@ -1,5 +1,5 @@
 """Offline resource cards and a validated editor for the actual bundled files."""
-from p4vasp.gtk3 import Gtk, Gdk, GdkPixbuf
+from p4vasp.gtk3 import Gtk, Gdk
 from p4vasp.applet.Applet import Applet
 from p4vasp.resource_data import ResourceStore, validate
 from p4vasp.gtk3.element_table import ElementTable
@@ -108,20 +108,15 @@ class ResourceHubApplet(Applet):
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)
         self.refresh(); self.panel.show_all()
 
-    def card(self, title, description, badge, icon=None):
-        button = Gtk.Button(); box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
-        box.set_border_width(8)
-        image = None
-        if icon:
-            try:
-                pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(str(self.store.root/'database_logos'/icon), 32, 32, True)
-                image = Gtk.Image.new_from_pixbuf(pixbuf)
-            except Exception: pass
-        if image is None: image = Gtk.Label(label=badge)
-        box.pack_start(image, False, False, 0)
-        label = Gtk.Label(label=title); label.set_line_wrap(True); label.set_max_width_chars(18)
-        box.pack_start(label, False, False, 0); button.add(box)
-        button.set_tooltip_text(description); return button
+    def card(self, title, description):
+        button = Gtk.Button()
+        label = Gtk.Label(label=title)
+        label.set_line_wrap(True); label.set_max_width_chars(18)
+        label.set_margin_top(12); label.set_margin_bottom(12)
+        label.set_margin_start(8); label.set_margin_end(8)
+        button.add(label)
+        button.set_tooltip_text(description)
+        return button
 
     def refresh(self):
         for child in self.online.get_children(): self.online.remove(child)
@@ -129,8 +124,7 @@ class ResourceHubApplet(Applet):
         try:
             sites = validate('websites', self.store.read('websites')[0])
             for index, site in enumerate(sites):
-                button = self.card(site['name'], site.get('description', '')+'\n'+site['url'],
-                                   site.get('badge', site['name'][:2]), site.get('icon'))
+                button = self.card(site['name'], site.get('description', '')+'\n'+site['url'])
                 button.connect('clicked', self.select_site, site['name'], site['url'])
                 self.online.attach(button, index % 4, index // 4, 1, 1); self.online_buttons.append(button)
         except Exception as error:
