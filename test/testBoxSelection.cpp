@@ -177,22 +177,24 @@ int main(int argc,char **argv){
     if(view==2){event(w,FL_PUSH,100,100,FL_BUTTON1);event(w,FL_DRAG,170,135,FL_BUTTON1);event(w,FL_RELEASE,170,135);}
     nav.setPerspective(view%2); nav.setZoom(.5+view); render(w);
     const int keys[]={FL_Left,FL_Right,FL_Up,FL_Down};
-    for(int k=0;k<4;k++){
+    for(int mode=0;mode<2;mode++)for(int k=0;k<4;k++){
       while(queue->current()) queue->pop();
       double rotation[3][3];
       for(int i=0;i<3;i++)for(int j=0;j<3;j++)rotation[i][j]=nav.getRotMatElement(i,j);
-      Fl::e_keysym=keys[k];Fl::e_state=0;
+      Fl::e_keysym=keys[k];Fl::e_state=mode ? FL_SHIFT : 0;
       assert(Fl::handle(FL_KEYBOARD,w.win)==1);
       VisBackEvent *move=queue->current();
       assert(move && move->type==BE_ATOM_MOVE && move->getWindow()==&w);
+      assert(move->index==mode);
       atoms.removeSelectedAll();
       assert(move->getMovedAtomCount()==1 && move->getMovedAtom(0)==1);
       atoms.selectAtom(1,0,0,0); atoms.selectAtom(1,1,0,0);
-      if(k==3) nav.setHome(); // Direction is the camera at keypress, not dispatch.
+      if(k==3 && mode==1) nav.setHome(); // Axis is the camera at keypress, not dispatch.
       double delta[]={move->dx,move->dy,move->dz};
       for(int i=0;i<3;i++){
         double screen=0;for(int j=0;j<3;j++)screen+=rotation[i][j]*delta[j];
-        double expected=(i==(k<2?0:1)) ? ((k==0 || k==3)?-1.:1.) : 0.;
+        int axis=mode ? (k<2?1:0) : (k<2?0:1);
+        double expected=(i==axis) ? ((k==0 || (mode ? k==2 : k==3))?-1.:1.) : 0.;
         assert(fabs(screen-expected)<1e-10);
       }
       queue->pop();

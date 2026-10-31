@@ -131,6 +131,7 @@ class MoveApplet(Applet):
         self.arrow_step.set_value(atom_movement.ARROW_STEP)
         self.arrow_step.connect('value-changed',lambda spin: atom_movement.set_arrow_step(spin.get_value()))
         row.pack_start(self.arrow_step,False,False,0)
+        row.pack_start(Gtk.Label(label='Shift + arrows: rotate 5° about mass center'),False,False,0)
         box=self.xml.get_widget('vbox1')
         box.pack_start(row,False,False,0)
         box.reorder_child(row,max(0,len(box.get_children())-2))

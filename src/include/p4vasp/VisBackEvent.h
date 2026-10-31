@@ -65,9 +65,10 @@ class VisBackEvent{
   }
 #ifndef SWIG
   static VisBackEvent *createAtomMove(VisWindow *w, double dx, double dy, double dz,
-                                     const std::vector<int> &atoms){
+                                     const std::vector<int> &atoms, bool rotate=false){
     VisBackEvent *e=new VisBackEvent();
     e->type=BE_ATOM_MOVE; e->pointer=w;
+    e->index=rotate ? 1 : 0;
     e->dx=dx; e->dy=dy; e->dz=dz; e->moved_atoms=atoms;
     return e;
   }
