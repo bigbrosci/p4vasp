@@ -606,6 +606,13 @@ class Frame(SystemListListener):
                     pass
         self.applet_box.pack_start(panel,True,True,0)
 
+    def updateContextControls(self):
+        controls = self.xml.get_widget('table1')
+        if controls is not None:
+            visible = getattr(self.embedded_applet, 'show_system_selection', True)
+            controls.set_no_show_all(not visible)
+            controls.set_visible(visible)
+
     def showApplet(self,applet):
         if not applet.applet_ready:
             if applet.showmode in [applet.EMBEDDED_MODE,applet.EMBEDDED_ONLY_MODE]:
@@ -651,6 +658,7 @@ class Frame(SystemListListener):
                 self.applet_box.show_all()
                 self.embedded_applet=applet
             applet.show()
+        self.updateContextControls()
 
     def quickCommit(self,*arg):
         import p4vasp.db as db
@@ -679,6 +687,7 @@ class Frame(SystemListListener):
     def externalizeApplet(self,applet):
         if id(applet) == id(self.embedded_applet):
             self.embedded_applet=None
+            self.updateContextControls()
     def embedApplet(self,applet):
         if not applet.applet_ready:
             self.showApplet(applet)
@@ -696,6 +705,7 @@ class Frame(SystemListListener):
             applet.show()
             self.embedded_applet=applet
             applet.applet_ready=1
+        self.updateContextControls()
 
 
 vbequeue=_cp4vasp.VisBackEventQueue_get()

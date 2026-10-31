@@ -80,6 +80,7 @@ class ResourceEditor(Gtk.Dialog):
 
 
 class ResourceHubApplet(Applet):
+    show_system_selection = False
     def __init__(self):
         super().__init__()
         self.name = 'Database resources'; self.gladefile = 'resources.glade'; self.gladename = 'applet_frame'

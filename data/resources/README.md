@@ -1,6 +1,6 @@
 # 数据库导航与内部资料
 
-从工具栏 **Database** 或菜单 **Database → Resources** 打开。
+从工具栏 **Database** 或菜单 **Database → Resources** 打开。此页面隐藏共用的 System／Selection 两行；切回结构编辑面板恢复。
 
 ## 在线数据库
 

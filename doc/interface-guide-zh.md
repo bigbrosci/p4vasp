@@ -400,7 +400,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 
 ## 数据库导航与内部资料编辑
 
-点击工具栏 **Database** 或菜单 **Database → Resources**。
+点击工具栏 **Database** 或菜单 **Database → Resources**。该页面隐藏顶部 System／Selection 两行；切回 Build 等结构编辑面板时恢复。
 **Online databases** 提供确认的 16 个网站，按四列四行排列，点击后在网格下方显示网址并自动复制到剪贴板，用户可粘贴到浏览器；剪贴板不可用时选中网址按 Ctrl+C 手动复制。悬停查看用途与网址；卡片只显示数据库名称，不重复显示缩写。
 **p4vasp data** 显示 H 到 Og 的 118 个元素，按原子序数排序。单位直接写入列标题：Name、atomic number、mass (u)、radii (Å)、R (0–255)、G (0–255)、B (0–255)、Magmom (μB)、U (eV)、J (eV)。前两列只读；双击其他数值编辑，按 Enter，再点 Save，小窗口可双向滚动。
 
