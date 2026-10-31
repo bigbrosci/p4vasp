@@ -3,15 +3,7 @@ import webbrowser
 from p4vasp.gtk3 import Gtk, GdkPixbuf
 from p4vasp.applet.Applet import Applet
 from p4vasp.resource_data import ResourceStore, validate
-
-INTERNAL = [
-    ('Elements & masses', 'elements', 'mass', 'Element symbols and atomic masses'),
-    ('Atomic radii', 'elements', 'radius', 'Display and covalent radii'),
-    ('Element colours', 'elements', 'red', 'RGB values from 0 to 1'),
-    ('INCAR presets', 'incar', 'categories', 'Calculation templates and standard settings'),
-    ('Magnetism / U / J', 'incar', 'elements', 'Per-element initial defaults'),
-    ('Website catalog', 'websites', 'name', 'Names, links and card descriptions'),
-]
+from p4vasp.gtk3.element_table import ElementTable
 
 
 def message(parent, text, kind=Gtk.MessageType.ERROR):
@@ -99,12 +91,13 @@ class ResourceHubApplet(Applet):
         self.online = Gtk.Grid(column_spacing=8, row_spacing=8, column_homogeneous=True)
         self.online.set_border_width(8)
         self.add_page(notebook, self.online, 'Online databases')
-        internal = Gtk.Grid(column_spacing=8, row_spacing=8, column_homogeneous=True); internal.set_border_width(8)
-        for index, (title, key, focus, description) in enumerate(INTERNAL):
-            button = self.card(title, description+'\n'+str(self.store.path(key).relative_to(self.store.root)), 'TXT')
-            button.connect('clicked', self.edit, key, title, focus)
-            internal.attach(button, index % 4, index // 4, 1, 1); self.internal_buttons.append(button)
-        self.add_page(notebook, internal, 'p4vasp data')
+        self.element_table = ElementTable(self.store, self.parent_window, message)
+        notebook.append_page(self.element_table, Gtk.Label(label='p4vasp data'))
+        tools = Gtk.Box(spacing=6)
+        for title, key, focus in [('INCAR presets', 'incar', 'categories'), ('Website catalog', 'websites', 'name')]:
+            button = Gtk.Button(label=title); button.connect('clicked', self.edit, key, title, focus)
+            tools.pack_start(button, False, False, 0); self.internal_buttons.append(button)
+        self.element_table.pack_start(tools, False, False, 0)
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)
         self.refresh(); self.panel.show_all()
 

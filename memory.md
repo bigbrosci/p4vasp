@@ -2,6 +2,12 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## p4vasp data 元素表（2026-10-31）
+
+- 用户要求将内部资料卡片改为表格，已由 `gtk3/element_table.py` 展示 `element_data.py` 合并的 36 个已有真实元素，按原子序数排序。10 列：Name、atomic number、mass、radii、R、G、B、Magmom（磁矩）、U、J；前两列只读，其他列双击编辑／Enter／Save。RGB 0–1，磁矩可负，空白磁矩／U／J 表示无设置；保留共价半径、数字占位和未显示的元素默认值。无新增元素或填补科学数据。
+- ResourceHub 的 p4vasp data 标签页现在直接为表格，底部保留完整 INCAR／网站文本按钮。双源保存有备份、校验、冲突检查和失败回滚；回滚失败明确报需手工恢复，不保证多文件断电事务。Reload 询问未保存修改；切换 applet／关闭前需先保存。重启应用默认值，Windows 打包仍暂停。
+- 本机 Linux：4 项合并表专项、5 项原资源专项、实际 X11 GTK 表格修改／保存／非法值拒绝和绘制截图通过，57 基础、32 applet 启动通过。GUI 初次夹具漏拦已绑定错误回调导致模态等待，停止后修正夹具并通过；不是应用保存失败。退出仍见已有 cmatrix.Vector 析构警告。未写生产数据、未测其他平台和完整 GTK 套件。详细记录见当日更新。
+
 ## Models 模型库空框架（2026-10-31）
 
 - 用户要求将 Database 下拉菜单 Commit 换成 Models；`CommitApplet.menupath=None` 仅隐藏菜单项，工具栏 Commit 保留。新增注册 `ModelsApplet.py` 和 `data/glade2/models.glade`，显示 2×2 四个空框：single atom、gas phase、bulk、surface，不填内容或添加建模操作。Resources 保留。

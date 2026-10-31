@@ -21,7 +21,9 @@ with tempfile.TemporaryDirectory() as temporary:
     for _ in range(10):
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 16
-    assert len(applet.internal_buttons) == 6
+    assert len(applet.internal_buttons) == 2
+    assert len(applet.element_table.model) == 36
+    assert [c.get_title() for c in applet.element_table.view.get_columns()] == list(__import__('p4vasp.element_data',fromlist=['COLUMNS']).COLUMNS)
     for i, button in enumerate(applet.online_buttons):
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
         assert applet.online.child_get_property(button, 'top-attach') == i // 4
@@ -29,7 +31,31 @@ with tempfile.TemporaryDirectory() as temporary:
     with patch('p4vasp.applet.ResourceHubApplet.webbrowser.open', return_value=True) as browser:
         applet.online_buttons[0].clicked()
         browser.assert_called_once_with('https://opencatalystproject.org/')
-    window.get_pixbuf().savev('/tmp/p4vasp-resource-hub.png', 'png', [], [])
+    notebook=applet.element_table.get_parent()
+    notebook.set_current_page(1)
+    while Gtk.events_pending(): Gtk.main_iteration()
+    table=applet.element_table
+    table.edited(None,'0','1.02',2)
+    table.edited(None,'0','2.5',7)
+    table.save()
+    assert table.model[0][2]=='1.02' and table.model[0][7]=='2.5'
+    assert not table.dirty
+    with patch.object(table, 'show_error') as error:
+        table.edited(None,'0','2',4)
+        assert error.called
+    assert table.model[0][4]!='2'
+    import time
+    for _ in range(20):
+        while Gtk.events_pending(): Gtk.main_iteration()
+        time.sleep(0.01)
+    assert notebook.get_current_page()==1
+    assert table.view.get_allocation().height>100
+    adjustment=table.view.get_parent().get_hadjustment()
+    assert adjustment.get_upper()>adjustment.get_page_size()
+    adjustment.set_value(adjustment.get_upper()-adjustment.get_page_size())
+    assert adjustment.get_value()>0
+    adjustment.set_value(0)
+    window.get_pixbuf().savev('/tmp/p4vasp-element-table.png', 'png', [], [])
     editor = ResourceEditor(None, applet.store, 'websites', 'Website catalog', 'name', lambda key: applet.refresh())
     for key in ('elements', 'incar'):
         check = ResourceEditor(None, applet.store, key, key, 'mass' if key == 'elements' else 'categories')
@@ -51,4 +77,4 @@ with tempfile.TemporaryDirectory() as temporary:
         assert error.called
     assert applet.store.read('websites')[1] != b'invalid json'
     editor.destroy(); window.destroy()
-print('PASS: 4x4 displayed grid, six internal cards, mocked browser, editor save/validation/backup')
+print('PASS: 4x4 displayed grid, element table, mocked browser, editor save/validation/backup')
