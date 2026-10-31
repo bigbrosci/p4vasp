@@ -84,7 +84,7 @@ class ResourceHubApplet(Applet):
     def __init__(self):
         super().__init__()
         self.name = 'Database resources'; self.gladefile = 'resources.glade'; self.gladename = 'applet_frame'
-        self.store = ResourceStore(); self.online_buttons = []; self.internal_buttons = []
+        self.store = ResourceStore(); self.online_buttons = []
 
     def initUI(self):
         notebook = Gtk.Notebook()
@@ -93,11 +93,6 @@ class ResourceHubApplet(Applet):
         self.add_page(notebook, self.online, 'Online databases')
         self.element_table = ElementTable(self.store, self.parent_window, message)
         notebook.append_page(self.element_table, Gtk.Label(label='p4vasp data'))
-        tools = Gtk.Box(spacing=6)
-        for title, key, focus in [('INCAR presets', 'incar', 'categories'), ('Website catalog', 'websites', 'name')]:
-            button = Gtk.Button(label=title); button.connect('clicked', self.edit, key, title, focus)
-            tools.pack_start(button, False, False, 0); self.internal_buttons.append(button)
-        self.element_table.pack_start(tools, False, False, 0)
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)
         self.refresh(); self.panel.show_all()
 

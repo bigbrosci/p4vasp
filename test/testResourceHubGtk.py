@@ -21,7 +21,6 @@ with tempfile.TemporaryDirectory() as temporary:
     for _ in range(10):
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 16
-    assert len(applet.internal_buttons) == 2
     assert len(applet.element_table.model) == 36
     assert [c.get_title() for c in applet.element_table.view.get_columns()] == list(__import__('p4vasp.element_data',fromlist=['COLUMNS']).COLUMNS)
     for i, button in enumerate(applet.online_buttons):

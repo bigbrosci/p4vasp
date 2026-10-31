@@ -4,10 +4,12 @@ Last updated: 2026-10-31. This is a repository navigation and handoff document. 
 
 ## p4vasp data 元素表（2026-10-31）
 
+- 后续按用户要求移除表格底部 INCAR presets／Website catalog 两按钮；实际 GTK 显示和原编辑保存集成再次通过，截图已查看。仅删入口，数据文件保留。
+
 - 后续按用户要求将列标题简化为 Magmom、U、J，并在表格上方增加独立单位说明：mass=u、radii=Å、Magmom=μB、U/J=eV，原子序数与 RGB 无量纲，Name 为元素符号。实际 GTK 绘制及原集成检查、4 项数据专项再次通过；640×480 中单位说明与按钮可见。
 
 - 用户要求将内部资料卡片改为表格，已由 `gtk3/element_table.py` 展示 `element_data.py` 合并的 36 个已有真实元素，按原子序数排序。10 列：Name、atomic number、mass、radii、R、G、B、Magmom（磁矩）、U、J；前两列只读，其他列双击编辑／Enter／Save。RGB 0–1，磁矩可负，空白磁矩／U／J 表示无设置；保留共价半径、数字占位和未显示的元素默认值。无新增元素或填补科学数据。
-- ResourceHub 的 p4vasp data 标签页现在直接为表格，底部保留完整 INCAR／网站文本按钮。双源保存有备份、校验、冲突检查和失败回滚；回滚失败明确报需手工恢复，不保证多文件断电事务。Reload 询问未保存修改；切换 applet／关闭前需先保存。重启应用默认值，Windows 打包仍暂停。
+- ResourceHub 的 p4vasp data 标签页现在直接为表格，底部的 INCAR presets／Website catalog 按钮已按后续要求移除，保留表格 Save／Reload。双源保存有备份、校验、冲突检查和失败回滚；回滚失败明确报需手工恢复，不保证多文件断电事务。Reload 询问未保存修改；切换 applet／关闭前需先保存。重启应用默认值，Windows 打包仍暂停。
 - 本机 Linux：4 项合并表专项、5 项原资源专项、实际 X11 GTK 表格修改／保存／非法值拒绝和绘制截图通过，57 基础、32 applet 启动通过。GUI 初次夹具漏拦已绑定错误回调导致模态等待，停止后修正夹具并通过；不是应用保存失败。退出仍见已有 cmatrix.Vector 析构警告。未写生产数据、未测其他平台和完整 GTK 套件。详细记录见当日更新。
 
 ## Models 模型库空框架（2026-10-31）
