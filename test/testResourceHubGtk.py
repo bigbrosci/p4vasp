@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory() as temporary:
     for _ in range(10):
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 16
-    assert len(applet.element_table.model) == 36
+    assert len(applet.element_table.model) == 118
     assert [c.get_title() for c in applet.element_table.view.get_columns()] == list(__import__('p4vasp.element_data',fromlist=['COLUMNS']).COLUMNS)
     for i, button in enumerate(applet.online_buttons):
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
@@ -68,6 +68,18 @@ with tempfile.TemporaryDirectory() as temporary:
     assert adjustment.get_value()>0
     adjustment.set_value(0)
     window.get_pixbuf().savev('/tmp/p4vasp-element-table.png', 'png', [], [])
+    assert table.model[117][0]=='Og' and table.model[117][3:7]==['']*4
+    window.set_size_request(1100,480)
+    table.view.scroll_to_cell(Gtk.TreePath.new_from_indices([117]),None,True,1.0,0.0)
+    for _ in range(20):
+        while Gtk.events_pending(): Gtk.main_iteration()
+        time.sleep(0.01)
+    vertical=table.view.get_parent().get_vadjustment()
+    vertical.set_value(vertical.get_upper()-vertical.get_page_size())
+    for _ in range(20):
+        while Gtk.events_pending(): Gtk.main_iteration()
+        time.sleep(0.01)
+    window.get_pixbuf().savev('/tmp/p4vasp-periodic-bottom.png','png',[],[])
     editor = ResourceEditor(None, applet.store, 'websites', 'Website catalog', 'name', lambda key: applet.refresh())
     for key in ('elements', 'incar'):
         check = ResourceEditor(None, applet.store, key, key, 'mass' if key == 'elements' else 'categories')

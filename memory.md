@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 完整元素资料与表内单位（2026-10-31，当前状态）
+
+- 后续按用户要求恢复列标题单位：mass (u)、radii (Å)、R/G/B (0–255)、Magmom (μB)、U/J (eV)，删除表格外单位段。表格已扩为 H–Og 共 118 行；替代下方早期 36 行记录。缺失字段可留空、补填或清空，不填零；RGB 仍为 0–255 整数。
+- 新程序默认资料为 `data/resources/elements.json`：已有 XML 36 元素原值迁入，补充来自 ASE 3.29.0 的质量、vdw_radii、jmol_colors、covalent_radii；118 项质量、62 项显示半径、109 套颜色、96 项共价半径。ASE 的缺失／dummy 共价半径已转 null。源归档 SHA-256、许可与维护导入脚本均保留，不增加 ASE 运行依赖。
+- `element_data.py` 表格保存改写新 JSON，与 INCAR JSON 继续用备份／校验／冲突／回滚；旧 atomtypes.xml 不改，数字占位保留。`util.getAtomtypes` 在基础 XML 后合并新资料，再应用个人／工作目录 XML；`render_cli.atom_styles` 同样读新资料。运行时空质量为未知，空半径有 1 Å 显示回退，空 RGB 通道用白色分量，空共价半径为 0（不据此判键）；这些回退不写入科学资料。已有结构不自动改写。
+- 本机 Linux：9 项元素专项（含 118 行／缺失、补填清空、原值保留、RGB、双文件失败回滚、实际 AtomInfo／图片样式加载、个人覆盖顺序）、5 项资源测试、6 项渲染、7 项平移旋转、57 基础、32 applet 启动通过。实际 X11 GTK 118 行编辑保存及头尾截图通过；修正了 XML 惰性数组不能 append 的补充加载问题。仍见既有 ODP／cmatrix 退出警告，未声称修复。
+- 当前设备验证不代表其他平台；完整 GTK 套件、其他设备和用户真实模型未测，Windows 打包暂停。操作、同位素质量与数据来源见 `data/resources/README.md`。更新安装时须保留新 JSON 与相关 helper，运行默认值改变需重启。
+
 ## 数据库卡片仅显示名称（2026-10-31）
 
 - 用户要求去掉 OQ／OQMD 等重复缩写，在线卡片现仅显示网站名称；已移除缩写标签和目录 badge 字段，4×4 排列及下方网址展示／复制保留。当前指南已同步。

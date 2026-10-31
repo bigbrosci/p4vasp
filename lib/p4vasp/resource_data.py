@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ET
 import p4vasp
 
 FILES = {'elements': 'atomtypes.xml', 'incar': 'incar/presets.json',
-         'websites': 'resources/websites.json'}
+         'websites': 'resources/websites.json', 'periodic': 'resources/elements.json'}
 
 
 def _pairs(pairs):
@@ -54,6 +54,26 @@ def validate(key, text):
         return root
     data = json.loads(text, object_pairs_hook=_pairs,
                       parse_constant=lambda value: (_ for _ in ()).throw(ValueError('Invalid number: '+value)))
+    if key == 'periodic':
+        from p4vasp.element_data import SYMBOLS
+        if not isinstance(data, dict) or not isinstance(data.get('elements'), list):
+            raise ValueError('Expected an elements list.')
+        if len(data['elements']) != 118 or not all(isinstance(row, dict) for row in data['elements']) or [row.get('symbol') for row in data['elements']] != SYMBOLS:
+            raise ValueError('Keep all 118 element symbols in atomic-number order.')
+        for number, row in enumerate(data['elements'], 1):
+            if type(row.get('number')) is not int or row['number'] != number:
+                raise ValueError('Incorrect atomic number.')
+            for field in ('mass', 'radius', 'covalent', 'red', 'green', 'blue'):
+                if field not in row: raise ValueError('Missing field: '+field)
+                value = row[field]
+                if value is None: continue
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                    raise ValueError('Invalid '+field+' for '+row['symbol'])
+                if field == 'mass' and value <= 0:
+                    raise ValueError('Mass must be positive or null.')
+                if field in ('red','green','blue') and value > 1:
+                    raise ValueError('Stored RGB must be 0–1 or null.')
+        return data
     if key == 'websites':
         if not isinstance(data, list) or len(data) > 16:
             raise ValueError('Use a JSON list with at most 16 websites.')

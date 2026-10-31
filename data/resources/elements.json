@@ -1,0 +1,1193 @@
+{
+  "source": {
+    "archive": "ase-3.29.0-py3-none-any.whl",
+    "sha256": "7b9dd103f007810339c24acfee2f6b677c0c48443b21d3c98e52959246cf4ebf",
+    "url": "https://ase-lib.org/ase/data.html",
+    "colors": "ASE ase/data/colors.py jmol_colors; existing XML values retained",
+    "radii": "Existing display radii retained; new values from ASE vdw_radii (angstrom)",
+    "masses": "Existing values retained; ASE atomic_masses_iupac2016, including selected isotope masses",
+    "missing": "null; ASE covalent missing/dummy sentinels excluded"
+  },
+  "elements": [
+    {
+      "symbol": "H",
+      "number": 1,
+      "mass": 1.008,
+      "radius": 1.25,
+      "covalent": 0.32,
+      "red": 1.0,
+      "green": 1.0,
+      "blue": 1.0
+    },
+    {
+      "symbol": "He",
+      "number": 2,
+      "mass": 4.003,
+      "radius": 1.2,
+      "covalent": 0.31,
+      "red": 0.85098,
+      "green": 1.0,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Li",
+      "number": 3,
+      "mass": 6.941,
+      "radius": 1.86,
+      "covalent": 1.23,
+      "red": 0.8,
+      "green": 0.501961,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Be",
+      "number": 4,
+      "mass": 9.0121831,
+      "radius": 1.53,
+      "covalent": 0.96,
+      "red": 0.761,
+      "green": 1.0,
+      "blue": 0.0
+    },
+    {
+      "symbol": "B",
+      "number": 5,
+      "mass": 10.811,
+      "radius": 0.0,
+      "covalent": 0.82,
+      "red": 1.0,
+      "green": 0.709804,
+      "blue": 0.709804
+    },
+    {
+      "symbol": "C",
+      "number": 6,
+      "mass": 12.011,
+      "radius": 1.65,
+      "covalent": 0.77,
+      "red": 0.564706,
+      "green": 0.564706,
+      "blue": 0.564706
+    },
+    {
+      "symbol": "N",
+      "number": 7,
+      "mass": 14.007,
+      "radius": 1.5,
+      "covalent": 0.75,
+      "red": 0.188235,
+      "green": 0.313725,
+      "blue": 0.972549
+    },
+    {
+      "symbol": "O",
+      "number": 8,
+      "mass": 15.999,
+      "radius": 1.35,
+      "covalent": 0.73,
+      "red": 1.0,
+      "green": 0.05098,
+      "blue": 0.05098
+    },
+    {
+      "symbol": "F",
+      "number": 9,
+      "mass": 18.998,
+      "radius": 1.4,
+      "covalent": 0.72,
+      "red": 0.564706,
+      "green": 0.878431,
+      "blue": 0.313725
+    },
+    {
+      "symbol": "Ne",
+      "number": 10,
+      "mass": 20.1797,
+      "radius": 1.54,
+      "covalent": 0.58,
+      "red": 0.702,
+      "green": 0.89,
+      "blue": 0.961
+    },
+    {
+      "symbol": "Na",
+      "number": 11,
+      "mass": 22.99,
+      "radius": 1.12,
+      "covalent": 1.54,
+      "red": 0.670588,
+      "green": 0.360784,
+      "blue": 0.94902
+    },
+    {
+      "symbol": "Mg",
+      "number": 12,
+      "mass": 24.312,
+      "radius": 0.87,
+      "covalent": 1.36,
+      "red": 0.541176,
+      "green": 1.0,
+      "blue": 0.0
+    },
+    {
+      "symbol": "Al",
+      "number": 13,
+      "mass": 26.982,
+      "radius": 1.7,
+      "covalent": 1.18,
+      "red": 0.74902,
+      "green": 0.65098,
+      "blue": 0.65098
+    },
+    {
+      "symbol": "Si",
+      "number": 14,
+      "mass": 28.086,
+      "radius": 1.93,
+      "covalent": 1.16,
+      "red": 0.941176,
+      "green": 0.784314,
+      "blue": 0.627451
+    },
+    {
+      "symbol": "P",
+      "number": 15,
+      "mass": 30.974,
+      "radius": 1.75,
+      "covalent": 1.06,
+      "red": 1.0,
+      "green": 0.501961,
+      "blue": 0.0
+    },
+    {
+      "symbol": "S",
+      "number": 16,
+      "mass": 32.06,
+      "radius": 1.85,
+      "covalent": 1.02,
+      "red": 1.0,
+      "green": 1.0,
+      "blue": 0.188235
+    },
+    {
+      "symbol": "Cl",
+      "number": 17,
+      "mass": 35.453,
+      "radius": 1.8,
+      "covalent": 0.99,
+      "red": 0.121569,
+      "green": 0.941176,
+      "blue": 0.121569
+    },
+    {
+      "symbol": "Ar",
+      "number": 18,
+      "mass": 39.948,
+      "radius": 1.88,
+      "covalent": 1.06,
+      "red": 0.502,
+      "green": 0.82,
+      "blue": 0.89
+    },
+    {
+      "symbol": "K",
+      "number": 19,
+      "mass": 39.098,
+      "radius": 1.44,
+      "covalent": 2.03,
+      "red": 0.560784,
+      "green": 0.25098,
+      "blue": 0.831373
+    },
+    {
+      "symbol": "Ca",
+      "number": 20,
+      "mass": 40.08,
+      "radius": 1.18,
+      "covalent": 1.74,
+      "red": 0.239216,
+      "green": 1.0,
+      "blue": 0.0
+    },
+    {
+      "symbol": "Sc",
+      "number": 21,
+      "mass": 44.956,
+      "radius": 1.37,
+      "covalent": 1.44,
+      "red": 0.901961,
+      "green": 0.901961,
+      "blue": 0.901961
+    },
+    {
+      "symbol": "Ti",
+      "number": 22,
+      "mass": 47.9,
+      "radius": 1.37,
+      "covalent": 1.32,
+      "red": 0.74902,
+      "green": 0.760784,
+      "blue": 0.780392
+    },
+    {
+      "symbol": "V",
+      "number": 23,
+      "mass": 50.941,
+      "radius": 1.37,
+      "covalent": 1.22,
+      "red": 0.65098,
+      "green": 0.65098,
+      "blue": 0.670588
+    },
+    {
+      "symbol": "Cr",
+      "number": 24,
+      "mass": 51.996,
+      "radius": 1.37,
+      "covalent": 1.18,
+      "red": 0.541176,
+      "green": 0.6,
+      "blue": 0.780392
+    },
+    {
+      "symbol": "Mn",
+      "number": 25,
+      "mass": 54.938,
+      "radius": 1.37,
+      "covalent": 1.17,
+      "red": 0.611765,
+      "green": 0.478431,
+      "blue": 0.780392
+    },
+    {
+      "symbol": "Fe",
+      "number": 26,
+      "mass": 55.847,
+      "radius": 0.9,
+      "covalent": 1.17,
+      "red": 0.878431,
+      "green": 0.4,
+      "blue": 0.2
+    },
+    {
+      "symbol": "Co",
+      "number": 27,
+      "mass": 58.933,
+      "radius": 0.88,
+      "covalent": 1.16,
+      "red": 0.941176,
+      "green": 0.564706,
+      "blue": 0.627451
+    },
+    {
+      "symbol": "Ni",
+      "number": 28,
+      "mass": 58.71,
+      "radius": 0.69,
+      "covalent": 1.15,
+      "red": 0.313725,
+      "green": 0.815686,
+      "blue": 0.313725
+    },
+    {
+      "symbol": "Cu",
+      "number": 29,
+      "mass": 63.54,
+      "radius": 0.72,
+      "covalent": 1.17,
+      "red": 0.784314,
+      "green": 0.501961,
+      "blue": 0.2
+    },
+    {
+      "symbol": "Zn",
+      "number": 30,
+      "mass": 65.37,
+      "radius": 0.74,
+      "covalent": 1.25,
+      "red": 0.490196,
+      "green": 0.501961,
+      "blue": 0.690196
+    },
+    {
+      "symbol": "Ga",
+      "number": 31,
+      "mass": 69.72,
+      "radius": 1.37,
+      "covalent": 1.26,
+      "red": 0.760784,
+      "green": 0.560784,
+      "blue": 0.560784
+    },
+    {
+      "symbol": "Ge",
+      "number": 32,
+      "mass": 72.63,
+      "radius": 2.11,
+      "covalent": 1.2,
+      "red": 0.4,
+      "green": 0.561,
+      "blue": 0.561
+    },
+    {
+      "symbol": "As",
+      "number": 33,
+      "mass": 74.921595,
+      "radius": 1.85,
+      "covalent": 1.19,
+      "red": 0.741,
+      "green": 0.502,
+      "blue": 0.89
+    },
+    {
+      "symbol": "Se",
+      "number": 34,
+      "mass": 78.971,
+      "radius": 1.9,
+      "covalent": 1.2,
+      "red": 1.0,
+      "green": 0.631,
+      "blue": 0.0
+    },
+    {
+      "symbol": "Br",
+      "number": 35,
+      "mass": 79.904,
+      "radius": 1.95,
+      "covalent": 1.14,
+      "red": 0.65098,
+      "green": 0.160784,
+      "blue": 0.160784
+    },
+    {
+      "symbol": "Kr",
+      "number": 36,
+      "mass": 83.798,
+      "radius": 2.02,
+      "covalent": 1.16,
+      "red": 0.361,
+      "green": 0.722,
+      "blue": 0.82
+    },
+    {
+      "symbol": "Rb",
+      "number": 37,
+      "mass": 85.47,
+      "radius": 1.58,
+      "covalent": 2.16,
+      "red": 0.439216,
+      "green": 0.180392,
+      "blue": 0.690196
+    },
+    {
+      "symbol": "Sr",
+      "number": 38,
+      "mass": 87.62,
+      "radius": 2.49,
+      "covalent": 1.95,
+      "red": 0.0,
+      "green": 1.0,
+      "blue": 0.0
+    },
+    {
+      "symbol": "Y",
+      "number": 39,
+      "mass": 88.90584,
+      "radius": null,
+      "covalent": 1.9,
+      "red": 0.58,
+      "green": 1.0,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Zr",
+      "number": 40,
+      "mass": 91.224,
+      "radius": null,
+      "covalent": 1.75,
+      "red": 0.58,
+      "green": 0.878,
+      "blue": 0.878
+    },
+    {
+      "symbol": "Nb",
+      "number": 41,
+      "mass": 92.90637,
+      "radius": null,
+      "covalent": 1.64,
+      "red": 0.451,
+      "green": 0.761,
+      "blue": 0.788
+    },
+    {
+      "symbol": "Mo",
+      "number": 42,
+      "mass": 95.95,
+      "radius": null,
+      "covalent": 1.54,
+      "red": 0.329,
+      "green": 0.71,
+      "blue": 0.71
+    },
+    {
+      "symbol": "Tc",
+      "number": 43,
+      "mass": 97.90721,
+      "radius": null,
+      "covalent": 1.47,
+      "red": 0.231,
+      "green": 0.62,
+      "blue": 0.62
+    },
+    {
+      "symbol": "Ru",
+      "number": 44,
+      "mass": 101.07,
+      "radius": null,
+      "covalent": 1.46,
+      "red": 0.141,
+      "green": 0.561,
+      "blue": 0.561
+    },
+    {
+      "symbol": "Rh",
+      "number": 45,
+      "mass": 102.9055,
+      "radius": null,
+      "covalent": 1.42,
+      "red": 0.039,
+      "green": 0.49,
+      "blue": 0.549
+    },
+    {
+      "symbol": "Pd",
+      "number": 46,
+      "mass": 106.42,
+      "radius": 1.63,
+      "covalent": 1.39,
+      "red": 0.0,
+      "green": 0.412,
+      "blue": 0.522
+    },
+    {
+      "symbol": "Ag",
+      "number": 47,
+      "mass": 107.87,
+      "radius": 1.27,
+      "covalent": 1.34,
+      "red": 0.752941,
+      "green": 0.752941,
+      "blue": 0.752941
+    },
+    {
+      "symbol": "Cd",
+      "number": 48,
+      "mass": 112.414,
+      "radius": 1.58,
+      "covalent": 1.44,
+      "red": 1.0,
+      "green": 0.851,
+      "blue": 0.561
+    },
+    {
+      "symbol": "In",
+      "number": 49,
+      "mass": 114.818,
+      "radius": 1.93,
+      "covalent": 1.42,
+      "red": 0.651,
+      "green": 0.459,
+      "blue": 0.451
+    },
+    {
+      "symbol": "Sn",
+      "number": 50,
+      "mass": 118.71,
+      "radius": 2.17,
+      "covalent": 1.39,
+      "red": 0.4,
+      "green": 0.502,
+      "blue": 0.502
+    },
+    {
+      "symbol": "Sb",
+      "number": 51,
+      "mass": 121.76,
+      "radius": 2.06,
+      "covalent": 1.39,
+      "red": 0.62,
+      "green": 0.388,
+      "blue": 0.71
+    },
+    {
+      "symbol": "Te",
+      "number": 52,
+      "mass": 127.6,
+      "radius": 2.06,
+      "covalent": 1.38,
+      "red": 0.831,
+      "green": 0.478,
+      "blue": 0.0
+    },
+    {
+      "symbol": "I",
+      "number": 53,
+      "mass": 129.905,
+      "radius": 2.15,
+      "covalent": 1.33,
+      "red": 0.580392,
+      "green": 0.0,
+      "blue": 0.580392
+    },
+    {
+      "symbol": "Xe",
+      "number": 54,
+      "mass": 131.293,
+      "radius": 2.16,
+      "covalent": 1.4,
+      "red": 0.259,
+      "green": 0.62,
+      "blue": 0.69
+    },
+    {
+      "symbol": "Cs",
+      "number": 55,
+      "mass": 132.905,
+      "radius": 1.84,
+      "covalent": 2.35,
+      "red": 0.341176,
+      "green": 0.090196,
+      "blue": 0.560784
+    },
+    {
+      "symbol": "Ba",
+      "number": 56,
+      "mass": 137.327,
+      "radius": 2.49,
+      "covalent": 2.15,
+      "red": 0.0,
+      "green": 0.788,
+      "blue": 0.0
+    },
+    {
+      "symbol": "La",
+      "number": 57,
+      "mass": 138.90547,
+      "radius": null,
+      "covalent": 2.07,
+      "red": 0.439,
+      "green": 0.831,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Ce",
+      "number": 58,
+      "mass": 140.115,
+      "radius": 1.85,
+      "covalent": 1.69,
+      "red": 1.0,
+      "green": 1.0,
+      "blue": 0.780392
+    },
+    {
+      "symbol": "Pr",
+      "number": 59,
+      "mass": 140.90766,
+      "radius": null,
+      "covalent": 2.03,
+      "red": 0.851,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Nd",
+      "number": 60,
+      "mass": 144.242,
+      "radius": null,
+      "covalent": 2.01,
+      "red": 0.78,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Pm",
+      "number": 61,
+      "mass": 144.91276,
+      "radius": null,
+      "covalent": 1.99,
+      "red": 0.639,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Sm",
+      "number": 62,
+      "mass": 150.36,
+      "radius": null,
+      "covalent": 1.98,
+      "red": 0.561,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Eu",
+      "number": 63,
+      "mass": 151.964,
+      "radius": null,
+      "covalent": 1.98,
+      "red": 0.38,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Gd",
+      "number": 64,
+      "mass": 157.25,
+      "radius": null,
+      "covalent": 1.96,
+      "red": 0.271,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Tb",
+      "number": 65,
+      "mass": 158.92535,
+      "radius": null,
+      "covalent": 1.94,
+      "red": 0.188,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Dy",
+      "number": 66,
+      "mass": 162.5,
+      "radius": null,
+      "covalent": 1.92,
+      "red": 0.122,
+      "green": 1.0,
+      "blue": 0.78
+    },
+    {
+      "symbol": "Ho",
+      "number": 67,
+      "mass": 164.93033,
+      "radius": null,
+      "covalent": 1.92,
+      "red": 0.0,
+      "green": 1.0,
+      "blue": 0.612
+    },
+    {
+      "symbol": "Er",
+      "number": 68,
+      "mass": 167.259,
+      "radius": null,
+      "covalent": 1.89,
+      "red": 0.0,
+      "green": 0.902,
+      "blue": 0.459
+    },
+    {
+      "symbol": "Tm",
+      "number": 69,
+      "mass": 168.93422,
+      "radius": null,
+      "covalent": 1.9,
+      "red": 0.0,
+      "green": 0.831,
+      "blue": 0.322
+    },
+    {
+      "symbol": "Yb",
+      "number": 70,
+      "mass": 173.054,
+      "radius": null,
+      "covalent": 1.87,
+      "red": 0.0,
+      "green": 0.749,
+      "blue": 0.22
+    },
+    {
+      "symbol": "Lu",
+      "number": 71,
+      "mass": 174.9668,
+      "radius": null,
+      "covalent": 1.87,
+      "red": 0.0,
+      "green": 0.671,
+      "blue": 0.141
+    },
+    {
+      "symbol": "Hf",
+      "number": 72,
+      "mass": 178.49,
+      "radius": null,
+      "covalent": 1.75,
+      "red": 0.302,
+      "green": 0.761,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Ta",
+      "number": 73,
+      "mass": 180.94788,
+      "radius": null,
+      "covalent": 1.7,
+      "red": 0.302,
+      "green": 0.651,
+      "blue": 1.0
+    },
+    {
+      "symbol": "W",
+      "number": 74,
+      "mass": 183.84,
+      "radius": null,
+      "covalent": 1.62,
+      "red": 0.129,
+      "green": 0.58,
+      "blue": 0.839
+    },
+    {
+      "symbol": "Re",
+      "number": 75,
+      "mass": 186.207,
+      "radius": null,
+      "covalent": 1.51,
+      "red": 0.149,
+      "green": 0.49,
+      "blue": 0.671
+    },
+    {
+      "symbol": "Os",
+      "number": 76,
+      "mass": 190.23,
+      "radius": null,
+      "covalent": 1.44,
+      "red": 0.149,
+      "green": 0.4,
+      "blue": 0.588
+    },
+    {
+      "symbol": "Ir",
+      "number": 77,
+      "mass": 192.217,
+      "radius": null,
+      "covalent": 1.41,
+      "red": 0.09,
+      "green": 0.329,
+      "blue": 0.529
+    },
+    {
+      "symbol": "Pt",
+      "number": 78,
+      "mass": 195.08,
+      "radius": 1.35,
+      "covalent": 1.28,
+      "red": 0.815686,
+      "green": 0.815686,
+      "blue": 0.878431
+    },
+    {
+      "symbol": "Au",
+      "number": 79,
+      "mass": 196.967,
+      "radius": 1.37,
+      "covalent": 1.34,
+      "red": 1.0,
+      "green": 0.819608,
+      "blue": 0.137255
+    },
+    {
+      "symbol": "Hg",
+      "number": 80,
+      "mass": 200.592,
+      "radius": 1.55,
+      "covalent": 1.32,
+      "red": 0.722,
+      "green": 0.722,
+      "blue": 0.816
+    },
+    {
+      "symbol": "Tl",
+      "number": 81,
+      "mass": 204.38,
+      "radius": 1.96,
+      "covalent": 1.45,
+      "red": 0.651,
+      "green": 0.329,
+      "blue": 0.302
+    },
+    {
+      "symbol": "Pb",
+      "number": 82,
+      "mass": 207.2,
+      "radius": 2.02,
+      "covalent": 1.46,
+      "red": 0.341,
+      "green": 0.349,
+      "blue": 0.38
+    },
+    {
+      "symbol": "Bi",
+      "number": 83,
+      "mass": 208.9804,
+      "radius": 2.07,
+      "covalent": 1.48,
+      "red": 0.62,
+      "green": 0.31,
+      "blue": 0.71
+    },
+    {
+      "symbol": "Po",
+      "number": 84,
+      "mass": 208.98243,
+      "radius": 1.97,
+      "covalent": 1.4,
+      "red": 0.671,
+      "green": 0.361,
+      "blue": 0.0
+    },
+    {
+      "symbol": "At",
+      "number": 85,
+      "mass": 209.98715,
+      "radius": 2.02,
+      "covalent": 1.5,
+      "red": 0.459,
+      "green": 0.31,
+      "blue": 0.271
+    },
+    {
+      "symbol": "Rn",
+      "number": 86,
+      "mass": 222.01758,
+      "radius": 2.2,
+      "covalent": 1.5,
+      "red": 0.259,
+      "green": 0.51,
+      "blue": 0.588
+    },
+    {
+      "symbol": "Fr",
+      "number": 87,
+      "mass": 223.01974,
+      "radius": 3.48,
+      "covalent": 2.6,
+      "red": 0.259,
+      "green": 0.0,
+      "blue": 0.4
+    },
+    {
+      "symbol": "Ra",
+      "number": 88,
+      "mass": 226.02541,
+      "radius": 2.83,
+      "covalent": 2.21,
+      "red": 0.0,
+      "green": 0.49,
+      "blue": 0.0
+    },
+    {
+      "symbol": "Ac",
+      "number": 89,
+      "mass": 227.02775,
+      "radius": null,
+      "covalent": 2.15,
+      "red": 0.439,
+      "green": 0.671,
+      "blue": 0.98
+    },
+    {
+      "symbol": "Th",
+      "number": 90,
+      "mass": 232.0377,
+      "radius": null,
+      "covalent": 2.06,
+      "red": 0.0,
+      "green": 0.729,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Pa",
+      "number": 91,
+      "mass": 231.03588,
+      "radius": null,
+      "covalent": 2.0,
+      "red": 0.0,
+      "green": 0.631,
+      "blue": 1.0
+    },
+    {
+      "symbol": "U",
+      "number": 92,
+      "mass": 238.02891,
+      "radius": 1.86,
+      "covalent": 1.96,
+      "red": 0.0,
+      "green": 0.561,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Np",
+      "number": 93,
+      "mass": 237.04817,
+      "radius": null,
+      "covalent": 1.9,
+      "red": 0.0,
+      "green": 0.502,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Pu",
+      "number": 94,
+      "mass": 244.06421,
+      "radius": null,
+      "covalent": 1.87,
+      "red": 0.0,
+      "green": 0.42,
+      "blue": 1.0
+    },
+    {
+      "symbol": "Am",
+      "number": 95,
+      "mass": 243.06138,
+      "radius": null,
+      "covalent": 1.8,
+      "red": 0.329,
+      "green": 0.361,
+      "blue": 0.949
+    },
+    {
+      "symbol": "Cm",
+      "number": 96,
+      "mass": 247.07035,
+      "radius": null,
+      "covalent": 1.69,
+      "red": 0.471,
+      "green": 0.361,
+      "blue": 0.89
+    },
+    {
+      "symbol": "Bk",
+      "number": 97,
+      "mass": 247.07031,
+      "radius": null,
+      "covalent": null,
+      "red": 0.541,
+      "green": 0.31,
+      "blue": 0.89
+    },
+    {
+      "symbol": "Cf",
+      "number": 98,
+      "mass": 251.07959,
+      "radius": null,
+      "covalent": null,
+      "red": 0.631,
+      "green": 0.212,
+      "blue": 0.831
+    },
+    {
+      "symbol": "Es",
+      "number": 99,
+      "mass": 252.083,
+      "radius": null,
+      "covalent": null,
+      "red": 0.702,
+      "green": 0.122,
+      "blue": 0.831
+    },
+    {
+      "symbol": "Fm",
+      "number": 100,
+      "mass": 257.09511,
+      "radius": null,
+      "covalent": null,
+      "red": 0.702,
+      "green": 0.122,
+      "blue": 0.729
+    },
+    {
+      "symbol": "Md",
+      "number": 101,
+      "mass": 258.09843,
+      "radius": null,
+      "covalent": null,
+      "red": 0.702,
+      "green": 0.051,
+      "blue": 0.651
+    },
+    {
+      "symbol": "No",
+      "number": 102,
+      "mass": 259.101,
+      "radius": null,
+      "covalent": null,
+      "red": 0.741,
+      "green": 0.051,
+      "blue": 0.529
+    },
+    {
+      "symbol": "Lr",
+      "number": 103,
+      "mass": 262.11,
+      "radius": null,
+      "covalent": null,
+      "red": 0.78,
+      "green": 0.0,
+      "blue": 0.4
+    },
+    {
+      "symbol": "Rf",
+      "number": 104,
+      "mass": 267.122,
+      "radius": null,
+      "covalent": null,
+      "red": 0.8,
+      "green": 0.0,
+      "blue": 0.349
+    },
+    {
+      "symbol": "Db",
+      "number": 105,
+      "mass": 268.126,
+      "radius": null,
+      "covalent": null,
+      "red": 0.82,
+      "green": 0.0,
+      "blue": 0.31
+    },
+    {
+      "symbol": "Sg",
+      "number": 106,
+      "mass": 271.134,
+      "radius": null,
+      "covalent": null,
+      "red": 0.851,
+      "green": 0.0,
+      "blue": 0.271
+    },
+    {
+      "symbol": "Bh",
+      "number": 107,
+      "mass": 270.133,
+      "radius": null,
+      "covalent": null,
+      "red": 0.878,
+      "green": 0.0,
+      "blue": 0.22
+    },
+    {
+      "symbol": "Hs",
+      "number": 108,
+      "mass": 269.1338,
+      "radius": null,
+      "covalent": null,
+      "red": 0.902,
+      "green": 0.0,
+      "blue": 0.18
+    },
+    {
+      "symbol": "Mt",
+      "number": 109,
+      "mass": 278.156,
+      "radius": null,
+      "covalent": null,
+      "red": 0.922,
+      "green": 0.0,
+      "blue": 0.149
+    },
+    {
+      "symbol": "Ds",
+      "number": 110,
+      "mass": 281.165,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Rg",
+      "number": 111,
+      "mass": 281.166,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Cn",
+      "number": 112,
+      "mass": 285.177,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Nh",
+      "number": 113,
+      "mass": 286.182,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Fl",
+      "number": 114,
+      "mass": 289.19,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Mc",
+      "number": 115,
+      "mass": 289.194,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Lv",
+      "number": 116,
+      "mass": 293.204,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Ts",
+      "number": 117,
+      "mass": 293.208,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    },
+    {
+      "symbol": "Og",
+      "number": 118,
+      "mass": 294.214,
+      "radius": null,
+      "covalent": null,
+      "red": null,
+      "green": null,
+      "blue": null
+    }
+  ]
+}

@@ -514,10 +514,13 @@ def getAtomtypes():
         return atomtypes_
     p=getPathChain()
     atomtypes_=p4vasp.Structure.AtomInfo()
-    for x in p:
+    for index, x in enumerate(p):
         try:
             a=p4vasp.Structure.AtomInfo(x+sep+"atomtypes.xml")
             atomtypes_.updateAttributes(a)
         except IOError:
             pass
+        if index == 0:
+            from p4vasp.element_data import apply_catalog
+            apply_catalog(atomtypes_)
     return atomtypes_

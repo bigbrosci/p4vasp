@@ -2,19 +2,18 @@
 import copy
 import json
 import math
-import xml.etree.ElementTree as ET
 from p4vasp.resource_data import validate
 
 SYMBOLS = ('H He Li Be B C N O F Ne Na Mg Al Si P S Cl Ar K Ca Sc Ti V Cr Mn Fe Co Ni Cu Zn Ga Ge As Se Br Kr Rb Sr Y Zr Nb Mo Tc Ru Rh Pd Ag Cd In Sn Sb Te I Xe Cs Ba La Ce Pr Nd Pm Sm Eu Gd Tb Dy Ho Er Tm Yb Lu Hf Ta W Re Os Ir Pt Au Hg Tl Pb Bi Po At Rn Fr Ra Ac Th Pa U Np Pu Am Cm Bk Cf Es Fm Md No Lr Rf Db Sg Bh Hs Mt Ds Rg Cn Nh Fl Mc Lv Ts Og').split()
 NUMBERS = {symbol: index+1 for index, symbol in enumerate(SYMBOLS)}
-COLUMNS = ('Name', 'atomic number', 'mass', 'radii', 'R', 'G', 'B', 'Magmom', 'U', 'J')
+COLUMNS = ('Name', 'atomic number', 'mass (u)', 'radii (Å)', 'R (0–255)', 'G (0–255)', 'B (0–255)', 'Magmom (μB)', 'U (eV)', 'J (eV)')
 XML_FIELDS = ('mass', 'radius', 'red', 'green', 'blue')
 DEFAULT_FIELDS = ('mag_value', 'u_value', 'j_value')
 
 
 def check_value(column, value):
     value = value.strip()
-    if not value and column >= 7:
+    if not value:
         return value
     number = float(value)
     if not math.isfinite(number):
@@ -36,50 +35,39 @@ class ElementData:
         self.reload()
 
     def reload(self):
-        self.sources = {key: self.store.read(key) for key in ('elements', 'incar')}
-        self.xml = validate('elements', self.sources['elements'][0])
+        self.sources = {key: self.store.read(key) for key in ('periodic', 'incar')}
+        self.catalog = validate('periodic', self.sources['periodic'][0])
         self.config = validate('incar', self.sources['incar'][0])
-        array = self.xml.find("./array[@name='atomtypes']")
-        self.fields = [(field.text or '').strip() for field in array.findall('field')]
         self.rows = []
-        for node in array.findall('./set/r'):
-            record = dict(zip(self.fields, node.text.split()))
-            symbol = record['element']
-            if symbol not in NUMBERS: continue  # Preserve numeric fallback entries outside the editor.
-            row = [symbol, str(NUMBERS[symbol])] + [record[field] for field in XML_FIELDS]
-            row[4:7] = [str(round(float(value)*255)) for value in row[4:7]]
+        for record in self.catalog['elements']:
+            symbol = record['symbol']
+            row = [symbol, str(record['number'])]
+            for field in XML_FIELDS:
+                value = record[field]
+                row.append('' if value is None else str(round(value*255)) if field in ('red','green','blue') else str(value))
             row += [str(self.config['elements'][field][symbol]) if symbol in self.config['elements'][field] else ''
                     for field in DEFAULT_FIELDS]
             self.rows.append(row)
-        self.rows.sort(key=lambda row: int(row[1]))
 
     def serialize(self, rows):
         rows = [list(row) for row in rows]
         if [row[:2] for row in rows] != [row[:2] for row in self.rows]:
             raise ValueError('Element identities and atomic numbers cannot be changed.')
-        for row in rows:
+        catalog = copy.deepcopy(self.catalog)
+        config = copy.deepcopy(self.config)
+        for row, original, record in zip(rows, self.rows, catalog['elements']):
             if len(row) != len(COLUMNS): raise ValueError('Incorrect column count.')
             for column in range(2, 10): row[column] = check_value(column, row[column])
-        by_symbol = {row[0]: row for row in rows}
-        original_rows = {row[0]: row for row in self.rows}
-        root = copy.deepcopy(self.xml)
-        array = root.find("./array[@name='atomtypes']")
-        for node in array.findall('./set/r'):
-            values = node.text.split(); symbol = values[self.fields.index('element')]
-            if symbol in by_symbol:
-                for column, field in enumerate(XML_FIELDS, 2):
-                    value = by_symbol[symbol][column]
-                    if value != original_rows[symbol][column]:
-                        values[self.fields.index(field)] = format(int(value)/255, '.17g') if column >= 4 else value
-                node.text = ' '.join(values)
-        config = copy.deepcopy(self.config)
-        for row in rows:
+            for column, field in enumerate(XML_FIELDS, 2):
+                value = row[column]
+                if value != original[column]:
+                    record[field] = None if value == '' else int(value)/255 if column >= 4 else float(value)
             for column, field in enumerate(DEFAULT_FIELDS, 7):
                 if row[column] == '': config['elements'][field].pop(row[0], None)
                 else: config['elements'][field][row[0]] = float(row[column])
         texts = {}
-        if any(row[2:7] != original[2:7] for row, original in zip(rows, self.rows)):
-            texts['elements'] = '<?xml version="1.0"?>\n'+ET.tostring(root, encoding='unicode')+'\n'
+        if catalog != self.catalog:
+            texts['periodic'] = json.dumps(catalog, ensure_ascii=False, indent=2)+'\n'
         if config != self.config:
             texts['incar'] = json.dumps(config, ensure_ascii=False, indent=2)+'\n'
         for key, text in texts.items(): validate(key, text)
@@ -108,3 +96,24 @@ class ElementData:
             raise
         self.reload()
         return backups
+
+
+def runtime_values(record):
+    """Finite rendering fallbacks; these are never written as reference data."""
+    defaults = {'mass':0.0, 'radius':1.0, 'covalent':0.0, 'red':1.0, 'green':1.0, 'blue':1.0}
+    return {field:record[field] if record[field] is not None else default for field, default in defaults.items()}
+
+
+def apply_catalog(atominfo, store=None):
+    from p4vasp.resource_data import ResourceStore
+    store = store or ResourceStore()
+    catalog = validate('periodic', store.read('periodic')[0])
+    # XML-backed arrays may be lazy read-only sequences; additions need a list.
+    atominfo.atomtypes.data = [list(row) for row in atominfo.atomtypes.data]
+    for record in catalog['elements']:
+        target = atominfo.getRecordForElement(record['symbol'])
+        if target is None:
+            target = atominfo.appendEmpty()
+            target.element = record['symbol']
+        for field, value in runtime_values(record).items(): setattr(target, field, value)
+    return atominfo

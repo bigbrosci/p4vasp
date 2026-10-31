@@ -88,6 +88,13 @@ def atom_styles():
         values = row.text.split()
         radius = float(values[2]) or float(values[3]) or .7
         styles[values[0]] = (radius, tuple(map(float, values[4:7])), float(values[3]))
+    from p4vasp.resource_data import ResourceStore, validate
+    from p4vasp.element_data import runtime_values
+    catalog = validate('periodic', ResourceStore().read('periodic')[0])
+    for record in catalog['elements']:
+        values = runtime_values(record)
+        radius = values['radius'] or values['covalent'] or .7
+        styles[record['symbol']] = (radius, tuple(values[field] for field in ('red','green','blue')), values['covalent'])
     return styles
 
 

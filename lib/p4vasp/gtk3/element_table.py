@@ -17,9 +17,6 @@ class ElementTable(Gtk.Box):
         self.reload_button = Gtk.Button(label='Reload'); self.reload_button.connect('clicked', self.reload_clicked)
         actions.pack_start(self.save_button, False, False, 0); actions.pack_start(self.reload_button, False, False, 0)
         self.pack_start(actions, False, False, 0)
-        self.units = Gtk.Label(label='Units: Name = element symbol; atomic number = dimensionless; mass = u; radii = Å;\nR / G / B = integers (0–255); Magmom = μB; U / J = eV.', xalign=0)
-        self.units.set_line_wrap(True)
-        self.pack_start(self.units, False, False, 0)
         self.model = Gtk.ListStore(*([str]*len(COLUMNS)))
         self.view = Gtk.TreeView(model=self.model)
         self.view.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
@@ -41,7 +38,7 @@ class ElementTable(Gtk.Box):
             for row in data.rows: self.model.append(row)
             self.data = data; self.dirty = False
             self.save_button.set_sensitive(True)
-            self.status.set_text('Existing elements only. Blank = unset. radii = display radius; RGB: 0–255.\nDouble-click a value to edit; press Enter, then Save. Restart p4vasp after saving.')
+            self.status.set_text('118 elements. Blank = unknown / unset. radii = display radius; RGB: 0–255.\nDouble-click a value to edit; press Enter, then Save. Restart p4vasp after saving.')
         except Exception as error:
             self.save_button.set_sensitive(False)
             self.status.set_text('Cannot load element data: '+str(error))
