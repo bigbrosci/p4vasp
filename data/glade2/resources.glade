@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<glade-interface>
+  <widget class="GtkFrame" id="applet_frame">
+    <property name="visible">True</property>
+    <child><widget class="GtkVBox" id="resource_host">
+      <property name="visible">True</property>
+    </widget></child>
+  </widget>
+</glade-interface>

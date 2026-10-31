@@ -39,6 +39,7 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 | INCAR / Edit → INCAR generator | 按预设和自定义参数生成 INCAR |
 | DOS+bands | 查看态密度和能带；需要相应计算数据 |
 | STM | 查看相关电荷密度／STM 数据；需要相应输入 |
+| Database / Database → Resources | 在线数据库导航、编辑程序内部资料，见下文 |
 | Commit | 向配置的数据库提交系统，不是保存 POSCAR 的按钮 |
 | File → Save system as | 保存当前系统的初始／Build 结构等内容 |
 
@@ -396,3 +397,13 @@ PNG 旁会保存 `.POSCAR` 几何快照、`.view.json` 配置和 `command_for_�
 Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通结构刷新或轨迹换帧不会自动重置相机；需要重新居中适配时，点击 Control 的 **Home**。Home 同时恢复默认朝向。
 
 本次包含原生接口更新。此电脑已重编译；其他电脑更新代码后需运行 `bash install.sh --build-only` 并重启。
+
+## 数据库导航与内部资料编辑
+
+点击工具栏 **Database** 或菜单 **Database → Resources**。
+**Online databases** 提供确认的 16 个网站，按四列四行排列，点击用浏览器打开，悬停查看用途与网址；名称缩写作为图标。
+**p4vasp data** 提供元素与质量、原子半径、元素颜色、INCAR 预设、磁性／U／J 默认值及网站目录六个入口。
+点击卡片后在文本窗口搜索和修改，按 **Save** 保存。元素相关入口共享 XML，INCAR 相关入口共享 JSON；窗口顶部显示真实路径。
+
+保存会校验格式并备份原文件到 `~/.p4vasp/backups/`，直接修改程序自带资料。网站导航立即刷新，元素／INCAR 默认值重启后生效；修改不会自动重写当前结构或计算输入。权限不足或文件被外部修改会提示错误，关闭或 Reload 前会确认未保存内容。更新安装可能覆盖个性修改，请自行保留并核对备份。
+完整说明见 [数据库资料说明](../data/resources/README.md)。元素表并非完整周期表，部分网站需账户或许可证；原 Commit 功能保持原样。

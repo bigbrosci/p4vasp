@@ -101,8 +101,8 @@ class QueryTreeModel(gtk.GenericTreeModel):
         '''returns the parent of this node'''
         return None
 
-class DBApplet(Applet):
-    menupath=["Database","Query"]
+class LegacyDBApplet(Applet):
+    menupath=None
     column_dbvariable="#CALC.id, #USERINFO.username, #CALC.name, #CALC.cdatetime, #CALC.keywords"
     column_type      =[gobject.TYPE_INT,gobject.TYPE_STRING,gobject.TYPE_STRING,gobject.TYPE_STRING, gobject.TYPE_STRING,gobject.TYPE_STRING]
     column_label     =[("#",0),("DB",1),("user",1),("name",1),("date",1),("keywords",1)]
@@ -231,3 +231,9 @@ class DBApplet(Applet):
                 dialog.destroy()
 
 #BuilderApplet.store_profile=AppletProfile(BuilderApplet,tagname="Builder")
+
+
+from p4vasp.applet.ResourceHubApplet import ResourceHubApplet
+
+class DBApplet(ResourceHubApplet):
+    menupath = ["Database", "Resources"]

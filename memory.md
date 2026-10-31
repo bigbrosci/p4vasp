@@ -2,6 +2,13 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 数据库资源导航（2026-10-31）
+
+- 已按用户最终确认的 16 个网站实现四列四行在线导航，入口为工具栏 Database／菜单 Database → Resources，名称缩写图标，点击交给默认浏览器。`data/resources/websites.json` 保存名单与网址；程序启动不联网获取数据。
+- `ResourceHubApplet.py` 提供在线／内部两个标签页和文本编辑器；六个内部卡片对应 `atomtypes.xml`、`incar/presets.json`、网站目录三个真实文件。按用户选择直接修改程序文件；`resource_data.py` 负责校验、外部修改冲突保护、备份到 `~/.p4vasp/backups/` 和原子替换，错误不降级成用户覆盖。网站保存刷新；元素／INCAR 缓存重启生效。旧 Query 保留为 LegacyDBApplet、Commit 未改。
+- 本机 Linux：5 项资源专项、实际 GTK 面板 4×4／六卡片／模拟浏览器派发／临时文件编辑保存校验备份、57 基础、31 applet 启动通过，640×480 绘制截图已查看。GUI 测试退出有 cmatrix.Vector 析构警告，未修复；未逐站打开真实浏览器，未验证其他平台或完整 GTK 套件。未修改实际元素／INCAR 数据。Windows 打包继续暂停。
+- 操作与限制见 `data/resources/README.md` 和 `doc/interface-guide-zh.md`；元素表只有 48 条含占位记录，不冒充完整周期表。重装可能覆盖直接修改；已有个人／工作目录元素表仍可能覆盖默认值。下一步由用户实际使用反馈；不自动恢复 Windows 打包。
+
 ## 当前视角方向键平移与质心旋转（2026-10-31）
 
 - 后续新增 Shift＋方向键围绕真实质量加权质心旋转，每次固定 5°；上下绕当前屏幕水平 X 轴，左右绕竖直 Y 轴，采用右手规则，上/左为负、下/右为正。仍仅编辑来源窗口的初始／Build 结构，普通箭头平移保留；状态栏显示质心。质量优先取结构，缺失查元素表，不可用时拒绝编辑；不做周期分子自动重构，周期重复编号仅计算一次。
