@@ -23,8 +23,10 @@ def check_value(column, value):
         raise ValueError('Mass, radius and RGB must be nonnegative.')
     if column == 2 and number <= 0:
         raise ValueError('Atomic mass must be positive.')
-    if 4 <= column <= 6 and number > 1:
-        raise ValueError('RGB values must be between 0 and 1.')
+    if 4 <= column <= 6:
+        if number > 255 or not number.is_integer():
+            raise ValueError('RGB values must be integers between 0 and 255.')
+        return str(int(number))
     return value
 
 
@@ -45,6 +47,7 @@ class ElementData:
             symbol = record['element']
             if symbol not in NUMBERS: continue  # Preserve numeric fallback entries outside the editor.
             row = [symbol, str(NUMBERS[symbol])] + [record[field] for field in XML_FIELDS]
+            row[4:7] = [str(round(float(value)*255)) for value in row[4:7]]
             row += [str(self.config['elements'][field][symbol]) if symbol in self.config['elements'][field] else ''
                     for field in DEFAULT_FIELDS]
             self.rows.append(row)
@@ -58,13 +61,16 @@ class ElementData:
             if len(row) != len(COLUMNS): raise ValueError('Incorrect column count.')
             for column in range(2, 10): row[column] = check_value(column, row[column])
         by_symbol = {row[0]: row for row in rows}
+        original_rows = {row[0]: row for row in self.rows}
         root = copy.deepcopy(self.xml)
         array = root.find("./array[@name='atomtypes']")
         for node in array.findall('./set/r'):
             values = node.text.split(); symbol = values[self.fields.index('element')]
             if symbol in by_symbol:
                 for column, field in enumerate(XML_FIELDS, 2):
-                    values[self.fields.index(field)] = by_symbol[symbol][column]
+                    value = by_symbol[symbol][column]
+                    if value != original_rows[symbol][column]:
+                        values[self.fields.index(field)] = format(int(value)/255, '.17g') if column >= 4 else value
                 node.text = ' '.join(values)
         config = copy.deepcopy(self.config)
         for row in rows:

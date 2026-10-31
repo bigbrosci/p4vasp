@@ -31,7 +31,7 @@ class Elements(unittest.TestCase):
         original=ET.fromstring(self.store.read('elements')[0])
         config=json.loads(self.store.read('incar')[0])
         rows=[row[:] for row in self.data.rows]
-        rows[0][2:]=['1.01','1.3','0.2','0.3','0.4','-1.5','2','0.5']
+        rows[0][2:]=['1.01','1.3','51','77','102','-1.5','2','0.5']
         self.assertEqual(len(self.data.save(rows)),2)
         self.assertEqual(self.data.rows[0][2:7],rows[0][2:7])
         self.assertEqual(self.data.rows[0][7:],['-1.5','2.0','0.5'])
@@ -48,12 +48,29 @@ class Elements(unittest.TestCase):
 
     def test_invalid_and_conflicting_edits_do_not_write(self):
         before={key:self.store.read(key)[1] for key in ('elements','incar')}
-        for col,value in [(2,'0'),(4,'1.1'),(7,'nan'),(8,'oops')]:
+        for col,value in [(2,'0'),(4,'256'),(5,'1.5'),(6,'-1'),(7,'nan'),(8,'oops')]:
             rows=[row[:] for row in self.data.rows];rows[0][col]=value
             with self.assertRaises(ValueError):self.data.save(rows)
             for key in before:self.assertEqual(self.store.read(key)[1],before[key])
         self.store.path('incar').write_bytes(before['incar']+b'\n')
         with self.assertRaises(ValueError):self.data.save(self.data.rows)
+
+    def test_rgb_conversion_preserves_unedited_precision(self):
+        self.assertEqual(self.data.rows[0][4:7],['255','255','255'])
+        before=ET.fromstring(self.store.read('elements')[0])
+        rows=[row[:] for row in self.data.rows]; rows[0][2]='1.02'
+        self.data.save(rows)
+        after=ET.fromstring(self.store.read('elements')[0])
+        for a,b in zip(before.findall('./array/set/r'),after.findall('./array/set/r')):
+            self.assertEqual(a.text.split()[4:7],b.text.split()[4:7])
+        rows=[row[:] for row in self.data.rows]; rows[0][4:7]=['0','128','255']
+        self.data.save(rows)
+        self.assertEqual(self.data.rows[0][4:7],['0','128','255'])
+        root=ET.fromstring(self.store.read('elements')[0])
+        h=next(node for node in root.findall('./array/set/r') if node.text.split()[0]=='H')
+        self.assertEqual(float(h.text.split()[4]),0)
+        self.assertAlmostEqual(float(h.text.split()[5]),128/255)
+        self.assertEqual(float(h.text.split()[6]),1)
 
     def test_second_write_failure_rolls_back_first(self):
         before={key:self.store.read(key)[1] for key in ('elements','incar')}

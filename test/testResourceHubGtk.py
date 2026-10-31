@@ -53,9 +53,9 @@ with tempfile.TemporaryDirectory() as temporary:
     assert table.model[0][2]=='1.02' and table.model[0][7]=='2.5'
     assert not table.dirty
     with patch.object(table, 'show_error') as error:
-        table.edited(None,'0','2',4)
+        table.edited(None,'0','256',4)
         assert error.called
-    assert table.model[0][4]!='2'
+    assert table.model[0][4]!='256'
     import time
     for _ in range(20):
         while Gtk.events_pending(): Gtk.main_iteration()
