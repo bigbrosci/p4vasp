@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Models 改为顶部横向标签（2026-10-31）
+
+- 用户要求 Models 与 Resources 的标签布局一致，已将原 2×2 空框改为 Gtk.Notebook，顶部横排 single atom、gas phase、bulk、surface，默认 single atom，内容全部为空。Glade 提供 models_host，ModelsApplet.initUI 创建四页；系统／选择栏继续隐藏。
+- 本机实际 Frame 专项验证四页标题／默认页／切换／空内容和系统栏显隐通过，900×640 绘制截图已查看。本次仅布局调整，未重跑全套应用测试或其他平台。后续模型内容仍等待用户指定，Windows 打包暂停。
+
 ## Database 隐藏系统／选择栏（2026-10-31）
 
 - 后续用户确认 Models 也需隐藏，已补齐 ModelsApplet 显示策略；实际 Frame 的 Models 隐藏／show_all 保护／切回 Builder 恢复专项通过，900×640 四空框截图已查看。本次未重复全套测试。
@@ -44,7 +49,7 @@ Last updated: 2026-10-31. This is a repository navigation and handoff document. 
 
 ## Models 模型库空框架（2026-10-31）
 
-- 用户要求将 Database 下拉菜单 Commit 换成 Models；`CommitApplet.menupath=None` 仅隐藏菜单项，工具栏 Commit 保留。新增注册 `ModelsApplet.py` 和 `data/glade2/models.glade`，显示 2×2 四个空框：single atom、gas phase、bulk、surface，不填内容或添加建模操作。Resources 保留。
+- 用户要求将 Database 下拉菜单 Commit 换成 Models；`CommitApplet.menupath=None` 仅隐藏菜单项，工具栏 Commit 保留。新增注册 `ModelsApplet.py` 和 `data/glade2/models.glade`，后续已改为顶部四个空标签页：single atom、gas phase、bulk、surface，不填内容或添加建模操作。Resources 保留。
 - 本机 Linux GTK 实际启动及 640×400 绘制检查通过，四框标题、空内容和可见尺寸已核对；57 基础测试和 32 applet 启动通过。界面专项退出仍见已有 cmatrix.Vector 析构警告。其他平台未测，Windows 打包继续暂停；后续内容等待用户指示。详见当日更新记录。
 
 ## 数据库资源导航（2026-10-31）

@@ -47,6 +47,15 @@ try:
    assert applet.panel is not None and applet.panel.get_parent() is frame.applet_box
  for _ in range(10):
   while gtk.events_pending():gtk.main_iteration()
+ if name.endswith('ModelsApplet.ModelsApplet'):
+  notebook=applet.notebook
+  assert notebook.get_n_pages()==4 and notebook.get_current_page()==0
+  for index, title in enumerate(('single atom','gas phase','bulk','surface')):
+   page=notebook.get_nth_page(index)
+   assert notebook.get_tab_label_text(page)==title and not page.get_children()
+   notebook.set_current_page(index)
+   assert notebook.get_current_page()==index
+  notebook.set_current_page(0)
  if name.endswith(('DBApplet.DBApplet', 'ModelsApplet.ModelsApplet')):
   controls=xml.get_widget('table1')
   assert not controls.get_visible(), 'Database must hide System/Selection'

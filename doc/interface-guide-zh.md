@@ -412,6 +412,6 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 
 ### 模型库框架
 
-从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。当前仅有 2×2 排列的四个空框：
-**single atom**、**gas phase**、**bulk**、**surface**。暂未提供模型或操作，后续再补充。
+从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列四个标签页，与 Resources 的标签页样式一致：
+**single atom**、**gas phase**、**bulk**、**surface**。点击切换，下方内容暂留空，默认打开 single atom；后续再补充模型或操作。
 Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍保留。
