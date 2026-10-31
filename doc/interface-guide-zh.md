@@ -413,7 +413,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 ### 模型库框架
 
 从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列四个标签页，与 Resources 的标签页样式一致：
-**single atom**、**gas phase**、**bulk**、**surface**。点击切换，默认打开 single atom；后三页暂时留空。
+**single atom**、**gas phase**、**bulk**、**surface**。点击切换，默认打开 single atom；gas phase 为本地分子库，bulk／surface 暂时留空。
 Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍保留。
 
 ### 单原子输入生成
@@ -425,3 +425,27 @@ Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍
 POSCAR 为 13×14×15 Å 正交晶胞，只有所选的一个原子，Direct 坐标 `(0.5, 0.5, 0.5)`，对应笛卡尔 `(6.5, 7, 7.5)` Å。KPOINTS 为 Γ 中心的 `1 1 1` 网格、零偏移。
 
 INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 `ISPIN=2`、`ALGO=ALL`、`NELM=500`，不输出 `MAGMOM`，不自动套用元素磁矩或 U/J。SYSTEM 标注所选元素；其他参数按当前基础预设保留，不自动启用额外 Task。生成时读取程序 `data/incar/presets.json`，不依赖外部 in.py。界面选择不会修改当前加载的结构、元素资料或 INCAR 预设；这里只生成上述三个文件。
+
+### 气相 XYZ 本地分子库
+
+把单构型 `.xyz` 文件放到仓库的 **`data/models/gas_phase/`**，然后打开 **Database → Models → gas phase**。进入页面会自动扫描，页面已打开时点击 **Refresh**。**Open library folder** 可打开实际目录；页面也显示其完整路径。内置 water、oxygen_triplet 两个格式示例，可复制后修改。
+
+统一格式示例：
+
+```xyz
+3
+name="Water" charge=0 multiplicity=1 units=angstrom
+O   0.000000   0.000000   0.000000
+H   0.758602   0.000000   0.504284
+H  -0.758602   0.000000   0.504284
+```
+
+每个文件只放一个构型，坐标为 Å 单位笛卡尔坐标。电荷／多重度缺失时不猜值，需在界面填写；错误文件显示文件名和行号，不阻止其他文件。盐、多片段、金属配合物均可按此格式提交全部原子坐标，程序不加氢、不重新摆放片段或重建配位。
+
+选择分子后核对 **Charge、Multiplicity、Lx／Ly／Lz**，点击 **Preview 3D** 查看独立三维预览。预览不替换当前加载系统或修改其选择；显示的键只是距离推断，不能代替输入中未保存的配位／键级资料。晶胞默认至少 13×14×15 Å，且每边留至少 6 Å 的包围盒边距，可自行调整。
+
+点击 **Generate inputs**，填写新文件夹名称与父目录，生成 INCAR、Gamma 1×1×1 KPOINTS、按元素分组且整体居中的 POSCAR。保留原子间距离，不改源文件，不覆盖既有目录；源文件几何或元数据已变化时要求刷新后重新确认。
+
+INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGMA=0.01`、`NUPDOWN=multiplicity−1`，不设置 MAGMOM；其他基础参数保留。中性体系 NELECT 留空；带电体系必须按所用 POTCAR 的 ZVAL 填写 **NELECT**，即价电子总数减去总电荷，程序不从原子序数猜测。NUPDOWN 固定自旋电子数差，不保证得到特定自旋本征态／基态。赝势、带电气相有限尺寸修正和收敛性仍需核对，生成文件不等于完成计算。
+
+格式、缺失值、保存及参数细节见 [本地分子库说明](../data/models/gas_phase/README.md)。名称查询与 SMILES 转三维尚未加入；本次实现的是本地 XYZ 接口。

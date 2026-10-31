@@ -20,19 +20,20 @@ PERIODS = [
 
 
 class InputFolderDialog:
-    def __init__(self, parent, symbol, directory=None):
+    def __init__(self, parent, symbol, directory=None, *, title=None, folder_name=None, summary=None, writer=None):
         self.symbol = symbol
-        self.dialog = Gtk.Dialog(title='Generate single atom inputs — '+symbol,
+        self.writer = writer
+        self.dialog = Gtk.Dialog(title=title or 'Generate single atom inputs — '+symbol,
                                  transient_for=parent, modal=True, use_header_bar=False)
         self.dialog.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Generate inputs', Gtk.ResponseType.OK)
         fit_dialog(self.dialog, parent, 540, 250)
         grid = Gtk.Grid(column_spacing=8, row_spacing=8); grid.set_border_width(12)
-        self.name = entry(symbol+'_single_atom')
+        self.name = entry(folder_name or symbol+'_single_atom')
         self.folder = entry(directory or Path.cwd())
         browse = Gtk.Button(label='Browse…'); browse.connect('clicked',self.browse)
         grid.attach(Gtk.Label(label='Folder name:',xalign=0),0,0,1,1); grid.attach(self.name,1,0,2,1)
         grid.attach(Gtk.Label(label='Save in:',xalign=0),0,1,1,1); grid.attach(self.folder,1,1,1,1); grid.attach(browse,2,1,1,1)
-        label=Gtk.Label(label='Creates a new folder containing INCAR, KPOINTS and POSCAR.\nCell: 13 × 14 × 15 Å; atom at the center.',xalign=0)
+        label=Gtk.Label(label=summary or 'Creates a new folder containing INCAR, KPOINTS and POSCAR.\nCell: 13 × 14 × 15 Å; atom at the center.',xalign=0)
         label.set_line_wrap(True);grid.attach(label,0,2,3,1)
         self.error=error_label();grid.attach(self.error,0,3,3,1)
         self.dialog.get_content_area().add(grid)
@@ -44,6 +45,8 @@ class InputFolderDialog:
         if chosen:self.folder.set_text(chosen)
 
     def create(self):
+        if self.writer:
+            return self.writer(self.folder.get_text().strip(), self.name.get_text())
         return write_inputs(self.symbol,self.folder.get_text().strip(),self.name.get_text())
 
     def run(self):

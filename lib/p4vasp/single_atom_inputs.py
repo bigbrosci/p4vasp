@@ -37,6 +37,10 @@ def destination(parent, name):
 
 def write_inputs(symbol, parent, name, config=None):
     contents = input_contents(symbol, config)
+    return write_contents(contents, parent, name)
+
+
+def write_contents(contents, parent, name):
     target = destination(parent, name)
     target.mkdir()  # Require a new directory; never overwrite an existing calculation.
     written = []

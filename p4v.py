@@ -728,6 +728,10 @@ def idle_func():
 #    print c
 #    print "vbe",c.type,c.index,c.nx,c.ny,c.nz
 
+        from p4vasp.gtk3.gas_phase import handle_preview_event
+        if handle_preview_event(c):
+            vbequeue.pop()
+            continue
         if c.type in selection_types:
             sd=c.getStructureDrawer()
             if sd is not None:

@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## gas phase 本地 XYZ 库（2026-10-31，当前状态）
+
+- 用户确认本地文件接口。新增 `data/models/gas_phase/`（water／oxygen_triplet 示例及 README），`gas_phase_inputs.py` 严格解析单帧 XYZ，第二行支持 name/charge/multiplicity/units；只允许 Å、有限坐标及元素符号，缺电荷／多重度必须填写，错误按文件行号展示。Models 的 gas phase 页使用 `gtk3/gas_phase.py`，进入自动扫描，另有 Refresh／打开目录；无后台扫描进程或联网服务。bulk／surface 仍空，名称／SMILES 转换未实现。
+- 可预览、编辑 charge/multiplicity/NELECT/三向晶胞，再经复用的紧凑目录弹窗导出新目录三文件。POSCAR 按元素分组、只整体平移包围盒居中，片段间几何保持；默认晶胞各方向 max(13/14/15, ceil(跨度+12 Å))。Gamma 1×1×1。INCAR 用内部 Standard，覆盖 ISPIN2、ISMEAR0、SIGMA0.01、NUPDOWN=multiplicity−1；不设MAGMOM／自动U/J，不继承SOC／非共线。中性NELECT省略，带电必须按实际POTCAR价电子提供整数NELECT并检查自旋奇偶，不按原子序数猜。生成前复核XYZ语义未变；不覆盖旧目录，写失败清理。
+- 预览是会话共用的单独原生窗口，不修改当前系统。`p4v.py idle_func` 优先消费预览的选择、移动和窗口事件，防止影响主系统或关闭 Models；窗口隐藏先 VisSync，保持绘图对象存活。测试发现直接 StructureWindow.hide 后丢引用会在异步 FL_HIDE 中崩溃，改为会话持有／隐藏并同步后，反复预览、关闭、重开和页销毁通过；未声称修复原有全局 StructureWindow.hide。
+- 本机 Linux：5 项气相数据专项、5 项单原子、6 项 INCAR、57 基础、32 applet 启动通过。实际 X11 GTK／原生测试覆盖坏文件行、缺元数据、刷新保留人工编辑、真实三维加载、合成预览选择／关闭事件路由、带电导出（真实保存弹窗）、取消及关闭重开／销毁；截图已查看。预览事件测试最初误用未暴露SWIG构造器，改用模拟事件引用真实窗口核验；不作为应用问题。未做VASP能量／磁态验证、其他平台或完整GTK套件，Windows打包仍暂停。
+- 格式与边界见 `data/models/gas_phase/README.md`、操作指南气相章节；带电修正／赝势仍由用户核对。接手下一步由用户实际分子反馈决定，不自动开发 bulk/surface 或恢复 Windows 打包。
+
 ## single atom 输入生成（2026-10-31，当前任务已完成）
 
 - Models 第一页现为 118 元素周期表：选择后高亮，Generate inputs 打开紧凑目录弹窗，指定新文件夹名称及父目录，生成 INCAR／KPOINTS／POSCAR；后三页仍空，系统／选择栏仍隐藏。`gtk3/single_atom.py` 承担 UI，`single_atom_inputs.py` 承担内容和写入。复用已有 FolderDialog/fit_dialog，不恢复 Windows 打包。
