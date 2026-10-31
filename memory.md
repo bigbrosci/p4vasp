@@ -2,6 +2,14 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## single atom 输入生成（2026-10-31，当前任务已完成）
+
+- Models 第一页现为 118 元素周期表：选择后高亮，Generate inputs 打开紧凑目录弹窗，指定新文件夹名称及父目录，生成 INCAR／KPOINTS／POSCAR；后三页仍空，系统／选择栏仍隐藏。`gtk3/single_atom.py` 承担 UI，`single_atom_inputs.py` 承担内容和写入。复用已有 FolderDialog/fit_dialog，不恢复 Windows 打包。
+- 用户澄清以 p4vasp INCAR 功能为准。助手找到了外部 qrob/actions_py/in.py 包装及 brain/incar.py，其基础参数与仓库 presets.json 当前一致；最终实现直接用内部 load_presets/generate_incar 全部 Standard，覆盖 ISPIN=2、ALGO=ALL、NELM=500，删除任何基础 MAGMOM，不使用元素磁矩/U/J，不额外套用 Task。SYSTEM 标注元素，其他基础参数保留，包括现有 NSW 等；不依赖或执行外部脚本。
+- POSCAR 正交 13×14×15 Å，单元素单原子 Direct 0.5/0.5/0.5；KPOINTS 为 Gamma 1×1×1、零偏移。要求新目录，不覆盖既有目录；中途写入失败清理本次已写内容，取消不写。未修改当前系统或源预设，不生成 POTCAR 或提交计算。
+- 本机 Linux：5 项新数据专项通过（全部118元素中心／晶胞／计数、INCAR基础继承及覆盖／无MAGMOM、KPOINTS、路径保护／同名不覆盖／中途失败清理），6 项原 INCAR 生成测试、57 基础、32 applet 启动通过。实际 X11 GTK 选择切换、高亮、按钮状态、弹窗创建/取消及动作接线通过，Models 主界面和紧凑目录弹窗截图已查看。仅临时目录测试，不是 VASP 计算验证；其他平台／完整 GTK 套件未测。
+- 使用说明见 doc/interface-guide-zh.md 单原子输入生成。后续 gas phase／bulk／surface 等待用户指定；本任务不授权自动生成其他模型或恢复 Windows 打包。
+
 ## Models 改为顶部横向标签（2026-10-31）
 
 - 用户要求 Models 与 Resources 的标签布局一致，已将原 2×2 空框改为 Gtk.Notebook，顶部横排 single atom、gas phase、bulk、surface，默认 single atom，内容全部为空。Glade 提供 models_host，ModelsApplet.initUI 创建四页；系统／选择栏继续隐藏。

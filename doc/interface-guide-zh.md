@@ -413,5 +413,15 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 ### 模型库框架
 
 从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列四个标签页，与 Resources 的标签页样式一致：
-**single atom**、**gas phase**、**bulk**、**surface**。点击切换，下方内容暂留空，默认打开 single atom；后续再补充模型或操作。
+**single atom**、**gas phase**、**bulk**、**surface**。点击切换，默认打开 single atom；后三页暂时留空。
 Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍保留。
+
+### 单原子输入生成
+
+1. 打开 **Database → Models → single atom**。周期表包含 118 个元素，点击选择，高亮后可点 **Generate inputs**。
+2. 弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。
+3. 新目录中生成 `INCAR`、`KPOINTS`、`POSCAR`。同名目录已存在时不会覆盖，需另选名称；取消不生成文件。状态栏显示实际输出路径。
+
+POSCAR 为 13×14×15 Å 正交晶胞，只有所选的一个原子，Direct 坐标 `(0.5, 0.5, 0.5)`，对应笛卡尔 `(6.5, 7, 7.5)` Å。KPOINTS 为 Γ 中心的 `1 1 1` 网格、零偏移。
+
+INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 `ISPIN=2`、`ALGO=ALL`、`NELM=500`，不输出 `MAGMOM`，不自动套用元素磁矩或 U/J。SYSTEM 标注所选元素；其他参数按当前基础预设保留，不自动启用额外 Task。生成时读取程序 `data/incar/presets.json`，不依赖外部 in.py。界面选择不会修改当前加载的结构、元素资料或 INCAR 预设；这里只生成上述三个文件。

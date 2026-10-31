@@ -52,7 +52,9 @@ try:
   assert notebook.get_n_pages()==4 and notebook.get_current_page()==0
   for index, title in enumerate(('single atom','gas phase','bulk','surface')):
    page=notebook.get_nth_page(index)
-   assert notebook.get_tab_label_text(page)==title and not page.get_children()
+   assert notebook.get_tab_label_text(page)==title
+   if index: assert not page.get_children()
+   else: assert len(page.buttons)==118 and page.symbol is None and not page.generate.get_sensitive()
    notebook.set_current_page(index)
    assert notebook.get_current_page()==index
   notebook.set_current_page(0)

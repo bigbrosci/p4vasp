@@ -1,6 +1,7 @@
-"""Empty model-library categories, ready for later model content."""
+"""Model-library tabs with isolated-atom input generation."""
 from p4vasp.applet.Applet import Applet
 from p4vasp.gtk3 import Gtk
+from p4vasp.gtk3.single_atom import SingleAtomPage
 
 
 class ModelsApplet(Applet):
@@ -16,7 +17,8 @@ class ModelsApplet(Applet):
     def initUI(self):
         self.notebook = Gtk.Notebook()
         for title in ('single atom', 'gas phase', 'bulk', 'surface'):
-            page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            page = SingleAtomPage() if title == 'single atom' else Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            if title == 'single atom': self.single_atom_page = page
             self.notebook.append_page(page, Gtk.Label(label=title))
         self.xml.get_widget('models_host').pack_start(self.notebook, True, True, 0)
         self.panel.show_all()
