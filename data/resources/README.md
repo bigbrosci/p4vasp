@@ -14,3 +14,5 @@
 16 个入口由用户确认：Open Catalyst Project、ioChem-BD、Materials Project、CRC Handbook、NIST WebBook、NOMAD、ChemSpider、Catalysis-Hub、OQMD、AFLOW、Materials Cloud、NIST JARVIS、PubChem、COD、ICSD、CCDC Access Structures。网址以 `websites.json` 为准。部分服务需要注册、订阅或许可证；导航卡片不提供这些权限。CCDC 基础结构获取与高级检索的权限可能不同。
 
 原 SQL Query 代码保留为 `LegacyDBApplet`，原 Commit 入口未改；本导航不依赖配置 SQL 数据库。
+
+表格列标题为 Magmom、U、J，单位在表格上方单独注明：mass = u，radii = Å，Magmom = μB，U / J = eV；atomic number 与 RGB 无量纲，Name 为元素符号。

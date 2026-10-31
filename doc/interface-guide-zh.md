@@ -415,3 +415,5 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 从 **Database → Models** 打开模型库。当前仅有 2×2 排列的四个空框：
 **single atom**、**gas phase**、**bulk**、**surface**。暂未提供模型或操作，后续再补充。
 Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍保留。
+
+表格列标题使用 **Magmom**；表格上方固定显示单位：mass 为 u（原子质量单位），radii 为 Å，Magmom 为 μB，U／J 为 eV；原子序数与 RGB 无量纲，Name 为元素符号。单位说明不会被保存状态消息替换。
