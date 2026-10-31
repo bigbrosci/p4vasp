@@ -6,6 +6,7 @@ import math
 from pathlib import Path
 import re
 import shlex
+from typing import Optional
 import p4vasp
 from p4vasp.element_data import SYMBOLS
 from p4vasp.incar_generator import generate_incar, load_presets
@@ -14,12 +15,13 @@ from p4vasp.single_atom_inputs import write_contents
 
 @dataclass(frozen=True)
 class Molecule:
-    path: Path
+    path: Optional[Path]
     name: str
     symbols: tuple
     positions: tuple
     charge: object = None
     multiplicity: object = None
+    provenance: str = ""
 
 
 def library_path():
@@ -123,14 +125,16 @@ def input_contents(molecule, charge, multiplicity, cell, config=None):
                   '# Negative charge adds electrons; positive charge removes electrons.\n'
                   '# Check NELECT - NUPDOWN is nonnegative and even.\n'
                   'NELECT = SET_AFTER_POTCAR\n') % charge
-    source=molecule.path.name.replace('\n',' ').replace('\r',' ')
-    incar='# XYZ: %s; charge=%d; multiplicity=%d\n'%(source,charge,multiplicity)+incar
+    source=(molecule.path.name if molecule.path is not None else 'SMILES generated geometry').replace('\n',' ').replace('\r',' ')
+    incar='# Source: %s; charge=%d; multiplicity=%d\n'%(source,charge,multiplicity)+incar
+    if molecule.provenance:
+        incar='# '+molecule.provenance.replace('\n',' ').replace('\r',' ')+'\n'+incar
     return {'INCAR':incar,'KPOINTS':'Gas phase Gamma mesh\n0\nGamma\n1 1 1\n0 0 0\n',
             'POSCAR':poscar(molecule,cell)}
 
 
 def write_inputs(molecule, charge, multiplicity, cell, parent, name):
     # Do not silently export an obsolete preview after the source was edited.
-    if read_xyz(molecule.path)!=molecule:
+    if molecule.path is not None and read_xyz(molecule.path)!=molecule:
         raise ValueError('XYZ file changed. Refresh the library and review the molecule again.')
     return write_contents(input_contents(molecule,charge,multiplicity,cell),parent,name)

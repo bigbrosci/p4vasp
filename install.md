@@ -288,3 +288,13 @@ bash p4v.sh POSCAR -o rotated.png --rotate=30x,-20y,10z --size 1200x900
 
 配置 `p4v` 别名后也可使用 `p4v POSCAR -o top.png`。无需启动 GUI 或显示服务器；依赖安装流程已包含的 NumPy 和 pycairo。更多视角、透明背景和覆盖选项见 [图片导出指南](doc/render-cli.md)。
 With the alias configured, use `p4v POSCAR -o top.png`. No GUI or display server is needed. See the [rendering guide](doc/render-cli.md) for options and rendering limitations.
+
+## 可选：SMILES 气相结构生成
+
+XYZ 本地分子库及其他原有功能不依赖 RDKit。需要在 gas phase 中通过 SMILES 生成并初步优化结构时，可在源码仓库执行：
+
+```bash
+bash install/install-rdkit.sh
+```
+
+依赖安装在独立 `.venv-smiles`，不替换 GTK 应用的 Python；运行时按需启动隔离计算进程。也可设置 `P4VASP_SMILES_PYTHON` 指向已有 RDKit 的 Python。当前仅本机 Linux 验证，完整操作及平台限制见 [SMILES 气相建模](doc/smiles-gas-phase-zh.md)。

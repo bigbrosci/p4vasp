@@ -47,3 +47,9 @@ NELECT = SET_AFTER_POTCAR
 总电荷和多重度记录在 INCAR 注释中；NUPDOWN 约束上下自旋电子数差，不保证目标自旋本征态或基态。参考 [NELECT](https://vasp.at/wiki/NELECT)、[NUPDOWN](https://vasp.at/wiki/NUPDOWN)。周期带电气相体系的有限尺寸／静电修正需自行选择，本功能不自动添加修正。
 
 只创建新目录，不覆盖已有目录；取消不生成文件。生成前检查 XYZ 内容是否已变化，变化时要求 Refresh 后重新确认；写入失败会清理本次已写的文件。生成输入不等于完成 VASP 计算，POTCAR 不在此功能中生成。
+
+## 从 SMILES 新建结构
+
+同一 gas phase 页面可输入 SMILES，点 Build 3D + optimize 补氢、生成三维构象并初步优化，随后复用预览及导出按钮。新结构只暂存内存，不自动改写此目录；需导出后再离开 Models。形式电荷自动填入，自旋多重度需确认；盐、多片段、金属等仍使用本目录的 XYZ 接口。
+
+这是可选 RDKit 功能，安装、优化方法与限制见 [SMILES 建模说明](../../../doc/smiles-gas-phase-zh.md)。

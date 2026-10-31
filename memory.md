@@ -2,6 +2,15 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## gas phase SMILES 建模（2026-10-31，当前状态）
+
+- 用户授权新增SMILES生成及初步优化，XYZ库保留。gas phase 增加 SMILES 输入、Build 3D + optimize、Cancel；完成后在同一列表加入临时 [SMILES] 条目并自动三维预览，复用已有电荷／自旋／晶胞／Generate inputs。形式电荷自动填入，多重度始终留空待确认；刷新保留临时结构及人工填写，重新生成重置确认。结构仅在当前页内存，离开Models前应导出POSCAR，不自动写XYZ库。
+- `smiles_builder.py`：RDKit ETKDGv3、固定seed20261031、最多8候选、MMFF94s优先／UFF参数完整时回退、1000步，选收敛候选中最低力场能量，显式补氢。多片段／盐／金属与超范围元素要求XYZ；潜在未指定立体信息提示只是一种构型，显式立体信息保持。100重原子／300总原子／2048字符限制，失败不生成假成功结果；不是DFT或全局最低能保证。
+- 依赖为独立可选 `.venv-smiles`，脚本 `install/install-rdkit.sh`，也可设置 P4VASP_SMILES_PYTHON。仅用户点击后启动一个隔离单线程计算进程，GUI线程只调度；60秒超时／Cancel／页面销毁均终止回收。主GUI不导入RDKit/其NumPy。当前Linux实际安装：可选Python3.14.6、RDKit2026.09.1；GUI /usr/bin/python3 为3.14.4，不证明其他设备环境可用。
+- Molecule增加可选内存来源与provenance，原XYZ仍检查文件变化；生成结构导出记录SMILES、方法、版本、seed、力场能量／警示。NELECT带电占位沿用，不增加伪电子数。已有单原子／XYZ行为保持。
+- 验证：6项真实化学专项（显式H、收敛／重现、实际3D手性、形式电荷、UFF回退、失败拒绝）、4项隔离worker专项（真实POSCAR／带电模板交接、取消／超时回收）、实际X11 GTK/原生端到端（响应计时器、预览、真实保存弹窗、同SMILES重复生成、刷新、错误／取消保留、页销毁）、原XYZ GUI、5气相／5单原子、57基础与32启动通过。缺RDKit的系统Python实际返回安装说明；截图已查看。未做DFT、完整GTK套件或其他平台；Windows打包仍暂停。
+- 使用与可选依赖见 doc/smiles-gas-phase-zh.md、install.md。本任务开始前已有未跟踪 data/models/gas_phase/Fe_single_atom/，未修改或纳入提交；不要把它当成本次测试产物。
+
 ## Charge 输入与带电 INCAR 模板（2026-10-31，当前补充）
 
 - 用户明确默认无 POTCAR，只需在 INCAR 加 NELECT 并告知用法。移除气相界面手填 NELECT，Charge 接受带符号整数。带电导出不再受缺 NELECT 阻挡，写入活动占位 `NELECT = SET_AFTER_POTCAR`、ZVAL总和减Charge公式及正负号／自旋核对说明；保存弹窗和状态提示补全后运行。中性不写NELECT。不提供猜测数值，带电输出为待补全模板，不是可直接运行的完整INCAR。

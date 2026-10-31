@@ -30,3 +30,5 @@ odpdom/cODP_wrap.cpp
 /dist/windows/
 /build/windows-update/
 /dist/windows-releases/
+
+.venv-smiles/

@@ -2,9 +2,10 @@
 from io import StringIO
 from pathlib import Path
 import re
-from p4vasp.gtk3 import Gtk
+from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.file_dialogs import entry
 from p4vasp.gtk3.single_atom import InputFolderDialog
+from p4vasp.smiles_builder import SmilesTask, molecule_from_result
 from p4vasp.gas_phase_inputs import library_path, scan_library, suggested_cell, poscar, input_contents, write_inputs
 
 
@@ -35,6 +36,7 @@ class GasPhasePage(Gtk.Box):
         self.set_border_width(8)
         self.folder=Path(folder) if folder is not None else library_path()
         self.molecule=None;self.directory=None;self.preview_window=None;self.refreshing=False
+        self.task=None;self.alive=True;self.generated=None;self.generated_note=''
         actions=Gtk.Box(spacing=6)
         self.refresh_button=Gtk.Button(label='Refresh');self.refresh_button.connect('clicked',self.refresh)
         self.open_button=Gtk.Button(label='Open library folder');self.open_button.connect('clicked',self.open_folder)
@@ -43,6 +45,16 @@ class GasPhasePage(Gtk.Box):
         for button in (self.refresh_button,self.open_button,self.preview_button,self.generate_button):actions.pack_start(button,False,False,0)
         self.pack_start(actions,False,False,0)
         path=entry(self.folder);path.set_editable(False);self.pack_start(path,False,False,0)
+        smiles_row=Gtk.Box(spacing=6)
+        self.smiles_entry=entry('');self.smiles_entry.set_placeholder_text('SMILES, e.g. CCO')
+        self.build_button=Gtk.Button(label='Build 3D + optimize');self.build_button.connect('clicked',self.build_smiles)
+        self.cancel_button=Gtk.Button(label='Cancel');self.cancel_button.set_sensitive(False)
+        self.cancel_button.connect('clicked',self.cancel_smiles)
+        smiles_row.pack_start(Gtk.Label(label='SMILES'),False,False,0)
+        smiles_row.pack_start(self.smiles_entry,True,True,0)
+        smiles_row.pack_start(self.build_button,False,False,0)
+        smiles_row.pack_start(self.cancel_button,False,False,0)
+        self.pack_start(smiles_row,False,False,0)
         self.model=Gtk.ListStore(str,str,int,str,object)
         self.tree=Gtk.TreeView(model=self.model)
         from gi.repository import Pango
@@ -66,10 +78,11 @@ class GasPhasePage(Gtk.Box):
         self.status=Gtk.Label(xalign=0);self.status.set_line_wrap(True)
         self.status.set_max_width_chars(80)
         self.pack_start(self.status,False,False,0)
-        self.connect('destroy',self.close_preview)
+        self.connect('destroy',self.destroyed)
         self.refresh()
 
     def refresh(self,*args):
+        if self.task is not None:return
         old=self.molecule
         self.refreshing=True;self.model.clear();restore=None
         try:
@@ -80,13 +93,18 @@ class GasPhasePage(Gtk.Box):
                 if old and path==old.path:restore=iterator
             self.status.set_text('Select a molecule. One XYZ frame per file; coordinates in Å.' if rows else 'No XYZ files found. Add files to the library folder, then Refresh.')
         except OSError as error:self.status.set_text(str(error))
+        if self.generated is not None:
+            iterator=self.model.append(['[SMILES]',self.generated.name,len(self.generated.symbols),'Optimized initial geometry',self.generated])
+            if old==self.generated:restore=iterator
         if restore is not None:
             current=self.model[restore][4]
             self.tree.get_selection().select_iter(restore)
         else:
             current=None;self.molecule=None
         self.refreshing=False
-        if restore is not None and current==old:return
+        if restore is not None and current==old:
+            self.status.set_text(self.generated_note+' Confirm charge / multiplicity before exporting.' if current.path is None else current.name+' — source unchanged; current field edits retained.')
+            return
         self.load_selection()
 
     def selected(self,*args):
@@ -105,6 +123,9 @@ class GasPhasePage(Gtk.Box):
         self.charge.set_text('' if molecule.charge is None else str(molecule.charge))
         self.multiplicity.set_text('' if molecule.multiplicity is None else str(molecule.multiplicity))
         for widget,length in zip(self.cell,suggested_cell(molecule)):widget.set_text(str(length))
+        if molecule.path is None:
+            self.status.set_text(self.generated_note+' Confirm charge / multiplicity before exporting.')
+            return
         self.status.set_text(molecule.name+' — geometry retained; no added atoms or fragment rearrangement. Confirm charge, multiplicity and cell before generating.')
 
     def lengths(self):
@@ -135,7 +156,7 @@ class GasPhasePage(Gtk.Box):
             self.preview_window.setStructure(None)
             self.preview_window.setStructure(structure)
             self.preview_window.win.show()
-            self.status.set_text('3D preview: '+self.molecule.name+'. Source XYZ coordinates are unchanged.')
+            self.status.set_text('3D preview: '+self.molecule.name+'. Coordinates are unchanged by preview.')
         except Exception as error:self.status.set_text(str(error))
 
     def close_preview(self,*args):
@@ -154,7 +175,7 @@ class GasPhasePage(Gtk.Box):
             molecule=self.molecule;charge=self.charge.get_text();multiplicity=self.multiplicity.get_text()
             cell=self.lengths()
             input_contents(molecule,charge,multiplicity,cell)
-            stem=re.sub(r'[^A-Za-z0-9_-]+','_',molecule.path.stem).strip('_') or 'molecule'
+            stem=re.sub(r'[^A-Za-z0-9_-]+','_',molecule.path.stem if molecule.path is not None else 'smiles_molecule').strip('_') or 'molecule'
             writer=lambda parent,name:write_inputs(molecule,charge,multiplicity,cell,parent,name)
             pending=int(charge)!=0
             note='\nCharged template: fill NELECT in INCAR after choosing POTCAR.' if pending else ''
@@ -164,3 +185,48 @@ class GasPhasePage(Gtk.Box):
             if output is not None:
                 self.directory=output.parent;self.status.set_text(('Created templates. Fill NELECT in INCAR using POTCAR before running. Folder: ' if pending else 'Created INCAR, KPOINTS and POSCAR in: ')+str(output))
         except Exception as error:self.status.set_text(str(error))
+
+    def set_busy(self,busy):
+        for widget in (self.build_button,self.smiles_entry,self.tree,self.refresh_button,
+                       self.charge,self.multiplicity,*self.cell):widget.set_sensitive(not busy)
+        self.cancel_button.set_sensitive(busy)
+        self.preview_button.set_sensitive(not busy and self.molecule is not None)
+        self.generate_button.set_sensitive(not busy and self.molecule is not None)
+
+    def build_smiles(self,*args):
+        if self.task is not None:return
+        text=self.smiles_entry.get_text().strip()
+        if not text:self.status.set_text('Enter a SMILES string, for example CCO.');return
+        task=SmilesTask(text,lambda result,error:GLib.idle_add(self.smiles_finished,task,result,error))
+        self.task=task;self.set_busy(True)
+        self.status.set_text('Building 3D conformers and optimizing...')
+        task.start()
+
+    def cancel_smiles(self,*args):
+        if self.task is not None:
+            self.task.cancel();self.cancel_button.set_sensitive(False)
+            self.status.set_text('Cancelling SMILES generation...')
+
+    def smiles_finished(self,task,result,error):
+        if not self.alive or self.task is not task:return False
+        self.task=None;self.set_busy(False)
+        if task.cancelled.is_set():error='SMILES generation cancelled.'
+        if error:self.status.set_text(error);return False
+        try:
+            self.generated=molecule_from_result(result)
+            self.generated_note='%s converged (%.6g kcal/mol); selected lowest from %d converged conformer(s). Initial geometry, not a DFT result. %s'%(result['forcefield'],result['energy'],result['converged_conformers'],result['warning'])
+            self.molecule=None
+            self.refresh()
+            for row in self.model:
+                if row[4] is self.generated:
+                    self.tree.get_selection().select_iter(row.iter);break
+            self.preview()
+            preview_note='' if self.status.get_text().startswith('3D preview:') else ' Preview: '+self.status.get_text()
+            self.status.set_text(self.generated_note+' Confirm charge / multiplicity before exporting.'+preview_note)
+        except Exception as exc:self.status.set_text(str(exc))
+        return False
+
+    def destroyed(self,*args):
+        self.alive=False
+        if self.task is not None:self.task.cancel()
+        self.close_preview()

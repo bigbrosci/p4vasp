@@ -448,4 +448,12 @@ H  -0.758602   0.000000   0.504284
 
 INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGMA=0.01`、`NUPDOWN=multiplicity−1`，不设置 MAGMOM；其他基础参数保留。界面只填写 **Charge**（如 -1、+1、0），不再输入 NELECT，也不要求已有 POTCAR。中性体系不写 NELECT；带电 INCAR 写入 `NELECT = SET_AFTER_POTCAR` 和公式注释，保存后需按实际 POTCAR 的 ZVAL 总和减 Charge 补成数值才能运行。Charge=-1 加一个电子，+1 减一个电子；程序不猜电子数。保存弹窗及成功状态均提醒待补全。NUPDOWN 固定自旋电子数差，不保证得到特定自旋本征态／基态。赝势、带电气相有限尺寸修正和收敛性仍需核对，生成文件不等于完成计算。
 
-格式、缺失值、保存及参数细节见 [本地分子库说明](../data/models/gas_phase/README.md)。名称查询与 SMILES 转三维尚未加入；本次实现的是本地 XYZ 接口。
+格式、缺失值、保存及参数细节见 [本地分子库说明](../data/models/gas_phase/README.md)。名称查询尚未加入；SMILES 三维生成见下节。
+
+### SMILES 生成与初步优化
+
+在 gas phase 的 **SMILES** 栏输入例如 `CCO`，点击 **Build 3D + optimize**。生成时补氢，用 ETKDGv3 生成候选、MMFF94s／UFF 初步优化并选已收敛候选中力场能量最低的一份，自动打开三维预览。列表显示 `[SMILES]`；随后继续用 Preview 3D／Generate inputs，输出文件沿用现有气相流程。
+
+Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构只是力场初始几何，不是 DFT 结果；盐、多片段及金属等继续导入 XYZ。生成结构只暂存当前页面，离开 Models 前需导出 POSCAR；不会自动写入原 XYZ 库。
+
+本机可选依赖已装入独立 `.venv-smiles`；其他设备需执行 `bash install/install-rdkit.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
