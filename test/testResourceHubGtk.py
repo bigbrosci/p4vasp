@@ -27,9 +27,22 @@ with tempfile.TemporaryDirectory() as temporary:
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
         assert applet.online.child_get_property(button, 'top-attach') == i // 4
         assert button.get_allocation().width > 40
-    with patch('p4vasp.applet.ResourceHubApplet.webbrowser.open', return_value=True) as browser:
+    from p4vasp.gtk3 import Gdk
+    for index, url in [(0, 'https://opencatalystproject.org/'), (2, 'https://materialsproject.org/')]:
+        applet.online_buttons[index].clicked()
+        assert applet.link_entry.get_text()==url
+        assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()==url
+    with patch('p4vasp.applet.ResourceHubApplet.Gtk.Clipboard.get', side_effect=RuntimeError('unavailable')):
         applet.online_buttons[0].clicked()
-        browser.assert_called_once_with('https://opencatalystproject.org/')
+        assert 'Ctrl+C' in applet.link_status.get_text()
+        assert applet.link_entry.get_text()=='https://opencatalystproject.org/'
+    applet.online_buttons[0].clicked()
+    import time
+    for _ in range(20):
+        while Gtk.events_pending(): Gtk.main_iteration()
+        time.sleep(0.01)
+    assert applet.link_entry.get_allocation().height>20
+    window.get_pixbuf().savev('/tmp/p4vasp-online-links.png','png',[],[])
     notebook=applet.element_table.get_parent()
     notebook.set_current_page(1)
     while Gtk.events_pending(): Gtk.main_iteration()
@@ -76,4 +89,4 @@ with tempfile.TemporaryDirectory() as temporary:
         assert error.called
     assert applet.store.read('websites')[1] != b'invalid json'
     editor.destroy(); window.destroy()
-print('PASS: 4x4 displayed grid, element table, mocked browser, editor save/validation/backup')
+print('PASS: 4x4 displayed grid, element table, clipboard copy and URL display, editor save/validation/backup')

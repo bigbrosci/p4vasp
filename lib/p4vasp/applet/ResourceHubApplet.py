@@ -1,6 +1,5 @@
 """Offline resource cards and a validated editor for the actual bundled files."""
-import webbrowser
-from p4vasp.gtk3 import Gtk, GdkPixbuf
+from p4vasp.gtk3 import Gtk, Gdk, GdkPixbuf
 from p4vasp.applet.Applet import Applet
 from p4vasp.resource_data import ResourceStore, validate
 from p4vasp.gtk3.element_table import ElementTable
@@ -90,15 +89,24 @@ class ResourceHubApplet(Applet):
         notebook = Gtk.Notebook()
         self.online = Gtk.Grid(column_spacing=8, row_spacing=8, column_homogeneous=True)
         self.online.set_border_width(8)
-        self.add_page(notebook, self.online, 'Online databases')
+        online_page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        scroll = Gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroll.add(self.online); online_page.pack_start(scroll, True, True, 0)
+        footer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        footer.set_border_width(8)
+        self.link_status = Gtk.Label(label='Click a database to show and copy its URL.', xalign=0)
+        self.link_status.set_line_wrap(True)
+        self.link_entry = Gtk.Entry(); self.link_entry.set_editable(False)
+        self.link_entry.set_placeholder_text('Database URL')
+        footer.pack_start(self.link_status, False, False, 0)
+        footer.pack_start(self.link_entry, False, False, 0)
+        online_page.pack_start(footer, False, False, 0)
+        notebook.append_page(online_page, Gtk.Label(label='Online databases'))
         self.element_table = ElementTable(self.store, self.parent_window, message)
         notebook.append_page(self.element_table, Gtk.Label(label='p4vasp data'))
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)
         self.refresh(); self.panel.show_all()
-
-    def add_page(self, notebook, grid, title):
-        scroll = Gtk.ScrolledWindow(); scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scroll.add(grid); notebook.append_page(scroll, Gtk.Label(label=title))
 
     def card(self, title, description, badge, icon=None):
         button = Gtk.Button(); box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
@@ -123,7 +131,7 @@ class ResourceHubApplet(Applet):
             for index, site in enumerate(sites):
                 button = self.card(site['name'], site.get('description', '')+'\n'+site['url'],
                                    site.get('badge', site['name'][:2]), site.get('icon'))
-                button.connect('clicked', self.open_site, site['url'])
+                button.connect('clicked', self.select_site, site['name'], site['url'])
                 self.online.attach(button, index % 4, index // 4, 1, 1); self.online_buttons.append(button)
         except Exception as error:
             self.online.attach(Gtk.Label(label='Cannot read website catalog: '+str(error)), 0, 0, 4, 1)
@@ -133,10 +141,16 @@ class ResourceHubApplet(Applet):
         parent = self.panel.get_toplevel()
         return parent if isinstance(parent, Gtk.Window) else None
 
-    def open_site(self, button, url):
+    def select_site(self, button, name, url):
+        self.link_entry.set_text(url)
+        self.link_entry.select_region(0, -1)
         try:
-            if not webbrowser.open(url): raise RuntimeError('No browser could be opened. URL: '+url)
-        except Exception as error: message(self.parent_window(), str(error))
+            clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+            clipboard.set_text(url, -1)
+            clipboard.store()
+            self.link_status.set_text(name+' — URL copied to clipboard.')
+        except Exception:
+            self.link_status.set_text(name+' — Select the URL below and press Ctrl+C to copy.')
 
     def edit(self, button, key, title, focus):
         try:
