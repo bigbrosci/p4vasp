@@ -107,33 +107,30 @@ def poscar(molecule, cell):
     return '\n'.join(lines)+'\n'
 
 
-def input_contents(molecule, charge, multiplicity, cell, nelect=None, config=None):
+def input_contents(molecule, charge, multiplicity, cell, config=None):
     charge=integer(charge,'Charge');multiplicity=integer(multiplicity,'Multiplicity',1)
-    if nelect is not None and str(nelect).strip()!='': nelect=integer(nelect,'NELECT',1)
-    else: nelect=None
-    if charge!=0 and nelect is None:
-        raise ValueError('Charged systems require NELECT from the chosen POTCAR valence counts minus charge.')
-    if charge==0 and nelect is not None:
-        raise ValueError('For a neutral system leave NELECT blank; VASP reads it from POTCAR.')
     difference=multiplicity-1
-    if nelect is not None and (nelect<difference or (nelect-difference)%2):
-        raise ValueError('NELECT and multiplicity have incompatible electron counts / spin parity.')
     config=copy.deepcopy(config if config is not None else load_presets())
     for params in config['standard'].values():
         for tag in list(params):
             if tag.upper() in ('MAGMOM','NELECT','NUPDOWN','LSORBIT','LNONCOLLINEAR'):
                 del params[tag]
     custom='ISPIN=2\nNUPDOWN=%d\nISMEAR=0\nSIGMA=0.01'%difference
-    if nelect is not None:custom+='\nNELECT=%d'%nelect
     incar=generate_incar(config,[],list(config['standard']),custom,system_name=molecule.name+' gas phase')
+    if charge != 0:
+        incar += ('\n# Charged-system template: complete NELECT before running VASP.\n'
+                  '# NELECT = sum(atom_count * POTCAR ZVAL) - (%+d)\n'
+                  '# Negative charge adds electrons; positive charge removes electrons.\n'
+                  '# Check NELECT - NUPDOWN is nonnegative and even.\n'
+                  'NELECT = SET_AFTER_POTCAR\n') % charge
     source=molecule.path.name.replace('\n',' ').replace('\r',' ')
     incar='# XYZ: %s; charge=%d; multiplicity=%d\n'%(source,charge,multiplicity)+incar
     return {'INCAR':incar,'KPOINTS':'Gas phase Gamma mesh\n0\nGamma\n1 1 1\n0 0 0\n',
             'POSCAR':poscar(molecule,cell)}
 
 
-def write_inputs(molecule, charge, multiplicity, cell, parent, name, nelect=None):
+def write_inputs(molecule, charge, multiplicity, cell, parent, name):
     # Do not silently export an obsolete preview after the source was edited.
     if read_xyz(molecule.path)!=molecule:
         raise ValueError('XYZ file changed. Refresh the library and review the molecule again.')
-    return write_contents(input_contents(molecule,charge,multiplicity,cell,nelect),parent,name)
+    return write_contents(input_contents(molecule,charge,multiplicity,cell),parent,name)

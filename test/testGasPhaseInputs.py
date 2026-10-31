@@ -56,10 +56,13 @@ class GasInputs(unittest.TestCase):
         self.assertEqual(params['NUPDOWN'],'2');self.assertEqual(params['ISPIN'],'2')
         self.assertNotIn('MAGMOM',params);self.assertNotIn('NELECT',params)
         self.assertEqual(params['SIGMA'],'0.01')
-        for q,m,n in [(1,2,None),(1,3,5),(1,8,3),(0,1,8)]:
-            with self.assertRaises(ValueError):input_contents(self.molecule,q,m,suggested_cell(self.molecule),n)
-        params=parse_custom(input_contents(self.molecule,1,2,suggested_cell(self.molecule),5)['INCAR'])
-        self.assertEqual(params['NELECT'],'5');self.assertEqual(params['NUPDOWN'],'1')
+        for charge in (-1,1):
+            text=input_contents(self.molecule,charge,2,suggested_cell(self.molecule))['INCAR']
+            params=parse_custom(text)
+            self.assertEqual(params['NELECT'],'SET_AFTER_POTCAR')
+            self.assertEqual(params['NUPDOWN'],'1')
+            self.assertIn('POTCAR ZVAL) - (%+d)'%charge,text)
+            self.assertIn('before running VASP',text)
 
     def test_write_conflict_and_source_change(self):
         output=write_inputs(self.molecule,0,1,suggested_cell(self.molecule),self.root,'out')

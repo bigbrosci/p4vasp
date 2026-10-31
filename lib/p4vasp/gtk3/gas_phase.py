@@ -55,12 +55,10 @@ class GasPhasePage(Gtk.Box):
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.add(self.tree);self.pack_start(scroll,True,True,0)
         fields=Gtk.Grid(column_spacing=6,row_spacing=6)
-        self.charge=entry('');self.multiplicity=entry('');self.nelect=entry('')
+        self.charge=entry('');self.multiplicity=entry('')
         self.charge.set_placeholder_text('Required');self.multiplicity.set_placeholder_text('Required')
-        self.nelect.set_placeholder_text('Charged only')
-        self.nelect.set_tooltip_text('For charged systems: sum of chosen POTCAR valence electrons minus total charge. Neutral: leave blank.')
         self.cell=[entry('') for _ in range(3)]
-        for row,items in enumerate((list(zip(('Charge','Multiplicity','NELECT'),(self.charge,self.multiplicity,self.nelect))),list(zip(('Lx (Å)','Ly (Å)','Lz (Å)'),self.cell)))):
+        for row,items in enumerate((list(zip(('Charge','Multiplicity'),(self.charge,self.multiplicity))),list(zip(('Lx (Å)','Ly (Å)','Lz (Å)'),self.cell)))):
             for index,(title,widget) in enumerate(items):
                 fields.attach(Gtk.Label(label=title,xalign=0),index*2,row,1,1)
                 fields.attach(widget,index*2+1,row,1,1)
@@ -101,12 +99,11 @@ class GasPhasePage(Gtk.Box):
         self.preview_button.set_sensitive(molecule is not None)
         self.generate_button.set_sensitive(molecule is not None)
         if molecule is None:
-            for field in (self.charge,self.multiplicity,self.nelect,*self.cell):field.set_text('')
+            for field in (self.charge,self.multiplicity,*self.cell):field.set_text('')
             if iterator is not None:self.status.set_text(model[iterator][3])
             return
         self.charge.set_text('' if molecule.charge is None else str(molecule.charge))
         self.multiplicity.set_text('' if molecule.multiplicity is None else str(molecule.multiplicity))
-        self.nelect.set_text('')
         for widget,length in zip(self.cell,suggested_cell(molecule)):widget.set_text(str(length))
         self.status.set_text(molecule.name+' — geometry retained; no added atoms or fragment rearrangement. Confirm charge, multiplicity and cell before generating.')
 
@@ -155,13 +152,15 @@ class GasPhasePage(Gtk.Box):
         if self.molecule is None:return
         try:
             molecule=self.molecule;charge=self.charge.get_text();multiplicity=self.multiplicity.get_text()
-            cell=self.lengths();nelect=self.nelect.get_text()
-            input_contents(molecule,charge,multiplicity,cell,nelect)
+            cell=self.lengths()
+            input_contents(molecule,charge,multiplicity,cell)
             stem=re.sub(r'[^A-Za-z0-9_-]+','_',molecule.path.stem).strip('_') or 'molecule'
-            writer=lambda parent,name:write_inputs(molecule,charge,multiplicity,cell,parent,name,nelect)
+            writer=lambda parent,name:write_inputs(molecule,charge,multiplicity,cell,parent,name)
+            pending=int(charge)!=0
+            note='\nCharged template: fill NELECT in INCAR after choosing POTCAR.' if pending else ''
             output=InputFolderDialog(self.parent_window(),molecule.name,self.directory,
                 title='Generate gas phase inputs',folder_name=stem+'_gas_phase',
-                summary='Creates INCAR, KPOINTS and POSCAR.\nCell (Å): '+ ' × '.join(map(str,cell))+'. Molecular geometry is retained.',writer=writer).run()
+                summary='Creates INCAR, KPOINTS and POSCAR.\nCell (Å): '+ ' × '.join(map(str,cell))+'. Molecular geometry is retained.'+note,writer=writer).run()
             if output is not None:
-                self.directory=output.parent;self.status.set_text('Created INCAR, KPOINTS and POSCAR in: '+str(output))
+                self.directory=output.parent;self.status.set_text(('Created templates. Fill NELECT in INCAR using POTCAR before running. Folder: ' if pending else 'Created INCAR, KPOINTS and POSCAR in: ')+str(output))
         except Exception as error:self.status.set_text(str(error))

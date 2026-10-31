@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Charge 输入与带电 INCAR 模板（2026-10-31，当前补充）
+
+- 用户明确默认无 POTCAR，只需在 INCAR 加 NELECT 并告知用法。移除气相界面手填 NELECT，Charge 接受带符号整数。带电导出不再受缺 NELECT 阻挡，写入活动占位 `NELECT = SET_AFTER_POTCAR`、ZVAL总和减Charge公式及正负号／自旋核对说明；保存弹窗和状态提示补全后运行。中性不写NELECT。不提供猜测数值，带电输出为待补全模板，不是可直接运行的完整INCAR。
+- 5项气相数据专项及实际X11 GTK/原生完整导出回归通过，检查±1公式／占位、去除NELECT输入、真实保存弹窗与提醒；截图已查看。本次未重跑全套基础／启动或其他平台。指南与库README已同步；下方早期“必须手填NELECT”已被此补充替代。Windows打包暂停。
+
 ## gas phase 本地 XYZ 库（2026-10-31，当前状态）
 
 - 用户确认本地文件接口。新增 `data/models/gas_phase/`（water／oxygen_triplet 示例及 README），`gas_phase_inputs.py` 严格解析单帧 XYZ，第二行支持 name/charge/multiplicity/units；只允许 Å、有限坐标及元素符号，缺电荷／多重度必须填写，错误按文件行号展示。Models 的 gas phase 页使用 `gtk3/gas_phase.py`，进入自动扫描，另有 Refresh／打开目录；无后台扫描进程或联网服务。bulk／surface 仍空，名称／SMILES 转换未实现。

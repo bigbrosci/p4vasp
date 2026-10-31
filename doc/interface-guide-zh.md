@@ -446,6 +446,6 @@ H  -0.758602   0.000000   0.504284
 
 点击 **Generate inputs**，填写新文件夹名称与父目录，生成 INCAR、Gamma 1×1×1 KPOINTS、按元素分组且整体居中的 POSCAR。保留原子间距离，不改源文件，不覆盖既有目录；源文件几何或元数据已变化时要求刷新后重新确认。
 
-INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGMA=0.01`、`NUPDOWN=multiplicity−1`，不设置 MAGMOM；其他基础参数保留。中性体系 NELECT 留空；带电体系必须按所用 POTCAR 的 ZVAL 填写 **NELECT**，即价电子总数减去总电荷，程序不从原子序数猜测。NUPDOWN 固定自旋电子数差，不保证得到特定自旋本征态／基态。赝势、带电气相有限尺寸修正和收敛性仍需核对，生成文件不等于完成计算。
+INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGMA=0.01`、`NUPDOWN=multiplicity−1`，不设置 MAGMOM；其他基础参数保留。界面只填写 **Charge**（如 -1、+1、0），不再输入 NELECT，也不要求已有 POTCAR。中性体系不写 NELECT；带电 INCAR 写入 `NELECT = SET_AFTER_POTCAR` 和公式注释，保存后需按实际 POTCAR 的 ZVAL 总和减 Charge 补成数值才能运行。Charge=-1 加一个电子，+1 减一个电子；程序不猜电子数。保存弹窗及成功状态均提醒待补全。NUPDOWN 固定自旋电子数差，不保证得到特定自旋本征态／基态。赝势、带电气相有限尺寸修正和收敛性仍需核对，生成文件不等于完成计算。
 
 格式、缺失值、保存及参数细节见 [本地分子库说明](../data/models/gas_phase/README.md)。名称查询与 SMILES 转三维尚未加入；本次实现的是本地 XYZ 接口。

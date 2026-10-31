@@ -59,8 +59,7 @@ def main():
         page.preview_button.clicked()
         assert page.molecule.positions==before
         page.charge.set_text('1');page.multiplicity.set_text('2')
-        page.generate_button.clicked();assert 'require NELECT' in page.status.get_text()
-        page.nelect.set_text('7')
+        assert not hasattr(page,'nelect')
         from p4vasp.gtk3.single_atom import InputFolderDialog
         def destination_dialog(*args,**kwargs):
             dialog=InputFolderDialog(None,*args[1:],**kwargs)
@@ -71,8 +70,8 @@ def main():
             page.generate_button.clicked()
             assert factory.call_args.kwargs['folder_name']=='water_gas_phase'
         params=parse_custom((root/'created/INCAR').read_text())
-        assert params['NELECT']=='7' and params['NUPDOWN']=='1'
-        assert 'created' in page.status.get_text()
+        assert params['NELECT']=='SET_AFTER_POTCAR' and params['NUPDOWN']=='1'
+        assert 'created' in page.status.get_text() and 'Fill NELECT' in page.status.get_text()
         with patch('p4vasp.gtk3.gas_phase.InputFolderDialog') as factory:
             factory.return_value.run.return_value=None
             page.generate_button.clicked()

@@ -34,6 +34,16 @@ H  -0.758602   0.000000   0.504284
 - `KPOINTS`：Gamma `1 1 1`、零偏移。
 - `INCAR`：沿用内部 INCAR generator 的 Standard 基础设置，覆盖 `ISPIN=2`、`ISMEAR=0`、`SIGMA=0.01`、`NUPDOWN=multiplicity-1`；不使用默认 MAGMOM、元素 U/J、SOC／非共线设置。其他基础值保留，并非自动套用 single atom 的 ALGO／NELM 覆盖。
 
-中性体系让 VASP 按 POTCAR 确定 NELECT，NELECT 栏留空；带电体系必须根据实际选用的 POTCAR 填入整数 NELECT：`各原子的 ZVAL 总和 − charge`。程序没有 POTCAR，不能从原子序数猜价电子数，也无法独立核验用户输入是否与总电荷相符。带电输入检查 NELECT 与自旋差的数量和奇偶性。总电荷和多重度记录在 INCAR 注释中；NUPDOWN 约束的是上下自旋电子数差，不保证该解一定是目标自旋本征态或基态。参考 [NELECT](https://vasp.at/wiki/NELECT)、[NUPDOWN](https://vasp.at/wiki/NUPDOWN)。周期带电气相体系的有限尺寸／静电修正需自行选择，本功能不自动添加修正。
+界面只输入 **Charge**（例如 `-1`、`+1`、`0`），不填写 NELECT，也不要求预先有 POTCAR。中性体系不写 NELECT，交给 VASP 按最终 POTCAR 确定。带电体系仍可生成三文件，但 INCAR 是**待补全模板，不能直接运行**：
+
+```text
+# NELECT = sum(atom_count * POTCAR ZVAL) - (+1)
+# Negative charge adds electrons; positive charge removes electrons.
+NELECT = SET_AFTER_POTCAR
+```
+
+上例为 Charge=+1，需从中性价电子总数减去 1；Charge=-1 则加 1。拿到实际计算所用的 POTCAR 后，按各元素 ZVAL 与原子数求和再减 Charge，将占位符替换为数值。程序不填猜测数值；不能简单将原子序数相加代替价电子数。还需核对 NELECT 与 NUPDOWN 的数量和奇偶性，当前模板阶段不做此数值检查。保存弹窗与成功状态都会提醒带电模板需补全。
+
+总电荷和多重度记录在 INCAR 注释中；NUPDOWN 约束上下自旋电子数差，不保证目标自旋本征态或基态。参考 [NELECT](https://vasp.at/wiki/NELECT)、[NUPDOWN](https://vasp.at/wiki/NUPDOWN)。周期带电气相体系的有限尺寸／静电修正需自行选择，本功能不自动添加修正。
 
 只创建新目录，不覆盖已有目录；取消不生成文件。生成前检查 XYZ 内容是否已变化，变化时要求 Refresh 后重新确认；写入失败会清理本次已写的文件。生成输入不等于完成 VASP 计算，POTCAR 不在此功能中生成。
