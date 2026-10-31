@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<glade-interface>
+  <widget class="GtkFrame" id="applet_frame">
+    <property name="visible">True</property>
+    <property name="label">Models</property>
+    <child><widget class="GtkTable" id="models_table">
+      <property name="visible">True</property>
+      <property name="n_rows">2</property>
+      <property name="n_columns">2</property>
+      <property name="homogeneous">True</property>
+      <property name="row_spacing">12</property>
+      <property name="column_spacing">12</property>
+      <property name="border_width">12</property>
+      <child>
+        <widget class="GtkFrame" id="models_single_atom">
+          <property name="visible">True</property>
+          <property name="label">single atom</property>
+          <property name="height_request">110</property>
+        </widget>
+        <packing>
+          <property name="left_attach">0</property>
+          <property name="right_attach">1</property>
+          <property name="top_attach">0</property>
+          <property name="bottom_attach">1</property>
+          <property name="x_options">expand|fill</property>
+          <property name="y_options">expand|fill</property>
+        </packing>
+      </child>
+      <child>
+        <widget class="GtkFrame" id="models_gas_phase">
+          <property name="visible">True</property>
+          <property name="label">gas phase</property>
+          <property name="height_request">110</property>
+        </widget>
+        <packing>
+          <property name="left_attach">1</property>
+          <property name="right_attach">2</property>
+          <property name="top_attach">0</property>
+          <property name="bottom_attach">1</property>
+          <property name="x_options">expand|fill</property>
+          <property name="y_options">expand|fill</property>
+        </packing>
+      </child>
+      <child>
+        <widget class="GtkFrame" id="models_bulk">
+          <property name="visible">True</property>
+          <property name="label">bulk</property>
+          <property name="height_request">110</property>
+        </widget>
+        <packing>
+          <property name="left_attach">0</property>
+          <property name="right_attach">1</property>
+          <property name="top_attach">1</property>
+          <property name="bottom_attach">2</property>
+          <property name="x_options">expand|fill</property>
+          <property name="y_options">expand|fill</property>
+        </packing>
+      </child>
+      <child>
+        <widget class="GtkFrame" id="models_surface">
+          <property name="visible">True</property>
+          <property name="label">surface</property>
+          <property name="height_request">110</property>
+        </widget>
+        <packing>
+          <property name="left_attach">1</property>
+          <property name="right_attach">2</property>
+          <property name="top_attach">1</property>
+          <property name="bottom_attach">2</property>
+          <property name="x_options">expand|fill</property>
+          <property name="y_options">expand|fill</property>
+        </packing>
+      </child>
+    </widget></child>
+  </widget>
+</glade-interface>

@@ -36,7 +36,7 @@ from p4vasp.gtk3 import pango
 
 
 class CommitApplet(Applet):
-    menupath=["Database","Commit"]
+    menupath=None  # The toolbar Commit shortcut remains available.
     def __init__(self):
         Applet.__init__(self)
         self.gladefile="commit.glade"

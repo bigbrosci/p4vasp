@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Models 模型库空框架（2026-10-31）
+
+- 用户要求将 Database 下拉菜单 Commit 换成 Models；`CommitApplet.menupath=None` 仅隐藏菜单项，工具栏 Commit 保留。新增注册 `ModelsApplet.py` 和 `data/glade2/models.glade`，显示 2×2 四个空框：single atom、gas phase、bulk、surface，不填内容或添加建模操作。Resources 保留。
+- 本机 Linux GTK 实际启动及 640×400 绘制检查通过，四框标题、空内容和可见尺寸已核对；57 基础测试和 32 applet 启动通过。界面专项退出仍见已有 cmatrix.Vector 析构警告。其他平台未测，Windows 打包继续暂停；后续内容等待用户指示。详见当日更新记录。
+
 ## 数据库资源导航（2026-10-31）
 
 - 已按用户最终确认的 16 个网站实现四列四行在线导航，入口为工具栏 Database／菜单 Database → Resources，名称缩写图标，点击交给默认浏览器。`data/resources/websites.json` 保存名单与网址；程序启动不联网获取数据。

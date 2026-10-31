@@ -7,6 +7,7 @@ def appletlist():
     'p4vasp.applet.BuilderApplet.BuilderApplet',
     'p4vasp.applet.IncarApplet.IncarApplet',
     'p4vasp.applet.DBApplet.DBApplet',
+    'p4vasp.applet.ModelsApplet.ModelsApplet',
     'p4vasp.applet.EnergyConvergenceApplet.EnergyConvergenceApplet',
     'p4vasp.applet.StructureWindowControlApplet.StructureWindowControlApplet',
     'p4vasp.applet.DielectricApplet.DielectricApplet',
