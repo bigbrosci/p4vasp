@@ -2,6 +2,7 @@
 from io import StringIO
 from pathlib import Path
 import re
+import math
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.file_dialogs import entry
 from p4vasp.gtk3.single_atom import InputFolderDialog
@@ -28,6 +29,18 @@ def handle_preview_event(event):
         window.hide();cp4vasp.VisSync()
     elif event.type==cp4vasp.BE_WIN_ACTIVATE:window.redraw()
     return True
+
+
+def molecular_atomtypes():
+    """Preview-only covalent ball radii; leave the shared element data intact."""
+    from p4vasp.Structure import AtomInfo
+    from p4vasp.util import getAtomtypes
+    table=AtomInfo(getAtomtypes())
+    for index in range(len(table)):
+        record=table.getRecord(index)
+        radius=record.covalent
+        record.radius=radius if math.isfinite(radius) and radius>0 else .7
+    return table
 
 
 class GasPhasePage(Gtk.Box):
@@ -147,12 +160,13 @@ class GasPhasePage(Gtk.Box):
         try:
             from p4vasp.Structure import Structure
             from p4vasp.StructureWindow import StructureWindow
-            from p4vasp.util import getAtomtypes
             structure=Structure();structure.read(StringIO(poscar(self.molecule,self.lengths())))
             global _shared_preview
             if _shared_preview is None:
-                _shared_preview=StructureWindow(w=600,h=500,title='Gas phase preview',atomtypes=getAtomtypes())
+                _shared_preview=StructureWindow(w=600,h=500,title='Gas phase preview')
             self.preview_window=_shared_preview
+            self.preview_window.atomtypes=molecular_atomtypes()
+            self.preview_window.setRadiusFactor(.5)
             self.preview_window.setStructure(None)
             self.preview_window.setStructure(structure)
             self.preview_window.win.show()

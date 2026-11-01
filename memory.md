@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 气相预览球半径（2026-10-31）
+
+- 用户报告气相球体过大，要求使用原子半径而非范德华半径。`gtk3/gas_phase.py molecular_atomtypes` 深复制默认 AtomInfo，预览 radius 改为 covalent，窗口球缩放0.5；缺失正共价半径时raw半径0.7 Å（最终球0.35 Å）。XYZ和SMILES共用，不改颜色、判键共价半径、全局缓存／资料或输出结构。
+- 本机实际X11 GTK／原生XYZ和SMILES流程通过；核对原生氧球取共价半径、缩放0.5、全局半径未变及Og缺值显示回退，原生截图已查看。此次未重跑全套基础／启动、其他平台或科学计算；Windows打包继续暂停。
+
 ## gas phase SMILES 建模（2026-10-31，当前状态）
 
 - 用户授权新增SMILES生成及初步优化，XYZ库保留。gas phase 增加 SMILES 输入、Build 3D + optimize、Cancel；完成后在同一列表加入临时 [SMILES] 条目并自动三维预览，复用已有电荷／自旋／晶胞／Generate inputs。形式电荷自动填入，多重度始终留空待确认；刷新保留临时结构及人工填写，重新生成重置确认。结构仅在当前页内存，离开Models前应导出POSCAR，不自动写XYZ库。

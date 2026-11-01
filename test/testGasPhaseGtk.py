@@ -35,9 +35,19 @@ def main():
         select('water.xyz');assert page.charge.get_text()=='0' and page.multiplicity.get_text()=='1'
         page.multiplicity.set_text('3');page.refresh();assert page.multiplicity.get_text()=='3'
         page.multiplicity.set_text('1');before=page.molecule.positions
+        from p4vasp.util import getAtomtypes
+        baseline_radius=getAtomtypes().getRecordForElement('O').radius
         page.preview_button.clicked()
         assert page.preview_window is not None,page.status.get_text()
         assert len(page.preview_window.structure)==3
+        from p4vasp.util import getAtomtypes
+        original=getAtomtypes().getRecordForElement('O')
+        assert abs(page.preview_window.structure_drawer.info.getRecord(0).radius-original.covalent)<1e-6
+        assert abs(page.preview_window.getRadiusFactor()-.5)<1e-6
+        assert abs(page.preview_window.atomtypes.getRecordForElement('Og').radius-.7)<1e-8
+        assert abs(getAtomtypes().getRecordForElement('O').radius-baseline_radius)<1e-8
+        for _ in range(12):cp4vasp.VisCheck();time.sleep(.02)
+        page.preview_window.win.saveScreenshot('/tmp/p4vasp-gas-covalent.tga')
         from p4vasp.gtk3.gas_phase import handle_preview_event
         from types import SimpleNamespace
         event=SimpleNamespace(type=cp4vasp.BE_SELECTED,getStructureDrawer=lambda:page.preview_window.structure_drawer)

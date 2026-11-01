@@ -5,7 +5,7 @@
 ## 使用
 
 1. 输入 SMILES，例如乙醇 `CCO`、苯 `c1ccccc1`、铵离子 `[NH4+]`。
-2. 点击 **Build 3D + optimize**。程序补全显式氢，生成三维候选构象并做分子力场优化。完成后列表出现 `[SMILES]` 条目，并自动打开三维预览。
+2. 点击 **Build 3D + optimize**。程序补全显式氢，生成三维候选构象并做分子力场优化。完成后列表出现 `[SMILES]` 条目，并自动打开三维预览，球体使用 0.5 倍共价半径的球棍样式。
 3. 核对结构、Charge、Multiplicity 和晶胞。形式电荷由 SMILES 填入；**自旋多重度一律留空，由用户确认**，不能仅凭 SMILES 判断磁态。例如氧气的普通 SMILES 不足以确定其自旋态。
 4. 继续使用已有 **Preview 3D** 和 **Generate inputs**，选择文件夹生成 INCAR、KPOINTS、POSCAR。带电体系沿用 `NELECT = SET_AFTER_POTCAR` 待填模板。
 
