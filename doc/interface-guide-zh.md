@@ -467,3 +467,7 @@ INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGM
 Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构只是力场初始几何，不是 DFT 结果；盐、多片段及金属等继续导入 XYZ。生成结构只暂存当前页面，离开 Models 前需导出 POSCAR；不会自动写入原 XYZ 库。
 
 本机可选依赖已装入独立 `.venv-smiles`；其他设备需执行 `bash install/install-rdkit.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
+
+### Useful tools 预留页
+
+Database → Resources 的顶部标签顺序为 Online databases、p4vasp data、Useful tools。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。

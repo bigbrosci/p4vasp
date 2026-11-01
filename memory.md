@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Useful tools 预留标签（2026-11-01）
+
+- 按用户要求，ResourceHub 在 p4vasp data 右侧新增 Useful tools 空标签页，后续软件／GitHub名单由用户提供，未自行填内容。
+- 本机实际GTK检查标签顺序、切换及空初始状态通过，700×480绘制截图已查看；退出仍见既有cmatrix析构警告。本次未重跑全套测试或其他平台，Windows打包暂停。
+
 ## Show 原子计数与 Delete 快捷删除（2026-11-01）
 
 - 用户要求结构弹窗左下角显示各元素原子数，并用 Delete 直接删选择、Build 按钮不变。`src/VisWindow.cpp` 在原生GL最后绘制屏幕坐标统计，源info按元素合并，不重复计周期副本，包含隐藏原子，长行折行／空结构Atoms:0；旋转缩放不改变位置。
