@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 中文方框修复（2026-11-01）
+
+- 用户截图报告交流页中文仍为方框；已用GTK先渲染文字再加载页面复现。之前冷启动专项通过不足以覆盖已缓存字体的主界面。
+- community.py向Pango实际持有的FcConfig补注册字体并清理PangoFc缓存；已缓存中文的回归、中文无缺字／二维码／剪贴板／窄窗口、Resources与Models集成通过，修复截图已查看。用户实际重启后效果待反馈，其他平台未验证；原集成退出cmatrix警告仍存在。
+
 ## 交流与支持二维码（2026-11-01）
 
 - 当前任务完成：Database → Resources 新增“交流与支持”，三张用户JPG按字节复制至data/community；中文卡片、QQ群1131610080复制、点击放大／100%／原图切换。微信仅标昵称BigBroSci，不冒充微信号。根目录用户原图保留，不纳入提交。

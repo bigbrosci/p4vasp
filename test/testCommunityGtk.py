@@ -10,6 +10,12 @@ def drain():
 
 window = Gtk.Window()
 window.set_default_size(800, 480)
+warm = Gtk.Label(label='预先缓存中文')
+window.add(warm)
+window.show_all()
+drain()
+warm.create_pango_layout('交流与支持 微信').get_unknown_glyphs_count()
+window.remove(warm)
 page = CommunityPage(lambda: window)
 window.add(page)
 window.show_all()

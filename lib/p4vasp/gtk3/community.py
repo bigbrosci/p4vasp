@@ -38,7 +38,24 @@ def load_chinese_font():
             import gi
             gi.require_version('PangoCairo', '1.0')
             from gi.repository import PangoCairo
-            PangoCairo.FontMap.get_default().changed()
+            font_map = PangoCairo.FontMap.get_default()
+            if __import__('sys').platform != 'win32':
+                # Pango may own a separate FcConfig once GTK has rendered text.
+                # Register against that config too, then invalidate its font cache.
+                cairo = ctypes.CDLL(ctypes.util.find_library('pangocairo-1.0'))
+                cairo.pango_cairo_font_map_get_default.restype = ctypes.c_void_p
+                native_map = cairo.pango_cairo_font_map_get_default()
+                pango_fc = ctypes.CDLL(ctypes.util.find_library('pangoft2-1.0'))
+                pango_fc.pango_fc_font_map_get_config.argtypes = [ctypes.c_void_p]
+                pango_fc.pango_fc_font_map_get_config.restype = ctypes.c_void_p
+                pango_fc.pango_fc_font_map_config_changed.argtypes = [ctypes.c_void_p]
+                pango_config = pango_fc.pango_fc_font_map_get_config(native_map)
+                if pango_config and pango_config != config:
+                    fc.FcConfigAppFontAddFile(pango_config, bytes(path))
+                    fc.FcConfigBuildFonts(pango_config)
+                pango_fc.pango_fc_font_map_config_changed(native_map)
+            else:
+                font_map.changed()
             _font_loaded = True
     except (OSError, AttributeError):
         pass  # Existing system font fallback remains available.
