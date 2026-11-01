@@ -36,6 +36,7 @@
 #include <algorithm>
 #include <cmath>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 
@@ -438,21 +439,61 @@ void VisWindow::assure_init(){
   local_unlock();
 }
 
-// Screen-space composition, independent of zoom, rotation and displayed replicas.
+static std::string countElement(const char *name){
+  std::string element=name;
+  element.erase(0,element.find_first_not_of(" \t"));
+  if (!element.empty()) element.erase(element.find_last_not_of(" \t")+1);
+  return element.empty()?"?":element;
+}
+
+static void drawCountPanel(const std::vector<std::string> &order,const std::map<std::string,int> &counts,
+                           const std::string &prefix,int viewportWidth,bool right){
+  const double available=(viewportWidth-32)/2.;
+  std::vector<std::string> lines;
+  std::string line=prefix;
+  bool first=true;
+  for(size_t i=0;i<order.size();i++){
+    std::map<std::string,int>::const_iterator value=counts.find(order[i]);
+    if(value==counts.end() || value->second<=0) continue;
+    std::ostringstream item;item<<value->first<<":"<<value->second;
+    std::string next=line.empty()?item.str():line+(first?" ":", ")+item.str();
+    if(!line.empty() && gl_width(next.c_str())>available){lines.push_back(line);line=item.str();}
+    else line=next;
+    first=false;
+  }
+  if(first) line=right?"Selected:0":"Atoms:0";
+  if(!line.empty()) lines.push_back(line);
+  double width=0;for(size_t i=0;i<lines.size();i++) width=std::max(width,gl_width(lines[i].c_str()));
+  double left=right?viewportWidth-width-16:4;
+  glColor4f(1,1,1,.9f);
+  glBegin(GL_QUADS);glVertex2d(left,4);glVertex2d(left+width+16,4);
+  glVertex2d(left+width+16,lines.size()*18+10);glVertex2d(left,lines.size()*18+10);glEnd();
+  glColor3f(0,0,0);
+  for(size_t i=0;i<lines.size();i++){
+    const double x=right?viewportWidth-10-gl_width(lines[i].c_str()):10;
+    glRasterPos2d(x,10+(lines.size()-1-i)*18);gl_draw(lines[i].c_str());
+  }
+}
+
+// Screen-space counts: left is the base structure, right is unique selected atoms.
 static void drawAtomCounts(VisStructureDrawer *atoms){
   Structure *source=atoms->getStructure();
   std::vector<std::string> order;
-  std::map<std::string,int> counts;
-  if (source && source->info){
-    for (int i=0;i<source->info->len();i++){
+  std::map<std::string,int> counts,selected;
+  if(source && source->info){
+    for(int i=0;i<source->info->len();i++){
       AtomtypesRecord *record=source->info->getRecord(i);
-      if (record->atomspertype<=0) continue;
-      std::string element=record->element;
-      element.erase(0,element.find_first_not_of(" \t"));
-      if (!element.empty()) element.erase(element.find_last_not_of(" \t")+1);
-      if (element.empty()) element="?";
-      if (!counts.count(element)) order.push_back(element);
+      if(record->atomspertype<=0) continue;
+      std::string element=countElement(record->element);
+      if(!counts.count(element)) order.push_back(element);
       counts[element]+=record->atomspertype;
+    }
+    std::set<int> unique;
+    for(int i=0;i<atoms->getSelectedCount();i++){
+      int atom=atoms->getSelected(i)->atom;
+      if(atom>=0 && atom<source->len() && unique.insert(atom).second){
+        selected[countElement(source->info->getRecordForAtom(atom)->element)]++;
+      }
     }
   }
   GLint viewport[4],mode;
@@ -463,25 +504,9 @@ static void drawAtomCounts(VisStructureDrawer *atoms){
   glOrtho(0,viewport[2],0,viewport[3],-1,1);
   glMatrixMode(GL_MODELVIEW);glPushMatrix();glLoadIdentity();
   gl_font(FL_HELVETICA,14);
-  std::vector<std::string> lines;
-  std::string line;
-  for (size_t i=0;i<order.size();i++){
-    std::ostringstream item;item<<order[i]<<":"<<counts[order[i]];
-    std::string next=line.empty()?item.str():line+", "+item.str();
-    if (!line.empty() && gl_width(next.c_str())>viewport[2]-24){lines.push_back(line);line=item.str();}
-    else line=next;
-  }
-  if (line.empty() && lines.empty()) line="Atoms:0";
-  if (!line.empty()) lines.push_back(line);
-  double width=0;for(size_t i=0;i<lines.size();i++) width=std::max(width,gl_width(lines[i].c_str()));
   glEnable(GL_BLEND);glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  glColor4f(1,1,1,.9f);
-  glBegin(GL_QUADS);glVertex2d(4,4);glVertex2d(width+20,4);
-  glVertex2d(width+20,lines.size()*18+10);glVertex2d(4,lines.size()*18+10);glEnd();
-  glColor3f(0,0,0);
-  for(size_t i=0;i<lines.size();i++){
-    glRasterPos2d(10,10+(lines.size()-1-i)*18);gl_draw(lines[i].c_str());
-  }
+  drawCountPanel(order,counts,"",viewport[2],false);
+  drawCountPanel(order,selected,"Selected:",viewport[2],true);
   glPopMatrix();glMatrixMode(GL_PROJECTION);glPopMatrix();glMatrixMode(mode);
   glPopAttrib();
 }

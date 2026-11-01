@@ -45,6 +45,7 @@ def main():
     chosen=[0,0,74]
     selection().setSelection([(0,0,0,0),(0,1,0,0),(74,0,0,0)])
     window.selectAtom(0,0,0,0);window.selectAtom(0,1,0,0);window.selectAtom(74,0,0,0)
+    capture(window,'/tmp/p4vasp-counts-selected.tga')
     other=SimpleNamespace(system=object(),getWindowPtr=lambda:None,updateSystem=lambda:(_ for _ in ()).throw(AssertionError('Other system refreshed')))
     event=SimpleNamespace(index=2,dx=96,dy=0,dz=0,getWindow=lambda:window.win,
                           getMovedAtomCount=lambda:len(chosen),getMovedAtom=lambda i:chosen[i])

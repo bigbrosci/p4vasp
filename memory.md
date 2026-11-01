@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 右下角选中原子计数（2026-11-01）
+
+- 用户要求左下角保留总数，右下角显示选中元素与数目。原生VisWindow的HUD已扩为左右独立计数区，右侧如Selected: Cu:1, H:1；按原胞编号去重周期副本、忽略无效编号，按结构元素顺序显示，无选择Selected:0。左右各自折行避免重叠，坐标／选择／导出输入不改。
+- 本机原生重编译通过；实际Show/Builder集成、原生框选／键盘回归及初始居中／多视角测试通过。700×500选中／删除后截图已查看：总数96原子时，选中重复Cu副本与H显示Cu1/H1，删除后总Cu63/H19、Selected0。此次未重跑全套基础／启动或其他平台，原生独立测试仍见Fontconfig提示，Windows打包暂停。
+
 ## 移除左侧 Commit（2026-11-01）
 
 - 按用户要求从 frame.glade 删除左工具栏 Commit 按钮；旧 CommitApplet／后台代码保留，Database 与其他按钮不改。指南同步。
