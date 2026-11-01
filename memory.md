@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 近期综合总结文档（2026-11-01）
+
+- 用户要求汇总近期全部总结，已整理doc/recent-updates-2026-11-01-zh.md，覆盖10月13日至11月1日最终功能、使用方式、安装／alias、Windows暂停边界、维护交接与未解决项。作为用户指南型汇总，不替代memory或历史证据。
+- 本次仅文档整理；已核对当前资源名单、入口和说明、本地链接、UTF-8、代码围栏及差异。验证章节引用历史检查，不记为本次重跑应用测试；未安装／构建／操作其他平台。
+
 ## Useful tools and links 六个入口（2026-11-01）
 
 - ResourceHub标签由Useful tools改为Useful tools and links，原两入口保留，新增ASE https://docs.ase-lib.org/、Pymatgen https://pymatgen.org/、phonopy https://phonopy.github.io/phonopy/、Cantera https://cantera.org/，均已核对官方页面；四列自动换行，点击显示并复制网址行为不变。
