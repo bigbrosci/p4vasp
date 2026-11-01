@@ -285,11 +285,11 @@
 	      </child>
 
               <child>
-                <widget class="GtkToolButton" id="astart p4vasp.applet.DBApplet.DBApplet">
+                <widget class="GtkToolButton" id="astart p4vasp.applet.ModelsApplet.ModelsApplet">
                   <property name="visible">True</property>
-                  <property name="label">Database</property>
-                  <property name="tooltip">Online databases and editable p4vasp resources</property>
-                  <property name="stock_id">gtk-harddisk</property>
+                  <property name="label">Models</property>
+                  <property name="tooltip">Model building and editable element data</property>
+                  <property name="stock_id">gtk-index</property>
                 </widget>
               </child>
 

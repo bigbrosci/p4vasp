@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Models 独立入口与元素表迁移（2026-11-01）
+
+- 用户要求将左侧 Database 换为独立 Models，Database 菜单删除 Models／只留 Resources。frame.glade 的 astart 改为 ModelsApplet，Models.menupath=None但工厂注册保留。Models 五页顺序 single atom、gas phase、bulk、surface、p4vasp data；ElementTable原组件移入最右侧，数据文件与保存规则不变。Resources 仅 Online databases／Useful tools，继续通过 Database → Resources 访问。
+- 本机实际GTK集成验证Resources网址复制、Models五页及元素表临时编辑／保存／非法值拒绝，32 applet启动通过；900×640实际Frame截图已查看。Models/Resources仍隐藏System／Selection，单原子／气相入口沿用。文档当前导航已同步，未重跑全套GTK或其他平台，未改原生代码／无需重编译。
+- 本任务开始时已有 data/incar/presets.json 用户修改和未跟踪 Fe_single_atom 目录，均保留、不纳入提交。Windows打包继续暂停。
+
 ## 右下角选中原子计数（2026-11-01）
 
 - 用户要求左下角保留总数，右下角显示选中元素与数目。原生VisWindow的HUD已扩为左右独立计数区，右侧如Selected: Cu:1, H:1；按原胞编号去重周期副本、忽略无效编号，按结构元素顺序显示，无选择Selected:0。左右各自折行避免重叠，坐标／选择／导出输入不改。

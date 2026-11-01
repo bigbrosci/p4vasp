@@ -1,12 +1,12 @@
 # 数据库导航与内部资料
 
-从工具栏 **Database** 或菜单 **Database → Resources** 打开。此页面隐藏共用的 System／Selection 两行；切回结构编辑面板恢复。
+从顶部菜单 **Database → Resources** 打开在线数据库及 Useful tools；元素表从左侧 **Models → p4vasp data** 打开。此页面隐藏共用的 System／Selection 两行；切回结构编辑面板恢复。
 
 ## 在线数据库
 
 16 张卡片按四列四行排列，只显示网站名称。点击后在网格下方显示可选中复制的网址，并自动复制到剪贴板；不自动打开浏览器。剪贴板不可用时可在网址框按 Ctrl+C 手动复制。悬停显示用途和网址，启动不联网获取图标或数据。
 
-网站目录为 `websites.json`。部分服务需注册、订阅或许可证，导航不提供这些权限。数据库菜单中的 Models 以顶部横向四个标签页 single atom、gas phase、bulk、surface 展示模型库，single atom 可选元素生成三个输入文件，gas phase 读取本地 XYZ 分子库，bulk／surface 留空，点击切换；左侧工具栏 Commit 已移除。
+网站目录为 `websites.json`。部分服务需注册、订阅或许可证，导航不提供这些权限。左侧 Models 以顶部横向五个标签页 single atom、gas phase、bulk、surface、p4vasp data 展示模型及元素资料，Database 菜单只保留 Resources；左侧工具栏 Commit 已移除。
 
 ## 元素资料表
 

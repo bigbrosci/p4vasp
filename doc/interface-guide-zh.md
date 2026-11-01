@@ -39,7 +39,8 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 | INCAR / Edit → INCAR generator | 按预设和自定义参数生成 INCAR |
 | DOS+bands | 查看态密度和能带；需要相应计算数据 |
 | STM | 查看相关电荷密度／STM 数据；需要相应输入 |
-| Database / Database → Resources | 在线数据库导航、编辑程序内部资料，见下文 |
+| Models | 单原子／气相建模及 p4vasp data 元素资料 |
+| Database → Resources | 在线数据库导航和 Useful tools |
 | File → Save system as | 保存当前系统的初始／Build 结构等内容 |
 
 顶部 **System** 用于识别／切换当前系统。打开多个结构时，编辑和保存前先核对当前系统。
@@ -409,9 +410,9 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 
 ## 数据库导航与内部资料编辑
 
-点击工具栏 **Database** 或菜单 **Database → Resources**。该页面隐藏顶部 System／Selection 两行；切回 Build 等结构编辑面板时恢复。
+左侧 **Models** 打开模型与元素资料；顶部菜单 **Database → Resources** 打开资源导航。两页均隐藏顶部 System／Selection，切回 Build 等结构编辑面板恢复。
 **Online databases** 提供确认的 16 个网站，按四列四行排列，点击后在网格下方显示网址并自动复制到剪贴板，用户可粘贴到浏览器；剪贴板不可用时选中网址按 Ctrl+C 手动复制。悬停查看用途与网址；卡片只显示数据库名称，不重复显示缩写。
-**p4vasp data** 显示 H 到 Og 的 118 个元素，按原子序数排序。单位直接写入列标题：Name、atomic number、mass (u)、radii (Å)、R (0–255)、G (0–255)、B (0–255)、Magmom (μB)、U (eV)、J (eV)。前两列只读；双击其他数值编辑，按 Enter，再点 Save，小窗口可双向滚动。
+**p4vasp data** 位于 Models 最右侧，显示 H 到 Og 的 118 个元素，按原子序数排序。单位直接写入列标题：Name、atomic number、mass (u)、radii (Å)、R (0–255)、G (0–255)、B (0–255)、Magmom (μB)、U (eV)、J (eV)。前两列只读；双击其他数值编辑，按 Enter，再点 Save，小窗口可双向滚动。
 
 补充数据参考 ASE 3.29.0：质量、范德华显示半径、Jmol 颜色及共价半径；已有 36 元素设置原值保留。目前质量 118 项、显示半径 62 项、颜色 109 套。没有的数据留空，空白不等于零，可自行补填或清空；RGB 为 0–255 整数。radii 为显示半径，共价半径单独保留，不混作同一字段。
 
@@ -421,13 +422,13 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 
 ### 模型库框架
 
-从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列四个标签页，与 Resources 的标签页样式一致：
-**single atom**、**gas phase**、**bulk**、**surface**。点击切换，默认打开 single atom；gas phase 为本地分子库，bulk／surface 暂时留空。
-Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 也已移除。
+从左侧 **Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列五个标签页，与 Resources 的标签页样式一致：
+**single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 为本地分子库，bulk／surface 暂时留空。
+Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料表从 Resources 移到 Models，Commit 快捷入口已移除。
 
 ### 单原子输入生成
 
-1. 打开 **Database → Models → single atom**。周期表包含 118 个元素，点击选择，高亮后可点 **Generate inputs**。
+1. 打开 **Models → single atom**。周期表包含 118 个元素，点击选择，高亮后可点 **Generate inputs**。
 2. 弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。
 3. 新目录中生成 `INCAR`、`KPOINTS`、`POSCAR`。同名目录已存在时不会覆盖，需另选名称；取消不生成文件。状态栏显示实际输出路径。
 
@@ -437,7 +438,7 @@ INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 
 
 ### 气相 XYZ 本地分子库
 
-把单构型 `.xyz` 文件放到仓库的 **`data/models/gas_phase/`**，然后打开 **Database → Models → gas phase**。进入页面会自动扫描，页面已打开时点击 **Refresh**。**Open library folder** 可打开实际目录；页面也显示其完整路径。内置 water、oxygen_triplet 两个格式示例，可复制后修改。
+把单构型 `.xyz` 文件放到仓库的 **`data/models/gas_phase/`**，然后打开 **Models → gas phase**。进入页面会自动扫描，页面已打开时点击 **Refresh**。**Open library folder** 可打开实际目录；页面也显示其完整路径。内置 water、oxygen_triplet 两个格式示例，可复制后修改。
 
 统一格式示例：
 
@@ -469,4 +470,4 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 ### Useful tools 预留页
 
-Database → Resources 的顶部标签顺序为 Online databases、p4vasp data、Useful tools。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
+Database → Resources 的顶部标签为 Online databases、Useful tools；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。

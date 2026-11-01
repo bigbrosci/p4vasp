@@ -5,6 +5,7 @@ import tempfile
 from unittest.mock import patch
 from p4vasp.gtk3 import Gtk
 from p4vasp.applet.DBApplet import DBApplet
+from p4vasp.applet.ModelsApplet import ModelsApplet
 from p4vasp.resource_data import ResourceStore, FILES
 from p4vasp.applet.ResourceHubApplet import ResourceEditor
 
@@ -21,8 +22,8 @@ with tempfile.TemporaryDirectory() as temporary:
     for _ in range(10):
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 16
-    assert len(applet.element_table.model) == 118
-    assert [c.get_title() for c in applet.element_table.view.get_columns()] == list(__import__('p4vasp.element_data',fromlist=['COLUMNS']).COLUMNS)
+    resource_tabs=applet.useful_tools.get_parent()
+    assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Online databases','Useful tools']
     for i, button in enumerate(applet.online_buttons):
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
         assert applet.online.child_get_property(button, 'top-attach') == i // 4
@@ -43,10 +44,14 @@ with tempfile.TemporaryDirectory() as temporary:
         time.sleep(0.01)
     assert applet.link_entry.get_allocation().height>20
     window.get_pixbuf().savev('/tmp/p4vasp-online-links.png','png',[],[])
-    notebook=applet.element_table.get_parent()
-    notebook.set_current_page(1)
+    window.remove(applet.panel)
+    models=ModelsApplet();models.store=applet.store
+    window.add(models.createPanel());models.initUI();window.show_all()
+    notebook=models.notebook
+    assert [notebook.get_tab_label_text(notebook.get_nth_page(i)) for i in range(notebook.get_n_pages())]==['single atom','gas phase','bulk','surface','p4vasp data']
+    notebook.set_current_page(4)
     while Gtk.events_pending(): Gtk.main_iteration()
-    table=applet.element_table
+    table=models.element_table
     table.edited(None,'0','1.02',2)
     table.edited(None,'0','2.5',7)
     table.save()
@@ -60,7 +65,7 @@ with tempfile.TemporaryDirectory() as temporary:
     for _ in range(20):
         while Gtk.events_pending(): Gtk.main_iteration()
         time.sleep(0.01)
-    assert notebook.get_current_page()==1
+    assert notebook.get_current_page()==4
     assert table.view.get_allocation().height>100
     adjustment=table.view.get_parent().get_hadjustment()
     assert adjustment.get_upper()>adjustment.get_page_size()

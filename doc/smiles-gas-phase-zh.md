@@ -1,6 +1,6 @@
 # SMILES 生成气相初始结构
 
-入口：**Database → Models → gas phase**。原来的 XYZ 本地库保留，新增 SMILES 输入行。
+入口：**Models → gas phase**。原来的 XYZ 本地库保留，新增 SMILES 输入行。
 
 ## 使用
 

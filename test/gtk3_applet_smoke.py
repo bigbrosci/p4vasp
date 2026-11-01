@@ -48,18 +48,24 @@ try:
  for _ in range(10):
   while gtk.events_pending():gtk.main_iteration()
  if name.endswith('ModelsApplet.ModelsApplet'):
+  assert applet.menupath is None
+  assert xml.get_widget('astart p4vasp.applet.DBApplet.DBApplet') is None
+  assert xml.get_widget('astart p4vasp.applet.ModelsApplet.ModelsApplet') is not None
   notebook=applet.notebook
-  assert notebook.get_n_pages()==4 and notebook.get_current_page()==0
-  for index, title in enumerate(('single atom','gas phase','bulk','surface')):
+  assert notebook.get_n_pages()==5 and notebook.get_current_page()==0
+  for index, title in enumerate(('single atom','gas phase','bulk','surface','p4vasp data')):
    page=notebook.get_nth_page(index)
    assert notebook.get_tab_label_text(page)==title
-   if index>=2: assert not page.get_children()
+   if index in (2,3): assert not page.get_children()
+   elif index==4: assert len(page.model)==118
    elif index==1: assert hasattr(page,'refresh_button')
    else: assert len(page.buttons)==118 and page.symbol is None and not page.generate.get_sensitive()
    notebook.set_current_page(index)
    assert notebook.get_current_page()==index
   notebook.set_current_page(0)
  if name.endswith(('DBApplet.DBApplet', 'ModelsApplet.ModelsApplet')):
+  database_paths=[entry.Class.menupath for entry in appletfactory().sortedvalues if entry.Class.menupath and entry.Class.menupath[0]=='Database']
+  assert database_paths==[['Database','Resources']]
   controls=xml.get_widget('table1')
   assert not controls.get_visible(), 'Database must hide System/Selection'
   window.set_size_request(900,640)
