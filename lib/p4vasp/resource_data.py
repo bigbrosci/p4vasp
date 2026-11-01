@@ -75,8 +75,8 @@ def validate(key, text):
                     raise ValueError('Stored RGB must be 0–1 or null.')
         return data
     if key == 'websites':
-        if not isinstance(data, list) or len(data) > 16:
-            raise ValueError('Use a JSON list with at most 16 websites.')
+        if not isinstance(data, list):
+            raise ValueError('Use a JSON list of websites.')
         names = set()
         for site in data:
             if not isinstance(site, dict) or not isinstance(site.get('name'), str) or not site['name'].strip():

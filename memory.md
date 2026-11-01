@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 新增 NIST-JANAF（2026-11-01）
+
+- 用户指定第17个数据库NIST-JANAF，网址 https://janaf.nist.gov/，官方主页已核对为热化学表SRD13。网站目录新增一项，校验不再限定16项，仍四列自动换行／滚动。
+- 5项资源测试与实际GTK集成通过，含第17张卡片位置及JANAF真实剪贴板网址读回；页面截图已查看。文档同步，无其他平台／全套测试，既有INCAR修改未纳入提交。
+
 ## 界面文字精简（2026-11-01）
 
 - 用户要求删除single atom底部ISPIN等参数提示，并把Resources的Online databases改为Databases。初始参数提示已移除，状态区初始隐藏、生成成功后显示路径；Resources标签为Databases／Useful tools，生成参数不改。
