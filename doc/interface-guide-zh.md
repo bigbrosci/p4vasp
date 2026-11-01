@@ -40,7 +40,7 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 | DOS+bands | 查看态密度和能带；需要相应计算数据 |
 | STM | 查看相关电荷密度／STM 数据；需要相应输入 |
 | Models | 单原子／气相建模及 p4vasp data 元素资料 |
-| Database → Resources | 在线数据库导航和 Useful tools |
+| Database → Resources | 在线数据库导航、Useful tools 和交流二维码 |
 | File → Save system as | 保存当前系统的初始／Build 结构等内容 |
 
 顶部 **System** 用于识别／切换当前系统。打开多个结构时，编辑和保存前先核对当前系统。
@@ -470,8 +470,14 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 ### Useful tools 预留页
 
-Database → Resources 的顶部标签为 Databases、Useful tools；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
+Database → Resources 的顶部标签为 Databases、Useful tools、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
 
 ## 关于与贡献署名
 
 Help → About 分别列出原作者 Orest Dubay、Python 2→3 移植的主要贡献者 Bigbrosci／Whitehare2023，以及 p4vasp-py3 后续维护与新功能开发者 Bigbrosci。保留原版权、既有GPL许可及无担保声明；详见 [版权与贡献说明](../AUTHORS.md)。关于窗口内容可选中复制、滚动，较长路径也会折行。
+
+### 交流与支持
+
+打开 **Database → Resources → 交流与支持**，可查看p4vasp QQ群、微信和微信公众号二维码。点击二维码打开大图，可选择适应窗口、100%、缩放或查看原图；大图可滚动，关闭按钮在底部。QQ群号1131610080可直接复制，微信显示的是昵称BigBroSci。
+
+程序自带开源中文字体，无需手动安装；仅在本程序内加载。图片在 `data/community/`，更换方法见该目录README。图片来源为维护者提供，手机扫码及二维码有效期需实际确认。

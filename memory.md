@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 交流与支持二维码（2026-11-01）
+
+- 当前任务完成：Database → Resources 新增“交流与支持”，三张用户JPG按字节复制至data/community；中文卡片、QQ群1131610080复制、点击放大／100%／原图切换。微信仅标昵称BigBroSci，不冒充微信号。根目录用户原图保留，不纳入提交。
+- gtk3/community.py负责页面及屏幕范围弹窗；ResourceHub沿用resources.glade宿主及现有Database菜单／GTK3适配器。自带Noto Sans SC及OFL许可，仅进程注册字体，当前Linux原先无中文字体。
+- 本机实际GTK中文无缺字、三图与裁剪边界、剪贴板、缩放／完整原图、420宽布局及原Resources/Models集成通过，截图已查看；原集成退出仍见cmatrix析构警告。32个GTK applet启动通过（不含GLUT），发布图片与用户原图逐字节相同。手机扫码、账号有效性及其他平台未测；Windows打包继续暂停。详见当日update记录；后续替换二维码按data/community/README，不自动扩展其他功能。
+
 ## Homepage 指向 p4vasp-py3（2026-11-01）
 
 - 用户指定当前主页为 https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3，About顶部已显示可点击Homepage，旧p4vasp.at单独标Original project website；静态后备文字及AUTHORS同步。
