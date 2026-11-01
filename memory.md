@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装末尾两秒预览与alias（2026-11-01）
+
+- install/finish-install.sh统一Linux/macOS收尾：默认启动GUI，p4v.py初始化完成且窗口mapped后计时2000ms退出，打印中文成功与实际路径alias p4v='bash …/p4v.sh'，提示~/.bashrc/source；macOS提示zsh替代。不会自动编辑用户配置，日常启动不变。
+- gtk3/install_preview.py提供仅安装时环境开关、60秒启动上限、异常／提前关闭失败处理；无显示跳过且不宣称GUI通过，no-launch/build-only/deps-only不预览。原生3D初始化失败在预览模式传播。
+- 本机真实bash install.sh --skip-deps --skip-build预览退出与输出通过（未重新安装／编译），9路由测试、收尾特殊路径alias实际执行／失败返回／无显示与禁启动检查通过；其他平台未运行。install.md与当日更新同步。
+
 ## Useful tools 两个入口（2026-11-01）
 
 - ResourceHub新增VASPwiki（https://vasp.at/wiki/Main_page，官方Wiki入口已查）和大师兄网站（用户指定https://www.bigbrosci.com/zh-cn/latest/），四列网格方式排列，点击在本页底部显示并复制网址。与Databases共享show_link逻辑，保留Ctrl+C后备。

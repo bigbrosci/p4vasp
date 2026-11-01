@@ -795,6 +795,8 @@ def init():
         yield 1
     except:
         msg().error("Error initialising 3d visualisation.")
+        if os.environ.get("P4VASP_INSTALL_PREVIEW") == "1":
+            raise
         yield 1
 
     frame.createFrame()
@@ -851,12 +853,19 @@ def init():
 
     msg().status("OK")
     msg().step(0,1)
+    if os.environ.get("P4VASP_INSTALL_PREVIEW") == "1":
+        from p4vasp.gtk3.install_preview import ready
+        ready()
     #  import traceback
     #  traceback.print_exc()
     #  print "Loading setup failed."
 
 
+if os.environ.get("P4VASP_INSTALL_PREVIEW") == "1":
+    from p4vasp.gtk3.install_preview import start
+    start()
+
 schedule(init())
 gobject.idle_add(idle_func)
 gtk.main()
-os._exit(0)
+os._exit(1 if os.environ.get("P4VASP_INSTALL_PREVIEW") == "1" else 0)

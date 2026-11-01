@@ -8,8 +8,8 @@ usage() {
 Usage: bash install.sh [options] [-- p4vasp arguments]
 
 Automatically selects Ubuntu/Debian, other Linux, or macOS installation.
-Ubuntu/Debian: install apt dependencies, rebuild, then launch if a display exists.
-Other Linux: use preinstalled dependencies, rebuild, then launch if possible.
+Ubuntu/Debian: install apt dependencies, rebuild, then preview the GUI for 2 seconds if a display exists.
+Other Linux: use preinstalled dependencies, rebuild, then preview the GUI for 2 seconds if possible.
 macOS: use the existing Homebrew/Python environment installation flow.
 
   --skip-deps     Skip system package installation (macOS still prepares its venv).

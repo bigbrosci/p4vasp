@@ -169,10 +169,6 @@ if [[ "$BUILD_EXT" -eq 1 ]]; then
     bash "$ROOT/install/build-macos-py3.sh"
 fi
 
-if [[ "$LAUNCH" -eq 1 ]]; then
-    if [[ "${APP_ARGS+x}" ]] && ((${#APP_ARGS[@]})); then
-        PYTHON="$VENV/bin/python3" exec bash "$ROOT/p4v.sh" "${APP_ARGS[@]}"
-    else
-        PYTHON="$VENV/bin/python3" exec bash "$ROOT/p4v.sh"
-    fi
-fi
+export PYTHON="$VENV/bin/python3"
+source "$ROOT/install/finish-install.sh"
+finish_install

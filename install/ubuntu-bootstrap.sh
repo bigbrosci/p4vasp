@@ -115,15 +115,5 @@ if [[ "$BUILD_EXT" -eq 1 ]]; then
     bash "$ROOT/install/build-ubuntu-py3.sh"
 fi
 
-if [[ "$LAUNCH" -eq 1 ]]; then
-    if [[ -z "${DISPLAY:-}" && -z "${WAYLAND_DISPLAY:-}" ]]; then
-        echo "Build finished, but no graphical display was detected."
-        echo "Start p4vasp later with: bash p4v.sh"
-        exit 0
-    fi
-    if [[ "${APP_ARGS+x}" ]] && ((${#APP_ARGS[@]})); then
-        exec bash "$ROOT/p4v.sh" "${APP_ARGS[@]}"
-    else
-        exec bash "$ROOT/p4v.sh"
-    fi
-fi
+source "$ROOT/install/finish-install.sh"
+finish_install
