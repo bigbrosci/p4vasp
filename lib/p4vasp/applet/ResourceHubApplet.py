@@ -102,7 +102,7 @@ class ResourceHubApplet(Applet):
         footer.pack_start(self.link_status, False, False, 0)
         footer.pack_start(self.link_entry, False, False, 0)
         online_page.pack_start(footer, False, False, 0)
-        notebook.append_page(online_page, Gtk.Label(label='Online databases'))
+        notebook.append_page(online_page, Gtk.Label(label='Databases'))
         self.useful_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         notebook.append_page(self.useful_tools, Gtk.Label(label='Useful tools'))
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)

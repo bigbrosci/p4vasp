@@ -12,6 +12,7 @@ assert sorted(symbol for period in PERIODS for symbol,_ in period)==sorted(SYMBO
 window=Gtk.OffscreenWindow();window.set_size_request(1100,600)
 page=SingleAtomPage();window.add(page);window.show_all()
 assert page.symbol is None and not page.generate.get_sensitive()
+assert not page.status.get_visible()
 page.buttons['Fe'].clicked()
 assert page.symbol=='Fe' and page.generate.get_sensitive()
 page.buttons['Og'].clicked();assert page.symbol=='Og'

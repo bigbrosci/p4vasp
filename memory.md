@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 界面文字精简（2026-11-01）
+
+- 用户要求删除single atom底部ISPIN等参数提示，并把Resources的Online databases改为Databases。初始参数提示已移除，状态区初始隐藏、生成成功后显示路径；Resources标签为Databases／Useful tools，生成参数不改。
+- 单原子GTK创建／取消／动作、资源与元素表GTK回归、Models启动通过；主界面与标签截图已查看。未重跑全套测试、其他平台或原生编译；已有INCAR预设修改未纳入本次更新。
+
 ## Models 独立入口与元素表迁移（2026-11-01）
 
 - 用户要求将左侧 Database 换为独立 Models，Database 菜单删除 Models／只留 Resources。frame.glade 的 astart 改为 ModelsApplet，Models.menupath=None但工厂注册保留。Models 五页顺序 single atom、gas phase、bulk、surface、p4vasp data；ElementTable原组件移入最右侧，数据文件与保存规则不变。Resources 仅 Online databases／Useful tools，继续通过 Database → Resources 访问。

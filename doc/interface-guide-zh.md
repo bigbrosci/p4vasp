@@ -411,7 +411,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 ## 数据库导航与内部资料编辑
 
 左侧 **Models** 打开模型与元素资料；顶部菜单 **Database → Resources** 打开资源导航。两页均隐藏顶部 System／Selection，切回 Build 等结构编辑面板恢复。
-**Online databases** 提供确认的 16 个网站，按四列四行排列，点击后在网格下方显示网址并自动复制到剪贴板，用户可粘贴到浏览器；剪贴板不可用时选中网址按 Ctrl+C 手动复制。悬停查看用途与网址；卡片只显示数据库名称，不重复显示缩写。
+**Databases** 提供确认的 16 个网站，按四列四行排列，点击后在网格下方显示网址并自动复制到剪贴板，用户可粘贴到浏览器；剪贴板不可用时选中网址按 Ctrl+C 手动复制。悬停查看用途与网址；卡片只显示数据库名称，不重复显示缩写。
 **p4vasp data** 位于 Models 最右侧，显示 H 到 Og 的 118 个元素，按原子序数排序。单位直接写入列标题：Name、atomic number、mass (u)、radii (Å)、R (0–255)、G (0–255)、B (0–255)、Magmom (μB)、U (eV)、J (eV)。前两列只读；双击其他数值编辑，按 Enter，再点 Save，小窗口可双向滚动。
 
 补充数据参考 ASE 3.29.0：质量、范德华显示半径、Jmol 颜色及共价半径；已有 36 元素设置原值保留。目前质量 118 项、显示半径 62 项、颜色 109 套。没有的数据留空，空白不等于零，可自行补填或清空；RGB 为 0–255 整数。radii 为显示半径，共价半径单独保留，不混作同一字段。
@@ -429,7 +429,7 @@ Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料
 ### 单原子输入生成
 
 1. 打开 **Models → single atom**。周期表包含 118 个元素，点击选择，高亮后可点 **Generate inputs**。
-2. 弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。
+2. 弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。页面底部不再显示默认 INCAR 参数提示，生成成功后仍显示输出路径。
 3. 新目录中生成 `INCAR`、`KPOINTS`、`POSCAR`。同名目录已存在时不会覆盖，需另选名称；取消不生成文件。状态栏显示实际输出路径。
 
 POSCAR 为 13×14×15 Å 正交晶胞，只有所选的一个原子，Direct 坐标 `(0.5, 0.5, 0.5)`，对应笛卡尔 `(6.5, 7, 7.5)` Å。KPOINTS 为 Γ 中心的 `1 1 1` 网格、零偏移。
@@ -470,4 +470,4 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 ### Useful tools 预留页
 
-Database → Resources 的顶部标签为 Online databases、Useful tools；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
+Database → Resources 的顶部标签为 Databases、Useful tools；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。

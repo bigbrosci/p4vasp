@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory() as temporary:
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 16
     resource_tabs=applet.useful_tools.get_parent()
-    assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Online databases','Useful tools']
+    assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Databases','Useful tools']
     for i, button in enumerate(applet.online_buttons):
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
         assert applet.online.child_get_property(button, 'top-attach') == i // 4

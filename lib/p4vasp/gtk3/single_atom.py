@@ -84,7 +84,8 @@ class SingleAtomPage(Gtk.Box):
                 grid.attach(button,column,row,1,1);self.buttons[symbol]=button
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.add(grid);self.pack_start(scroll,True,True,0)
-        self.status=Gtk.Label(label='ISPIN=2; ALGO=ALL; NELM=500; no MAGMOM. Gamma 1×1×1.',xalign=0)
+        self.status=Gtk.Label(xalign=0)
+        self.status.set_no_show_all(True)
         self.status.set_line_wrap(True);self.pack_start(self.status,False,False,0)
 
     def choose(self,button,symbol):
@@ -99,3 +100,4 @@ class SingleAtomPage(Gtk.Box):
         if output is not None:
             self.directory=output.parent
             self.status.set_text('Created INCAR, KPOINTS and POSCAR in: '+str(output))
+            self.status.show()
