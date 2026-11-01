@@ -83,5 +83,10 @@
     "name": "NIST-JANAF",
     "url": "https://janaf.nist.gov/",
     "description": "NIST-JANAF Thermochemical Tables · SRD 13"
+  },
+  {
+    "name": "The Cambridge Cluster Database",
+    "url": "http://www-wales.ch.cam.ac.uk/CCD.html",
+    "description": "Cluster structures · global optimization and energy landscapes"
   }
 ]

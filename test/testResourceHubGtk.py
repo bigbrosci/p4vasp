@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory() as temporary:
     window.add(applet.createPanel()); applet.initUI(); window.show_all()
     for _ in range(10):
         while Gtk.events_pending(): Gtk.main_iteration()
-    assert len(applet.online_buttons) == 17
+    assert len(applet.online_buttons) == 18
     resource_tabs=applet.useful_tools.get_parent()
     assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Databases','Useful tools']
     for i, button in enumerate(applet.online_buttons):
@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory() as temporary:
         assert applet.online.child_get_property(button, 'top-attach') == i // 4
         assert button.get_allocation().width > 40
     from p4vasp.gtk3 import Gdk
-    for index, url in [(0, 'https://opencatalystproject.org/'), (2, 'https://materialsproject.org/'), (16, 'https://janaf.nist.gov/')]:
+    for index, url in [(0, 'https://opencatalystproject.org/'), (2, 'https://materialsproject.org/'), (16, 'https://janaf.nist.gov/'), (17, 'http://www-wales.ch.cam.ac.uk/CCD.html')]:
         applet.online_buttons[index].clicked()
         assert applet.link_entry.get_text()==url
         assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()==url

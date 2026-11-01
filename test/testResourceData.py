@@ -18,9 +18,9 @@ class Resources(unittest.TestCase):
             shutil.copyfile(ROOT/'data'/relative, target)
         self.store = ResourceStore(root, root/'backups')
 
-    def test_bundled_schemas_and_17_sites(self):
+    def test_bundled_schemas_and_18_sites(self):
         for key in FILES: validate(key, self.store.read(key)[0])
-        self.assertEqual(len(validate('websites', self.store.read('websites')[0])), 17)
+        self.assertEqual(len(validate('websites', self.store.read('websites')[0])), 18)
 
     def test_save_backup_and_conflict(self):
         text, original = self.store.read('websites')

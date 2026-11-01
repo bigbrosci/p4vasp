@@ -4,7 +4,7 @@
 
 ## 在线数据库
 
-17 张卡片按四列排列，新增项目自动换行，必要时滚动，只显示网站名称。点击后在网格下方显示可选中复制的网址，并自动复制到剪贴板；不自动打开浏览器。剪贴板不可用时可在网址框按 Ctrl+C 手动复制。悬停显示用途和网址，启动不联网获取图标或数据。
+18 张卡片按四列排列，新增项目自动换行，必要时滚动，只显示网站名称。点击后在网格下方显示可选中复制的网址，并自动复制到剪贴板；不自动打开浏览器。剪贴板不可用时可在网址框按 Ctrl+C 手动复制。悬停显示用途和网址，启动不联网获取图标或数据。
 
 网站目录为 `websites.json`。部分服务需注册、订阅或许可证，导航不提供这些权限。左侧 Models 以顶部横向五个标签页 single atom、gas phase、bulk、surface、p4vasp data 展示模型及元素资料，Database 菜单只保留 Resources；左侧工具栏 Commit 已移除。
 
@@ -33,3 +33,5 @@ Reload 前有修改会询问；切换 applet 或关闭程序前应先保存。�
 本地气相 XYZ 库位于 `data/models/gas_phase/`，格式与操作见 [分子库说明](../models/gas_phase/README.md)。
 
 第 17 个入口为 [NIST-JANAF](https://janaf.nist.gov/)，提供 NIST-JANAF 热化学表（SRD 13）。
+
+第 18 个入口为 [The Cambridge Cluster Database](http://www-wales.ch.cam.ac.uk/CCD.html)（剑桥团簇数据库），官网现标题为 Cambridge Energy Landscape Database，提供团簇全局优化与结构数据。

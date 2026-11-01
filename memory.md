@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 新增剑桥团簇数据库（2026-11-01）
+
+- 用户指定The Cambridge Cluster Database，原网址 http://www-wales.ch.cam.ac.uk/CCD.html，官方页面已核对（现标题Cambridge Energy Landscape Database）。作为第18张卡片加入，保留指定网址，仍四列换行。
+- 5项资源及实际GTK集成通过，含第18项位置和网址剪贴板读回；截图已查看。文档同步，无全套／其他平台验证，已有INCAR修改不纳入提交。
+
 ## 新增 NIST-JANAF（2026-11-01）
 
 - 用户指定第17个数据库NIST-JANAF，网址 https://janaf.nist.gov/，官方主页已核对为热化学表SRD13。网站目录新增一项，校验不再限定16项，仍四列自动换行／滚动。
