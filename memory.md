@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Useful tools and links 六个入口（2026-11-01）
+
+- ResourceHub标签由Useful tools改为Useful tools and links，原两入口保留，新增ASE https://docs.ase-lib.org/、Pymatgen https://pymatgen.org/、phonopy https://phonopy.github.io/phonopy/、Cantera https://cantera.org/，均已核对官方页面；四列自动换行，点击显示并复制网址行为不变。
+- 本机实际X11 GTK六网址显示／真实剪贴板读回、异常后备、中文及原Resources/Models编辑集成通过，640×480截图已查看。既有cmatrix退出警告仍存在；其他平台／浏览器操作未测。指南和当日更新同步。
+
 ## 安装末尾两秒预览与alias（2026-11-01）
 
 - install/finish-install.sh统一Linux/macOS收尾：默认启动GUI，p4v.py初始化完成且窗口mapped后计时2000ms退出，打印中文成功与实际路径alias p4v='bash …/p4v.sh'，提示~/.bashrc/source；macOS提示zsh替代。不会自动编辑用户配置，日常启动不变。

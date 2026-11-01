@@ -23,7 +23,7 @@ with tempfile.TemporaryDirectory() as temporary:
         while Gtk.events_pending(): Gtk.main_iteration()
     assert len(applet.online_buttons) == 18
     resource_tabs=applet.useful_tools.get_parent()
-    assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Databases','Useful tools','交流与支持']
+    assert [resource_tabs.get_tab_label_text(resource_tabs.get_nth_page(i)) for i in range(resource_tabs.get_n_pages())]==['Databases','Useful tools and links','交流与支持']
     for i, button in enumerate(applet.online_buttons):
         assert applet.online.child_get_property(button, 'left-attach') == i % 4
         assert applet.online.child_get_property(button, 'top-attach') == i // 4
@@ -45,8 +45,8 @@ with tempfile.TemporaryDirectory() as temporary:
     assert applet.link_entry.get_allocation().height>20
     window.get_pixbuf().savev('/tmp/p4vasp-online-links.png','png',[],[])
     resource_tabs.set_current_page(1)
-    assert len(applet.tool_buttons) == 2
-    for index, url in enumerate(['https://vasp.at/wiki/Main_page', 'https://www.bigbrosci.com/zh-cn/latest/']):
+    assert len(applet.tool_buttons) == 6
+    for index, url in enumerate(['https://vasp.at/wiki/Main_page', 'https://www.bigbrosci.com/zh-cn/latest/', 'https://docs.ase-lib.org/', 'https://pymatgen.org/', 'https://phonopy.github.io/phonopy/', 'https://cantera.org/']):
         applet.tool_buttons[index].clicked()
         assert applet.tool_entry.get_text() == url
         assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == url

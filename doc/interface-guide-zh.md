@@ -40,7 +40,7 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 | DOS+bands | 查看态密度和能带；需要相应计算数据 |
 | STM | 查看相关电荷密度／STM 数据；需要相应输入 |
 | Models | 单原子／气相建模及 p4vasp data 元素资料 |
-| Database → Resources | 在线数据库导航、Useful tools 和交流二维码 |
+| Database → Resources | 在线数据库导航、Useful tools and links 和交流二维码 |
 | File → Save system as | 保存当前系统的初始／Build 结构等内容 |
 
 顶部 **System** 用于识别／切换当前系统。打开多个结构时，编辑和保存前先核对当前系统。
@@ -468,9 +468,9 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 本机可选依赖已装入独立 `.venv-smiles`；其他设备需执行 `bash install/install-rdkit.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
 
-### Useful tools
+### Useful tools and links
 
-Database → Resources 的顶部标签为 Databases、Useful tools、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools 包含 [VASPwiki](https://vasp.at/wiki/Main_page) 和 [大师兄网站](https://www.bigbrosci.com/zh-cn/latest/)。点击卡片后，下方显示网址并自动复制到剪贴板，与 Databases 相同；剪贴板不可用时可选中网址按 Ctrl+C。
+Database → Resources 的顶部标签为 Databases、Useful tools and links、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools and links 包含 [VASPwiki](https://vasp.at/wiki/Main_page) 、[大师兄网站](https://www.bigbrosci.com/zh-cn/latest/)、[ASE](https://docs.ase-lib.org/)、[Pymatgen](https://pymatgen.org/)、[phonopy](https://phonopy.github.io/phonopy/) 和 [Cantera](https://cantera.org/)。点击卡片后，下方显示网址并自动复制到剪贴板，与 Databases 相同；剪贴板不可用时可选中网址按 Ctrl+C。
 
 ## 关于与贡献署名
 

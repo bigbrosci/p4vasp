@@ -123,12 +123,16 @@ class ResourceHubApplet(Applet):
         self.tool_buttons = []
         for index, (name, url) in enumerate([
                 ('VASPwiki', 'https://vasp.at/wiki/Main_page'),
-                ('大师兄网站', 'https://www.bigbrosci.com/zh-cn/latest/')]):
+                ('大师兄网站', 'https://www.bigbrosci.com/zh-cn/latest/'),
+                ('ASE', 'https://docs.ase-lib.org/'),
+                ('Pymatgen', 'https://pymatgen.org/'),
+                ('phonopy', 'https://phonopy.github.io/phonopy/'),
+                ('Cantera', 'https://cantera.org/')]):
             button = self.card(name, url)
             button.connect('clicked', self.select_tool, name, url)
             tools_grid.attach(button, index % 4, index // 4, 1, 1)
             self.tool_buttons.append(button)
-        notebook.append_page(self.useful_tools, Gtk.Label(label='Useful tools'))
+        notebook.append_page(self.useful_tools, Gtk.Label(label='Useful tools and links'))
         from p4vasp.gtk3.community import CommunityPage
         self.community = CommunityPage(self.parent_window)
         notebook.append_page(self.community, Gtk.Label(label='交流与支持'))
