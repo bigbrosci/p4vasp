@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Show 原子计数与 Delete 快捷删除（2026-11-01）
+
+- 用户要求结构弹窗左下角显示各元素原子数，并用 Delete 直接删选择、Build 按钮不变。`src/VisWindow.cpp` 在原生GL最后绘制屏幕坐标统计，源info按元素合并，不重复计周期副本，包含隐藏原子，长行折行／空结构Atoms:0；旋转缩放不改变位置。
+- 同文件捕获无修饰 Delete，将去重原胞选择及原子数快照以BE_ATOM_MOVE index2发给现有Python分发，无新绑定接口。`atom_movement.py delete_selected/handle_event` 只改来源窗口初始／Build结构，校验索引和原子数以拒绝过期重复请求；清空选择、刷新同系统面板，保留相机／晶胞／坐标表示／剩余标记。只读最终／轨迹／原胞／STM及气相预览不改。Builder源码和原删除入口未改，实际原按钮也已验证。
+- 当前Linux已完整原生重编译。3项删除数据测试、扩展原生框选／方向／Delete回归、真实Show/Builder集成（含Cu重复块计数、删除前后HUD、空结构、去重／过期／最终只读、其他系统不更新、相机保留、POSCAR标记）通过；三张原生截图已查看。7移动旋转、原生居中、GTK/原生图片导出、57基础、32启动通过。原生独立测试见Fontconfig提示，已有ODP释放警告仍未处理；不代表完整GTK或其他平台通过。
+- 详细记录见 update_history/update_2026_11_01.md，操作指南已补充。本机重启即可；其他源码设备需重编译，Windows打包仍暂停。既有未跟踪Fe_single_atom目录保留未发布。
 
 ## 气相 C–H 显示键修复（2026-10-31）
 

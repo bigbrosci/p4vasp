@@ -35,6 +35,9 @@
 #include <p4vasp/VisBackEvent.h>
 #include <algorithm>
 #include <cmath>
+#include <map>
+#include <sstream>
+#include <string>
 
 /* ***************************************************************** *
  *  This is a HACK to compensate that GL_BGR definition is missing   *
@@ -435,6 +438,54 @@ void VisWindow::assure_init(){
   local_unlock();
 }
 
+// Screen-space composition, independent of zoom, rotation and displayed replicas.
+static void drawAtomCounts(VisStructureDrawer *atoms){
+  Structure *source=atoms->getStructure();
+  std::vector<std::string> order;
+  std::map<std::string,int> counts;
+  if (source && source->info){
+    for (int i=0;i<source->info->len();i++){
+      AtomtypesRecord *record=source->info->getRecord(i);
+      if (record->atomspertype<=0) continue;
+      std::string element=record->element;
+      element.erase(0,element.find_first_not_of(" \t"));
+      if (!element.empty()) element.erase(element.find_last_not_of(" \t")+1);
+      if (element.empty()) element="?";
+      if (!counts.count(element)) order.push_back(element);
+      counts[element]+=record->atomspertype;
+    }
+  }
+  GLint viewport[4],mode;
+  glGetIntegerv(GL_VIEWPORT,viewport);glGetIntegerv(GL_MATRIX_MODE,&mode);
+  glPushAttrib(GL_ALL_ATTRIB_BITS);
+  glDisable(GL_DEPTH_TEST);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);glDisable(GL_FOG);
+  glMatrixMode(GL_PROJECTION);glPushMatrix();glLoadIdentity();
+  glOrtho(0,viewport[2],0,viewport[3],-1,1);
+  glMatrixMode(GL_MODELVIEW);glPushMatrix();glLoadIdentity();
+  gl_font(FL_HELVETICA,14);
+  std::vector<std::string> lines;
+  std::string line;
+  for (size_t i=0;i<order.size();i++){
+    std::ostringstream item;item<<order[i]<<":"<<counts[order[i]];
+    std::string next=line.empty()?item.str():line+", "+item.str();
+    if (!line.empty() && gl_width(next.c_str())>viewport[2]-24){lines.push_back(line);line=item.str();}
+    else line=next;
+  }
+  if (line.empty() && lines.empty()) line="Atoms:0";
+  if (!line.empty()) lines.push_back(line);
+  double width=0;for(size_t i=0;i<lines.size();i++) width=std::max(width,gl_width(lines[i].c_str()));
+  glEnable(GL_BLEND);glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  glColor4f(1,1,1,.9f);
+  glBegin(GL_QUADS);glVertex2d(4,4);glVertex2d(width+20,4);
+  glVertex2d(width+20,lines.size()*18+10);glVertex2d(4,lines.size()*18+10);glEnd();
+  glColor3f(0,0,0);
+  for(size_t i=0;i<lines.size();i++){
+    glRasterPos2d(10,10+(lines.size()-1-i)*18);gl_draw(lines[i].c_str());
+  }
+  glPopMatrix();glMatrixMode(GL_PROJECTION);glPopMatrix();glMatrixMode(mode);
+  glPopAttrib();
+}
+
 void VisWindow::draw(){
 #if VERBOSE>0
   printf("VisWindow::draw()\n");
@@ -465,6 +516,10 @@ void VisWindow::draw(){
     VisStructureDrawer *structure=dynamic_cast<VisStructureDrawer *>(d);
     if (structure) structure->drawBoxSelection();
   }
+  for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
+    VisStructureDrawer *structure=dynamic_cast<VisStructureDrawer *>(d);
+    if (structure){drawAtomCounts(structure);break;}
+  }
   glFinish();
   local_unlock();  
 #if VERBOSE>0
@@ -476,6 +531,20 @@ int VisWindow::handle(int event){
   local_lock();
   if (event==FL_KEYBOARD && !(Fl::event_state()&(FL_CTRL|FL_ALT|FL_META|FL_BUTTONS))){
     const int key=Fl::event_key();
+    if (key==FL_Delete && !(Fl::event_state()&FL_SHIFT)){
+      for (VisDrawer *d=drawer;d!=NULL;d=d->getNext()){
+        VisStructureDrawer *atoms=dynamic_cast<VisStructureDrawer *>(d);
+        if (!atoms || !atoms->getSelectedCount() || !atoms->getStructure()) continue;
+        std::vector<int> selected;
+        for(int i=0;i<atoms->getSelectedCount();i++) selected.push_back(atoms->getSelected(i)->atom);
+        std::sort(selected.begin(),selected.end());
+        selected.erase(std::unique(selected.begin(),selected.end()),selected.end());
+        // Reuse the snapshotted edit event; index=2 deletes, dx guards stale queued keys.
+        VisBackEvent *request=VisBackEvent::createAtomMove(this,atoms->getStructure()->len(),0,0,selected);
+        request->index=2;VisBackEventQueue::get()->append(request);
+        local_unlock();return 1;
+      }
+    }
     if (key==FL_Left || key==FL_Right || key==FL_Up || key==FL_Down){
       VisNavDrawer *nav=NULL;
       VisStructureDrawer *atoms=NULL;

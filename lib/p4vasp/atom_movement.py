@@ -1,4 +1,4 @@
-"""Editable-structure screen-relative movement, dispatched from native key events."""
+"""Editable-structure keyboard movement, rotation and deletion."""
 import math
 from p4vasp.matrix import Vector
 from p4vasp.Structure import Structure
@@ -112,6 +112,15 @@ def rotate_selected(structure, indices, direction, degrees=ROTATION_DEGREES):
     return tuple(center)
 
 
+def delete_selected(structure, indices, expected_count=None):
+    """Delete unique base atoms, rejecting stale requests before mutation."""
+    atoms=sorted(set(int(i) for i in indices))
+    if expected_count is not None and len(structure)!=expected_count:return False
+    if not atoms or any(i<0 or i>=len(structure) for i in atoms):return False
+    structure.remove(atoms)
+    return True
+
+
 def handle_event(event, repository):
     from p4vasp import msg
     owner = next((a for a in repository if a.getWindowPtr() == event.getWindow().this), None)
@@ -127,25 +136,34 @@ def handle_event(event, repository):
     else:
         return
     if not editable or owner.system is None:
-        msg().status('Arrow editing is available for the initial/Build structure only.')
+        msg().status('Keyboard editing is available for the initial/Build structure only.')
         return
     structure = owner.system.INITIAL_STRUCTURE
     if structure is None:
         return
     indices = [event.getMovedAtom(i) for i in range(event.getMovedAtomCount())]
     rotating = getattr(event, 'index', 0) == 1
+    deleting = getattr(event, 'index', 0) == 2
     direction = (event.dx, event.dy, event.dz)
     try:
         center = rotate_selected(structure, indices, direction) if rotating else None
-        changed = center is not None if rotating else move_selected(structure, indices, direction)
+        if deleting:changed=delete_selected(structure,indices,event.dx)
+        else:changed = center is not None if rotating else move_selected(structure, indices, direction)
     except ValueError as error:
         msg().status(str(error))
         return
     if changed:
+        if deleting:
+            from p4vasp.Selection import selection
+            selection().setSelection([])
+            if owner.swin is not None:owner.swin.removeSelectedAll()
+            selection().notify(owner)
         for applet in list(repository):
             if getattr(applet, 'system', None) is owner.system:
                 applet.updateSystem()
-        if rotating:
+        if deleting:
+            msg().status('Deleted %d selected atom(s).' % len(set(indices)))
+        elif rotating:
             msg().status('Rotated 5 degrees about mass center (%.4f, %.4f, %.4f) angstrom.' % center)
         else:
             msg().status('Moved selected atoms by %g angstrom (current view).' % ARROW_STEP)

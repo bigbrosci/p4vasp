@@ -206,6 +206,25 @@ int main(int argc,char **argv){
   atoms.removeSelectedAll();
   while(queue->current()) queue->pop();
   Fl::e_state=0;w.win->handle(FL_KEYBOARD);assert(!queue->current());
+  // Delete snapshots unique base atoms and source size; modifiers/empty selection do nothing.
+  atoms.selectAtom(1,0,0,0); atoms.selectAtom(1,1,0,0);
+  while(queue->current()) queue->pop();
+  Fl::e_keysym=FL_Delete;Fl::e_state=0;
+  assert(w.win->handle(FL_KEYBOARD)==1);
+  VisBackEvent *deletion=queue->current();
+  assert(deletion && deletion->type==BE_ATOM_MOVE && deletion->index==2);
+  assert(deletion->getWindow()==&w && deletion->dx==5);
+  atoms.removeSelectedAll();
+  assert(deletion->getMovedAtomCount()==1 && deletion->getMovedAtom(0)==1);
+  queue->pop();
+  atoms.selectAtom(1,0,0,0);
+  const int delete_modifiers[]={FL_CTRL,FL_ALT,FL_META,FL_SHIFT};
+  for(int i=0;i<4;i++){
+    Fl::e_state=delete_modifiers[i];w.win->handle(FL_KEYBOARD);
+    assert(!queue->current() && atoms.getSelectedCount()==1);
+  }
+  atoms.removeSelectedAll();
+  Fl::e_state=0;w.win->handle(FL_KEYBOARD);assert(!queue->current());
   // Empty structures must not select or crash.
   atoms.setStructure(NULL); render(w); box(w,0,0,700,550);
   // Escape is safe before/after a structure drawer is attached too.
