@@ -22,7 +22,7 @@ This includes subsequent maintenance, modernization and new functionality.
 
 Copyright (C) 2026 Bigbrosci, for new contributions.
 
-Repository: https://github.com/bigbrosci/p4vasp (branch: `p4vasp-py3`).
+Homepage: https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3
 
 ## License
 

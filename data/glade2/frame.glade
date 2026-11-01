@@ -614,6 +614,7 @@
             <child><widget class="GtkLabel" id="about_label">
 	  <property name="visible">True</property>
 	  <property name="label" translatable="yes">P4vasp 
+ Homepage: https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3
 
  P4vasp, Copyright (C) 2003,2004 Orest Dubay &lt;odubay@users.sourceforge.net&gt;
 
@@ -623,7 +624,6 @@
  p4vasp-py3 — ongoing maintenance and new development:
  Maintained and further developed by Bigbrosci (GitHub username).
  Copyright (C) 2026 Bigbrosci, for new contributions.
- Repository: https://github.com/bigbrosci/p4vasp
 
  P4vasp comes with ABSOLUTELY NO WARRANTY.
  This is free software, and you are welcome to redistribute it

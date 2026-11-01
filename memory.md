@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Homepage 指向 p4vasp-py3（2026-11-01）
+
+- 用户指定当前主页为 https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3，About顶部已显示可点击Homepage，旧p4vasp.at单独标Original project website；静态后备文字及AUTHORS同步。
+- 2项文字／转义与实际GTK两个标题／长路径小工作区检查通过，截图已查看；未实际打开浏览器／重跑全套或其他平台。
+
 ## About 版权与贡献说明（2026-11-01）
 
 - 用户明确署名：Python2→3移植主要由Bigbrosci与Whitehare2023共同贡献，随后p4vasp-py3维护／新开发由Bigbrosci负责。新 `about.py` 统一两个版本状态的About文字，保留Orest Dubay原版权，分列移植与后续维护，新增2026 Bigbrosci新贡献版权及仓库地址。`AUTHORS.md`保存同样角色说明；LICENSE与源文件原许可不改，GPLv2文本及原有or-later许可均保留。

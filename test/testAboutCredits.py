@@ -13,6 +13,8 @@ class Credits(unittest.TestCase):
         self.assertIn('Maintained and further developed by Bigbrosci',text)
         self.assertIn('Copyright (C) 2026 Bigbrosci, for new contributions.',text)
         self.assertIn('development version',text)
+        self.assertIn('Homepage: https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3',text)
+        self.assertIn('Original project website: http://www.p4vasp.at',text)
 
     def test_version_and_path_markup_escape(self):
         markup=about_markup(SimpleNamespace(name='Fork <A&B>',version='3',release='1',build_date='2026-11-01',p4vasp_home='/tmp/A&B/<fork>'))
