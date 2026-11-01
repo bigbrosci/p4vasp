@@ -293,22 +293,6 @@
                 </widget>
               </child>
 
-	      <child>
-		<widget class="GtkToolButton" id="astart p4vasp.applet.CommitApplet.CommitApplet">
-		  <property name="visible">True</property>
-		  <property name="tooltip" translatable="yes">Quick commit of the active systems to the database</property>
-		  <property name="label" translatable="yes">Commit</property>
-		  <property name="use_underline">True</property>
-		  <property name="icon">qcommit.png</property>
-		  <property name="visible_horizontal">True</property>
-		  <property name="visible_vertical">True</property>
-		  <property name="is_important">False</property>
-		</widget>
-		<packing>
-		  <property name="expand">False</property>
-		  <property name="homogeneous">True</property>
-		</packing>
-	      </child>
 	    </widget>
 	    <packing>
 	      <property name="padding">0</property>

@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 移除左侧 Commit（2026-11-01）
+
+- 按用户要求从 frame.glade 删除左工具栏 Commit 按钮；旧 CommitApplet／后台代码保留，Database 与其他按钮不改。指南同步。
+- 实际GTK加载检查按钮不存在、Database可见及分配尺寸通过，800×600截图已查看。本次仅资源入口删除，未重跑应用全套或其他平台；旧“工具栏Commit保留”记录为历史状态。
+
 ## Useful tools 预留标签（2026-11-01）
 
 - 按用户要求，ResourceHub 在 p4vasp data 右侧新增 Useful tools 空标签页，后续软件／GitHub名单由用户提供，未自行填内容。

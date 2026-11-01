@@ -40,7 +40,6 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 | DOS+bands | 查看态密度和能带；需要相应计算数据 |
 | STM | 查看相关电荷密度／STM 数据；需要相应输入 |
 | Database / Database → Resources | 在线数据库导航、编辑程序内部资料，见下文 |
-| Commit | 向配置的数据库提交系统，不是保存 POSCAR 的按钮 |
 | File → Save system as | 保存当前系统的初始／Build 结构等内容 |
 
 顶部 **System** 用于识别／切换当前系统。打开多个结构时，编辑和保存前先核对当前系统。
@@ -424,7 +423,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 
 从 **Database → Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列四个标签页，与 Resources 的标签页样式一致：
 **single atom**、**gas phase**、**bulk**、**surface**。点击切换，默认打开 single atom；gas phase 为本地分子库，bulk／surface 暂时留空。
-Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 仍保留。
+Models 替代了 Database 下拉菜单中的 Commit；左侧工具栏 Commit 也已移除。
 
 ### 单原子输入生成
 
