@@ -523,29 +523,19 @@ class Frame(SystemListListener):
         self.connect_signals(xml)
         about=xml.get_widget("about_dialog")
         about_label=xml.get_widget("about_label")
-        try:
-            about_label.set_markup("""<big><b>%s <i>v%sr%s</i></b></big>
-
-       Build:%s
-       Homepage: <span foreground="blue">http://www.p4vasp.at</span>
-       P4vasp home directory:%s
-
-       P4vasp, Copyright (C) 2003,2004 Orest Dubay &lt;dubay@danubiananotech.com&gt;
-       P4vasp comes with <u>ABSOLUTELY NO WARRANTY</u>.
-       This is free software, and you are welcome to redistribute it
-       under certain conditions; see Help/License agreement for details.
-      """%(p4vasp.name,p4vasp.version,p4vasp.release,p4vasp.build_date,p4vasp.p4vasp_home))
-        except:
-            about_label.set_markup("""<big><b>P4vasp <span foreground="red"><i>development version</i></span></b></big>
-
-       Homepage: <span foreground="blue">http://www.p4vasp.at</span>
-       P4vasp home directory:%s
-
-       P4vasp, Copyright (C) 2003,2004 Orest Dubay &lt;dubay@danubiananotech.com&gt;
-       P4vasp comes with <u>ABSOLUTELY NO WARRANTY</u>.
-       This is free software, and you are welcome to redistribute it
-       under certain conditions; see Help/License agreement for details.
-      """%(p4vasp.p4vasp_home))
+        from p4vasp.about import about_markup
+        from gi.repository import Pango
+        from p4vasp.gtk3.file_dialogs import fit_dialog
+        about_label.set_markup(about_markup(p4vasp))
+        about_label.set_line_wrap(True)
+        about_label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        about_label.set_max_width_chars(64)
+        about_label.set_selectable(True)
+        about_label.set_xalign(0)
+        about_label.set_justify(gtk.Justification.LEFT)
+        for side in ('top','bottom','start','end'):
+            getattr(about_label, 'set_margin_'+side)(12)
+        fit_dialog(about, None, 620, 520)
 
         about.show()
     def show_license_dialog(self,*arg):

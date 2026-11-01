@@ -471,3 +471,7 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 ### Useful tools 预留页
 
 Database → Resources 的顶部标签为 Databases、Useful tools；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
+
+## 关于与贡献署名
+
+Help → About 分别列出原作者 Orest Dubay、Python 2→3 移植的主要贡献者 Bigbrosci／Whitehare2023，以及 p4vasp-py3 后续维护与新功能开发者 Bigbrosci。保留原版权、既有GPL许可及无担保声明；详见 [版权与贡献说明](../AUTHORS.md)。关于窗口内容可选中复制、滚动，较长路径也会折行。

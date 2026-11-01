@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## About 版权与贡献说明（2026-11-01）
+
+- 用户明确署名：Python2→3移植主要由Bigbrosci与Whitehare2023共同贡献，随后p4vasp-py3维护／新开发由Bigbrosci负责。新 `about.py` 统一两个版本状态的About文字，保留Orest Dubay原版权，分列移植与后续维护，新增2026 Bigbrosci新贡献版权及仓库地址。`AUTHORS.md`保存同样角色说明；LICENSE与源文件原许可不改，GPLv2文本及原有or-later许可均保留。
+- frame.glade静态后备文字同步，About增加滚动／换行／选中复制和屏幕范围尺寸。2项文字与转义测试、实际GTK两个标题状态／可见按钮／长路径480×400工作区检查及32启动通过；实际截图已查看。角色归属按用户提供，不冒充独立Git历史审计。未重跑全套GTK或其他平台；用户INCAR修改和Fe_single_atom目录保留不提交。
+
 ## 新增剑桥团簇数据库（2026-11-01）
 
 - 用户指定The Cambridge Cluster Database，原网址 http://www-wales.ch.cam.ac.uk/CCD.html，官方页面已核对（现标题Cambridge Energy Landscape Database）。作为第18张卡片加入，保留指定网址，仍四列换行。
