@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 更新记录双语格式（2026-11-01）
+
+- 用户要求严格沿用以往English／中文记录更新过程。update_history/update_2026_11_01.md从已提交内容重建，保留原中文过程与证据，补齐对应英文分区；后续维护更新继续使用双语，不用中文用户总结替代维护历史。
+- 用户表示已将中文文档移到桌面；当前检查发现当日update文件在工作树缺失，而doc中的综合总结仍存在，未定位／修改桌面文件，不推断具体桌面路径。此次仅核对文档结构、内容对应与差异，不重新验证历史应用结果。
+
 ## 近期综合总结文档（2026-11-01）
 
 - 用户要求汇总近期全部总结，已整理doc/recent-updates-2026-11-01-zh.md，覆盖10月13日至11月1日最终功能、使用方式、安装／alias、Windows暂停边界、维护交接与未解决项。作为用户指南型汇总，不替代memory或历史证据。
