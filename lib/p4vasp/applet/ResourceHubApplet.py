@@ -103,7 +103,31 @@ class ResourceHubApplet(Applet):
         footer.pack_start(self.link_entry, False, False, 0)
         online_page.pack_start(footer, False, False, 0)
         notebook.append_page(online_page, Gtk.Label(label='Databases'))
-        self.useful_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.useful_tools = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        tools_grid = Gtk.Grid(column_spacing=8, row_spacing=8, column_homogeneous=True)
+        tools_grid.set_border_width(8)
+        tools_scroll = Gtk.ScrolledWindow()
+        tools_scroll.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        tools_scroll.add(tools_grid)
+        self.useful_tools.pack_start(tools_scroll, True, True, 0)
+        self.tool_status = Gtk.Label(label='Click a tool to show and copy its URL.', xalign=0)
+        self.tool_status.set_line_wrap(True)
+        self.tool_entry = Gtk.Entry()
+        self.tool_entry.set_editable(False)
+        self.tool_entry.set_placeholder_text('Tool URL')
+        tools_footer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        tools_footer.set_border_width(8)
+        tools_footer.pack_start(self.tool_status, False, False, 0)
+        tools_footer.pack_start(self.tool_entry, False, False, 0)
+        self.useful_tools.pack_start(tools_footer, False, False, 0)
+        self.tool_buttons = []
+        for index, (name, url) in enumerate([
+                ('VASPwiki', 'https://vasp.at/wiki/Main_page'),
+                ('大师兄网站', 'https://www.bigbrosci.com/zh-cn/latest/')]):
+            button = self.card(name, url)
+            button.connect('clicked', self.select_tool, name, url)
+            tools_grid.attach(button, index % 4, index // 4, 1, 1)
+            self.tool_buttons.append(button)
         notebook.append_page(self.useful_tools, Gtk.Label(label='Useful tools'))
         from p4vasp.gtk3.community import CommunityPage
         self.community = CommunityPage(self.parent_window)
@@ -139,15 +163,21 @@ class ResourceHubApplet(Applet):
         return parent if isinstance(parent, Gtk.Window) else None
 
     def select_site(self, button, name, url):
-        self.link_entry.set_text(url)
-        self.link_entry.select_region(0, -1)
+        self.show_link(name, url, self.link_entry, self.link_status)
+
+    def select_tool(self, button, name, url):
+        self.show_link(name, url, self.tool_entry, self.tool_status)
+
+    def show_link(self, name, url, entry, status):
+        entry.set_text(url)
+        entry.select_region(0, -1)
         try:
             clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
             clipboard.set_text(url, -1)
             clipboard.store()
-            self.link_status.set_text(name+' — URL copied to clipboard.')
+            status.set_text(name+' — URL copied to clipboard.')
         except Exception:
-            self.link_status.set_text(name+' — Select the URL below and press Ctrl+C to copy.')
+            status.set_text(name+' — Select the URL below and press Ctrl+C to copy.')
 
     def edit(self, button, key, title, focus):
         try:

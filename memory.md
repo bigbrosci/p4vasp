@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Useful tools 两个入口（2026-11-01）
+
+- ResourceHub新增VASPwiki（https://vasp.at/wiki/Main_page，官方Wiki入口已查）和大师兄网站（用户指定https://www.bigbrosci.com/zh-cn/latest/），四列网格方式排列，点击在本页底部显示并复制网址。与Databases共享show_link逻辑，保留Ctrl+C后备。
+- 实际X11 GTK集成验证两个网址显示／真实剪贴板读回／故障后备及中文无缺字，截图已查看；原Resources/Models编辑回归通过。既有cmatrix退出警告仍见，其他平台／浏览器跳转未测。使用指南和当日更新同步，Windows打包保持暂停。
+
 ## 中文方框修复（2026-11-01）
 
 - 用户截图报告交流页中文仍为方框；已用GTK先渲染文字再加载页面复现。之前冷启动专项通过不足以覆盖已缓存字体的主界面。

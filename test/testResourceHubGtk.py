@@ -44,6 +44,20 @@ with tempfile.TemporaryDirectory() as temporary:
         time.sleep(0.01)
     assert applet.link_entry.get_allocation().height>20
     window.get_pixbuf().savev('/tmp/p4vasp-online-links.png','png',[],[])
+    resource_tabs.set_current_page(1)
+    assert len(applet.tool_buttons) == 2
+    for index, url in enumerate(['https://vasp.at/wiki/Main_page', 'https://www.bigbrosci.com/zh-cn/latest/']):
+        applet.tool_buttons[index].clicked()
+        assert applet.tool_entry.get_text() == url
+        assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == url
+    with patch('p4vasp.applet.ResourceHubApplet.Gtk.Clipboard.get', side_effect=RuntimeError('unavailable')):
+        applet.tool_buttons[1].clicked()
+        assert 'Ctrl+C' in applet.tool_status.get_text()
+    for _ in range(20):
+        while Gtk.events_pending(): Gtk.main_iteration()
+        time.sleep(0.01)
+    assert applet.tool_buttons[1].create_pango_layout('大师兄网站').get_unknown_glyphs_count() == 0
+    window.get_pixbuf().savev('/tmp/p4vasp-useful-tools.png', 'png', [], [])
     window.remove(applet.panel)
     models=ModelsApplet();models.store=applet.store
     window.add(models.createPanel());models.initUI();window.show_all()

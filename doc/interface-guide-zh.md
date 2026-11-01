@@ -468,9 +468,9 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 本机可选依赖已装入独立 `.venv-smiles`；其他设备需执行 `bash install/install-rdkit.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
 
-### Useful tools 预留页
+### Useful tools
 
-Database → Resources 的顶部标签为 Databases、Useful tools、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools 当前留空，后续加入常用软件和 GitHub 链接。
+Database → Resources 的顶部标签为 Databases、Useful tools、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools 包含 [VASPwiki](https://vasp.at/wiki/Main_page) 和 [大师兄网站](https://www.bigbrosci.com/zh-cn/latest/)。点击卡片后，下方显示网址并自动复制到剪贴板，与 Databases 相同；剪贴板不可用时可选中网址按 Ctrl+C。
 
 ## 关于与贡献署名
 
