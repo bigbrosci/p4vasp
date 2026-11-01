@@ -34,6 +34,19 @@ def main():
         assert len(page.molecule.symbols)==9 and page.charge.get_text()=='0'
         assert page.multiplicity.get_text()==''
         assert page.preview_window is not None and len(page.preview_window.structure)==9
+        import math
+        drawer=page.preview_window.structure_drawer
+        assert abs(drawer.getBondFactor()-1.2)<1e-8
+        radii={symbol:page.preview_window.atomtypes.getRecordForElement(symbol).covalent for symbol in page.molecule.symbols}
+        bonds=[]
+        for i,first in enumerate(page.molecule.symbols):
+            for j in range(i+1,len(page.molecule.symbols)):
+                second=page.molecule.symbols[j]
+                if math.dist(page.molecule.positions[i],page.molecule.positions[j])<=drawer.getBondFactor()*(radii[first]+radii[second]):bonds.append((first,second))
+        assert len(bonds)==8,bonds
+        assert sum(set(pair)=={'C','H'} for pair in bonds)==5,bonds
+        for _ in range(12):cp4vasp.VisCheck();time.sleep(.02)
+        page.preview_window.win.saveScreenshot('/tmp/p4vasp-ethanol-bonds.tga')
         page.generate_button.clicked();assert 'integer' in page.status.get_text()
         page.multiplicity.set_text('1')
         def choose_folder(*args,**kwargs):

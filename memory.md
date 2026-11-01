@@ -2,6 +2,11 @@
 
 Last updated: 2026-10-31. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 气相 C–H 显示键修复（2026-10-31）
+
+- 用户截图显示乙醇 C–C／C–O 可见而 C–H 缺失。原生距离判键默认因子1.0，C0.77+H0.32=1.09 Å，略小于部分优化C–H键长；气相独立预览设置setBondFactor(1.2)，保留0.5倍共价半径球，不改全局默认或输出结构。
+- 实际XYZ／SMILES GTK和原生回归通过。用真实原生半径及getBondFactor检查乙醇应有8对连接（5个C–H），原生截图已查看，C–H均显示；未将此当作化学键级识别。此次未跑全套测试或其他平台，Windows打包暂停。
+
 ## 气相预览球半径（2026-10-31）
 
 - 用户报告气相球体过大，要求使用原子半径而非范德华半径。`gtk3/gas_phase.py molecular_atomtypes` 深复制默认 AtomInfo，预览 radius 改为 covalent，窗口球缩放0.5；缺失正共价半径时raw半径0.7 Å（最终球0.35 Å）。XYZ和SMILES共用，不改颜色、判键共价半径、全局缓存／资料或输出结构。

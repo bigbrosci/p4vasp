@@ -167,6 +167,7 @@ class GasPhasePage(Gtk.Box):
             self.preview_window=_shared_preview
             self.preview_window.atomtypes=molecular_atomtypes()
             self.preview_window.setRadiusFactor(.5)
+            self.preview_window.structure_drawer.setBondFactor(1.2)
             self.preview_window.setStructure(None)
             self.preview_window.setStructure(structure)
             self.preview_window.win.show()
