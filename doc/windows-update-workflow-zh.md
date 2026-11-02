@@ -1,8 +1,18 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-10-29。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-01。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
+
+## 最近一次构建（2026-11-01）
+
+用户已恢复Windows打包。当前已生成的便携版源提交为 `9ba86cd855c52754d3be66be3b9d91d00ec4ad24`，交付目录：
+
+```text
+C:\Users\lqlhz\Downloads\p4vasp-20261101-190120-9ba86cd8-g3u1bhr3
+```
+
+双击其中 `p4vasp.exe`；同级ZIP可分发，先完整解压。构建及迁移到下载目录后的冻结runtime／GUI检查通过，ZIP校验通过。便携包不含可选RDKit，SMILES生成仍需另配环境且本次未验收。其他机器、完整人工建模与正常退出仍需确认。以下更新步骤继续适用于后续源码更新，不能将此版本当作后续提交的自动构建。
 
 ## 1. 完成并发布 Linux 更新
 

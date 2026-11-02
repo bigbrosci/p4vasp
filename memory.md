@@ -2,6 +2,15 @@
 
 Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows新版交付检查点（2026-11-01）
+
+- 用户已明确恢复打包，之前“Windows暂停”条目为历史。Windows干净checkout从约定origin fast-forward后，UCRT64隔离重编译／PyInstaller完成源提交 `9ba86cd855c52754d3be66be3b9d91d00ec4ad24`。
+- 已交付Windows下载目录：`C:\Users\lqlhz\Downloads\p4vasp-20261101-190120-9ba86cd8-g3u1bhr3`，双击p4vasp.exe；同级ZIP为75,104,955字节，SHA256 `4c78367281feafa6586a016be41caf707f60a839df77f7feb647e5d9bd9dfbe1`，整目录／ZIP／哈希已复制且核对。旧版保留，未改快捷方式或用户输入。
+- 构建与Downloads迁移冻结runtime／GUI均通过，42个Glade资源无属性错误、原生结构／左右计数、相机PNG、POSCAR标记／紧凑保存窗口通过，截图已查看。新资源确实入包；源码快照另过Resources/Models六网址剪贴板、临时元素编辑、中文缓存／三二维码／放大／窄窗口与单原子生成；不冒充冻结版全部新功能验收。源快照最初连续剪贴板合成检查失败，映射窗口且点击间处理200ms事件后通过，仍见GDK选择警告。
+- 迁移首次检查在复制完成前缺DLL，失败报告保留；完整复制后最终成功报告为Downloads同级 `-checks-final`。Windows构建日志在 `build/windows-update/9ba86cd8-f2hf3s7a`（Windows checkout相对路径），源码页面证据在其new-pages；构建产物与checks在dist/windows-releases。
+- 构建后Windows --check通过，工作树干净，分支／origin正确；本次诊断脚本已归档到构建证据目录。
+- 便携包不带RDKit，SMILES外部环境未验收；干净机、签名、完整正常退出／全部人工键盘建模／科学计算未验证。下一步为用户双击试用；本次交付记录是后续文档提交，EXE仍标上述源提交。双语详情见当日update，指南已同步。
+
 ## 更新记录双语格式（2026-11-01）
 
 - 用户要求严格沿用以往English／中文记录更新过程。update_history/update_2026_11_01.md从已提交内容重建，保留原中文过程与证据，补齐对应英文分区；后续维护更新继续使用双语，不用中文用户总结替代维护历史。
