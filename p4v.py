@@ -148,6 +148,8 @@ class Frame(SystemListListener):
 
     def init3d(self):
         if not self.init3d_flag:
+            from p4vasp.gtk3.macos import configure_event_loop
+            configure_event_loop()
             from p4vasp.gui_environment import configure_wsl_cursor
             configure_wsl_cursor(gtk.Gtk.Settings.get_default())
             _cp4vasp.VisInit()
@@ -853,6 +855,8 @@ def init():
 
     msg().status("OK")
     msg().step(0,1)
+    from p4vasp.gtk3.macos import present_startup
+    present_startup(frame.root_window)
     if os.environ.get("P4VASP_INSTALL_PREVIEW") == "1":
         from p4vasp.gtk3.install_preview import ready
         ready()

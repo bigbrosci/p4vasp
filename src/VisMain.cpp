@@ -21,6 +21,8 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <p4vasp/VisWindow.h>
 #include <p4vasp/VisMain.h>
 #include <p4vasp/VisEvent.h>
@@ -372,7 +374,16 @@ void VisCheck(){
 #if VERBOSE>3
   printf("VisCheck() (vis event handling finished)\n");
 #endif  
-  Fl::check();
+#ifdef __APPLE__
+  // GTK Quartz owns the Cocoa queue in the mixed GUI. Its event source
+  // forwards non-GTK events to AppKit/FLTK. Fl::check() would dequeue GTK
+  // keystrokes itself, bypassing GDK's translation and losing text input.
+  const char *quartz_loop=getenv("P4VASP_GTK_QUARTZ_EVENT_LOOP");
+  if (quartz_loop && strcmp(quartz_loop,"1")==0)
+    Fl::flush();
+  else
+#endif
+    Fl::check();
 #if VERBOSE>3  
   printf("VisCheck() -\n");
 #endif  

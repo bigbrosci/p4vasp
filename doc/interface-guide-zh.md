@@ -8,7 +8,7 @@
 
 ```bash
 cd ~/opt/p4vasp
-PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
+bash p4v.sh
 ```
 
 在 WSL 中运行时，需要可用的图形显示连接。程序包含两个常用窗口：
@@ -17,6 +17,14 @@ PYTHONPATH="$PWD/lib:$PWD/src" P4VASP_HOME="$PWD" /usr/bin/python3 p4v.py
 - **模型窗口**：独立显示三维原子结构，鼠标旋转、Space 和 Shift 框选在这里操作。使用键盘快捷键前，先让模型窗口获得焦点。
 
 更新 Python 界面代码后需要重启程序。涉及 C++ 结构显示功能时，需要先重新编译原生扩展；仅重新启动不会自动编译。
+
+### macOS 窗口与输入（2026-11-03）
+
+macOS 原生 GTK Quartz 主窗口会在启动完成时主动置前。之后仍按正常窗口焦点切换，
+不持续抢占前台。GTK 输入框（包括 Models → gas phase → SMILES）与 FLTK 三维窗口
+共用由 GTK 管理的 Cocoa 事件队列，避免 FLTK 轮询吞掉文字按键。
+本次修复同时涉及 Python 与 C++；其他 Mac 更新源码后需执行
+`bash install.sh --build-only`，再 `bash p4v.sh`。本次维护 Mac 已重新编译。
 
 ### WSL 结构窗口鼠标大小（2026-10-29 补充）
 

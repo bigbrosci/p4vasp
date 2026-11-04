@@ -31,6 +31,33 @@ Historical generated documentation is not rewritten.
 The native FLTK/OpenGL structure windows and GLUT k-point viewer are separate
 renderers. This change does not replace their graphics APIs with GTK widgets.
 
+### macOS Quartz event ownership (2026-11-03)
+
+The main GUI calls `p4vasp.gtk3.macos.configure_event_loop()` before native
+initialization. On Quartz only, it sets the process-local
+`P4VASP_GTK_QUARTZ_EVENT_LOOP=1` flag. Native `VisCheck()` still executes queued
+window commands and calls `Fl::flush()`, while GTK owns Cocoa event dequeueing
+and forwards non-GTK events to AppKit/FLTK. Independently polling `Fl::check()`
+would consume GTK keystrokes before GDK translates them. Standalone native
+callers without this flag keep the FLTK loop. Do not set the flag for a native
+standalone program without a running GTK Quartz event loop.
+
+At the end of startup, `present_startup()` activates the terminal-launched
+macOS application through AppKit and presents the main GTK window once. It
+needs neither PyObjC nor Accessibility permission. Other display backends skip
+these helpers. This change requires rebuilding the native extension.
+
+Focused desktop check on macOS:
+
+```bash
+PYTHONPATH=lib P4VASP_HOME="$PWD" .venv-macos/bin/python3 test/testMacQuartzInput.py
+```
+
+This posts Cocoa events only to its own windows and checks activation, actual
+SMILES typing/deletion, a second entry, native Delete delivery, and returning
+to GTK. `--legacy` disables the bridge and is expected to fail at text input.
+It does not validate physical keyboard layouts, input methods, or chemistry.
+
 ## Dependencies and launch
 
 On Ubuntu/Debian:
