@@ -9,7 +9,16 @@ Last updated: 2026-11-04. This is a repository navigation and handoff document. 
 - gtk3/bulk.py提供滚动参数页／结果摘要；复用gtk3/gas_phase.py会话辅助窗口与事件保护，新增show_model_preview切换气相共价球或bulk默认资料／标题，防止预览编辑当前系统。single_atom.InputFolderDialog仅增加可选动作文字，bulk保存新文件夹内POSCAR，保留同名保护／取消；需Open后继续编辑，不生成INCAR/KPOINTS/POTCAR或额外约束。
 - 本机11/4：5项真实ASE几何／输入（13原型样例、FCC胞／超胞数目体积、NaCl配比距离、HCP／菱方、拒绝非法／超大化学式）；3项真实worker交接／缺依赖／超时取消回收通过。实际X11 GTK＋原生32Cu预览、键盘事件隔离、界面响应、真实保存／取消／不覆盖／POSCAR重读／结果失效／独立bulk滚动页480×320通过，页面与原生截图已查看。完整Models标签有原有最小宽度，不将独立小页尺寸冒充全窗口尺寸。
 - 原气相／单原子／Resources-Models实际GTK回归、57基础及32启动通过；Resources退出cmatrix旧警告与ASE/NumPy弃用提示保留。最初测试误用StructureWindow.getStructure已改为实际structure属性；ASE3.29 tetragonal核验失败，未列入首版。未跑完整GTK旧失败套件／其他平台或DFT。指南doc/ase-bulk-zh.md、操作／安装说明及双语当日记录已同步；下一步用户实际bulk反馈，surface待后续明确需求。
+- 首次推送因另一设备macOS提交a7841ff被拒，正常merge保留其启动／输入修复及Resources字体崩溃限制；memory冲突保留双方检查点，日期11/4。合并后bulk实际GTK／原生、57基础、32启动再次通过；本机Linux不冒充Mac验收。
 - 用户既有INCAR预设修改、根目录原图与Fe_single_atom保持，不纳入提交；不自动重建Windows包或接入RDKit。
+
+## macOS 窗口激活与键盘输入接手检查点（2026-11-03）
+
+- 用户报告本 Mac 已安装，启动窗口在其他应用后面、Models → gas phase → SMILES 无法输入。助手桌面检查：Intel Mac／Darwin24.6.0、Python3.15.2、GTK3.24 Quartz；纯GTK按键成功，加入原生FLTK轮询即丢失，已复现事件循环竞争。
+- 已实现 `gtk3/macos.py`：Frame原生初始化前配置进程内Quartz标记，macOS `VisCheck` 处理原生命令并flush，由GTK取Cocoa事件及转交非GTK事件；启动完成后AppKit激活并present一次。涉及 `p4v.py`、`src/VisMain.cpp`，本Mac已重编译，其他源码Mac须重编译。入口为frame.glade→ModelsApplet→models.glade→GasPhasePage，无布局改动。
+- 本次专项真实Cocoa输入／退格／Charge、应用激活、原生选中原子Delete事件及返回GTK继续输入通过；旧循环对照按预期失败。截图已查看，完整两秒启动预览、57基础、8 GTK通过；31 applet启动通过、1失败（DBApplet/Resources），不含GLUT。详细证据、命令与限制见 [November 3](update_history/update_2026_11_03.md)。物理键盘／输入法、用户重启反馈、完整人工三维操作及其他平台未验收。
+- 新发现独立未解决项：Resources交流页字体注册在macOS非Fc字体后端调用PangoFc，启动检查及单独ResourceHub均在 `PANGO_IS_FC_FONT_MAP` 断言后退出139。未纳入本次两项修复，后续需处理 `gtk3/community.py load_chinese_font` 的后端分支，不能将完整smoke记为通过。
+- 已有 `odpdom/cODP.py` SWIG4.4.0→4.5.1生成差异保留、不提交。下一步：用户关闭旧进程后`p4v`验证实际置前与SMILES物理输入；可继续定位Resources字体问题，但不把本检查点当成新增功能授权。提交／推送结果以实际交付报告为准。
 
 ## Windows新版交付检查点（2026-11-01）
 
