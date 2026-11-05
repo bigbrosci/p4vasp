@@ -26,7 +26,8 @@ assert quote_for_day(records,day)==quote_for_day(records,day)
 assert quote_for_day(records,day)!=quote_for_day(records,day+timedelta(days=1))
 assert quote_for_day(records,day)==quote_for_day(records,day+timedelta(days=len(records)))
 driver.status('OK');driver.daily_status.refresh(day);drain()
-assert label.get_text().startswith('每日一句：')
+assert label.get_text().startswith(quote_for_day(records,day)['text'])
+assert '每日一句：' not in label.get_text()
 assert label.create_pango_layout(label.get_text()).get_unknown_glyphs_count()==0
 assert label.get_selectable() and not progress.get_visible()
 footer=frame.xml.get_widget('status_frame');content=frame.xml.get_widget('applet_box')
@@ -48,7 +49,7 @@ driver.error('Synthetic error: missing structure')
 driver.daily_status.refresh(day+timedelta(days=1))
 assert label.get_text()=='ERROR: Synthetic error: missing structure'
 driver.step(0,1);driver.status('OK');drain()
-assert not progress.get_visible() and label.get_text().startswith('每日一句：')
+assert not progress.get_visible() and label.get_text().startswith(quote_for_day(records)['text'])
 driver.daily_status.refresh(day+timedelta(days=1))
 assert quote_for_day(records,day+timedelta(days=1))['text'] in label.get_text()
 window.destroy();assert driver.daily_status.timer is None

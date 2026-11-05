@@ -4,6 +4,8 @@ Last updated: 2026-11-04. This is a repository navigation and handoff document. 
 
 ## 底部全宽每日一句（2026-11-04）
 
+- 后续按用户要求删除可见“每日一句：”前缀，仅显示名句与出处；实际GTK显示／日期与状态优先回归通过，截图已查看。
+
 - 用户要求原底部文字框改每日名句，左沿到Models右侧。frame.glade原水平进度／状态行改垂直：上方按需进度条，下方status_frame内可选／换行GtkLabel，与applet_box全宽对齐，原statusbar ID及set_text/get_text接口保留。
 - daily_quotes.py离线加载data/quotes/daily.json的12条公版经典，按本地日期轮换，缺失／坏文件用后备；gtk3/daily_status.py在空闲／OK时显示，60秒查日期、任务／ERROR优先不被刷新覆盖，destroy清理定时器。FrameMessageDriver接控制器，不改实际日志／错误报出。中文字体仅非darwin调用既有加载器，避免新增触发已知Quartz/PangoFc问题；不声称修复Mac Resources。
 - 实际Linux X11检查日期稳定／次日与循环、中文无缺字、700／900宽主内容对齐、可复制、进度条上下位置与显隐、任务／错误优先及计时器回收通过，截图已查看；4场景真实启动回归通过。57基础／32启动通过（不含GLUT）；其他平台、完整GTK旧失败套件及Windows包未测。语句来源/抓取限制见data/quotes/README.md，指南与双语记录同步。
