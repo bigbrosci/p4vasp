@@ -30,6 +30,11 @@ def spin(seconds=.1,until=None):
     if until is not None:assert until(),'timed out'
 
 assert page.result is None and not page.save_button.get_sensitive()
+import shlex
+assert shlex.split(page.install_hint.command.get_text()) == ['bash', str(Path(__file__).resolve().parents[1]/'install/install-ase.sh')]
+assert not page.install_hint.command.get_editable()
+page.install_hint.copy_button.clicked()
+assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == page.install_hint.command.get_text()
 assert not page.fields['c'].get_sensitive()
 page.mode.set_active(2)
 for field in page.repeat:field.set_text('2')
@@ -83,6 +88,10 @@ with tempfile.TemporaryDirectory() as temporary:
         return dialog
     with patch('p4vasp.gtk3.bulk.InputFolderDialog',side_effect=cancel_dialog):page.save_button.clicked()
 spin(.1)
+adjustment=applet.notebook.get_nth_page(2).get_vadjustment()
+adjustment.set_value(adjustment.get_upper()-adjustment.get_page_size())
+spin(.1)
+assert page.install_hint.copy_button.get_mapped()
 Gdk.pixbuf_get_from_window(window.get_window(),0,0,window.get_allocated_width(),window.get_allocated_height()).savev('/tmp/p4vasp-bulk-page.png','png',[],[])
 page.fields['a'].set_text('3.7')
 assert page.result is None and not page.save_button.get_sensitive() and not page.preview_button.get_sensitive()

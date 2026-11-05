@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-04. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 建模页底部可复制安装命令（2026-11-04）
+
+- 用户要求ASE与RDKit安装命令直接可复制。gtk3/install_hint.py共用底部提示：只读可选Entry＋Copy command，按实际项目绝对路径和shell转义生成bash install脚本命令，任意工作目录可运行；不自动执行。bulk／gas phase分别接install-ase.sh／install-rdkit.sh，独立于运行状态提示，后续报错不覆盖命令。bulk小窗口可滚动到底部。
+- Windows原生／冻结包或脚本缺失时不展示假安装命令，禁用复制并说明需源码环境。实际X11 bulk命令／剪贴板、生成／原生预览／保存／紧凑布局和原gas phase集成通过，底部截图已查看；未安装依赖第二次／改Windows包或跨平台验证。指南与双语当日记录同步。
+
 ## ASE bulk 接入检查点（2026-11-04）
 
 - 用户确认首批仅bulk：晶型、晶格参数、超胞、预览、保存POSCAR。Models → bulk已接入13种真实ASE原型，显式晶格参数／primitive-orthorhombic-cubic／基矢重复，最高10000原子；不支持组合报错，参数改变使旧结果失效。surface仍空，不做ASE整套GUI／计算器或本轮Windows打包。

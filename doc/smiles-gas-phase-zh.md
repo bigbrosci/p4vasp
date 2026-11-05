@@ -60,3 +60,7 @@ GDK_BACKEND=x11 PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/test
 最后一项需要显示环境和现有原生扩展。测试生成临时输入，不能替代 VASP 收敛性或科学结果验证。
 
 气相预览的距离判键使用 `1.2 × (两原子的共价半径之和)`，为优化后的 C–H 等键留出容差；球大小仍为 0.5 倍共价半径。此项仅改变显示判键，不修改坐标、元素资料或化学键级。
+
+## 可复制的安装命令
+
+gas phase页面底部显示RDKit安装命令，自动使用当前项目完整路径。点击 **Copy command** 或选中文本复制到Ubuntu／WSL或macOS终端运行，完成后重新生成SMILES结构即可；不会在界面内自动安装。Windows原生／冻结包不展示不可执行的Unix安装命令，而是说明需配置源码环境。
