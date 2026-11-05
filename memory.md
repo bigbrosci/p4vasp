@@ -1,6 +1,15 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-01. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-04. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## ASE bulk 接入检查点（2026-11-04）
+
+- 用户确认首批仅bulk：晶型、晶格参数、超胞、预览、保存POSCAR。Models → bulk已接入13种真实ASE原型，显式晶格参数／primitive-orthorhombic-cubic／基矢重复，最高10000原子；不支持组合报错，参数改变使旧结果失效。surface仍空，不做ASE整套GUI／计算器或本轮Windows打包。
+- ase_bulk.py为标准库前端＋独立ASE worker：只点击Build才启进程，单线程数值库、Cancel／30秒超时／销毁取消并回收。install/install-ase.sh创建.gitignore忽略的.venv-ase，当前Linux实际安装ASE3.29.0／worker Python3.14.6；GUI /usr/bin/python3为3.14.4且无ASE，不导入worker依赖。可选P4VASP_ASE_PYTHON覆盖。其他设备／Windows旧包依赖未安装或核验。
+- gtk3/bulk.py提供滚动参数页／结果摘要；复用gtk3/gas_phase.py会话辅助窗口与事件保护，新增show_model_preview切换气相共价球或bulk默认资料／标题，防止预览编辑当前系统。single_atom.InputFolderDialog仅增加可选动作文字，bulk保存新文件夹内POSCAR，保留同名保护／取消；需Open后继续编辑，不生成INCAR/KPOINTS/POTCAR或额外约束。
+- 本机11/4：5项真实ASE几何／输入（13原型样例、FCC胞／超胞数目体积、NaCl配比距离、HCP／菱方、拒绝非法／超大化学式）；3项真实worker交接／缺依赖／超时取消回收通过。实际X11 GTK＋原生32Cu预览、键盘事件隔离、界面响应、真实保存／取消／不覆盖／POSCAR重读／结果失效／独立bulk滚动页480×320通过，页面与原生截图已查看。完整Models标签有原有最小宽度，不将独立小页尺寸冒充全窗口尺寸。
+- 原气相／单原子／Resources-Models实际GTK回归、57基础及32启动通过；Resources退出cmatrix旧警告与ASE/NumPy弃用提示保留。最初测试误用StructureWindow.getStructure已改为实际structure属性；ASE3.29 tetragonal核验失败，未列入首版。未跑完整GTK旧失败套件／其他平台或DFT。指南doc/ase-bulk-zh.md、操作／安装说明及双语当日记录已同步；下一步用户实际bulk反馈，surface待后续明确需求。
+- 用户既有INCAR预设修改、根目录原图与Fe_single_atom保持，不纳入提交；不自动重建Windows包或接入RDKit。
 
 ## Windows新版交付检查点（2026-11-01）
 

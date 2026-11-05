@@ -3,6 +3,7 @@ from p4vasp.applet.Applet import Applet
 from p4vasp.gtk3 import Gtk
 from p4vasp.gtk3.single_atom import SingleAtomPage
 from p4vasp.gtk3.gas_phase import GasPhasePage
+from p4vasp.gtk3.bulk import BulkPage
 from p4vasp.gtk3.element_table import ElementTable
 from p4vasp.resource_data import ResourceStore
 from p4vasp.applet.ResourceHubApplet import message
@@ -24,6 +25,11 @@ class ModelsApplet(Applet):
         for title in ('single atom', 'gas phase', 'bulk', 'surface', 'p4vasp data'):
             if title == 'single atom': page = SingleAtomPage()
             elif title == 'gas phase': page = GasPhasePage()
+            elif title == 'bulk':
+                page = Gtk.ScrolledWindow()
+                page.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+                self.bulk_page = BulkPage()
+                page.add(self.bulk_page)
             elif title == 'p4vasp data':
                 page = ElementTable(self.store, self.parent_window, message)
                 self.element_table = page

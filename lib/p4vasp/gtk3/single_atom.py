@@ -20,12 +20,12 @@ PERIODS = [
 
 
 class InputFolderDialog:
-    def __init__(self, parent, symbol, directory=None, *, title=None, folder_name=None, summary=None, writer=None):
+    def __init__(self, parent, symbol, directory=None, *, title=None, folder_name=None, summary=None, writer=None, action_label='Generate inputs'):
         self.symbol = symbol
         self.writer = writer
         self.dialog = Gtk.Dialog(title=title or 'Generate single atom inputs — '+symbol,
                                  transient_for=parent, modal=True, use_header_bar=False)
-        self.dialog.add_buttons('Cancel', Gtk.ResponseType.CANCEL, 'Generate inputs', Gtk.ResponseType.OK)
+        self.dialog.add_buttons('Cancel', Gtk.ResponseType.CANCEL, action_label, Gtk.ResponseType.OK)
         fit_dialog(self.dialog, parent, 540, 250)
         grid = Gtk.Grid(column_spacing=8, row_spacing=8); grid.set_border_width(12)
         self.name = entry(folder_name or symbol+'_single_atom')

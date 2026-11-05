@@ -43,6 +43,24 @@ def molecular_atomtypes():
     return table
 
 
+def show_model_preview(structure, title, molecular=False):
+    """Reuse the session-owned read-only model window and its event protection."""
+    from p4vasp.StructureWindow import StructureWindow
+    from p4vasp.util import getAtomtypes
+    global _shared_preview
+    if _shared_preview is None:
+        _shared_preview = StructureWindow(w=600, h=500, title=title)
+    window = _shared_preview
+    window.win.setTitle(title)
+    window.atomtypes = molecular_atomtypes() if molecular else getAtomtypes()
+    window.setRadiusFactor(.5)
+    window.structure_drawer.setBondFactor(1.2 if molecular else 1.0)
+    window.setStructure(None)
+    window.setStructure(structure)
+    window.win.show()
+    return window
+
+
 class GasPhasePage(Gtk.Box):
     def __init__(self, folder=None):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=6)
@@ -159,18 +177,8 @@ class GasPhasePage(Gtk.Box):
         if self.molecule is None:return
         try:
             from p4vasp.Structure import Structure
-            from p4vasp.StructureWindow import StructureWindow
             structure=Structure();structure.read(StringIO(poscar(self.molecule,self.lengths())))
-            global _shared_preview
-            if _shared_preview is None:
-                _shared_preview=StructureWindow(w=600,h=500,title='Gas phase preview')
-            self.preview_window=_shared_preview
-            self.preview_window.atomtypes=molecular_atomtypes()
-            self.preview_window.setRadiusFactor(.5)
-            self.preview_window.structure_drawer.setBondFactor(1.2)
-            self.preview_window.setStructure(None)
-            self.preview_window.setStructure(structure)
-            self.preview_window.win.show()
+            self.preview_window=show_model_preview(structure, 'Gas phase preview', molecular=True)
             self.status.set_text('3D preview: '+self.molecule.name+'. Coordinates are unchanged by preview.')
         except Exception as error:self.status.set_text(str(error))
 

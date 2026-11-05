@@ -423,7 +423,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 ### 模型库框架
 
 从左侧 **Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列五个标签页，与 Resources 的标签页样式一致：
-**single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 为本地分子库，bulk／surface 暂时留空。
+**single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 支持本地分子库与SMILES，bulk使用ASE生成体相，surface暂时留空。
 Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料表从 Resources 移到 Models，Commit 快捷入口已移除。
 
 ### 单原子输入生成
@@ -435,6 +435,12 @@ Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料
 POSCAR 为 13×14×15 Å 正交晶胞，只有所选的一个原子，Direct 坐标 `(0.5, 0.5, 0.5)`，对应笛卡尔 `(6.5, 7, 7.5)` Å。KPOINTS 为 Γ 中心的 `1 1 1` 网格、零偏移。
 
 INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 `ISPIN=2`、`ALGO=ALL`、`NELM=500`，不输出 `MAGMOM`，不自动套用元素磁矩或 U/J。SYSTEM 标注所选元素；其他参数按当前基础预设保留，不自动启用额外 Task。生成时读取程序 `data/incar/presets.json`，不依赖外部 in.py。界面选择不会修改当前加载的结构、元素资料或 INCAR 预设；这里只生成上述三个文件。
+
+### ASE体相建模
+
+在 **Models → bulk** 选择化学式和晶体原型，填写晶格参数、晶胞形式与超胞重复数，点击 **Build bulk**。完成后可查看原子数／晶胞／体积，使用 **Preview 3D** 预览，或 **Save POSCAR** 将结构写入新文件夹。保存后Open打开POSCAR可继续编辑；本页只生成POSCAR。
+
+首次使用在项目目录执行 `bash install/install-ase.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface仍为空框架。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
 
 ### 气相 XYZ 本地分子库
 

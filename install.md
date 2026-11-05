@@ -308,3 +308,9 @@ bash install/install-rdkit.sh
 ```
 
 依赖安装在独立 `.venv-smiles`，不替换 GTK 应用的 Python；运行时按需启动隔离计算进程。也可设置 `P4VASP_SMILES_PYTHON` 指向已有 RDKit 的 Python。当前仅本机 Linux 验证，完整操作及平台限制见 [SMILES 气相建模](doc/smiles-gas-phase-zh.md)。
+
+## Optional ASE bulk builder / 可选ASE体相建模
+
+For Models → bulk, run `bash install/install-ase.sh` from the checkout. This installs tested ASE 3.29.0 into `.venv-ase` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Current validation is Linux/WSL only; the existing Windows portable build was not rebuilt with ASE. See [bulk usage](doc/ase-bulk-zh.md).
+
+Models → bulk使用前，在项目目录运行 `bash install/install-ase.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，当前Windows旧便携包不包含本轮新增功能。

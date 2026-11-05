@@ -56,7 +56,8 @@ try:
   for index, title in enumerate(('single atom','gas phase','bulk','surface','p4vasp data')):
    page=notebook.get_nth_page(index)
    assert notebook.get_tab_label_text(page)==title
-   if index in (2,3): assert not page.get_children()
+   if index==3: assert not page.get_children()
+   elif index==2: assert applet.bulk_page.result is None and not applet.bulk_page.save_button.get_sensitive()
    elif index==4: assert len(page.model)==118
    elif index==1: assert hasattr(page,'refresh_button')
    else: assert len(page.buttons)==118 and page.symbol is None and not page.generate.get_sensitive()
