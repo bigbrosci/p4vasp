@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-04. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 空白启动的初始结构误报（2026-11-04）
+
+- 用户报告底部反复ERROR no initial structure available。源码根因：p4v.init无条件追加XMLSystemPM("vasprun.xml")，即使目录无该文件或已有显式系统；SystemPM.fetchStructure随后报错并创建空结构。未修改fetchStructure的真实文件错误行为。
+- 启动现仅在无显式／已恢复系统时加载实际存在的默认XML；否则建立带URL空串／PATH当前目录／New structure名称的SetupPM空结构，避免URL未初始化的附带错误。可选setup.xml不存在时不读，存在但坏文件仍保留错误处理。无文件启动不自动把当前目录POSCAR当输入，仍可Open或命令参数指定。
+- testStartupSystemGtk.py实际初始化4种隔离临时场景通过：空目录无错误／可见状态OK、显式POSCAR单原子、显式POSCAR＋坏默认XML不干扰、已有无initialpos的XML仍报告真实错误；空白主界面截图已查看。57基础／32启动通过（不含GLUT），未改科学数据、全套GTK／其他平台或Windows包未测。旧进程需重启。
+
 ## 建模页底部可复制安装命令（2026-11-04）
 
 - 用户要求ASE与RDKit安装命令直接可复制。gtk3/install_hint.py共用底部提示：只读可选Entry＋Copy command，按实际项目绝对路径和shell转义生成bash install脚本命令，任意工作目录可运行；不自动执行。bulk／gas phase分别接install-ase.sh／install-rdkit.sh，独立于运行状态提示，后续报错不覆盖命令。bulk小窗口可滚动到底部。

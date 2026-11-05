@@ -36,6 +36,12 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 `bash install.sh --build-only` 后再 `bash p4v.sh`。WSLg 最终合成的物理光标大小仍需实际显示确认；
 不能仅凭 X11 报告的像素尺寸认定视觉问题已经解决。
 
+### 空目录启动与初始结构提示
+
+从没有vasprun.xml的目录启动时，程序正常创建New structure空白建模系统；可直接使用Models，或Open已有POSCAR。已经通过启动参数／会话打开的系统保留，不再额外追加当前目录的vasprun.xml；没有可选setup.xml时也不尝试读取。
+
+如果实际打开的vasprun.xml本身缺少初始结构，仍会显示“no initial structure available”。这时需要核对文件是否完整、是否为目标计算文件，不能仅隐藏提示当作读取成功。
+
 ## 2. 主界面常用入口
 
 | 入口 | 用途 |

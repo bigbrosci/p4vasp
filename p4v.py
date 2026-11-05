@@ -837,21 +837,31 @@ def init():
         frame.addSystem(getSystem(s))
 
     applets().activate(applets().factory.create("p4vasp.applet.InfoApplet.InfoApplet"))
-    try:
-        msg().status("loading setup")
-        yield 1
-        scheduleFirst(frame.loadSetupGen("setup.xml"))
-        yield 1
-        msg().status("setup loaded")
-        yield 1
-    except:
-        pass
+    if os.path.isfile("setup.xml"):
+        try:
+            msg().status("loading setup")
+            yield 1
+            scheduleFirst(frame.loadSetupGen("setup.xml"))
+            yield 1
+            msg().status("setup loaded")
+            yield 1
+        except:
+            pass
 
-    msg().status("reading vasprun.xml")
-    yield 1
-    frame.addSystem(XMLSystemPM("vasprun.xml"))
-    msg().status("reading vasprun.xml OK")
-    yield 1
+    # Explicit inputs/restored systems already define the startup context.
+    # A directory without calculation output is a normal modeling session.
+    if not len(systemlist()):
+        if os.path.isfile("vasprun.xml"):
+            msg().status("reading vasprun.xml")
+            yield 1
+            frame.addSystem(XMLSystemPM("vasprun.xml"))
+        else:
+            empty = SetupPM()
+            empty.add("URL", "")
+            empty.add("PATH", os.getcwd())
+            empty.INCAR["SYSTEM"] = "New structure"
+            frame.addSystem(empty)
+        yield 1
 
     msg().status("OK")
     msg().step(0,1)
