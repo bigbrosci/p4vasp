@@ -67,15 +67,18 @@ class FrameMessageDriver(p4vasp.message.MessageDriver):
         self.progressbar.set_pulse_step(0.1)
         self.statusbar            = xml.get_widget("statusbar")
         self.consoleout=0
+        self.progressbar.set_no_show_all(True)
+        self.progressbar.hide()
+        from p4vasp.gtk3.daily_status import DailyStatus
+        self.daily_status = DailyStatus(self.statusbar)
 
     def status(self,txt):
-        self.statusbar.set_text(txt)
-        self.statusbar.show()
+        self.daily_status.status(txt)
         self.logfile.write("STATUS:%s\n"%p4vasp.message.indent(txt,"       "))
         self.logfile.flush()
 
     def error(self,txt):
-        self.statusbar.set_text("ERROR: %s"%txt)
+        self.daily_status.error(txt)
         if (self.consoleout):
             stdout.write("ERROR : %s\n"%p4vasp.message.indent(txt,"       "))
             stdout.flush()
@@ -84,9 +87,11 @@ class FrameMessageDriver(p4vasp.message.MessageDriver):
 
     def step(self, step=None,total=None):
         if (step is None) or (total is None) or (total<=0):
+            self.progressbar.show()
             self.progressbar.pulse()
             self.pstep+=1
         else:
+            self.progressbar.set_visible(0 < step < total)
             self.progressbar.set_fraction(float(step)/float(total))
             if step:
                 self.progressbar.set_text("%s/%s"%(str(step),str(total)))

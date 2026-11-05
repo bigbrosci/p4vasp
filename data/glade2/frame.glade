@@ -491,7 +491,7 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkHBox" id="hbox2">
+		<widget class="GtkVBox" id="hbox2">
 		  <property name="visible">True</property>
 		  <property name="homogeneous">False</property>
 		  <property name="spacing">0</property>
@@ -507,22 +507,22 @@
 		    <packing>
 		      <property name="padding">0</property>
 		      <property name="expand">False</property>
-		      <property name="fill">False</property>
+		      <property name="fill">True</property>
 		    </packing>
 		  </child>
 
 		  <child>
-		    <widget class="GtkEntry" id="statusbar">
-		      <property name="visible">True</property>
-		      <property name="can_focus">True</property>
-		      <property name="editable">False</property>
-		      <property name="visibility">True</property>
-		      <property name="max_length">0</property>
-		      <property name="text" translatable="yes"></property>
-		      <property name="has_frame">True</property>
-		      <property name="invisible_char">*</property>
-		      <property name="activates_default">False</property>
-		    </widget>
+            <widget class="GtkFrame" id="status_frame">
+              <property name="visible">True</property>
+              <child>
+                <widget class="GtkLabel" id="statusbar">
+                  <property name="visible">True</property>
+                  <property name="selectable">True</property>
+                  <property name="xalign">0</property>
+                  <property name="label"></property>
+                </widget>
+              </child>
+            </widget>
 		    <packing>
 		      <property name="padding">0</property>
 		      <property name="expand">True</property>
