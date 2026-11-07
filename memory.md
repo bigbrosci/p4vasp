@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-06. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## ASE通用结构导入（2026-11-07）
+
+- 本次任务已实现：getSystem新增ASESystemPM，CLI与File/Open共用；保留目录／DOSCAR／XML／POSCAR分流。ase_import.py在既有ASE解释器或新版随包worker里读取8类扩展名（xyz/extxyz/cif/pdb/mol/sdf/xsf/traj），不向GTK进程导入ASE；超时60秒，错误显示原因，Open失败保留旧系统，CLI失败不再中断初始化。
+- 无晶胞时三个笛卡尔跨度分别加20Å并将两侧留白各设10Å，单原子20Å盒；完整晶胞／坐标和原子顺序保留，部分晶胞／空／非法坐标拒绝。支持的多帧读最后一帧，不导入整条轨迹；只转几何与可表示的POSCAR信息，不承诺任意ASE元数据／原始PBC的显示等价；原文件不写。
+- 本机Linux 11/7：5专项覆盖全部8类扩展名、跨度／留白／单原子／顺序／非正交cell／最后帧／含空格与@路径／坏数据／旧分流／worker失败；2冻结路由与环境测试、3DOSCAR、57基础、8真实GTK、32面板启动（不含GLUT）和4旧启动场景通过。真实CLI XYZ→Show原生窗口、Open extxyz→原窗口刷新、坏文件保留原系统通过，已查看原生截图；初次沙箱不能连X11，授权显示后执行，8GTK首次skip不算通过。夹具的ToolButton信号、过早导入导致旧wildcard名遮蔽、复用旧chooser问题已修正，非应用功能改动。
+- Windows worker新增--read-structure、格式hiddenimports与下次--check-models导入断言；本次未构建或实测新Windows包，11/6交付EXE仍不含此功能。macOS未测；未改原生C++。指南及双语update_2026_11_07.md已同步。无进一步构建待自动执行，后续重新打包需用户任务；保留用户INCAR预设、原图与Fe_single_atom。
 
 ## Windows随包ASE／RDKit：已交付（2026-11-06）
 

@@ -36,6 +36,30 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 `bash install.sh --build-only` 后再 `bash p4v.sh`。WSLg 最终合成的物理光标大小仍需实际显示确认；
 不能仅凭 X11 报告的像素尺寸认定视觉问题已经解决。
 
+### 用 ASE 打开其他结构格式（2026-11-07）
+
+除原来的 VASP 文件外，命令行和 File／Open 现在也支持 `.xyz`、`.extxyz`、`.cif`、`.pdb`、`.mol`、`.sdf`、`.xsf`、`.traj`。例如已设置 p4v 别名后：
+
+```bash
+p4v test.xyz
+p4v crystal.cif
+```
+
+也可以从仓库运行 `bash p4v.sh /path/to/test.xyz`。载入后点击 **Show** 显示结构，后续可按原来的 Build／保存方式操作；不会修改原始文件或自动写出 POSCAR。
+
+- 没有晶胞时，按笛卡尔坐标计算各方向跨度，盒长分别为 `跨度 + 20 Å`，平移后各方向最外侧原子距离两侧盒壁各 10 Å；单原子使用 20×20×20 Å 的盒子。
+- 已有完整晶胞（包括 extended XYZ 的 Lattice）则保留晶胞和坐标，不再加空白。仅有一维／二维晶胞时会明确报错，请提供完整三维晶胞或无晶胞结构。
+- 保留原子顺序。支持多帧的格式（如 XYZ／trajectory）读取最后一帧，不导入整条轨迹；MOL／SDF 使用 ASE 的单结构读取器。
+- 这是几何结构导入：原始周期边界标志保留在导入信息中，p4vasp 的晶胞／重复显示仍沿用原有规则；键级、电荷、速度、计算结果和任意扩展属性不会完整转换为 VASP 输入。自动盒子是显示／建模起点，正式计算前需核对参数。
+
+Linux／macOS 源码版需要可用的 ASE 环境；若缺失，在仓库目录运行下面的命令，再启动 p4vasp：
+
+```bash
+bash install/install-ase.sh
+```
+
+也可通过 `P4VASP_ASE_PYTHON` 指定已有 ASE 解释器。读取在独立进程中进行，60 秒超时；File／Open 失败时保留原系统。新版 Windows 构建脚本已接入随包 ASE 读取器及格式模块，但本次未生成／核验新 Windows 包，11 月 6 日旧 EXE 尚不包含此功能。
+
 ### 空目录启动与初始结构提示
 
 从没有vasprun.xml的目录启动时，程序正常创建New structure空白建模系统；可直接使用Models，或Open已有POSCAR。已经通过启动参数／会话打开的系统保留，不再额外追加当前目录的vasprun.xml；没有可选setup.xml时也不尝试读取。

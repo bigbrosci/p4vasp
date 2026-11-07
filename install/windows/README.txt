@@ -13,6 +13,12 @@ work through the included model-worker executable. No PATH or Python setup is
 required. Keep model-worker with the main application; its private runtime is
 separate from GTK. These are initial structures, not DFT-optimized results.
 
+Structure import (new builds): launch p4vasp.exe test.xyz, or use File/Open,
+then Show. XYZ/extxyz, CIF, PDB, MOL/SDF, XSF and ASE trajectory are supported.
+Cell-free structures receive 10 Angstrom of padding on each Cartesian side;
+complete cells and atom order are retained. Supported multi-frame formats use
+the last frame. This imports geometry, not complete calculation metadata.
+
 Optional synthetic diagnostics (use new/empty output folders):
   p4vasp-console.exe --check-runtime C:\path\to\new-output
   p4vasp-console.exe --check-gui C:\path\to\new-gui-output

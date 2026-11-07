@@ -19,6 +19,11 @@ class BundledWorkerTest(unittest.TestCase):
                 self.assertEqual(bundled_worker(),worker)
                 self.assertEqual(bulk_command(),[str(worker),'--bulk'])
                 self.assertEqual(smiles_command(),[str(worker),'--smiles'])
+                from p4vasp.ase_import import load_structure
+                with patch('subprocess.run',return_value=subprocess.CompletedProcess([],0,'{"ok":true,"result":{"atoms":1}}','')) as run:
+                    self.assertEqual(load_structure(root/'one.xyz'),{'atoms':1})
+                    self.assertEqual(run.call_args.args[0],[str(worker),'--read-structure'])
+                    self.assertEqual(run.call_args.kwargs['env']['PYINSTALLER_RESET_ENVIRONMENT'],'1')
                 with patch.object(sys,'platform','win32'),patch.object(subprocess,'CREATE_NO_WINDOW',0x08000000,create=True):
                     options=launch_options([str(worker),'--bulk'])
                     self.assertEqual(options['creationflags'],0x08000000)

@@ -1203,6 +1203,25 @@ class DoscarSystemPM(SystemPM):
             return _doscar_header(stream)[1]
 
 
+class ASESystemPM(SystemPM):
+    """Imported geometry only; no VASP results inferred from neighboring files."""
+    def __init__(self,path):
+        from io import StringIO
+        from p4vasp.ase_import import load_structure
+        path=os.path.abspath(os.fspath(path))
+        result=load_structure(path)
+        structure=Structure()
+        structure.read(StringIO(result['poscar']))
+        structure.comment=os.path.basename(path)
+        SystemPM.__init__(self,path)
+        self.add('PATH',os.path.dirname(path))
+        self.add('NAME',os.path.basename(path))
+        self.add('INITIAL_STRUCTURE',structure)
+        self.add('INCAR',Incar())
+        self.add('PROGRAM','ASE import')
+        self.add('ASE_IMPORT_INFO',result)
+
+
 def getSystem(path):
     path=os.fspath(path)
     if os.path.isdir(path):
@@ -1212,6 +1231,9 @@ def getSystem(path):
     elif lower(path[-4:])==".xml":
         return XMLSystemPM(path)
     else:
+        from p4vasp.ase_import import FORMATS
+        if os.path.splitext(path)[1].lower() in FORMATS:
+            return ASESystemPM(path)
         return PoscarSystemPM(path)
 
 if __name__=="__main__":

@@ -455,9 +455,9 @@ class Frame(SystemListListener):
         self.last_system_path=path
         try:
             systemlist().activate(getSystem(path))
-        except Exception:
+        except Exception as error:
             traceback.print_exc()
-            msg().error("Can not load selected system. See p4vasp.log for details.")
+            msg().error("Can not load selected system: %s"%error)
         finally:
             w.hide()
 
@@ -842,7 +842,11 @@ def init():
         s=sys.argv[i]
         msg().status("reading %s"%s)
         yield 1
-        frame.addSystem(getSystem(s))
+        try:
+            frame.addSystem(getSystem(s))
+        except Exception as error:
+            traceback.print_exc()
+            msg().error("Can not load %s: %s"%(s,error))
 
     applets().activate(applets().factory.create("p4vasp.applet.InfoApplet.InfoApplet"))
     if os.path.isfile("setup.xml"):

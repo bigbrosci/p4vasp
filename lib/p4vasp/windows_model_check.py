@@ -31,6 +31,13 @@ def main(args):
                                 **launch_options([str(worker),'--versions']))
         report['versions']=json.loads(versions.stdout)
         report['checks'].append('bundled ASE/RDKit version query with isolated child environment')
+        from p4vasp.SystemPM import getSystem
+        xyz=out/'import.xyz'
+        xyz.write_text('2\nimport probe\nH -1 0 0\nH 1 0 0\n',encoding='utf-8')
+        imported=getSystem(xyz)
+        assert len(imported.INITIAL_STRUCTURE)==2 and imported.ASE_IMPORT_INFO['boxed']
+        assert imported.ASE_IMPORT_INFO['cell']==[[22,0,0],[0,20,0],[0,0,20]]
+        report['checks'].append('frozen getSystem -> bundled ASE XYZ reader -> 10 Angstrom padding on each side')
         cp4vasp.VisInit()
         window=Gtk.Window();window.set_default_size(1000,700)
         models=ModelsApplet();window.add(models.createPanel());models.initUI();window.show_all()
