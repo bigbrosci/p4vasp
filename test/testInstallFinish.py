@@ -31,8 +31,11 @@ class FinishTest(unittest.TestCase):
             result=self.run_finish(root)
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('GUI startup check: PASSED',result.stdout)
-            self.assertIn('Shell alias: CONFIGURED',result.stdout)
-            self.assertIn('NEXT STEP: Reload',result.stdout)
+            self.assertIn('Command setup: CONFIGURED',result.stdout)
+            self.assertIn('NEXT STEP: Try these commands',result.stdout)
+            for command in ('p4v POSCAR','p4v test.xyz','p4v OUTCAR','p4v POSCAR -o top.png --view top','p4v POSCAR -o side.png --view side'):
+                self.assertIn(command,result.stdout)
+            self.assertNotIn('source ~/.bashrc',result.stdout)
             original=rc.read_bytes();mtime=rc.stat().st_mtime_ns
             (root/'p4v.sh').write_text('printf "%s\\n" "$0"\n')
             check=subprocess.run(['bash','-O','expand_aliases','-c','source '+shlex.quote(str(rc))+'\np4v'],capture_output=True,text=True)
@@ -76,7 +79,7 @@ class FinishTest(unittest.TestCase):
                 self.assertTrue((directory/'.bashrc').is_file())
             directory=root/'dependencies';result=self.run_finish(directory,launch=0,configure=0)
             self.assertEqual(result.returncode,0)
-            self.assertIn('Shell alias: SKIPPED (--deps-only)',result.stdout)
+            self.assertIn('Command setup: SKIPPED (--deps-only)',result.stdout)
             self.assertFalse((directory/'.bashrc').exists())
 
     def test_zsh_destination_and_malformed_block(self):
@@ -85,11 +88,11 @@ class FinishTest(unittest.TestCase):
             result=self.run_finish(root,launch=0,shell='zsh',zdotdir=root)
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertTrue((root/'.zshrc').is_file())
-            self.assertIn('Reload this zsh terminal',result.stdout)
+            self.assertIn('COMMON COMMANDS:',result.stdout)
             rc=root/'.bashrc';original=BEGIN+'\n# incomplete block\n';rc.write_text(original)
             result=self.run_finish(root,launch=0)
             self.assertEqual(result.returncode,0)
-            self.assertIn('Shell alias: NOT CONFIGURED',result.stdout)
+            self.assertIn('Command setup: NOT CONFIGURED',result.stdout)
             self.assertIn('Incomplete/duplicate',result.stderr)
             self.assertEqual(rc.read_text(),original)
 
@@ -108,7 +111,7 @@ class FinishTest(unittest.TestCase):
             result=self.run_finish(root,launch=0,receipt=receipt)
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertEqual(receipt.read_bytes(),str(root/'.bashrc').encode()+b'\0')
-            self.assertIn('calling Bash terminal will reload automatically',result.stdout)
+            self.assertIn('EXPORT PNG (no GUI window):',result.stdout)
             self.assertNotIn('NEXT STEP: Reload this',result.stdout)
 
 

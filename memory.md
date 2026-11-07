@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装末尾常用命令示例（2026-11-07）
+
+- 用户要求用常用命令替代bashrc说明，并加top/side导出。finish-install.sh正常结束只显示简短GUI/Command setup结果及NEXT STEP/COMMON COMMANDS/EXPORT PNG：p4v、POSCAR、test.xyz、频率OUTCAR、两条--view top/side导出。保留ASE条件、计算目录提示；自动配置/父source机制不变，正常不打印rc路径/追加/备份细节，出错仍显示原因与NOT CONFIGURED，普通bash调用仅提示开新终端。备份仍在实际rc同目录。
+- 本机6 finish与13 unified测试通过（含新输出断言、源入口/receipt回归），shell语法/diff通过。实际临时合成POSCAR经p4v.sh执行两条打印参数（仅替换alias为bash绝对启动器）无DISPLAY导出top/side，各1000×1000，PNG可读且哈希不同；没有真实重新安装、改用户rc或GUI验收。安装指南与双语记录同步，未生成Windows包。
+
 ## 安装后自动source当前Bash（2026-11-07）
 
 - 用户要求安装后自动source。已新增Bash用source install.sh入口：安装/构建仍在隔离子进程中执行，finish-install仅在成功配置后通过私有临时receipt回传rc路径（NUL分隔），父Bash自动builtin source并确认p4v别名存在，打印ready。不会用exec替换父终端，不改变父目录/安装器选项或泄漏临时函数；receipt成功/失败均清理。
