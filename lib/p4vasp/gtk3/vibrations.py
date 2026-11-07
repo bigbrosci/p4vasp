@@ -6,6 +6,7 @@ import time
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.mode_view import ModeView
 from p4vasp.gtk3.install_hint import InstallHint
+from p4vasp.gtk3.file_dialogs import CompactFileDialog
 from p4vasp.vibrations import task, displaced_structure
 
 
@@ -179,11 +180,10 @@ class VibrationsPage(Gtk.Box):
         self.start({'action':'read','path':self.pending_path},'read')
 
     def open(self,*_):
-        dialog=Gtk.FileChooserDialog(title='Open frequency OUTCAR',transient_for=self.parent(),action=Gtk.FileChooserAction.OPEN)
-        dialog.add_buttons('Cancel',Gtk.ResponseType.CANCEL,'Open',Gtk.ResponseType.OK)
-        dialog.set_default_size(650,450)
-        if dialog.run()==Gtk.ResponseType.OK:self.load_path(dialog.get_filename())
-        dialog.destroy()
+        directory=Path(self.data['path']).parent if self.data else Path.cwd()
+        self.file_dialog=CompactFileDialog(self.parent(),directory,'Open frequency OUTCAR')
+        path=self.file_dialog.run()
+        if path:self.load_path(path)
 
     def select_mode(self,selection):
         model,iterator=selection.get_selected()
@@ -241,11 +241,9 @@ class VibrationsPage(Gtk.Box):
         self.pause();self.scale.set_value(0);self.static_preview()
 
     def destination(self,title,name):
-        dialog=Gtk.FileChooserDialog(title=title,transient_for=self.parent(),action=Gtk.FileChooserAction.SAVE)
-        dialog.add_buttons('Cancel',Gtk.ResponseType.CANCEL,'Save',Gtk.ResponseType.OK)
-        dialog.set_default_size(650,450);dialog.set_current_name(name)
-        path=dialog.get_filename() if dialog.run()==Gtk.ResponseType.OK else None
-        dialog.destroy();return path
+        directory=Path(self.data['path']).parent if self.data else Path.cwd()
+        self.file_dialog=CompactFileDialog(self.parent(),directory,title,save_name=name)
+        return self.file_dialog.run()
 
     def export_poscar(self,path):
         if not self.data or not self.data['modes'][self.mode]['imaginary']:raise ValueError('Select an imaginary mode first.')

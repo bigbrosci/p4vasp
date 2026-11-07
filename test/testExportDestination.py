@@ -10,7 +10,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'lib'))
 from p4vasp.gtk3 import Gtk, GLib
-from p4vasp.gtk3.file_dialogs import PngSaveDialog, FolderDialog
+from p4vasp.gtk3.file_dialogs import PngSaveDialog, FolderDialog, CompactFileDialog
 
 
 @unittest.skipUnless(Gtk.init_check()[0], 'GTK display required')
@@ -56,7 +56,11 @@ class DestinationTests(unittest.TestCase):
             folder.mkdir(parents=True, exist_ok=True)
             surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
             dialog.draw(cairo.Context(surface))
-            surface.write_to_png(str(folder/('folder.png' if 'folder' in dialog.get_title() else 'save.png')))
+            title=dialog.get_title()
+            filename=('frequency-open.png' if title=='Open frequency OUTCAR' else
+                      'frequency-save.png' if title=='Save displaced POSCAR' else
+                      'folder.png' if 'folder' in title else 'save.png')
+            surface.write_to_png(str(folder/filename))
 
     def test_small_workarea_save_and_browse_buttons(self):
         (self.root/('long folder name '*10)).mkdir()
@@ -74,6 +78,52 @@ class DestinationTests(unittest.TestCase):
             save.dialog.response(Gtk.ResponseType.CANCEL)
         self.later(inspect_save)
         self.assertIsNone(save.run())
+
+    def test_compact_open_small_screen_file_navigation(self):
+        child=self.root/('long directory '*9);child.mkdir()
+        target=child/'OUTCAR with spaces 测试';target.write_text('synthetic')
+        with patch('p4vasp.gtk3.file_dialogs.workarea',return_value=SimpleNamespace(width=640,height=480)):
+            browser=CompactFileDialog(None,self.root,'Open frequency OUTCAR')
+        def choose():
+            self.assert_buttons_fit(browser.dialog)
+            self.assertEqual(browser.dialog.get_widget_for_response(Gtk.ResponseType.OK).get_label(),'Open')
+            browser.tree.emit('row-activated',Gtk.TreePath.new_from_string('0'),browser.tree.get_column(0))
+            self.assertEqual(browser.current,child)
+            browser.tree.get_selection().select_path('0')
+            self.assertEqual(browser.filename.get_text(),target.name)
+            browser.dialog.response(Gtk.ResponseType.OK)
+        self.later(choose)
+        self.assertEqual(browser.run(),str(target))
+
+    def test_compact_save_buttons_and_existing_file_rejection(self):
+        target=self.root/'POSCAR';target.write_text('keep original')
+        with patch('p4vasp.gtk3.file_dialogs.workarea',return_value=SimpleNamespace(width=640,height=480)):
+            browser=CompactFileDialog(None,self.root,'Save displaced POSCAR',save_name='POSCAR')
+        def correct():
+            self.assertIn('not overwritten',browser.error.get_text())
+            browser.filename.set_text('POSCAR_new')
+            browser.dialog.response(Gtk.ResponseType.OK)
+        def inspect():
+            self.assert_buttons_fit(browser.dialog)
+            self.assertEqual(browser.dialog.get_widget_for_response(Gtk.ResponseType.OK).get_label(),'Save')
+            self.later(correct);browser.dialog.response(Gtk.ResponseType.OK)
+        self.later(inspect)
+        self.assertEqual(browser.run(),str(self.root/'POSCAR_new'))
+        self.assertEqual(target.read_text(),'keep original')
+
+    def test_compact_missing_file_cancel_and_pasted_path(self):
+        target=self.root/'OUTCAR';target.write_text('synthetic')
+        browser=CompactFileDialog(None,self.root,'Open frequency OUTCAR')
+        def correct():
+            self.assertIn('does not exist',browser.error.get_text())
+            browser.location.set_text(str(target));browser.location.emit('activate')
+        def invalid():
+            browser.filename.set_text('missing');self.later(correct)
+            browser.dialog.response(Gtk.ResponseType.OK)
+        self.later(invalid);self.assertEqual(browser.run(),str(target))
+        browser=CompactFileDialog(None,self.root,'Open frequency OUTCAR')
+        self.later(lambda:browser.dialog.response(Gtk.ResponseType.CANCEL))
+        self.assertIsNone(browser.run())
 
     def test_export_callback_receives_png_path(self):
         from p4vasp.export_image import ExportImageDialog

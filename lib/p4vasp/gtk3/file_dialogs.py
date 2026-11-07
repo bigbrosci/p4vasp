@@ -1,4 +1,4 @@
-"""Compact PNG destination dialogs, independent of desktop chooser saved sizes."""
+"""Compact file/folder dialogs, independent of desktop chooser saved sizes."""
 from pathlib import Path
 
 from p4vasp.gtk3 import Gtk, Gdk
@@ -105,6 +105,94 @@ class FolderDialog:
             return None
         finally:
             self.dialog.destroy()
+
+
+class CompactFileDialog(FolderDialog):
+    """File navigation using the bounded folder browser, without GtkFileChooser.
+
+    Open accepts existing files; save exclusively selects a new destination.
+    Short entry requests and an expanding scroll area keep actions on screen.
+    """
+    def __init__(self, parent, directory, title, save_name=None):
+        self.saving=save_name is not None
+        super().__init__(parent,directory)
+        self.dialog.set_title(title)
+        self.dialog.get_widget_for_response(Gtk.ResponseType.OK).set_label('Save' if self.saving else 'Open')
+        self.dialog.set_default_response(Gtk.ResponseType.OK)
+        fit_dialog(self.dialog,parent,580,390)
+        self.tree.get_column(0).set_title('Folders and files (double-click to open)')
+        self.filename=entry(save_name or '')
+        self.filename.set_activates_default(True)
+        row=Gtk.Box(spacing=8)
+        row.pack_start(Gtk.Label(label='Filename:'),False,False,0)
+        row.pack_start(self.filename,True,True,0)
+        box=self.dialog.get_content_area()
+        box.pack_start(row,False,False,0);box.reorder_child(row,1)
+        self.tree.get_selection().connect('changed',self.selected)
+        self.error.set_lines(3)
+        self.error.set_ellipsize(Pango.EllipsizeMode.END)
+
+    def navigate(self,directory):
+        try:
+            path=Path(directory).expanduser().absolute()
+            if path.is_file() and hasattr(self,'filename'):
+                self.navigate(path.parent)
+                self.filename.set_text(path.name)
+                self.dialog.response(Gtk.ResponseType.OK)
+                return True
+            children=sorted(path.iterdir(),key=lambda p:(not p.is_dir(),p.name.casefold()))
+        except (OSError,ValueError) as error:
+            self.error.set_text('Could not open folder: '+str(error))
+            return False
+        self.current=path;self.location.set_text(str(path));self.model.clear()
+        if hasattr(self,'filename') and not self.saving:self.filename.set_text('')
+        for child in children:
+            self.model.append([child.name+('/' if child.is_dir() else ''),str(child)])
+        self.up.set_sensitive(path.parent!=path);self.error.set_text('')
+        return True
+
+    def selected(self,selection):
+        model,iterator=selection.get_selected()
+        if iterator is None:return
+        path=Path(model[iterator][1])
+        if path.is_file():self.filename.set_text(path.name)
+        elif not self.saving:self.filename.set_text('')
+
+    def select_file(self,path):
+        path=Path(path).expanduser().absolute()
+        if self.navigate(path.parent):self.filename.set_text(path.name)
+
+    def destination(self):
+        location=self.location.get_text()
+        if not location:raise ValueError('Enter a folder path.')
+        directory=Path(location).expanduser().absolute()
+        if not directory.is_dir():raise ValueError('Choose an existing folder, or paste a file path and press Enter.')
+        name=self.filename.get_text()
+        if not name:
+            model,iterator=self.tree.get_selection().get_selected()
+            if iterator is not None:
+                path=Path(model[iterator][1])
+                if path.is_dir():self.navigate(path);return None
+            raise ValueError('Select a file or enter its filename.')
+        path=(directory/Path(name).expanduser()).absolute()
+        if path.is_dir():self.navigate(path);return None
+        if self.saving:
+            if not path.parent.is_dir():raise ValueError('Choose an existing destination folder.')
+            if path.exists():raise ValueError('Choose a new filename; existing files are not overwritten.')
+        elif not path.is_file():raise ValueError('The selected file does not exist.')
+        return path
+
+    def run(self):
+        self.dialog.show_all()
+        (self.filename if self.saving else self.tree).grab_focus()
+        try:
+            while self.dialog.run()==Gtk.ResponseType.OK:
+                try:path=self.destination()
+                except (ValueError,OSError) as error:
+                    self.error.set_text(str(error));continue
+                if path is not None:return str(path)
+            return None
+        finally:self.dialog.destroy()
 
 
 class PngSaveDialog:

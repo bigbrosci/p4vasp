@@ -60,13 +60,10 @@ def main():
         adj=page.scale.get_adjustment()
         assert adj.get_lower()==-1 and adj.get_upper()==1 and adj.get_step_increment()==.1
         def answer_save(name='POSCAR_displaced'):
-            for dialog in Gtk.Window.list_toplevels():
-                if isinstance(dialog,Gtk.FileChooserDialog) and dialog.get_visible() and dialog.get_action()==Gtk.FileChooserAction.SAVE:
-                    dialog.set_current_folder(str(folder));dialog.set_current_name(name)
-                    def respond():
-                        if dialog.get_filename()!=str(folder/name):return True
-                        dialog.response(Gtk.ResponseType.OK);return False
-                    GLib.timeout_add(100,respond);return False
+            browser=getattr(page,'file_dialog',None)
+            if browser and browser.saving and browser.dialog.get_visible():
+                browser.navigate(folder);browser.filename.set_text(name)
+                browser.dialog.response(Gtk.ResponseType.OK);return False
             return True
         GLib.timeout_add(50,answer_save);page.save_button.clicked();pump()
         output=folder/'POSCAR_displaced'
@@ -116,10 +113,9 @@ def main():
         # Asynchronous source loading, absent constraints and explicit export confirmation.
         no_flags=write_calculation(folder/'without flags',flags=False)
         def answer_open():
-            for dialog in Gtk.Window.list_toplevels():
-                if isinstance(dialog,Gtk.FileChooserDialog) and dialog.get_visible() and dialog.get_action()==Gtk.FileChooserAction.OPEN:
-                    dialog.set_filename(str(no_flags))
-                    GLib.timeout_add(200,lambda:(dialog.response(Gtk.ResponseType.OK),False)[1]);return False
+            browser=getattr(page,'file_dialog',None)
+            if browser and not browser.saving and browser.dialog.get_visible():
+                browser.select_file(no_flags);browser.dialog.response(Gtk.ResponseType.OK);return False
             return True
         GLib.timeout_add(50,answer_open);page.open_button.clicked();pump(lambda:page.job is None,30)
         assert page.data['constraints_source'] is None

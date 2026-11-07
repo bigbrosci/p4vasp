@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率面板文件窗口按钮不可见修复（2026-11-07）
+
+- 用户报告Open frequency OUTCAR弹窗找不到按钮，类似旧PNG窗口超屏。源码确认gtk3/vibrations.py使用原生Gtk.FileChooserDialog，仅set_default_size不足以限制自然最小尺寸／桌面保存尺寸；此前未验证这一用户环境尺寸。现改用file_dialogs.py新增CompactFileDialog，继承已用FolderDialog的紧凑Gtk.Dialog导航，fit_dialog按工作区设尺寸，use_header_bar=False底部动作固定；该面板Open及POSCAR/JSON保存一起接入，原PNG/Folder逻辑保留。
+- 支持目录/文件列表、Up/Home、双击、文件名、完整路径Enter、失效路径错误、Cancel和新文件名校验；路径保留真实尾空格。GUI长目录用例发现新增dialog曾strip尾空格导致拒绝合法目录，已修正并重跑；首轮被等待modal的测试进程已终止，不记为通过。
+- 本机Linux 11/7：8项testExportDestination通过（含3新增compact用例，模拟640×480工作区/实际映射按钮坐标、长/中文/空格路径、打开/保存/取消/已有文件拒绝与旧PNG回归）；实际Vibrations完整Open/双保存/F/G/Scale等集成通过，8 GTK通过，编译/diff通过。已查看frequency-open.png/frequency-save.png映射widget截图，按钮位于窗口内；截图在/tmp/p4vasp-frequency-dialogs。未在另一平台/用户实际DPI设置核验，不新建Windows EXE。
+- 操作指南和当日双语记录同步；本任务已完成，纯Python更新重启即可，无原生重编译。保留用户无关预设/原图/Fe_single_atom。
+
 ## 频率分析三步功能（2026-11-07）
 
 - 当前任务：用户批准频率列表／动画、ASE热化学、沿虚频Scale导出，源码已完成。新增左侧Vibrations及Analysis菜单→vibrations.glade→VibrationsApplet→gtk3/vibrations.py；ModeView用GTK/Cairo交互三维投影嵌入面板，右侧模式列表；不嵌FLTK，不改Show/Build。vibrations.py为数据／worker核心，新增VibrationSystemPM支持p4v OUTCAR及主Open；面板可独立Open，或从当前系统PATH找OUTCAR。
