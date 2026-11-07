@@ -1,8 +1,16 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-01。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-06。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
+
+## 随包ASE与RDKit（2026-11-06）
+
+当前打包流程已加入独立model-worker，携带ASE3.29.0、RDKit2026.09.1及匹配Python运行库；GUI继续使用原UCRT64工具链。首次构建会从Python.org／PyPI准备项目专用缓存环境，后续复用；不需要给Windows系统安装Python。程序运行时不联网安装依赖，不需配置PATH。
+
+更新仍执行原来的 `bash install/update-windows.sh`。自动验收新增冻结版 `--check-models`，覆盖实际bulk与SMILES界面、随包计算程序、预览、保存和取消。只有整包检查通过后才生成成功ZIP。请保留主目录的 `_internal` 与 `model-worker`，不能只复制EXE。依赖许可随包保留。
+
+本次独立计算程序已实测成功，完整新版构建／交付结果以更新记录的后续完成记录为准；下方11月1日旧包不含这些依赖。
 
 ## 最近一次构建（2026-11-01）
 

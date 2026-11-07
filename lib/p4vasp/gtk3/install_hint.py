@@ -19,6 +19,13 @@ class InstallHint(Gtk.Box):
         self.command.set_width_chars(1)
         self.command.set_hexpand(True)
         self.copy_button = Gtk.Button(label='Copy command')
+        from p4vasp.model_worker import bundled_worker
+        if bundled_worker() is not None:
+            self.caption.set_text(dependency+' is included. No installation or PATH setup is required.')
+            self.command.set_no_show_all(True)
+            self.copy_button.set_no_show_all(True)
+            self.copy_button.set_sensitive(False)
+            return
         path = Path(p4vasp.p4vasp_home).resolve()/'install'/script
         available = sys.platform != 'win32' and not getattr(sys, 'frozen', False) and path.is_file()
         if available:

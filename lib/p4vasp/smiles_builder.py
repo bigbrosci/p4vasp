@@ -80,6 +80,9 @@ def molecule_from_result(result):
 def worker_command():
     configured=os.environ.get('P4VASP_SMILES_PYTHON')
     if configured:return [configured,'-m','p4vasp.smiles_builder']
+    from p4vasp.model_worker import bundled_worker
+    bundled=bundled_worker()
+    if bundled is not None:return [str(bundled),'--smiles']
     root=Path(p4vasp.p4vasp_home)
     for relative in ('.venv-smiles/bin/python','.venv-smiles/Scripts/python.exe'):
         python=root/relative
@@ -111,11 +114,15 @@ class SmilesTask:
             if self.cancelled.is_set():raise RuntimeError('SMILES generation cancelled.')
             env=os.environ.copy()
             env['PYTHONPATH']=str(Path(__file__).resolve().parents[1])+os.pathsep+env.get('PYTHONPATH','')
-            env['OMP_NUM_THREADS']='1';env['OPENBLAS_NUM_THREADS']='1'
+            from p4vasp.model_worker import launch_options
+            command=worker_command()
+            options=launch_options(command)
+            if not getattr(sys,'frozen',False):options['env'].update(env)
+            options['env']['OMP_NUM_THREADS']='1';options['env']['OPENBLAS_NUM_THREADS']='1'
             with self.lock:
                 if self.cancelled.is_set():raise RuntimeError('SMILES generation cancelled.')
-                self.process=subprocess.Popen(worker_command(),stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
-                                              text=True,encoding='utf-8',env=env)
+                self.process=subprocess.Popen(command,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+                                              text=True,encoding='utf-8',**options)
             try:stdout,stderr=self.process.communicate(json.dumps({'smiles':self.smiles}),timeout=self.timeout)
             except subprocess.TimeoutExpired:
                 self.process.kill();self.process.communicate()

@@ -11,6 +11,9 @@ if __name__ == "__main__":
     if cli_args and cli_args[0] == '--check-runtime':
         from p4vasp.windows_check import main as check_runtime
         check_runtime(cli_args[1:])
+    if cli_args and cli_args[0] == '--check-models':
+        from p4vasp.windows_model_check import main as check_models
+        check_models(cli_args[1:])
     if cli_args and cli_args[0] == '--check-gui':
         from p4vasp.windows_check import prepare_gui_check
         prepare_gui_check(cli_args[1:])

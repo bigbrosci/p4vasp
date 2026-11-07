@@ -90,6 +90,10 @@ def worker_command():
     configured = os.environ.get('P4VASP_ASE_PYTHON')
     candidates = [root/'.venv-ase/bin/python', root/'.venv-ase/Scripts/python.exe']
     python = configured or next((str(path) for path in candidates if path.is_file()), None)
+    if not configured:
+        from p4vasp.model_worker import bundled_worker
+        bundled=bundled_worker()
+        if bundled is not None:return [str(bundled),'--bulk']
     if python is None:
         if getattr(sys, 'frozen', False):
             raise RuntimeError('This portable build does not bundle ASE. Use a configured ASE source environment.')
@@ -122,11 +126,12 @@ class BulkTask:
         result, error = None, None
         try:
             command = worker_command()
-            env = dict(os.environ, OMP_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1')
+            from p4vasp.model_worker import launch_options
+            options = launch_options(command)
             with self.lock:
                 if self.cancelled.is_set(): raise RuntimeError('Bulk generation cancelled.')
                 self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                                stderr=subprocess.PIPE, text=True, encoding='utf-8', env=env)
+                                                stderr=subprocess.PIPE, text=True, encoding='utf-8', **options)
             try:
                 output, stderr = self.process.communicate(json.dumps(self.request), timeout=self.timeout)
             except subprocess.TimeoutExpired:

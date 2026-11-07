@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-06. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows随包ASE／RDKit：构建中（2026-11-06）
+
+- 用户明确要求生成自带ASE/RDKit的Windows版本。已实现独立CPython model-worker、冻结客户端自动选择／子进程环境清理／隐藏控制台和已内置提示；不在GTK/UCRT进程加载MSVC科学DLL。主包脚本新增worker冻结，更新器新增--check-models真实GUI验收，旧版保留。
+- Windows缓存：LOCALAPPDATA/p4vasp-build/python-3.13.17，官方embeddable CPython3.13.17＋ASE3.29.0＋RDKit2026.09.1＋PyInstaller6.22.3；引导pip wheel按PyPI元数据SHA256检查，Python来源与下载哈希／依赖清单保留。专用探针在Windows checkout build/windows-update/model-tools，不影响Git干净检查。
+- 独立冻结worker的版本查询、32Cu bulk和乙醇MMFF94s收敛实测通过；2路由／隔离、3bulk worker、4SMILES worker、7更新器保护测试、57基础和实际Linux bulk/SMILES GUI回归通过。源码实现将先提交用于可追溯构建；完整Windows主包／冻结GUI模型验收／迁移交付仍待本任务后续完成，不能将探针当交付包。
+- 入口／操作说明与双语记录已更新为待验收边界；原INCAR预设、原图和Fe_single_atom继续保留，不打包未提交数据。
+
 ## DOS缩放刻度长小数（2026-11-06）
 
 - 用户报告缩放后部分Y轴ticks出现很多小数位。graph.py中X/YAxis.render用str(i*major)直接显示二进制尾差；新增Axis.formatTick共用格式，默认6有效数字，按刻度量级／步长增加分辨率（上限17），归一负零。只改文字，不改DOS、能量、范围或刻度位置。

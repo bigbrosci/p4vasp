@@ -42,15 +42,15 @@ def verify(release, reports):
     env = dict(os.environ)
     for name in ('PYTHONPATH', 'PYTHONHOME', 'P4VASP_HOME', 'GI_TYPELIB_PATH',
                  'GTK_PATH', 'GTK_DATA_PREFIX', 'GTK_EXE_PREFIX', 'GIO_MODULE_DIR',
-                 'MSYSTEM', 'MINGW_PREFIX'):
+                 'MSYSTEM', 'MINGW_PREFIX', 'P4VASP_SMILES_PYTHON', 'P4VASP_ASE_PYTHON'):
         env.pop(name, None)
     windows = Path(env.get('SystemRoot', r'C:\Windows'))
     env['PATH'] = str(windows/'System32') + os.pathsep + str(windows)
     reports.mkdir()
-    for option, name in (('--check-runtime', 'runtime'), ('--check-gui', 'gui')):
+    for option, name in (('--check-runtime', 'runtime'), ('--check-gui', 'gui'), ('--check-models', 'models')):
         executable = 'p4vasp.exe' if name == 'gui' else 'p4vasp-console.exe'
         logged([release/executable, option, reports/name],
-               tempfile.gettempdir(), reports/(name+'.log'), env=env, timeout=60)
+               tempfile.gettempdir(), reports/(name+'.log'), env=env, timeout=180 if name=='models' else 60)
         report_path = reports/name/'report.json'
         if not report_path.is_file():
             raise RuntimeError(f'{name} process exited without a completion report; see {reports}')
@@ -102,9 +102,9 @@ def main(args=None):
         shutil.copytree(source/'dist/windows/p4vasp', release, dirs_exist_ok=True)
         (release/'SOURCE-COMMIT.txt').write_text(revision+'\n', encoding='utf-8')
         (release/'BUILD-STATUS.txt').write_text('Verification pending\n')
-        print('Checking portable runtime and GUI (test windows will open briefly)...', flush=True)
+        print('Checking portable runtime, GUI and bundled models (test windows will open briefly)...', flush=True)
         verify(release, release.with_name(release.name+'-checks'))
-        (release/'BUILD-STATUS.txt').write_text('Synthetic runtime and GUI checks passed; clean-machine acceptance pending.\n')
+        (release/'BUILD-STATUS.txt').write_text('Synthetic runtime, GUI and bundled ASE/RDKit model checks passed; clean-machine acceptance pending.\n')
         bundle = Path(shutil.make_archive(str(release), 'zip', root_dir=release.parent, base_dir=release.name))
         with bundle.open('rb') as handle:
             digest = hashlib.file_digest(handle, 'sha256').hexdigest()

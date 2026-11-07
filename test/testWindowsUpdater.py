@@ -65,6 +65,10 @@ class CheckoutGuards(unittest.TestCase):
             updater.verify(self.root/'release', reports)
         self.assertEqual(calls[0][0][0].name, 'p4vasp-console.exe')
         self.assertEqual(calls[1][0][0].name, 'p4vasp.exe')
+        self.assertEqual(calls[2][0][0].name, 'p4vasp-console.exe')
+        self.assertEqual(calls[2][0][1], '--check-models')
+        self.assertNotIn('P4VASP_SMILES_PYTHON',calls[2][1])
+        self.assertNotIn('P4VASP_ASE_PYTHON',calls[2][1])
         self.assertNotIn('PYTHONPATH', calls[1][1])
         self.assertNotIn('MSYSTEM', calls[1][1])
 

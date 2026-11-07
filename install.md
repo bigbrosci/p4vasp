@@ -314,3 +314,9 @@ bash install/install-rdkit.sh
 For Models → bulk, run `bash install/install-ase.sh` from the checkout. This installs tested ASE 3.29.0 into `.venv-ase` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Current validation is Linux/WSL only; the existing Windows portable build was not rebuilt with ASE. See [bulk usage](doc/ase-bulk-zh.md).
 
 Models → bulk使用前，在项目目录运行 `bash install/install-ase.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，当前Windows旧便携包不包含本轮新增功能。
+
+## Windows bundled ASE and RDKit / Windows随包建模依赖
+
+The Windows packaging pipeline now builds a private official-CPython model-worker with ASE 3.29.0 and RDKit 2026.09.1, separate from the UCRT64 GTK runtime. First build prepares an isolated cache from Python.org/PyPI; users need no external Python or PATH configuration. Keep the full folder including model-worker. Frozen --check-models validates real GUI generation/preview/export/cancellation; successful delivery evidence is recorded in the dated update.
+
+Windows打包流程已加入独立ASE／RDKit计算程序，首次构建下载专用缓存，不改系统Python。运行时自动调用，用户无需配置解释器路径；保留整个目录及model-worker。整包构建／交付以当日更新记录实际结果为准，11月1日旧包不因此自动获得依赖。
