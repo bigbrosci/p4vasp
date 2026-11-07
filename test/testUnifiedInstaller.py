@@ -91,6 +91,63 @@ class UnifiedInstallerTest(unittest.TestCase):
         self.run_installer(release=f'ID=$(touch "{marker}")\n')
         self.assertFalse(marker.exists())
 
+    def source_installer(self,args=(),exitcode=0,no_receipt=False,interactive=False):
+        (self.root/'os-release').write_text('ID=ubuntu\n')
+        receipt_dir=self.root/'receipts';receipt_dir.mkdir(exist_ok=True)
+        rc=self.root/'test rc'
+        rc.write_text(('case $- in *i*) ;; *) return;; esac\n' if interactive else '')+"alias p4v='printf READY\\n'\n")
+        (self.root/'install/ubuntu-bootstrap.sh').write_text('''
+if [ "${BACKEND_EXIT:-0}" -ne 0 ]; then exit "$BACKEND_EXIT"; fi
+for arg in "$@"; do if [ "$arg" = --deps-only ]; then exit 0; fi; done
+if [ "${TEST_NO_RECEIPT:-0}" -eq 0 ]; then
+    printf '%s\\0' "$P4VASP_SHELL_RC" > "$P4VASP_RELOAD_RECEIPT"
+fi
+''')
+        env=dict(os.environ,PATH=str(self.root/'bin')+':'+os.environ['PATH'],TEST_KERNEL='Linux',
+                 P4VASP_OS_RELEASE=str(self.root/'os-release'),TEST_ENTRY=str(self.root/'install.sh'),
+                 BACKEND_EXIT=str(exitcode),TEST_NO_RECEIPT=str(int(no_receipt)),
+                 P4VASP_SHELL_RC=str(rc),TMPDIR=str(receipt_dir))
+        script='''ROOT=preserve-parent
+p4v_options=$-
+p4v_directory=$PWD
+if source "$TEST_ENTRY" "$@"; then p4v_status=0; else p4v_status=$?; fi
+printf 'SOURCE_STATUS:%s\\n' "$p4v_status"
+[[ "$ROOT" == preserve-parent && "$-" == "$p4v_options" && "$PWD" == "$p4v_directory" ]] || exit 99
+if declare -F _p4vasp_install_and_reload >/dev/null; then exit 98; fi
+if alias p4v >/dev/null 2>&1; then p4v; else echo NO_ALIAS; fi
+'''
+        command=['bash','--noprofile','--norc']+(['-i'] if interactive else [])
+        result=subprocess.run([*command,'-O','expand_aliases','-c',script,'source-test',*args],
+                              env=env,cwd='/tmp',capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertFalse(list(receipt_dir.iterdir()))
+        return result
+
+    def test_source_reloads_parent_without_changing_options_or_directory(self):
+        result=self.source_installer(args=('--skip-deps','--no-launch'))
+        self.assertIn('SOURCE_STATUS:0',result.stdout)
+        self.assertIn('READY',result.stdout)
+        self.assertIn('p4v is ready in this terminal',result.stdout)
+
+    def test_source_interactive_bash_rc_guard(self):
+        result=self.source_installer(interactive=True)
+        self.assertIn('SOURCE_STATUS:0',result.stdout)
+        self.assertIn('READY',result.stdout)
+
+    def test_source_failure_does_not_reload_or_exit_parent(self):
+        result=self.source_installer(exitcode=23)
+        self.assertIn('SOURCE_STATUS:23',result.stdout)
+        self.assertIn('NO_ALIAS',result.stdout)
+        result=self.source_installer(no_receipt=True)
+        self.assertIn('SOURCE_STATUS:1',result.stdout)
+        self.assertIn('NO_ALIAS',result.stdout)
+
+    def test_source_dry_run_help_and_dependencies_do_not_reload(self):
+        for option in ('--dry-run','--help','--deps-only'):
+            result=self.source_installer(args=(option,))
+            self.assertIn('SOURCE_STATUS:0',result.stdout)
+            self.assertIn('NO_ALIAS',result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main()

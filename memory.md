@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装后自动source当前Bash（2026-11-07）
+
+- 用户要求安装后自动source。已新增Bash用source install.sh入口：安装/构建仍在隔离子进程中执行，finish-install仅在成功配置后通过私有临时receipt回传rc路径（NUL分隔），父Bash自动builtin source并确认p4v别名存在，打印ready。不会用exec替换父终端，不改变父目录/安装器选项或泄漏临时函数；receipt成功/失败均清理。
+- 普通bash install.sh因进程模型不能替父终端source，保留手动reload/新终端提示；source入口明确选当前Bash的bashrc而非登录SHELL可能指向的zshrc。zsh仍用bash install.sh及其zsh提示，未增加zsh直接source支持。dry-run/help/deps-only不加载，安装或配置失败不加载，不伪报ready。
+- 本机6 finish-install专项、13 unified-installer专项通过：父Bash能立即调用alias、交互Bash rc guard、父ROOT/选项/cwd保留、失败码23保留且父继续、无成功receipt不加载、dry/help/deps跳过和临时文件清理。真实入口source ./install.sh --dry-run、4脚本bash -n/测试编译/diff通过。使用临时rc和backend/launcher stub；没有真实安装、修改/加载本机用户bashrc、GUI或实际macOS/zsh验收。安装指南和当日双语记录同步；源码任务已完成，未授权另行构建Windows。
+
 ## 安装自动配置shell别名（2026-11-07）
 
 - 用户明确授权将配置bashrc写入安装流程，替代手动复制四行命令。统一install.sh经Unix后端finish-install.sh调用新configure-shell.py；默认~/.bashrc，SHELL为zsh时用ZDOTDIR或~/.zshrc。自动维护带标记的p4vasp区块，更新路径/重复安装幂等，保留其他内容/非UTF8字节/权限/符号链接，已有文件每次改变前备份，临时文件原子替换，不执行用户配置。

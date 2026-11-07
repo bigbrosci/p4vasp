@@ -23,7 +23,7 @@ finish_install() {
     local rc_file rc_display shell_kind='Bash' shell_result='SKIPPED (--deps-only).' configured=0
     rc_file="$HOME/.bashrc"
     rc_display='~/.bashrc'
-    if [[ "${SHELL:-}" == */zsh || "${SHELL:-}" == zsh ]]; then
+    if [[ "${P4VASP_CALLER_SHELL:-}" != bash && ( "${SHELL:-}" == */zsh || "${SHELL:-}" == zsh ) ]]; then
         shell_kind='zsh'
         rc_file="${ZDOTDIR:-$HOME}/.zshrc"
         if [[ -z "${ZDOTDIR:-}" ]]; then rc_display='~/.zshrc'; else printf -v rc_display '%q' "$rc_file"; fi
@@ -43,6 +43,9 @@ finish_install() {
             shell_result='NOT CONFIGURED (see the error above).'
         fi
     fi
+    if [[ "$configured" -eq 1 && -n "${P4VASP_RELOAD_RECEIPT:-}" ]]; then
+        printf '%s\0' "$rc_file" > "$P4VASP_RELOAD_RECEIPT" || return $?
+    fi
     echo
     echo '============================================================'
     echo '  p4vasp installation steps completed.'
@@ -51,9 +54,14 @@ finish_install() {
     echo '============================================================'
     echo
     if [[ "$configured" -eq 1 ]]; then
-        printf 'NEXT STEP: Reload this %s terminal (or open a new one)\n' "$shell_kind"
-        echo
-        printf 'source %s\n' "$rc_display"
+        if [[ -n "${P4VASP_RELOAD_RECEIPT:-}" ]]; then
+            echo 'NEXT STEP: The calling Bash terminal will reload automatically.'
+        else
+            printf 'NEXT STEP: Reload this %s terminal (or open a new one)\n' "$shell_kind"
+            echo
+            printf 'source %s\n' "$rc_display"
+            echo 'Tip for Bash: use source install.sh next time to reload automatically.'
+        fi
     elif [[ "${CONFIGURE_SHELL:-1}" -eq 1 ]]; then
         echo 'NEXT STEP: Resolve the shell-config error, then run:'
         echo

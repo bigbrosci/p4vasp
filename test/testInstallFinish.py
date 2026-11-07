@@ -12,13 +12,14 @@ BEGIN='# >>> p4vasp command >>>'
 
 
 class FinishTest(unittest.TestCase):
-    def run_finish(self,directory,code=0,display=':0',launch=1,rc=None,shell='bash',configure=1,zdotdir=None):
+    def run_finish(self,directory,code=0,display=':0',launch=1,rc=None,shell='bash',configure=1,zdotdir=None,receipt=None):
         directory.mkdir(parents=True,exist_ok=True)
         (directory/'p4v.sh').write_text('exit '+str(code)+'\n')
         env=dict(os.environ,DISPLAY=display,WAYLAND_DISPLAY='',TEST_ROOT=str(directory),
                  FINISH_SCRIPT=str(ROOT/'install/finish-install.sh'),TEST_LAUNCH=str(launch),
                  TEST_CONFIGURE=str(configure),SHELL='/bin/'+shell,PYTHON=sys.executable,
-                 P4VASP_SHELL_RC=str(rc or directory/'.bashrc'))
+                 P4VASP_SHELL_RC=str(rc or directory/'.bashrc'),
+                 P4VASP_RELOAD_RECEIPT=str(receipt) if receipt else '',P4VASP_CALLER_SHELL='bash' if receipt else '')
         if zdotdir is not None:
             env.update(ZDOTDIR=str(zdotdir),P4VASP_SHELL_RC='')
         return subprocess.run(['bash','-c','set -euo pipefail; ROOT="$TEST_ROOT"; LAUNCH="$TEST_LAUNCH"; CONFIGURE_SHELL="$TEST_CONFIGURE"; APP_ARGS=(); source "$FINISH_SCRIPT"; finish_install'],
@@ -100,6 +101,15 @@ class FinishTest(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertTrue(rc.is_symlink())
             self.assertIn(BEGIN,target.read_text())
+
+    def test_successful_reload_receipt_and_footer(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);receipt=root/'receipt';receipt.write_bytes(b'')
+            result=self.run_finish(root,launch=0,receipt=receipt)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(receipt.read_bytes(),str(root/'.bashrc').encode()+b'\0')
+            self.assertIn('calling Bash terminal will reload automatically',result.stdout)
+            self.assertNotIn('NEXT STEP: Reload this',result.stdout)
 
 
 if __name__=='__main__':unittest.main()
