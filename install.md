@@ -75,16 +75,17 @@ bash install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
 bash install.sh -- '/path with spaces/POSCAR'
 ```
 
-安装完成后，有图形环境时会自动打开 p4vasp，界面初始化并显示后停留约2秒，再自动关闭。结束提示改为英文，以 `========` 分隔安装结果和 `NEXT STEP`，分别显示 `GUI startup check: PASSED` 或 `SKIPPED`，并打印当前路径对应的可复制命令，例如：
+安装完成后，有图形环境时会自动打开 p4vasp，界面初始化并显示后停留约2秒，再自动关闭。结束提示为英文，以 `========` 分隔安装结果和 `NEXT STEP`，分别显示 `GUI startup check: PASSED` 或 `SKIPPED`，以及 shell 别名的配置结果。
+
+`bash install.sh` 现在会自动将 `p4v` 别名配置到当前运行用户的 `~/.bashrc`；zsh 用户写入 `${ZDOTDIR:-$HOME}/.zshrc`。在配置文件末尾新增带 p4vasp 标记的独立区块，重复安装更新该区块而不重复追加，项目路径改变后也会更新别名；保留区块外的原配置，修改已有文件前创建备份并打印备份位置，保留权限及配置文件的符号链接。配置标记残缺等问题会明确显示 `NOT CONFIGURED`，并提供手动处理提示。
+
+安装结束后，在当前终端执行输出的这一行即可：
 
 ```bash
-cat >> ~/.bashrc <<'P4VASP_ALIAS'
-alias p4v='bash /home/your-user/opt/p4vasp/p4v.sh'
-P4VASP_ALIAS
 source ~/.bashrc
 ```
 
-直接复制安装器实际输出的四行执行：追加别名到 `~/.bashrc` 并重新加载，以后输入 `p4v` 或 `p4v POSCAR` 即可启动。上面的 your-user 是文档示例，实际输出会填入安装路径；安装器本身只打印命令，不自动修改 shell 配置，追加不会覆盖原有配置。macOS 默认 zsh 用户应使用安装器单独打印的 `~/.zshrc` 替代命令块。
+zsh 用户使用安装器输出的 `source ~/.zshrc`（有 ZDOTDIR 时为实际路径）。之后输入 `p4v` 或 `p4v POSCAR` 即可；Ubuntu 的新 Bash 终端及通常的交互 zsh 终端会自动加载各自配置。安装脚本运行在子进程，不能替当前已打开的父终端执行生效，因此仍需这一次 `source`，或打开会加载该配置的新终端。`--deps-only` 不配置别名；`--no-launch`／`--build-only` 成功后仍会配置。
 
 无显示环境时跳过预览并明确提示GUI未验证；`--no-launch`、`--build-only`、`--deps-only` 不打开界面。启动失败不会显示GUI成功，初始化超过60秒会退出。两秒预览仅验证启动，不代表完整功能或科学计算验证。日常 `bash p4v.sh`／`p4v` 不会自动关闭。
 

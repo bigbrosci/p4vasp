@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装自动配置shell别名（2026-11-07）
+
+- 用户明确授权将配置bashrc写入安装流程，替代手动复制四行命令。统一install.sh经Unix后端finish-install.sh调用新configure-shell.py；默认~/.bashrc，SHELL为zsh时用ZDOTDIR或~/.zshrc。自动维护带标记的p4vasp区块，更新路径/重复安装幂等，保留其他内容/非UTF8字节/权限/符号链接，已有文件每次改变前备份，临时文件原子替换，不执行用户配置。
+- GUI启动失败时仍提前返回、不改rc；headless/no-launch/build-only成功流程会配置，两个后端deps-only跳过。写入或标记错误明确NOT CONFIGURED并给手动提示，不能误报已配置。英文完成区块保留，NEXT STEP改为单行source实际rc；子进程无法替父终端生效，新终端按各自启动文件读取。
+- 本机5项testInstallFinish通过：实际临时rc写入/读取alias（特殊路径含空格、单引号、$、反引号）、重复不改mtime/不增备份、更换checkout/备份字节/权限/非UTF8保留、失败与deps-only不写、headless/no-launch、zsh+ZDOTDIR目标/残缺标记拒绝、符号链接保留；9统一分流通过，4脚本bash -n/新helper编译/diff通过。均使用临时rc及启动stub，不重跑真实安装/GUI或修改本机用户bashrc；未实际macOS/zsh执行验收。当前安装指南/双语记录已同步，前条“只打印不修改”是旧行为；用户预设/原图/Fe_single_atom保留。
+
 ## 安装结束英文提示与复制配置命令（2026-11-07）
 
 - 用户要求安装末尾英文、分隔线和可复制bashrc配置命令。install/finish-install.sh改为英文Launching及分隔清楚的结果/NEXT STEP/START区块；GUI PASSED与SKIPPED区分，启动失败仍返回原错误码、不打印完成提示。输出四行带单引号heredoc的cat追加alias及source ~/.bashrc；保持原路径安全引用，不自动修改用户配置，macOS打印替代zshrc命令块。

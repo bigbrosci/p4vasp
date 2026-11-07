@@ -20,33 +20,55 @@ finish_install() {
     # Quote the alias value as literal shell text, including unusual path names.
     alias_definition="${launch_command//\'/\'\\\'\'}"
     alias_definition="alias p4v='$alias_definition'"
+    local rc_file rc_display shell_kind='Bash' shell_result='SKIPPED (--deps-only).' configured=0
+    rc_file="$HOME/.bashrc"
+    rc_display='~/.bashrc'
+    if [[ "${SHELL:-}" == */zsh || "${SHELL:-}" == zsh ]]; then
+        shell_kind='zsh'
+        rc_file="${ZDOTDIR:-$HOME}/.zshrc"
+        if [[ -z "${ZDOTDIR:-}" ]]; then rc_display='~/.zshrc'; else printf -v rc_display '%q' "$rc_file"; fi
+    fi
+    # Optional explicit destination for automation; never change HOME for tests.
+    if [[ -n "${P4VASP_SHELL_RC:-}" ]]; then
+        rc_file="$P4VASP_SHELL_RC"
+        printf -v rc_display '%q' "$rc_file"
+    fi
+    if [[ "${CONFIGURE_SHELL:-1}" -eq 1 ]]; then
+        local configure_script
+        configure_script="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/configure-shell.py"
+        if "${PYTHON:-python3}" "$configure_script" "$rc_file" "$alias_definition"; then
+            shell_result="CONFIGURED ($rc_file)."
+            configured=1
+        else
+            shell_result='NOT CONFIGURED (see the error above).'
+        fi
+    fi
     echo
     echo '============================================================'
     echo '  p4vasp installation steps completed.'
     printf '  GUI startup check: %s\n' "$gui_result"
+    printf '  Shell alias: %s\n' "$shell_result"
     echo '============================================================'
     echo
-    echo 'NEXT STEP: Enable the p4v command in Bash'
-    echo 'Copy and run all four lines below in your terminal:'
-    echo
-    echo "cat >> ~/.bashrc <<'P4VASP_ALIAS'"
-    printf '%s\n' "$alias_definition"
-    echo 'P4VASP_ALIAS'
-    echo 'source ~/.bashrc'
+    if [[ "$configured" -eq 1 ]]; then
+        printf 'NEXT STEP: Reload this %s terminal (or open a new one)\n' "$shell_kind"
+        echo
+        printf 'source %s\n' "$rc_display"
+    elif [[ "${CONFIGURE_SHELL:-1}" -eq 1 ]]; then
+        echo 'NEXT STEP: Resolve the shell-config error, then run:'
+        echo
+        printf "cat >> %s <<'P4VASP_ALIAS'\n" "$rc_display"
+        printf '%s\n' "$alias_definition"
+        echo 'P4VASP_ALIAS'
+        printf 'source %s\n' "$rc_display"
+    else
+        echo 'NEXT STEP: Run bash install.sh to build and configure p4vasp.'
+    fi
     echo
     echo '------------------------------------------------------------'
     echo 'START p4vasp:'
     echo '  p4v          # Open the application'
     echo '  p4v POSCAR   # Open a structure file'
     echo '------------------------------------------------------------'
-    if [[ "$(uname -s)" == Darwin ]]; then
-        echo
-        echo 'macOS zsh users: run this block INSTEAD of the Bash block:'
-        echo
-        echo "cat >> ~/.zshrc <<'P4VASP_ALIAS'"
-        printf '%s\n' "$alias_definition"
-        echo 'P4VASP_ALIAS'
-        echo 'source ~/.zshrc'
-    fi
     echo '============================================================'
 }

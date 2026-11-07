@@ -8,6 +8,8 @@ usage() {
 Usage: bash install.sh [options] [-- p4vasp arguments]
 
 Automatically selects Ubuntu/Debian, other Linux, or macOS installation.
+Successful builds configure p4v in ~/.bashrc (or ~/.zshrc for zsh).
+Reload that file in the current terminal, or open a new terminal, to use p4v.
 Ubuntu/Debian: install apt dependencies, rebuild, then preview the GUI for 2 seconds if a display exists.
 Other Linux: use preinstalled dependencies, rebuild, then preview the GUI for 2 seconds if possible.
 macOS: use the existing Homebrew/Python environment installation flow.

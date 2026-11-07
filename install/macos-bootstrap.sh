@@ -6,6 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 INSTALL_DEPS=1
 BUILD_EXT=1
 LAUNCH=1
+CONFIGURE_SHELL=1
 APP_ARGS=()
 
 usage() {
@@ -35,6 +36,7 @@ while (($#)); do
         --deps-only)
             BUILD_EXT=0
             LAUNCH=0
+            CONFIGURE_SHELL=0
             ;;
         --build-only)
             INSTALL_DEPS=0
