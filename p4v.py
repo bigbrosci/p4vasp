@@ -860,6 +860,8 @@ def init():
             msg().status("reading vasprun.xml")
             yield 1
             frame.addSystem(XMLSystemPM("vasprun.xml"))
+        elif os.path.isfile("DOSCAR"):
+            frame.addSystem(getSystem("DOSCAR"))
         else:
             empty = SetupPM()
             empty.add("URL", "")

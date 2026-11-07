@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-04. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-06. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## DOS切换与Open载入修复（2026-11-06）
+
+- 用户报告p4v空参／DOSCAR／vasprun.xml首次DOS可见，切其他面板再回来或File/Open载入则空白。用真实Frame/startApplet分发＋合成数据复现GraphCanvas.updateSize调用GTK3 Gdk.Window不存在的get_size，刷新生成器抛AttributeError；现改读绘图DrawingArea实际allocation，兼容尚未realize的状态，保留重绘／视图逻辑。
+- getSystem原将DOSCAR当PoscarSystemPM，新增DoscarSystemPM按所选文件读TOTAL_DOS和头部E_FERMI，不要求POSCAR/INCAR（有结构文件时可读），不解析DOSCAR为原子坐标。readDOSCAR按NEDOS读取3列／5列自旋总DOS，忽略后续投影块，校验截断／列不一致；上下通道保留正原始值，由现ElectronicApplet按已有约定负向绘下通道。空参启动无XML但有DOSCAR时载入DOSCAR，无两文件仍空白。
+- 本机11/6：3项解析／dispatch／独立源测试通过；实际GTK四种启动（当前XML目录、DOSCAR参数、XML参数、DOSCAR-only目录）、多次Info/Models/Build/电子控制切换、真实文件选择器OK＋含空格路径、活跃图时换源、E−E_F与不同幅度／spin两通道、DOS+bands合成两带、绘图尺寸／可见曲线通过，截图已查看。57基础、8 GTK、32启动和4场景空白启动回归通过（GLUT未测）。GTK／GI弃用及一次初始自然分配提示保留，真实用户计算文件／其他平台／完整人工科学验收／会话存储未核验，不重编译或打包Windows。
+- 新测试test/testDoscarSystem.py、test/testElectronicDosGtk.py和test/dos_fixtures.py（仅合成输入）。回归初期不间断清空GTK事件队列导致测试超时，改为有界事件批次；DOS-only跳过不存在XML后留在Info的测试夹具错误已修正，不当作应用缺陷。操作指南及双语当日记录同步；原INCAR预设／原图／Fe_single_atom保留不提交。
 
 ## 底部全宽每日一句（2026-11-04）
 

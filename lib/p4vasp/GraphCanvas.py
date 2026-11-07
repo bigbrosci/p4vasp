@@ -393,7 +393,10 @@ class GraphCanvas(piddleGTK3.InteractiveCanvas):
         self.updateGraph()
 
     def updateSize(self):
-        x,y=self.area_drawable().get_size()
+        # GTK3 Gdk.Window has no get_size(); use this plot widget's
+        # allocation, which is also valid before realization.
+        x=max(1, self.area.get_allocated_width())
+        y=max(1, self.area.get_allocated_height())
 #    print "updateSize(%d,%d)"%(x,y)
         s=self.area
         if self.world is None:

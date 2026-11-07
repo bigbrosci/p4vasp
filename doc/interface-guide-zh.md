@@ -76,6 +76,12 @@ Linux 结构窗口在显示或鼠标进入时明确使用普通箭头，不修�
 
 只有 POSCAR 时，通常只有结构信息，不会因此获得 DOS、能带或完整轨迹。较大的计算结果可能需要解析时间。
 
+### DOS与能带文件的打开和切换
+
+可通过 `p4v DOSCAR`、`p4v vasprun.xml`，或主界面Open／File → Load system载入文件，再点击DOS+bands。从其他面板切换回来会重新绘制图像；载入另一份文件后显示其当前数据。空参数启动优先读取当前目录实际存在的vasprun.xml，没有XML但有DOSCAR时读取DOSCAR；两者均无时正常建立空白建模系统。
+
+DOSCAR按独立总DOS文件读取，可没有POSCAR／INCAR；费米能从DOSCAR头部读取，图中能量按E−E_Fermi显示，自旋上下总DOS分别显示，下通道按现有约定绘为负值。只读取头部NEDOS指定的总DOS行，不将后续投影块混入总DOS。只有DOSCAR不等于有能带／投影DOS，能带显示仍需要相应的vasprun.xml本征值与k点数据。损坏或截断的DOSCAR仍报读取失败，不生成假曲线。
+
 ## 4. 调整视角与显示
 
 以下鼠标操作在独立模型窗口内进行：

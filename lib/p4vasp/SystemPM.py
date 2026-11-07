@@ -159,39 +159,52 @@ def getCurrentSystemPM():
 #    f=open(f)
 #    closeflag=1
 
+def _doscar_header(stream):
+    for _ in range(5):
+        if not stream.readline():
+            raise ValueError("DOSCAR: incomplete header")
+    fields=stream.readline().split()
+    if len(fields)<4:
+        raise ValueError("DOSCAR: expected Emax Emin NEDOS E_Fermi header")
+    count=int(fields[2])
+    if count<=0:
+        raise ValueError("DOSCAR: NEDOS must be positive")
+    return count,float(fields[3])
+
+
 def readDOSCAR(f="DOSCAR",closeflag=0):
-    if type(f)==type(""):
+    if isinstance(f,(str,os.PathLike)):
         f=open(f)
         closeflag=1
+    try:
+        count,_=_doscar_header(f)
+        tdos=Array()
+        tdos.dimension=['gridpoints','spin']
+        tdos.setupFields(['energy','total','integrated'],
+                         [FLOAT_TYPE,FLOAT_TYPE,FLOAT_TYPE],
+                         ['%+14.10f','%+14.10f','%+14.10f'])
+        columns=None
+        for index in range(count):
+            fields=f.readline().split()
+            if len(fields) not in (3,5):
+                raise ValueError("DOSCAR: invalid total DOS row %d"%(index+1))
+            if columns is None:
+                columns=len(fields)
+                tdos.append([])
+                if columns==5:tdos.append([])
+            elif len(fields)!=columns:
+                raise ValueError("DOSCAR: inconsistent spin columns")
+            values=list(map(float,fields))
+            if columns==3:
+                tdos[0].append(tuple(values))
+            else:
+                tdos[0].append((values[0],values[1],values[3]))
+                tdos[1].append((values[0],values[2],values[4]))
+        # Projected-DOS blocks, if present, are not part of TOTAL_DOS.
+        return tdos
+    finally:
+        if closeflag:f.close()
 
-    tdos=Array()
-    tdos.dimension=['gridpoints','spin']
-    tdos.setupFields(['energy','total','integrated'],
-                     [FLOAT_TYPE,FLOAT_TYPE,FLOAT_TYPE],
-                     ['%+14.10f','%+14.10f','%+14.10f'])
-    d=[]
-    tdos.append(d)
-
-    s=f.readline()
-    s=f.readline()
-    s=f.readline()
-    s=f.readline()
-    s=f.readline()
-    s=f.readline()
-    v=split(s)
-    Ef=float(v[3])
-    s=f.readline()
-    while s!="":
-        v=split(s)
-        if len(v)!=3:
-            break
-        d.append((float(v[0]),float(v[1]),float(v[2])))
-        s=f.readline()
-
-    if closeflag:
-        f.close()
-
-    return tdos
 
 class Kpoints:
     def __init__(self,elem):
@@ -1165,9 +1178,37 @@ class PoscarSystemPM(SystemPM):
 
 
 
+class DoscarSystemPM(SystemPM):
+    """Standalone total DOS, including Fermi energy, without requiring a POSCAR."""
+    def __init__(self,path="DOSCAR"):
+        self.doscarpath=os.path.abspath(os.fspath(path))
+        SystemPM.__init__(self)
+        self.add("URL",read=lambda x:os.path.abspath(self.doscarpath))
+        self.add("PATH",read=lambda x:os.path.dirname(self.URL))
+        self.add("NAME",read=lambda x:os.path.basename(self.PATH)+" DOSCAR")
+        self.add("INCAR",read=lambda x: Incar(os.path.join(self.PATH,"INCAR"))
+                 if os.path.isfile(os.path.join(self.PATH,"INCAR")) else Incar())
+        self.add("INITIAL_STRUCTURE",read=self.getInitialStructure)
+        self.add("TOTAL_DOS",read=lambda x:readDOSCAR(self.doscarpath))
+        self.add("E_FERMI",read=self.getEFermi)
+
+    def getInitialStructure(self,x):
+        for name in ("POSCAR","CONTCAR"):
+            path=os.path.join(self.PATH,name)
+            if os.path.isfile(path):return Structure(path)
+        return Structure()
+
+    def getEFermi(self,x):
+        with open(self.doscarpath) as stream:
+            return _doscar_header(stream)[1]
+
+
 def getSystem(path):
+    path=os.fspath(path)
     if os.path.isdir(path):
         return OldSystemPM(path)
+    elif os.path.basename(path).upper()=="DOSCAR":
+        return DoscarSystemPM(path)
     elif lower(path[-4:])==".xml":
         return XMLSystemPM(path)
     else:
