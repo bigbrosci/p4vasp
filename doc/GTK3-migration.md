@@ -72,6 +72,21 @@ was exercised on Linux; macOS execution has not been verified in this session.
 
 ## Verification
 
+The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
+`VibrationsApplet`, whose page uses a GTK/Cairo 3D projection, independently of
+the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived
+scientific worker. Timers stop on unmap/destroy, pending workers are cancelled,
+and display offsets do not mutate the active system. Focused checks:
+
+```bash
+PYTHONPATH=lib:src P4VASP_HOME="$PWD" .venv-ase/bin/python test/testVibrations.py
+PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/testVibrationsGtk.py
+```
+
+The first requires the optional ASE environment, the second the GUI/native
+environment and a display. Both use synthetic frequency tables; see
+[the usage guide](vibrations-zh.md) for scientific scope and input conventions.
+
 Run from the checkout root with the compiled cp4vasp extension available:
 
 ```bash

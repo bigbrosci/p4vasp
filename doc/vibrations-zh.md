@@ -1,0 +1,71 @@
+# 频率分析、热力学矫正与沿虚频位移
+
+适用于 `p4vasp-py3` 源码版，2026-11-07。首版读取 **VASP 频率计算的 OUTCAR**；普通优化 OUTCAR、单独 POSCAR／XYZ 不含所需完整模式时会报错。尚未实现直接从 XML Hessian 重建模式、声子全布里渊区积分、IR／Raman 强度或频率计算任务提交。
+
+## 打开与播放
+
+```bash
+p4v OUTCAR
+```
+
+然后点击左侧 **Vibrations**。也可以正常启动后点击此按钮，再使用面板上方的 **Open frequency OUTCAR**。如果当前系统所在目录有 OUTCAR，会尝试自动读取；分析面板内打开文件只更换该面板的分析快照，主窗口 File／Open 打开 OUTCAR 则会激活对应系统。
+
+面板左侧是 GTK／Cairo 内嵌三维投影预览，右侧是全部已读取模式。点击频率即播放对应模式，虚频标为 `i`／Imaginary。可播放／暂停、调整动画振幅倍数和周期；鼠标左键拖动旋转，滚轮缩放。动画采用统一的示意播放周期，不代表真实飞秒时间，虚频播放也不是不稳定运动的真实时间演化。退出／切换面板会停止动画。
+
+预览使用共价半径及 Jmol 颜色，键是根据平衡结构的距离推测的，不提供真实键级或周期边界邻居分析；不显示完整晶胞框，也不修改原来的 Show／Build 结构。它是可交互的三维投影，不是把原生 FLTK 窗口嵌入 GTK。
+
+源码版需要 ASE 环境；若缺失，在仓库目录运行：
+
+```bash
+bash install/install-ase.sh
+```
+
+读取／计算复用独立 ASE worker，有取消与 90 秒超时，界面保持响应。Windows 构建代码已接入相同 worker，但本次没有生成或验证新 EXE，旧包不会自动拥有新面板。
+
+## 模式向量与原子信息
+
+读取最后一组模式数据，优先使用该次输出末尾的 `Eigenvectors after division by SQRT(mass)` 实际位移段；若只有动力学矩阵的质量加权本征向量，则按对应原子的 OUTCAR `POMASS` 除以 √mass。**不再额外归一化最大位移。**缺少必要质量或坐标／模式不一致会报错，不回退到早先完整模式组。
+
+使用模式表中的平衡坐标，而不是有限差分过程最后一个被扰动的结构。晶胞、元素顺序来自 OUTCAR；有完整 POMASS 时也用于热化学，否则实际位移段允许使用 ASE 标准质量并显示提示。首版最多 10,000 原子。
+
+在同目录寻找 POSCAR／CONTCAR，仅当元素顺序、晶胞及平衡坐标一致时，才继承选择性动力学标记。找不到匹配文件时明确提示，导出前必须勾选 **Confirm export without selective-dynamics flags**；不会猜测哪些原子应固定。精度／周期等价平移使坐标不匹配时同样不能保证恢复原标记。缩减模式集会提示核对自由度，不能从列表存在推断频率计算完整或收敛。
+
+向量约定的依据见 [VASP 官方 Improved dimer method](https://vasp.at/wiki/index.php/Improved_dimer_method) 的 Initial dimer axis；其中说明质量处理以及通过 NWRITE=3 输出实际位移段。这里仅沿用向量约定，不自动生成 dimer 方向附加块。
+
+## Scale 与新 POSCAR
+
+选择一个虚频，拖动 **Scale × mode vector**：
+
+- 范围 **−1～1**，步长 **0.1**，无量纲；负值为相反方向。
+- `R_new = R_original + Scale × displacement_vector`。例如原模式最大位移为 0.4，Scale=0.1 时最大位移是 0.04；并非固定移动 0.1 Å。
+- 每次从原始平衡结构计算，不累积移动。换模式时归零；拖动时暂停动画，**Zero** 可恢复原结构。
+- 点击 **Save new POSCAR**，保存当前滑块对应的静态结构。播放中的临时相位及动画振幅不参与导出；原子顺序、晶胞和已取得的选择性动力学标记保留，注释中记录模式、波数及 Scale。
+- 必须使用新文件名，已有文件不会被覆盖。不会替换当前主系统、写入 INCAR／KPOINTS／POTCAR 或提交计算。
+
+保存的是待重新优化的扰动结构，不保证已消除虚频。正常极小值通常需要无实质虚频；一阶过渡态应保留正确反应方向的一个虚频，重新计算后才能确认。
+
+## 热力学矫正
+
+展开 **Thermochemistry — ASE**。频率表左侧的 **Thermo** 勾选框表示是否纳入热化学，与点击播放哪一行相互独立；虚频和零频不能直接作为实振动输入。
+
+| 设置 | 含义 |
+| --- | --- |
+| Harmonic | ASE HarmonicThermo，吸附物／局域模式谐振子模型，输出 Helmholtz 自由能 F 矫正 |
+| Ideal gas | ASE IdealGasThermo，气相平动／转动／振动／电子熵，输出 Gibbs 自由能 G 矫正 |
+| Stationary point | Minimum 要求无超过显式容差的虚频；Transition state 要求恰好一个 |
+| T／P | 温度 K；气相压力 Pa，默认 298.15 K、101325 Pa |
+| Gas geometry | nonlinear／linear／monatomic，与结构惯性矩核对 |
+| Symmetry number／Spin S | 气相转动对称数及总电子自旋 S；S 不是多重度 2S+1，默认值需用户核对 |
+| Low-frequency floor | 对选中的正频率设置下限，单位 cm⁻¹；默认 0，不自动截断 |
+| Imaginary tolerance | 明确判为数值／平动伪模式的小虚频阈值，单位 cm⁻¹；默认 0，不自动忽略虚频 |
+| Electronic energy | 可选电子能，eV；留空时以 0 为基准，只解释为矫正 |
+
+气相可点击 **Select highest gas vibrational modes**：按所选几何选择最高的 3N−6／3N−5 个实振动，单原子为 0 个；过渡态再减去反应坐标的 1 个。随后必须查看表中选择并确认被排除的平动／转动，程序不会因数量正确而保证物理模式选择正确。不足或多选会拒绝计算。
+
+气相结构应为同一个连续分子；程序不会自动跨周期边界解包原子或识别多分子混合物，需先核对分子几何及惯性矩所对应的结构。
+
+任何模式排除都需要勾选确认框。小虚频容差应只用于已识别的数值／平动伪模式，不用于隐藏真实不稳定性；虚频仍保持在列表中，绝不取绝对值当成实频。这里的频率下限是简单谐振子下限处理，并非准 RRHO／受阻转子模型。
+
+点击 **Calculate correction** 显示 ZPE、U、S、TS，以及气相 H、F／G 矫正；提供电子能时还显示相应总 F／G。**Save thermochemistry** 保存 JSON，含单位、温度／压力、选中与排除的模式编号、有效频率及设置；改变参数会清除旧结果，已有文件不覆盖。
+
+热化学依赖本地 ASE 3.29.0 API（源码参见 [ASE thermochemistry](https://gitlab.com/ase/ase/-/blob/master/ase/thermochemistry.py)）；本次谐振子结果与独立公式交叉检查，气相检查压力／对称数／自旋的解析变化。不提供整个周期晶体的声子 DOS 热化学，也不从这些合成测试推断用户的计算已收敛或模式有正确物理含义。

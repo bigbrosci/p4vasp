@@ -19,6 +19,8 @@ class BundledWorkerTest(unittest.TestCase):
                 self.assertEqual(bundled_worker(),worker)
                 self.assertEqual(bulk_command(),[str(worker),'--bulk'])
                 self.assertEqual(smiles_command(),[str(worker),'--smiles'])
+                from p4vasp.vibrations import worker_command as vibration_command
+                self.assertEqual(vibration_command(),[str(worker),'--vibrations'])
                 from p4vasp.ase_import import load_structure
                 with patch('subprocess.run',return_value=subprocess.CompletedProcess([],0,'{"ok":true,"result":{"atoms":1}}','')) as run:
                     self.assertEqual(load_structure(root/'one.xyz'),{'atoms':1})

@@ -19,6 +19,11 @@ Cell-free structures receive 10 Angstrom of padding on each Cartesian side;
 complete cells and atom order are retained. Supported multi-frame formats use
 the last frame. This imports geometry, not complete calculation metadata.
 
+Vibrations (new builds): open a VASP frequency OUTCAR and click Vibrations,
+or use that panel's Open button. Modes animate in an embedded GTK preview;
+imaginary modes support dimensionless Scale -1..1 and new POSCAR export.
+ASE harmonic/ideal-gas corrections require explicit mode/parameter review.
+
 Optional synthetic diagnostics (use new/empty output folders):
   p4vasp-console.exe --check-runtime C:\path\to\new-output
   p4vasp-console.exe --check-gui C:\path\to\new-gui-output

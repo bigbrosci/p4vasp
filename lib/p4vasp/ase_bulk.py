@@ -106,8 +106,9 @@ def worker_command():
 
 class BulkTask:
     """One short-lived worker, bounded in time; no idle ASE process."""
-    def __init__(self, request, callback, timeout=30):
+    def __init__(self, request, callback, timeout=30, command_factory=None, label='Bulk generation'):
         self.request, self.callback, self.timeout = request, callback, timeout
+        self.command_factory, self.label = command_factory, label
         self.cancelled = threading.Event()
         self.lock = threading.Lock()
         self.process = None
@@ -125,19 +126,19 @@ class BulkTask:
     def run(self):
         result, error = None, None
         try:
-            command = worker_command()
+            command = (self.command_factory or worker_command)()
             from p4vasp.model_worker import launch_options
             options = launch_options(command)
             with self.lock:
-                if self.cancelled.is_set(): raise RuntimeError('Bulk generation cancelled.')
+                if self.cancelled.is_set(): raise RuntimeError(self.label+' cancelled.')
                 self.process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                                 stderr=subprocess.PIPE, text=True, encoding='utf-8', **options)
             try:
                 output, stderr = self.process.communicate(json.dumps(self.request), timeout=self.timeout)
             except subprocess.TimeoutExpired:
                 self.process.kill(); self.process.communicate()
-                raise RuntimeError('ASE bulk generation timed out.')
-            if self.cancelled.is_set(): raise RuntimeError('Bulk generation cancelled.')
+                raise RuntimeError(self.label+' timed out.')
+            if self.cancelled.is_set(): raise RuntimeError(self.label+' cancelled.')
             try: response = json.loads(output)
             except ValueError: raise RuntimeError('ASE worker could not start. Run bash install/install-ase.sh, or check P4VASP_ASE_PYTHON. '+stderr[-400:])
             if self.process.returncode or not response.get('ok'):

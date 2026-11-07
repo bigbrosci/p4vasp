@@ -30,6 +30,7 @@ def appletlist():
     'p4vasp.applet.ShowHideControlApplet.ShowHideControlApplet',
     'p4vasp.applet.MoveApplet.MoveApplet',
     'p4vasp.applet.ElectronicApplet.ElectronicApplet',
+    'p4vasp.applet.VibrationsApplet.VibrationsApplet',
     'p4vasp.applet.ForcesConvergenceApplet.ForcesConvergenceApplet',
     'p4vasp.applet.EditSubZMatApplet.EditSubZMatApplet',
     'p4vasp.applet.PhononDispersionApplet.PhononDispersionApplet'

@@ -269,6 +269,16 @@
 	      </child>
 
 	      <child>
+                <widget class="GtkToolButton" id="astart p4vasp.applet.VibrationsApplet.VibrationsApplet">
+                  <property name="visible">True</property>
+                  <property name="label">Vibrations</property>
+                  <property name="tooltip">Frequency modes, animation, thermochemistry and displaced POSCAR</property>
+                  <property name="stock_id">gtk-media-play</property>
+                  <property name="visible_horizontal">True</property>
+                  <property name="visible_vertical">True</property>
+                </widget>
+              </child>
+              <child>
 		<widget class="GtkToolButton" id="astart p4vasp.applet.STMWindowControlApplet.STMWindowControlApplet">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes">STM</property>

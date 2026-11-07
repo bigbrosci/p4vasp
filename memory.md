@@ -2,6 +2,16 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率分析三步功能（2026-11-07）
+
+- 当前任务：用户批准频率列表／动画、ASE热化学、沿虚频Scale导出，源码已完成。新增左侧Vibrations及Analysis菜单→vibrations.glade→VibrationsApplet→gtk3/vibrations.py；ModeView用GTK/Cairo交互三维投影嵌入面板，右侧模式列表；不嵌FLTK，不改Show/Build。vibrations.py为数据／worker核心，新增VibrationSystemPM支持p4v OUTCAR及主Open；面板可独立Open，或从当前系统PATH找OUTCAR。
+- 首版仅频率OUTCAR：最后模式组、逐原子坐标／编号／数值检查；末尾实际位移段原样使用，否则除以OUTCAR POMASS的sqrt，不再归一化。平衡坐标来自模式表；匹配POSCAR/CONTCAR才继承固定标记，缺失必须确认无约束导出。缩减模式集提示核对，自定义质量保留。无直接XML Hessian/全q点/IR强度功能，不证明真实用户频率完整或收敛。
+- 无量纲Scale[-1,1]、0.1步长，从原坐标加scale×实际位移；静态拖动/Zero暂停动画，POSCAR仅导出静态值，新文件exclusive写，不覆盖源。播放/旋转/缩放仅显示副本；切面板停止timer，destroy/换源取消worker。ASE读数/热化学复用BulkTask命令工厂与隐藏独立worker，90秒超时。
+- HarmonicThermo输出F矫正，IdealGasThermo输出G矫正；温度K、压力Pa、气相几何/对称数/自旋S、可选电子能，逐模式选择/排除需确认；气相模式数明确核对。实频下限/小虚频容差默认0，后者需用户明确指定并确认排除，绝不取绝对值入热化学；minimum无实质虚频，TS恰一。报告含ZPE/U/H/S/TS与矫正及设置/有效频率，可保存JSON；参数变更清除旧结果。
+- 本机Linux 11/7证据：7后端专项（独立谐振子公式、气相压力/对称数/自旋解析差值、物理/质量加权向量、signed Scale与flags、不累积、坏/截断表和不匹配参考）通过；实际Frame的CLI OUTCAR/左按钮/内嵌预览/点模式动画、Scale/真实POSCAR保存、F/G计算/JSON保存/实际Open/缺flags确认/切回/取消与销毁通过。截图为真实映射GTK widget.draw结果，已查看；桌面Gdk捕获首轮黑屏不当可视证据。夹具改为等待文件选择器路径就绪，未当应用修复。
+- 另3 BulkTask、3 DOSCAR、57基础、2冻结路由（含--vibrations）、5 ASE导入、7更新器、8 GTK、33面板启动（不含GLUT）、4原启动场景通过；XML/编译/diff通过。初版展开热化学横向溢出已改单列参数，实际导出按钮位于窗口内；纵向通过滚动访问。操作详见doc/vibrations-zh.md，双语记录update_2026_11_07.md。
+- 接手边界：本功能已完成源码交付；Windows脚本/worker增加thermochemistry入口，但未构建新EXE，11/6旧包不含新功能；macOS/Windows未实测，无真实用户OUTCAR/完整人工或科学验收，不自动启动下一轮打包。用户INCAR预设/二维码原图/Fe_single_atom保留。
+
 ## ASE通用结构导入（2026-11-07）
 
 - 本次任务已实现：getSystem新增ASESystemPM，CLI与File/Open共用；保留目录／DOSCAR／XML／POSCAR分流。ase_import.py在既有ASE解释器或新版随包worker里读取8类扩展名（xyz/extxyz/cif/pdb/mol/sdf/xsf/traj），不向GTK进程导入ASE；超时60秒，错误显示原因，Open失败保留旧系统，CLI失败不再中断初始化。

@@ -60,6 +60,10 @@ bash install/install-ase.sh
 
 也可通过 `P4VASP_ASE_PYTHON` 指定已有 ASE 解释器。读取在独立进程中进行，60 秒超时；File／Open 失败时保留原系统。新版 Windows 构建脚本已接入随包 ASE 读取器及格式模块，但本次未生成／核验新 Windows 包，11 月 6 日旧 EXE 尚不包含此功能。
 
+### 频率分析入口（2026-11-07）
+
+左侧新增 **Vibrations**：可打开频率计算的 OUTCAR，左侧结构、右侧波数列表，点击模式播放；虚频可用 −1～1、步长 0.1 的无量纲 Scale 生成新 POSCAR，并通过 ASE 计算谐振子／气相热力学矫正。详细数据约定、固定标记与虚频处理见[频率分析操作指南](vibrations-zh.md)。本次为源码功能，未重新打包 Windows。
+
 ### 空目录启动与初始结构提示
 
 从没有vasprun.xml的目录启动时，程序正常创建New structure空白建模系统；可直接使用Models，或Open已有POSCAR。已经通过启动参数／会话打开的系统保留，不再额外追加当前目录的vasprun.xml；没有可选setup.xml时也不尝试读取。

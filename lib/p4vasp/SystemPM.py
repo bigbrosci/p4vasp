@@ -1203,6 +1203,23 @@ class DoscarSystemPM(SystemPM):
             return _doscar_header(stream)[1]
 
 
+class VibrationSystemPM(SystemPM):
+    """A frequency OUTCAR: equilibrium geometry and modes, not a DOS source."""
+    def __init__(self,path):
+        from io import StringIO
+        from p4vasp.vibrations import load
+        path=os.path.abspath(os.fspath(path))
+        data=load(path)
+        structure=Structure();structure.read(StringIO(data['poscar']))
+        structure.comment='Frequency geometry: '+os.path.basename(path)
+        SystemPM.__init__(self,path)
+        self.add('PATH',os.path.dirname(path))
+        self.add('NAME','Vibrations: '+os.path.basename(os.path.dirname(path)))
+        self.add('INITIAL_STRUCTURE',structure)
+        self.add('INCAR',Incar())
+        self.add('VIBRATIONS',data)
+
+
 class ASESystemPM(SystemPM):
     """Imported geometry only; no VASP results inferred from neighboring files."""
     def __init__(self,path):
@@ -1226,6 +1243,8 @@ def getSystem(path):
     path=os.fspath(path)
     if os.path.isdir(path):
         return OldSystemPM(path)
+    elif os.path.basename(path).upper()=="OUTCAR":
+        return VibrationSystemPM(path)
     elif os.path.basename(path).upper()=="DOSCAR":
         return DoscarSystemPM(path)
     elif lower(path[-4:])==".xml":

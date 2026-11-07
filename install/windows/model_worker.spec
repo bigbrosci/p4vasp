@@ -13,7 +13,7 @@ if python_license.is_file():datas += [(str(python_license),'dependency-licenses/
 a=Analysis([str(root/'install/windows/model_worker.py')],pathex=[str(root/'lib')],
     datas=datas,binaries=binaries,hiddenimports=['ase.build','ase.io.vasp','ase.io.extxyz',
         'ase.io.cif','ase.io.proteindatabank','ase.io.mol','ase.io.sdf','ase.io.xsf',
-        'ase.io.trajectory','rdkit.Chem.AllChem'],
+        'ase.io.trajectory','ase.thermochemistry','rdkit.Chem.AllChem'],
     excludes=['gi','cairo','cp4vasp','_cp4vasp','tkinter','matplotlib','PyQt5','PyQt6','PySide6'],noarchive=False)
 pyz=PYZ(a.pure)
 exe=EXE(pyz,a.scripts,[],exclude_binaries=True,name='p4vasp-model-worker',console=True,strip=False,upx=False)
