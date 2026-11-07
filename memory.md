@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-06. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS缩放刻度长小数（2026-11-06）
+
+- 用户报告缩放后部分Y轴ticks出现很多小数位。graph.py中X/YAxis.render用str(i*major)直接显示二进制尾差；新增Axis.formatTick共用格式，默认6有效数字，按刻度量级／步长增加分辨率（上限17），归一负零。只改文字，不改DOS、能量、范围或刻度位置。
+- 2项专项（双轴0.2／0.25步长、负值／负零、近1的1e-8细步长、1e9偏移与2e-12小数值相邻刻度区分）通过。真实Linux X11 DOSCAR曲线缩放／双轴绘制标签捕获／原数据不变通过，截图已查看；8 GTK及57基础通过。其他平台／Windows包未测，操作指南和双语当日记录同步。
+
 ## DOS切换与Open载入修复（2026-11-06）
 
 - 用户报告p4v空参／DOSCAR／vasprun.xml首次DOS可见，切其他面板再回来或File/Open载入则空白。用真实Frame/startApplet分发＋合成数据复现GraphCanvas.updateSize调用GTK3 Gdk.Window不存在的get_size，刷新生成器抛AttributeError；现改读绘图DrawingArea实际allocation，兼容尚未realize的状态，保留重绘／视图逻辑。

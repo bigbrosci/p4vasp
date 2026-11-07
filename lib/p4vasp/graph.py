@@ -1169,6 +1169,17 @@ class Axis(Cloneable):
             if self.minor:
                 self.minor=minor
 
+    def formatTick(self,value):
+        """Suppress binary roundoff while resolving adjacent zoomed ticks."""
+        if value==0:
+            return "0"
+        precision=6
+        step=abs(self.major)
+        if isfinite(value) and isfinite(step) and step>0:
+            precision=max(precision, int(floor(log10(abs(value))))-
+                          int(floor(log10(step)))+2)
+        return format(value,".%dg"%min(17,precision))
+
     def parseGraceStatement(self,s):
         m=self.bar_on_p.match(s)
         if m:
@@ -1455,7 +1466,7 @@ class XAxis(Axis):
                     aa=self.graph.world2screenX(a)
                     canvas.drawLine(aa,tpos,aa,tpos+dp,c,w)
                     if self.ticklabel:
-                        s=str(a)
+                        s=self.formatTick(a)
                         wl=canvas.stringWidth(s,self.ticklabel_font)
                         canvas.drawString(s,aa-wl/2,tpos+hl*1.2,self.ticklabel_font,cl)
                 if self.minor:
@@ -1544,7 +1555,7 @@ class YAxis(Axis):
                     aa=self.graph.world2screenY(a)
                     canvas.drawLine(tpos,aa,tpos+dp,aa,c,w)
                     if self.ticklabel:
-                        s=str(a)
+                        s=self.formatTick(a)
                         wl=canvas.stringWidth(s,self.ticklabel_font)
                         canvas.drawString(s,tpos-wl-5*z,aa+hl/2,self.ticklabel_font,cl)
                 if self.minor:
