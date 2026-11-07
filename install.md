@@ -75,13 +75,16 @@ bash install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
 bash install.sh -- '/path with spaces/POSCAR'
 ```
 
-安装完成后，有图形环境时会自动打开 p4vasp，界面初始化并显示后停留约2秒，再自动关闭。终端随后显示“p4vasp 已顺利完成安装，界面启动检查通过”，并打印当前安装路径对应的别名，例如：
+安装完成后，有图形环境时会自动打开 p4vasp，界面初始化并显示后停留约2秒，再自动关闭。结束提示改为英文，以 `========` 分隔安装结果和 `NEXT STEP`，分别显示 `GUI startup check: PASSED` 或 `SKIPPED`，并打印当前路径对应的可复制命令，例如：
 
 ```bash
-alias p4v='bash /home/你的用户名/opt/p4vasp/p4v.sh'
+cat >> ~/.bashrc <<'P4VASP_ALIAS'
+alias p4v='bash /home/your-user/opt/p4vasp/p4v.sh'
+P4VASP_ALIAS
+source ~/.bashrc
 ```
 
-把安装器输出的完整别名行添加到 `~/.bashrc`，保存后执行 `source ~/.bashrc`，以后输入 `p4v` 或 `p4v POSCAR` 即可启动。安装器不自动修改 shell 配置。macOS 默认 zsh 用户应写入 `~/.zshrc` 并执行 `source ~/.zshrc`。
+直接复制安装器实际输出的四行执行：追加别名到 `~/.bashrc` 并重新加载，以后输入 `p4v` 或 `p4v POSCAR` 即可启动。上面的 your-user 是文档示例，实际输出会填入安装路径；安装器本身只打印命令，不自动修改 shell 配置，追加不会覆盖原有配置。macOS 默认 zsh 用户应使用安装器单独打印的 `~/.zshrc` 替代命令块。
 
 无显示环境时跳过预览并明确提示GUI未验证；`--no-launch`、`--build-only`、`--deps-only` 不打开界面。启动失败不会显示GUI成功，初始化超过60秒会退出。两秒预览仅验证启动，不代表完整功能或科学计算验证。日常 `bash p4v.sh`／`p4v` 不会自动关闭。
 

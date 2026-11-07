@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装结束英文提示与复制配置命令（2026-11-07）
+
+- 用户要求安装末尾英文、分隔线和可复制bashrc配置命令。install/finish-install.sh改为英文Launching及分隔清楚的结果/NEXT STEP/START区块；GUI PASSED与SKIPPED区分，启动失败仍返回原错误码、不打印完成提示。输出四行带单引号heredoc的cat追加alias及source ~/.bashrc；保持原路径安全引用，不自动修改用户配置，macOS打印替代zshrc命令块。
+- 本机2项testInstallFinish通过：成功/错误码/无显示/禁启动、含空格/单引号/$路径、在临时rc文件执行实际打印命令并调用alias，以及模拟Darwin分支的zsh块语法（非真macOS/zsh验收）；9统一安装分流通过，4个相关脚本bash -n及diff通过。只预览LAUNCH=0的真实结束输出，未重跑安装/GUI预览或编译原生，用户bashrc未修改。install.md及双语当日记录同步；无其他安装功能/Windows打包改动。
+
 ## Help致谢表（2026-11-07）
 
 - 按用户纠正，名单与GTK模型按Date升序（从早到晚）：wikidog 2026-10-26、ai-vasp 2026-10-31、岁月静好 2026-11-05；模型显式排序，后续新增不依赖JSON插入顺序。本次实际GTK模型顺序／临时逆序插入专项、JSON／编译／diff检查通过，未重跑整套GUI或构建Windows。
