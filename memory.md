@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Help致谢表（2026-11-07）
+
+- 用户要求Help新增Acknowledgment，四列Who/QQ号/Donate/Suggestion。p4v.Frame.createHelpMenu新增动作→gtk3/acknowledgment.py创建只读滚动Gtk.Dialog；没有Glade变更，保留About/License。数据在data/acknowledgments.json：ai-vasp/1106151494/20元/空；岁月静好/1020948036/空/DOS可视化Y轴显示Bug。全部由用户提供，未自行补充贡献或金额。
+- 本机Linux11/7实际Frame菜单点击、精确表头和两行、Close可见并关闭通过，已查看映射widget截图/tmp/p4vasp-acknowledgment.png，中文正常；8 GTK、JSON/编译/diff通过。同步指南和双语当日记录。纯Python/数据新增，重启即可；未构建Windows或验证其他平台，不改用户预设/原图/Fe_single_atom。名单后续按明确提供信息维护。
+
 ## 频率面板文件窗口按钮不可见修复（2026-11-07）
 
 - 用户报告Open frequency OUTCAR弹窗找不到按钮，类似旧PNG窗口超屏。源码确认gtk3/vibrations.py使用原生Gtk.FileChooserDialog，仅set_default_size不足以限制自然最小尺寸／桌面保存尺寸；此前未验证这一用户环境尺寸。现改用file_dialogs.py新增CompactFileDialog，继承已用FolderDialog的紧凑Gtk.Dialog导航，fit_dialog按工作区设尺寸，use_header_bar=False底部动作固定；该面板Open及POSCAR/JSON保存一起接入，原PNG/Folder逻辑保留。

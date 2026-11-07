@@ -355,12 +355,15 @@ class Frame(SystemListListener):
         helpmenu=gtk.Menu()
         about=gtk.MenuItem("About")
         lic=gtk.MenuItem("License agreement")
+        acknowledgment=gtk.MenuItem("Acknowledgment")
         self.menubar.add(helpitem)
         helpitem.set_submenu(helpmenu)
         helpmenu.add(about)
         helpmenu.add(lic)
+        helpmenu.add(acknowledgment)
         about.connect("activate",self.show_about_dialog)
         lic.connect("activate",self.show_license_dialog)
+        acknowledgment.connect("activate",self.show_acknowledgment_dialog)
         helpitem.show_all()
 
 
@@ -548,6 +551,10 @@ class Frame(SystemListListener):
         fit_dialog(about, None, 620, 520)
 
         about.show()
+    def show_acknowledgment_dialog(self,*arg):
+        from p4vasp.gtk3.acknowledgment import show_acknowledgment
+        show_acknowledgment(self.root_window)
+
     def show_license_dialog(self,*arg):
         xml=p4vasp.util.loadGlade(self.gladefile,"license_dialog")
         self.connect_signals(xml)
