@@ -2,12 +2,13 @@
 
 Last updated: 2026-11-06. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
-## Windows随包ASE／RDKit：构建中（2026-11-06）
+## Windows随包ASE／RDKit：已交付（2026-11-06）
 
 - 用户明确要求生成自带ASE/RDKit的Windows版本。已实现独立CPython model-worker、冻结客户端自动选择／子进程环境清理／隐藏控制台和已内置提示；不在GTK/UCRT进程加载MSVC科学DLL。主包脚本新增worker冻结，更新器新增--check-models真实GUI验收，旧版保留。
 - Windows缓存：LOCALAPPDATA/p4vasp-build/python-3.13.17，官方embeddable CPython3.13.17＋ASE3.29.0＋RDKit2026.09.1＋PyInstaller6.22.3；引导pip wheel按PyPI元数据SHA256检查，Python来源与下载哈希／依赖清单保留。专用探针在Windows checkout build/windows-update/model-tools，不影响Git干净检查。
-- 独立冻结worker的版本查询、32Cu bulk和乙醇MMFF94s收敛实测通过；2路由／隔离、3bulk worker、4SMILES worker、7更新器保护测试、57基础和实际Linux bulk/SMILES GUI回归通过。源码实现将先提交用于可追溯构建；完整Windows主包／冻结GUI模型验收／迁移交付仍待本任务后续完成，不能将探针当交付包。
-- 入口／操作说明与双语记录已更新为待验收边界；原INCAR预设、原图和Fe_single_atom继续保留，不打包未提交数据。
+- 独立冻结worker的版本查询、32Cu bulk和乙醇MMFF94s收敛实测通过；2路由／隔离、3bulk worker、4SMILES worker、7更新器保护测试、57基础和实际Linux bulk/SMILES GUI回归通过。源码7ccd76d3243ffb20bd2dfab998747d08dad10f3a已提交／推送并完成原生编译、完整冻结构建和实际Windows模型界面验收。
+- 交付：Windows Downloads/p4vasp-20261106-231955-7ccd76d3-isn9bffb，双击p4vasp.exe；同名ZIP为156,510,557字节，SHA256 fc109421ddacfbf01cdd9a82fe49c6e26ce4b432bb4101eb36f9855521446823。原构建及迁移Downloads后均通过runtime/gui/models三项：42资源无属性错误、紧凑文件对话框／PNG／POSCAR、实际32Cu bulk与9原子乙醇的随包计算／原生预览／真实保存、非法多片段拒绝和取消回收；PATH仅Windows/System32与Windows，清除外部解释器覆盖，未用构建环境提供科学依赖。模型页截图已查看；ZIP CRC／哈希／源码版本／Python许可检查通过。报告在两处同名-checks目录。
+- 后续接手：本任务已完成，无待继续构建；尚未在另一台干净Windows机器验收，未签名，也不等于全部科学结果／普通交互和退出的人工验收。详细双语记录见update_history/update_2026_11_06.md。更新器仍自动包含依赖；不因本次任务自动开展surface等功能。原INCAR预设、原图和Fe_single_atom继续保留，不打包未提交数据。
 
 ## DOS缩放刻度长小数（2026-11-06）
 

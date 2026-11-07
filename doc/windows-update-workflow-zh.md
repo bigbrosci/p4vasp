@@ -10,7 +10,15 @@
 
 更新仍执行原来的 `bash install/update-windows.sh`。自动验收新增冻结版 `--check-models`，覆盖实际bulk与SMILES界面、随包计算程序、预览、保存和取消。只有整包检查通过后才生成成功ZIP。请保留主目录的 `_internal` 与 `model-worker`，不能只复制EXE。依赖许可随包保留。
 
-本次独立计算程序已实测成功，完整新版构建／交付结果以更新记录的后续完成记录为准；下方11月1日旧包不含这些依赖。
+本次完整构建及迁移Downloads后的runtime／gui／models三项验收均通过，涵盖32Cu超胞、乙醇SMILES优化、预览、保存及取消。交付位置：
+
+```text
+C:\Users\lqlhz\Downloads\p4vasp-20261106-231955-7ccd76d3-isn9bffb\p4vasp.exe
+```
+
+双击即可启动。bulk页选择晶体类型／晶格参数／超胞，点击Build bulk、Preview 3D或Save POSCAR；gas phase页输入SMILES，点击Build 3D + optimize，再预览，确认Charge／Multiplicity后Generate inputs。请将完整目录一起复制；分子力场优化得到的是初始结构。
+
+同名ZIP约149MiB，SHA256：`fc109421ddacfbf01cdd9a82fe49c6e26ce4b432bb4101eb36f9855521446823`。包的源码版本为`7ccd76d`，依赖版本另见根目录MODEL-VERSIONS.json。未核验另一台干净Windows，详细证据见[当日更新记录](../update_history/update_2026_11_06.md)。下方11月1日旧包不含这些依赖。
 
 ## 最近一次构建（2026-11-01）
 
