@@ -16,6 +16,7 @@ def show_acknowledgment(parent=None):
     label.set_line_wrap(True);box.pack_start(label,False,False,0)
     model=Gtk.ListStore(str,str,str,str,str)
     for row in rows:model.append([row.get(key,'') for key in ('who','qq','donate','suggestion','date')])
+    model.set_sort_column_id(4,Gtk.SortType.ASCENDING)
     table=Gtk.TreeView(model=model)
     for i,title in enumerate(('Who','QQ号','Donate','Suggestion','Date')):
         renderer=Gtk.CellRendererText()

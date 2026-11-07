@@ -4,6 +4,8 @@ Last updated: 2026-11-07. This is a repository navigation and handoff document. 
 
 ## Help致谢表（2026-11-07）
 
+- 按用户纠正，名单与GTK模型按Date升序（从早到晚）：wikidog 2026-10-26、ai-vasp 2026-10-31、岁月静好 2026-11-05；模型显式排序，后续新增不依赖JSON插入顺序。本次实际GTK模型顺序／临时逆序插入专项、JSON／编译／diff检查通过，未重跑整套GUI或构建Windows。
+
 - 后续按用户提供新增第3位wikidog，QQ 65387222，建议“Windows版本的生成”，日期2026-10-26，Donate留空。仅名单数据／双语记录更新；JSON精确行值／3行与diff检查通过，无界面代码变更，不重跑GUI。
 
 - 后续按用户补充新增第5列Date：ai-vasp为2026-10-31，岁月静好为2026-11-05；JSON及表格同步，按工作区设置的默认宽度增至780。实际Frame Help→表格5列／准确日期／Close通过，截图已查看；本次仅日期列专项及JSON/编译/diff检查，下面8 GTK为初版验证，不冒充本次重跑。

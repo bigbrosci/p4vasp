@@ -1,5 +1,12 @@
 [
   {
+    "who": "wikidog",
+    "qq": "65387222",
+    "donate": "",
+    "suggestion": "Windows版本的生成",
+    "date": "2026-10-26"
+  },
+  {
     "who": "ai-vasp",
     "qq": "1106151494",
     "donate": "20元",
@@ -12,12 +19,5 @@
     "donate": "",
     "suggestion": "DOS可视化Y轴显示Bug",
     "date": "2026-11-05"
-  },
-  {
-    "who": "wikidog",
-    "qq": "65387222",
-    "donate": "",
-    "suggestion": "Windows版本的生成",
-    "date": "2026-10-26"
   }
 ]
