@@ -4,7 +4,7 @@
 
 ## 1. 启动与认识窗口
 
-**Help → Acknowledgment** 打开只读致谢表，列为 Who、QQ号、Donate、Suggestion，记录捐款支持和问题／建议贡献；没有提供的项目留空，Close 关闭。名单保存在 `data/acknowledgments.json`，本次按用户提供的信息录入。
+**Help → Acknowledgment** 打开只读致谢表，列为 Who、QQ号、Donate、Suggestion、Date，记录捐款支持和问题／建议贡献；没有提供的项目留空，Close 关闭。名单保存在 `data/acknowledgments.json`，本次按用户提供的信息录入。
 
 从当前项目目录启动：
 

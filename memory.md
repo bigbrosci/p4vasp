@@ -4,6 +4,8 @@ Last updated: 2026-11-07. This is a repository navigation and handoff document. 
 
 ## Help致谢表（2026-11-07）
 
+- 后续按用户补充新增第5列Date：ai-vasp为2026-10-31，岁月静好为2026-11-05；JSON及表格同步，按工作区设置的默认宽度增至780。实际Frame Help→表格5列／准确日期／Close通过，截图已查看；本次仅日期列专项及JSON/编译/diff检查，下面8 GTK为初版验证，不冒充本次重跑。
+
 - 用户要求Help新增Acknowledgment，四列Who/QQ号/Donate/Suggestion。p4v.Frame.createHelpMenu新增动作→gtk3/acknowledgment.py创建只读滚动Gtk.Dialog；没有Glade变更，保留About/License。数据在data/acknowledgments.json：ai-vasp/1106151494/20元/空；岁月静好/1020948036/空/DOS可视化Y轴显示Bug。全部由用户提供，未自行补充贡献或金额。
 - 本机Linux11/7实际Frame菜单点击、精确表头和两行、Close可见并关闭通过，已查看映射widget截图/tmp/p4vasp-acknowledgment.png，中文正常；8 GTK、JSON/编译/diff通过。同步指南和双语当日记录。纯Python/数据新增，重启即可；未构建Windows或验证其他平台，不改用户预设/原图/Fe_single_atom。名单后续按明确提供信息维护。
 
