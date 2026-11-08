@@ -223,7 +223,7 @@ def main():
         # Hidden gas choices must never restrict a later harmonic calculation.
         page.model.set_active(0);page.calculate.clicked();pump(lambda:page.job is None,30)
         assert page.thermo_result['selected_modes']==list(range(1,7))
-        # Asynchronous source loading, absent constraints and explicit export confirmation.
+        # Missing constraint sources export directly without adding selective dynamics.
         no_flags=write_calculation(folder/'without flags',flags=False)
         def answer_open():
             browser=getattr(page,'file_dialog',None)
@@ -232,9 +232,11 @@ def main():
             return True
         GLib.timeout_add(50,answer_open);page.open_button.clicked();pump(lambda:page.job is None,30)
         assert page.data['constraints_source'] is None
-        page.scale.set_value(.1);assert not page.save_button.get_sensitive()
-        page.accept_flags.set_active(True);assert page.save_button.get_sensitive()
+        page.scale.set_value(.1);assert page.save_button.get_sensitive()
+        assert not hasattr(page,'accept_flags')
         page.export_poscar(folder/'unconstrained.POSCAR')
+        assert 'Selective' not in (folder/'unconstrained.POSCAR').read_text()
+        assert not Structure(str(folder/'unconstrained.POSCAR')).isSelective()
         # A cancelled worker must not replace the active snapshot with a late callback.
         active=page.data;page.load_path(path);job=page.job;page.cancel()
         pump(lambda:job.process is None or job.process.poll() is not None,10)

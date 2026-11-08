@@ -38,7 +38,7 @@ bash install/install-ase.sh
 
 使用模式表中的平衡坐标，而不是有限差分过程最后一个被扰动的结构。晶胞、元素顺序来自 OUTCAR；有完整 POMASS 时也用于热化学，否则实际位移段允许使用 ASE 标准质量并显示提示。首版最多 10,000 原子。
 
-在同目录寻找 POSCAR／CONTCAR，仅当元素顺序、晶胞及平衡坐标一致时，才继承选择性动力学标记。找不到匹配文件时明确提示，导出前必须勾选 **Confirm export without selective-dynamics flags**；不会猜测哪些原子应固定。精度／周期等价平移使坐标不匹配时同样不能保证恢复原标记。缩减模式集会提示核对自由度，不能从列表存在推断频率计算完整或收敛。
+在同目录寻找 POSCAR／CONTCAR，仅当元素顺序、晶胞及平衡坐标一致时，才继承选择性动力学标记。找到匹配文件时自动保留固定标记；找不到时直接导出不含选择性动力学约束的POSCAR，无需勾选确认，也不会猜测哪些原子应固定。精度／周期等价平移使坐标不匹配时同样不能保证恢复原标记。缩减模式集会提示核对自由度，不能从列表存在推断频率计算完整或收敛。
 
 向量约定的依据见 [VASP 官方 Improved dimer method](https://vasp.at/wiki/index.php/Improved_dimer_method) 的 Initial dimer axis；其中说明质量处理以及通过 NWRITE=3 输出实际位移段。这里仅沿用向量约定，不自动生成 dimer 方向附加块。
 

@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## POSCAR固定标记自动保留/缺失直接导出（2026-11-08）
+
+- 按用户要求删除Confirm export without selective-dynamics flags及其阻挡。选择虚频后保存按钮不再依赖约束来源；匹配POSCAR/CONTCAR的固定标记自动保留，找不到则沿用无约束POSCAR，不补猜标记、不需确认。读取器/坐标/Scale/模式判断/已有文件保护不改。
+- 实际Linux完整频率合成GTK专项通过，既有匹配标记导出仍为T/F/T，无来源时直接保存且文件无Selective段、重读isSelective为False；确认框不存在，原动画/周期/气相/结果/脚本流程通过，更新后截图已查看，编译/diff通过。本次聚焦验证，未重跑广泛GTK/启动或科学后端，未跨平台/重打EXE，无原生改动；未操作R25，用户无关删除保留，指南/双语同步。
+
 ## 精简结果卡片与预览左上角模式标题（2026-11-08）
 
 - 用户修改1：ThermoResult删除底部频率下限/纳入/虚频/电子能说明/驻点警告，实际ASE版本放标题Thermochemistry Results (ASE x)，保留数值/条件。结果Frame与左参数列均Fill，测试确认等高；JSON/脚本原记录不删，科学计算未改。

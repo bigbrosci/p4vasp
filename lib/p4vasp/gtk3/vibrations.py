@@ -154,9 +154,6 @@ class VibrationsPage(Gtk.Box):
         scale_actions.pack_start(reset,False,False,0);scale_actions.pack_start(self.save_button,False,False,0)
         displacement.pack_start(scale_actions,False,False,0)
         self.tools.pack_start(displacement,True,True,0)
-        self.accept_flags=Gtk.CheckButton(label='Confirm export without selective-dynamics flags')
-        self.accept_flags.set_tooltip_text('Required only when no matching POSCAR/CONTCAR can supply the original flags.')
-        self.pack_start(self.accept_flags,False,False,0)
         thermo=Gtk.Expander(label='Thermochemistry — ASE');thermo.set_expanded(True);self.thermo=thermo
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5);self.thermo_box=box
         grid=Gtk.Grid(column_spacing=10,row_spacing=5)
@@ -206,7 +203,6 @@ class VibrationsPage(Gtk.Box):
         self.save_thermo.connect('clicked',self.export_thermo)
         for widget in (self.model,self.state,self.geometry,*self.fields.values()):widget.connect('changed',self.invalidate)
         self.model.connect('changed',self.model_changed)
-        self.accept_flags.connect('toggled',lambda *_:self.controls())
         self.connect('unmap',lambda *_:self.pause())
         self.connect('destroy',self.destroyed)
         self.controls()
@@ -248,12 +244,11 @@ class VibrationsPage(Gtk.Box):
         ready=self.data is not None and self.job is None
         imaginary=ready and self.data['modes'][self.mode]['imaginary']
         self.scale.set_sensitive(imaginary);self.play.set_sensitive(ready)
-        self.save_button.set_sensitive(bool(imaginary and (self.data['constraints_source'] or self.accept_flags.get_active())))
+        self.save_button.set_sensitive(bool(imaginary))
         self.calculate.set_sensitive(ready)
         self.tree.set_sensitive(ready)
         self.periodic_controls.set_sensitive(ready)
         self.thermo_box.set_sensitive(ready)
-        self.accept_flags.set_sensitive(bool(ready and not self.data['constraints_source']))
         self.save_thermo.set_sensitive(self.thermo_result is not None and self.job is None)
         self.cancel_button.set_sensitive(self.job is not None)
 
@@ -265,7 +260,7 @@ class VibrationsPage(Gtk.Box):
         self.thermo_result=None;self.result_panel.clear();self.controls()
 
     def set_data(self,data):
-        self.pause();self.data=data;self.mode=0;self.accept_flags.set_active(False);self.scale.set_value(0)
+        self.pause();self.data=data;self.mode=0;self.scale.set_value(0)
         self.source.set_text(data['path']);self.source.set_tooltip_text(data['path'])
         self.store.clear()
         for mode in data['modes']:
@@ -357,7 +352,6 @@ class VibrationsPage(Gtk.Box):
 
     def export_poscar(self,path):
         if not self.data or not self.data['modes'][self.mode]['imaginary']:raise ValueError('Select an imaginary mode first.')
-        if not self.data['constraints_source'] and not self.accept_flags.get_active():raise ValueError('Confirm export without selective-dynamics flags.')
         self.pause();structure=displaced_structure(self.data,self.mode,round(self.scale.get_value(),1))
         with open(path,'x',encoding='utf-8') as output:structure.write(output)
 
