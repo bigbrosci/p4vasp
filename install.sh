@@ -4,46 +4,10 @@ if [ -z "${BASH_VERSION:-}" ]; then
     printf '%s\n' 'This installer requires Bash. Run: bash install.sh' >&2
     return 2 2>/dev/null || exit 2
 fi
-# When sourced in Bash, isolate installation and reload the successful rc in
-# the calling shell. Never exec, exit, set options or change its directory.
-if [[ -n "${BASH_VERSION:-}" && "${BASH_SOURCE[0]}" != "$0" ]]; then
-    _p4vasp_install_and_reload() {
-        unset -f _p4vasp_install_and_reload
-        local p4v_entry p4v_receipt p4v_rc p4v_status=0 p4v_expected=1 p4v_arg
-        p4v_entry="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/install.sh" || return $?
-        p4v_receipt="$(mktemp "${TMPDIR:-/tmp}/p4vasp-reload.XXXXXX")" || return $?
-        for p4v_arg in "$@"; do
-            case "$p4v_arg" in
-                --) break ;;
-                --deps-only|--dry-run|-h|--help) p4v_expected=0 ;;
-            esac
-        done
-        if P4VASP_CALLER_SHELL=bash P4VASP_RELOAD_RECEIPT="$p4v_receipt" bash "$p4v_entry" "$@"; then
-            if IFS= read -r -d '' p4v_rc < "$p4v_receipt"; then
-                if builtin source "$p4v_rc"; then
-                    if alias p4v >/dev/null 2>&1; then
-                        printf '\n============================================================\n'
-                        printf '  Shell configuration reloaded. p4v is ready in this terminal.\n'
-                        printf '============================================================\n'
-                    else
-                        echo 'Shell configuration did not define p4v; check for an early return in the rc file.' >&2
-                        p4v_status=1
-                    fi
-                else
-                    p4v_status=$?
-                    echo 'Could not reload the shell configuration.' >&2
-                fi
-            elif [[ "$p4v_expected" -eq 1 ]]; then
-                echo 'No successful shell configuration was reported; nothing was sourced.' >&2
-                p4v_status=1
-            fi
-        else
-            p4v_status=$?
-        fi
-        rm -f "$p4v_receipt"
-        return "$p4v_status"
-    }
-    if _p4vasp_install_and_reload "$@"; then return 0; else return $?; fi
+# Sourcing would apply installer options/exec to the user's terminal.
+if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
+    printf '%s\n' 'Run: bash install.sh' >&2
+    return 2
 fi
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -51,12 +15,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 usage() {
     cat <<'HELP'
 Usage: bash install.sh [options] [-- p4vasp arguments]
-       source install.sh [options]   # Bash: install and auto-reload this terminal
 
 Automatically selects Ubuntu/Debian, other Linux, or macOS installation.
-Successful builds configure p4v in ~/.bashrc (or ~/.zshrc for zsh).
-In Bash, source install.sh reloads the current terminal automatically.
-With bash install.sh, reload that file manually or open a new terminal.
+Successful builds configure p4v in ~/.bashrc.
+After installation, run: source ~/.bashrc
+Common commands: usage_commands.md
 Ubuntu/Debian: install apt dependencies, rebuild, then preview the GUI for 2 seconds if a display exists.
 Other Linux: use preinstalled dependencies, rebuild, then preview the GUI for 2 seconds if possible.
 macOS: use the existing Homebrew/Python environment installation flow.

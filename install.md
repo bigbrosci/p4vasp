@@ -75,36 +75,23 @@ bash install.sh --deps-only        # Dependencies only: Ubuntu/Debian or macOS
 bash install.sh -- '/path with spaces/POSCAR'
 ```
 
-安装完成后，有图形环境时会自动打开 p4vasp，界面初始化并显示后停留约2秒，再自动关闭。结束提示为英文，以 `========` 分隔安装结果和 `NEXT STEP`，显示 GUI／命令配置结果；末尾用常用启动和图片导出命令代替正常情况下的 bashrc 配置说明：
+Linux 和 macOS 统一使用：
 
 ```bash
-p4v
-p4v POSCAR
-p4v test.xyz
-p4v OUTCAR
-p4v POSCAR -o top.png --view top
-p4v POSCAR -o side.png --view side
+bash install.sh
 ```
 
-请在自己的计算目录使用，并替换成实际文件名。XYZ 导入和频率分析需要 ASE；这里的 OUTCAR 应来自频率计算，打开后点击 Vibrations。PNG 从 POSCAR 导出，不需要打开图形窗口。
-
-`bash install.sh` 现在会自动将 `p4v` 别名配置到当前运行用户的 `~/.bashrc`；zsh 用户写入 `${ZDOTDIR:-$HOME}/.zshrc`。在配置文件末尾新增带 p4vasp 标记的独立区块，重复安装更新该区块而不重复追加，项目路径改变后也会更新别名；保留区块外的原配置，修改已有文件前在实际配置文件同目录创建名字包含 `.p4vasp-backup-` 的备份，保留权限及配置文件的符号链接。正常成功时不再打印这些配置细节；出错会显示原因、`NOT CONFIGURED` 和重跑提示。
-
-**Bash 用户推荐用下面的方式安装**，成功后会在当前终端自动 source 配置，随后直接输入 `p4v`，无需另做加载：
-
-```bash
-source install.sh
-```
-
-此入口将依赖安装／构建／预览放在子进程，成功配置后才回到调用它的 Bash 加载 `.bashrc`；不会通过 exec 替换当前终端，不把安装器的 `set -euo pipefail` 或工作目录变动带入父终端。失败／帮助／dry-run／deps-only 不加载配置。
-
-如果仍使用 `bash install.sh`，打开新终端即可使用；若想继续用当前 Bash 终端，可以执行：
+安装成功后，按末尾英文提示在当前终端执行：
 
 ```bash
 source ~/.bashrc
 ```
 
-zsh 用户仍使用 `bash install.sh`，可执行 `source ~/.zshrc`（有 ZDOTDIR 时为实际路径），或打开会加载该配置的新终端；不要在 zsh 中直接 source 这个 Bash 脚本。`bash install.sh` 的子进程不能替父终端生效，`source install.sh` 则在调用它的 Bash 中完成最后一步。`--deps-only` 不配置别名；`--no-launch`／`--build-only` 成功后仍会配置。
+安装器统一将 `p4v` 别名写入 `~/.bashrc`，Mac 的 zsh 终端也可以手动执行上述 source 命令加载该别名。不要使用 `source install.sh`。zsh 默认不会在新终端读取 `.bashrc`，因此新开的 zsh 终端需要再次执行 `source ~/.bashrc`。如果已有 `.bashrc` 包含 Bash 专用配置，zsh 加载时可能报错，此时请在 Bash 终端使用这套流程。
+
+配置使用独立标记区块，重复安装只更新该区块，保留其他内容；修改已有文件前在实际配置文件同目录备份，保留权限与符号链接。`--deps-only` 不配置别名；`--no-launch`／`--build-only` 成功后仍配置。失败会显示原因，不提示配置成功。
+
+启动、结构查看与 top／side 图片导出命令见 [常用命令](usage_commands.md)。安装末尾只保留安装结果、`source ~/.bashrc` 下一步及该文档入口。
 
 无显示环境时跳过预览并明确提示GUI未验证；`--no-launch`、`--build-only`、`--deps-only` 不打开界面。启动失败不会显示GUI成功，初始化超过60秒会退出。两秒预览仅验证启动，不代表完整功能或科学计算验证。日常 `bash p4v.sh`／`p4v` 不会自动关闭。
 
@@ -265,40 +252,15 @@ calculation inputs. Record destination-machine checks separately from historical
 Starting with the magic `p4v` command
 --------------------------
 
-Add the following alias to your shell configuration file.
+The installer configures the `p4v` alias in `~/.bashrc` on Linux and macOS.
+Run `bash install.sh`, then load it in your current terminal:
 
------------
+```bash
+source ~/.bashrc
+```
 
-**macOS (zsh)**
-
-Edit:
-
-    ~/.zshrc
-
-and add:
-
-    alias p4v='bash /完整路径/p4vasp/p4v.sh'
-
-Then reload the shell:
-
-    source ~/.zshrc
-
----------------------
-
-**Ubuntu / Linux (bash)**
-
-Edit:
-
-    ~/.bashrc
-
-and add:
-
-    alias p4v='bash /完整路径/p4vasp/p4v.sh'
-
-Then reload the shell:
-
-    source ~/.bashrc
-
+In zsh, repeat this load in each new terminal. Existing Bash-specific rc content
+may require using a Bash terminal instead. See [usage commands](usage_commands.md).
 
 GTK3 GUI runtime
 --------------------------

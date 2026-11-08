@@ -32,10 +32,10 @@ class FinishTest(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('GUI startup check: PASSED',result.stdout)
             self.assertIn('Command setup: CONFIGURED',result.stdout)
-            self.assertIn('NEXT STEP: Try these commands',result.stdout)
+            self.assertIn('source ~/.bashrc',result.stdout)
             for command in ('p4v POSCAR','p4v test.xyz','p4v OUTCAR','p4v POSCAR -o top.png --view top','p4v POSCAR -o side.png --view side'):
-                self.assertIn(command,result.stdout)
-            self.assertNotIn('source ~/.bashrc',result.stdout)
+                self.assertNotIn(command,result.stdout)
+            self.assertIn('usage_commands.md',result.stdout)
             original=rc.read_bytes();mtime=rc.stat().st_mtime_ns
             (root/'p4v.sh').write_text('printf "%s\\n" "$0"\n')
             check=subprocess.run(['bash','-O','expand_aliases','-c','source '+shlex.quote(str(rc))+'\np4v'],capture_output=True,text=True)
@@ -85,10 +85,10 @@ class FinishTest(unittest.TestCase):
     def test_zsh_destination_and_malformed_block(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
-            result=self.run_finish(root,launch=0,shell='zsh',zdotdir=root)
+            result=self.run_finish(root,launch=0,shell='zsh')
             self.assertEqual(result.returncode,0,result.stderr)
-            self.assertTrue((root/'.zshrc').is_file())
-            self.assertIn('COMMON COMMANDS:',result.stdout)
+            self.assertFalse((root/'.zshrc').exists())
+            self.assertIn('source ~/.bashrc',result.stdout)
             rc=root/'.bashrc';original=BEGIN+'\n# incomplete block\n';rc.write_text(original)
             result=self.run_finish(root,launch=0)
             self.assertEqual(result.returncode,0)
@@ -104,15 +104,6 @@ class FinishTest(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertTrue(rc.is_symlink())
             self.assertIn(BEGIN,target.read_text())
-
-    def test_successful_reload_receipt_and_footer(self):
-        with tempfile.TemporaryDirectory() as folder:
-            root=Path(folder);receipt=root/'receipt';receipt.write_bytes(b'')
-            result=self.run_finish(root,launch=0,receipt=receipt)
-            self.assertEqual(result.returncode,0,result.stderr)
-            self.assertEqual(receipt.read_bytes(),str(root/'.bashrc').encode()+b'\0')
-            self.assertIn('EXPORT PNG (no GUI window):',result.stdout)
-            self.assertNotIn('NEXT STEP: Reload this',result.stdout)
 
 
 if __name__=='__main__':unittest.main()

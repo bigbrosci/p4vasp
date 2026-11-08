@@ -22,9 +22,6 @@ finish_install() {
     alias_definition="alias p4v='$alias_definition'"
     local rc_file config_output shell_result='SKIPPED (--deps-only).' configured=0
     rc_file="$HOME/.bashrc"
-    if [[ "${P4VASP_CALLER_SHELL:-}" != bash && ( "${SHELL:-}" == */zsh || "${SHELL:-}" == zsh ) ]]; then
-        rc_file="${ZDOTDIR:-$HOME}/.zshrc"
-    fi
     # Optional explicit destination for automation; never change HOME for tests.
     if [[ -n "${P4VASP_SHELL_RC:-}" ]]; then
         rc_file="$P4VASP_SHELL_RC"
@@ -40,9 +37,6 @@ finish_install() {
             shell_result='NOT CONFIGURED (see the error above).'
         fi
     fi
-    if [[ "$configured" -eq 1 && -n "${P4VASP_RELOAD_RECEIPT:-}" ]]; then
-        printf '%s\0' "$rc_file" > "$P4VASP_RELOAD_RECEIPT" || return $?
-    fi
     echo
     echo '============================================================'
     echo '  p4vasp installation steps completed.'
@@ -51,10 +45,8 @@ finish_install() {
     echo '============================================================'
     echo
     if [[ "$configured" -eq 1 ]]; then
-        echo 'NEXT STEP: Try these commands in your calculation directory.'
-        if [[ -z "${P4VASP_RELOAD_RECEIPT:-}" ]]; then
-            echo 'If p4v is not found, open a new terminal.'
-        fi
+        echo 'NEXT STEP: Run this command in your terminal:'
+        echo '  source ~/.bashrc'
     elif [[ "${CONFIGURE_SHELL:-1}" -eq 1 ]]; then
         echo 'NEXT STEP: Resolve the command-setup error above and rerun the installer.'
     else
@@ -62,15 +54,7 @@ finish_install() {
     fi
     echo
     echo '------------------------------------------------------------'
-    echo 'COMMON COMMANDS:'
-    echo '  p4v             # Open the application'
-    echo '  p4v POSCAR      # View a VASP structure'
-    echo '  p4v test.xyz    # View an XYZ structure (ASE required)'
-    echo '  p4v OUTCAR      # Frequency OUTCAR; click Vibrations (ASE required)'
-    echo
-    echo 'EXPORT PNG (no GUI window):'
-    echo '  p4v POSCAR -o top.png --view top'
-    echo '  p4v POSCAR -o side.png --view side'
+    echo 'Common commands and image export: usage_commands.md'
     echo '------------------------------------------------------------'
     echo '============================================================'
 }

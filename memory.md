@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 统一安装与独立命令文档（2026-11-07）
+
+- 按最新要求撤回自动source入口：Linux/macOS统一bash install.sh；统一配置~/.bashrc，末尾提示source ~/.bashrc，常用启动和top/side命令移至usage_commands.md。删除receipt与zshrc分流，Bash误source安装入口安全返回，不改变父终端选项。安装指南同步；下方自动source/zshrc记录为历史行为。
+- 本机5 finish与10 unified专项通过，含特殊路径、幂等、备份/权限/符号链接、失败/deps-only、zsh环境仍写指定bashrc、父终端误source安全返回；shell语法/diff通过。首次unittest模块调用因test包命名冲突未运行，改直接执行两测试文件后15项通过。未真实安装、未改用户rc、未验收Mac/zsh或GUI；本机无zsh。zsh手动source但新终端不自动读取bashrc，已有Bash专用配置可能不兼容，指南注明。用户删除的Fe_single_atom三个输入文件不纳入提交。
+
 ## 安装末尾常用命令示例（2026-11-07）
 
 - 用户要求用常用命令替代bashrc说明，并加top/side导出。finish-install.sh正常结束只显示简短GUI/Command setup结果及NEXT STEP/COMMON COMMANDS/EXPORT PNG：p4v、POSCAR、test.xyz、频率OUTCAR、两条--view top/side导出。保留ASE条件、计算目录提示；自动配置/父source机制不变，正常不打印rc路径/追加/备份细节，出错仍显示原因与NOT CONFIGURED，普通bash调用仅提示开新终端。备份仍在实际rc同目录。
