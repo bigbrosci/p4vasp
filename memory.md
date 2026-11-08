@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 精简结果卡片与预览左上角模式标题（2026-11-08）
+
+- 用户修改1：ThermoResult删除底部频率下限/纳入/虚频/电子能说明/驻点警告，实际ASE版本放标题Thermochemistry Results (ASE x)，保留数值/条件。结果Frame与左参数列均Fill，测试确认等高；JSON/脚本原记录不删，科学计算未改。
+- 用户修改2：VibrationsPage以Gtk.Overlay叠加Mode编号/波数于ModeView左上角，删下方独占行，最大位移改tooltip；overlay pass-through不抢拖动。Glade/adapter/applet入口无变化。
+- 实际Linux频率完整GTK合成流程通过：F/G标题实际版本、无details、左右等高、左上角坐标/输入穿透、700/900/1200布局及原播放/Scale/周期/气相参数/保存/失效流程；截图已查看，编译/diff通过。8 GTK与33面板启动通过（不含GLUT）。未Mac/Windows或新EXE，未改原生/重编译，未操作R25/无关删除。指南/架构/双语同步。
+
 ## Show晶胞细线与真实抗锯齿（2026-11-08）
 
 - 用户希望Show接近频率效果，重点是粗糙box线。原生cell默认2→1，与viewer_style.CELL_LINE_WIDTH和ModeView共用整数1（native setter要求int）；StructureWindow创建/重开都设细线。VisFLWindow按can_do选择MSAA visual，否则回退；VisNavDrawer启停线平滑/MSAA并采用更柔和的ambient .4/diffuse .7/specular .35、shininess32、左上光源。drawCell scoped alpha blending且暂时禁用MSAA以确保实际线覆盖，结束恢复GL状态，保留深度/选择/相机逻辑。

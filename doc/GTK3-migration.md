@@ -91,7 +91,10 @@ the left and Scale/export on the right, stacking at narrow widths while
 preserving the 300-pixel frequency region. Thermochemistry is expanded by
 default, with compact settings on the left and `thermo_result.py` rendering
 a result card on the right (highlighted correction, quantity/value/unit rows,
-conditions and mode policy). Calculation completion reveals the result after
+conditions, with the actual ASE version in its title). Policy/mode provenance
+stays in exported data, and the result frame fills the same height as settings.
+The selected mode caption is a top-left, input-pass-through Gtk.Overlay child
+over ModeView; it no longer occupies a separate row. Calculation completion reveals the result after
 layout; invalidation clears it. Harmonic calculations use all
 positive modes; gas selection remains in the parameter dialog.
 The frequency policy is fixed: positive modes below 50 cm^-1 use 50, all

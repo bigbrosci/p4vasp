@@ -46,6 +46,10 @@ def main():
         page=frame.embedded_applet.page
         assert page.view.get_mapped() and len(page.store)==6
         assert page.thermo.get_expanded()
+        assert page.mode_info.get_parent() is page.preview_overlay
+        assert page.preview_overlay.get_overlay_pass_through(page.mode_info)
+        assert page.mode_info.get_halign()==Gtk.Align.START and page.mode_info.get_valign()==Gtk.Align.START
+        assert 'Mode 1 |' in page.mode_info.get_text() and 'max' not in page.mode_info.get_text()
         assert [column.get_title() for column in page.tree.get_columns()]==['Mode','cm⁻¹','Type']
         for width in (700,900,1200):
             frame.root_window.resize(width,750)
@@ -123,6 +127,8 @@ def main():
         assert page.result_panel.stack.get_visible_child_name()=='result'
         assert page.calculate.is_sensitive() and page.save_thermo.is_sensitive()
         assert page.result_panel.names['free_energy_eV'].get_text()=='Total F'
+        assert page.result_panel.title.get_text()=='Thermochemistry Results (ASE '+page.thermo_result['ase_version']+')'
+        assert not hasattr(page.result_panel,'details')
         assert 'ΔF' in page.result_panel.summary.get_text()
         assert abs(float(page.result_panel.values['ZPE_eV'].get_text())-page.thermo_result['ZPE_eV'])<1e-6
         x,y=page.result_panel.translate_coordinates(page.thermo_content,0,0)
@@ -145,6 +151,9 @@ def main():
             surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
             widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/'+name+'.png')
         capture('p4vasp-vibrations-thermo')
+        assert page.result_panel.get_allocated_height()==page.thermo_box.get_allocated_height()
+        mx,my=page.mode_info.translate_coordinates(page.preview_overlay,0,0)
+        assert 0<=mx<=16 and 0<=my<=16
         # Switch panels: animation/timers must stop, then returning must reload modes.
         page.play.set_active(True)
         namespace['startApplet'](None,'p4vasp.applet.InfoApplet.InfoApplet',frame);pump()

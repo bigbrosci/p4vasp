@@ -92,7 +92,9 @@ class VibrationsPage(Gtk.Box):
         self.pack_start(top,False,False,0)
         split=Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL);self.split=split;self.split_width=None
         left=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
-        self.view=ModeView();self.view.set_size_request(200,200);left.pack_start(self.view,True,True,0)
+        self.view=ModeView();self.view.set_size_request(200,200)
+        self.preview_overlay=Gtk.Overlay();self.preview_overlay.add(self.view)
+        left.pack_start(self.preview_overlay,True,True,0)
         playback=Gtk.Box(spacing=6)
         self.play=Gtk.ToggleButton(label='Play / Pause')
         self.amplitude=Gtk.SpinButton.new_with_range(.1,10,.1);self.amplitude.set_value(1)
@@ -101,7 +103,13 @@ class VibrationsPage(Gtk.Box):
         for label,widget in (('',self.play),('Amp. ×',self.amplitude),('Period (s)',self.period)):
             if label:playback.pack_start(Gtk.Label(label=label),False,False,0)
             playback.pack_start(widget,False,False,0)
-        self.mode_info=Gtk.Label(xalign=0);self.mode_info.set_line_wrap(True);self.mode_info.set_max_width_chars(55)
+        self.mode_info=Gtk.Label(xalign=0);self.mode_info.set_line_wrap(True);self.mode_info.set_max_width_chars(28)
+        self.mode_info.set_halign(Gtk.Align.START);self.mode_info.set_valign(Gtk.Align.START)
+        self.mode_info.set_margin_start(8);self.mode_info.set_margin_top(8)
+        css=Gtk.CssProvider();css.load_from_data(b'.mode-caption {background-color: rgba(255,255,255,0.88); padding: 4px 6px; border-radius: 4px;}')
+        self.mode_info.get_style_context().add_class('mode-caption')
+        self.mode_info.get_style_context().add_provider(css,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        self.preview_overlay.add_overlay(self.mode_info);self.preview_overlay.set_overlay_pass_through(self.mode_info,True)
         split.pack1(left,resize=True,shrink=True)
         self.store=Gtk.ListStore(bool,int,str,str)
         self.tree=Gtk.TreeView(model=self.store)
@@ -146,7 +154,6 @@ class VibrationsPage(Gtk.Box):
         scale_actions.pack_start(reset,False,False,0);scale_actions.pack_start(self.save_button,False,False,0)
         displacement.pack_start(scale_actions,False,False,0)
         self.tools.pack_start(displacement,True,True,0)
-        self.pack_start(self.mode_info,False,False,0)
         self.accept_flags=Gtk.CheckButton(label='Confirm export without selective-dynamics flags')
         self.accept_flags.set_tooltip_text('Required only when no matching POSCAR/CONTCAR can supply the original flags.')
         self.pack_start(self.accept_flags,False,False,0)
@@ -182,6 +189,7 @@ class VibrationsPage(Gtk.Box):
         for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
         self.result_panel=ThermoResult();self.result=self.result_panel.summary
+        box.set_valign(Gtk.Align.FILL);self.result_panel.set_valign(Gtk.Align.FILL)
         thermo_content=Gtk.Box(spacing=12);self.thermo_content=thermo_content
         thermo_content.pack_start(box,False,False,0);thermo_content.pack_start(self.result_panel,True,True,0)
         thermo.add(thermo_content);self.pack_start(thermo,False,False,0)
@@ -310,8 +318,8 @@ class VibrationsPage(Gtk.Box):
         if iterator is None or self.data is None:return
         self.pause();self.mode=model.get_path(iterator).get_indices()[0];self.scale.set_value(0)
         mode=self.data['modes'][self.mode]
-        self.mode_info.set_text('Mode %d | %.4f%s cm⁻¹ | max |Δr| = %.6g (source-vector magnitude)'%
-                                (mode['index'],mode['cm1'],' i' if mode['imaginary'] else '',mode['max_displacement']))
+        self.mode_info.set_text('Mode %d | %.4f%s cm⁻¹'%(mode['index'],mode['cm1'],' i' if mode['imaginary'] else ''))
+        self.mode_info.set_tooltip_text('Maximum source-vector displacement: %.6g'%mode['max_displacement'])
         self.static_preview();self.controls()
         # A frequency click starts its mode; slider movement switches to static preview.
         self.play.set_active(True)
