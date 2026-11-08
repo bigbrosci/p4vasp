@@ -90,7 +90,8 @@ removed. Below the responsive Paned, a two-column tool area places Cell/playback
 the left and Scale/export on the right, stacking at narrow widths while
 preserving the 300-pixel frequency region. Thermochemistry is expanded by
 default, with compact settings on the left and `thermo_result.py` rendering
-a result card on the right (highlighted correction, quantity/value/unit rows,
+a result table on the right (energy item, equation, eV value, kJ/mol value;
+correction row in bold, entropy explicitly per K,
 conditions, with the actual ASE version in its title). Policy/mode provenance
 stays in exported data, and the result frame fills the same height as settings.
 The selected mode caption is a top-left, input-pass-through Gtk.Overlay child

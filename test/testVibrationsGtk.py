@@ -128,11 +128,16 @@ def main():
         assert page.thermo_result['kind']=='F' and page.thermo_result['excluded_modes']==[1]
         assert page.result_panel.stack.get_visible_child_name()=='result'
         assert page.calculate.is_sensitive() and page.save_thermo.is_sensitive()
-        assert page.result_panel.names['free_energy_eV'].get_text()=='Total F'
+        assert [column.get_title() for column in page.result_panel.table.get_columns()]==['Energy item','Equation','Value in eV','Value in kJ/mol']
+        assert abs(float(page.result_panel.cell('electronic_energy_eV',3))-(-10.25*96.48533212331002))<1e-6
+        assert page.result_panel.cell('free_energy_eV',1)=='U − TS'
+        assert page.result_panel.cell('correction_eV',1)=='U − E − TS'
+        assert '/K' in page.result_panel.cell('S_eV_per_K',2) and '/K' in page.result_panel.cell('S_eV_per_K',3)
+        assert page.result_panel.cell('free_energy_eV',0)=='Total F'
         assert page.result_panel.title.get_text()=='Thermochemistry Results (ASE '+page.thermo_result['ase_version']+')'
         assert not hasattr(page.result_panel,'details')
-        assert 'ΔF' in page.result_panel.summary.get_text()
-        assert abs(float(page.result_panel.values['ZPE_eV'].get_text())-page.thermo_result['ZPE_eV'])<1e-6
+        assert page.result_panel.cell('correction_eV',0)=='ΔF'
+        assert abs(float(page.result_panel.cell('ZPE_eV',2))-page.thermo_result['ZPE_eV'])<1e-6
         x,y=page.result_panel.translate_coordinates(page.thermo_content,0,0)
         assert x>=page.thermo_box.get_allocated_width()
 
@@ -194,6 +199,7 @@ def main():
             widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/'+name+'.png')
         capture('p4vasp-vibrations-thermo')
         assert page.result_panel.get_allocated_height()==page.thermo_box.get_allocated_height()
+        assert sum(column.get_width() for column in page.result_panel.table.get_columns())<=page.result_panel.table.get_visible_rect().width
         mx,my=page.mode_info.translate_coordinates(page.preview_overlay,0,0)
         assert 0<=mx<=16 and 0<=my<=16
         # Switch panels: animation/timers must stop, then returning must reload modes.
@@ -250,9 +256,16 @@ def main():
         assert answers==['invalid','invalid conditions','valid']
         assert page.thermo_result is not None and page.thermo_result['kind']=='G',page.status.get_text()
         assert page.thermo_result['temperature_K']==350 and page.thermo_result['pressure_Pa']==200000
-        assert 'ΔG' in page.result_panel.summary.get_text()
+        assert page.result_panel.cell('correction_eV',0)=='ΔG'
+        assert page.result_panel.cell('free_energy_eV',1)=='H − TS'
+        assert page.result_panel.cell('correction_eV',1)=='H − E − TS'
+        assert page.result_panel.cell('free_energy_eV',2)=='—' and page.result_panel.cell('free_energy_eV',3)=='—'
+        assert abs(float(page.result_panel.cell('S_eV_per_K',3).split()[0])-page.thermo_result['S_eV_per_K']*96.48533212331002)<1e-8
         assert '350 K' in page.result_panel.conditions.get_text() and '200000 Pa' in page.result_panel.conditions.get_text()
         capture('p4vasp-thermochemistry-gas-result')
+        assert sum(column.get_width() for column in page.result_panel.table.get_columns())<=page.result_panel.table_scroll.get_hadjustment().get_page_size()
+        rx,ry=page.result_panel.translate_coordinates(frame.root_window,0,0)
+        assert rx+page.result_panel.get_allocated_width()<=frame.root_window.get_allocated_width()
         assert page.fields['temperature'].get_text()=='350' and page.fields['pressure'].get_text()=='200000'
         assert page.thermo_result['request_settings']['spin']=='1.0'
         assert page.thermo_result['request_settings']['symmetry']=='2'

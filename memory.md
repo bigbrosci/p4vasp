@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 热化学结果四列表格与kJ/mol显示（2026-11-08）
+
+- 用户要求右侧按item/Equation/eV/kJ/mol显示。ThermoResult改只读TreeView，四列Energy item/Equation/Value in eV/Value in kJ/mol，8行E/ZPE/U/H/S/TS/ΔF或G/Total F或G，校正行加粗。公式区分harmonic F=U-TS与gas G=H-TS，H=U+kBT，U_th与S分量用tooltip解释。精确SI e与NA相乘换算96.48533212331002；S单独注明per K，数值带/K避免误当能量。
+- 保留实际ASE标题、温压/气相条件及与左参数区等高；空E及不可用H/Total用双列—。正常宽度完整四列，窄时表内滚动。JSON/独立脚本仍使用原eV计算结果，本次只展示换算，无科学计算改动。
+- 实际Linux完整频率GTK通过四列表头、负电子能/熵换算数值、F/G公式、空值、列宽/结果边界/等高、原能源选择/气相/周期/动画/导出流程；已查看最终表格及末列局部截图。首轮列宽使表头/熵单位偏挤，已扩大后检查真实viewport与显示。8 GTK/33面板通过（GLUT除外），编译/diff通过；未重跑后端/原生或跨平台/EXE，未操作R25/无关删除。指南/架构/双语同步。
+
 ## E自动读第一步与单独OUTCAR末步选择（2026-11-08）
 
 - 用户确认频率任务第一个ionic step能量正确，要求E右侧可另开OUTCAR取最后一步。vibrations.py新增ionic_energy/first_ionic_energy：优先ASE vasp-out index0/-1的sigma->0，简化输出失败时p4vasp按第一/最后能量块解析，缺sigma时明确标TOTEN fallback。频率快照带electronic_energy_eV/source；run_request新增energy动作，复用既有可取消worker，不新增长驻进程。

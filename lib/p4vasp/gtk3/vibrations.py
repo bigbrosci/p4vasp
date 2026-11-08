@@ -189,7 +189,7 @@ class VibrationsPage(Gtk.Box):
         self.save_thermo=Gtk.Button(label='Save result + Python script')
         for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
-        self.result_panel=ThermoResult();self.result=self.result_panel.summary
+        self.result_panel=ThermoResult()
         box.set_valign(Gtk.Align.FILL);self.result_panel.set_valign(Gtk.Align.FILL)
         thermo_content=Gtk.Box(spacing=12);self.thermo_content=thermo_content
         thermo_content.pack_start(box,False,False,0);thermo_content.pack_start(self.result_panel,True,True,0)
