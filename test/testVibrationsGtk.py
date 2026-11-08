@@ -83,7 +83,8 @@ def main():
         assert page.thermo_result['kind']=='F' and page.thermo_result['excluded_modes']==[1]
         page.fields['temperature'].set_text('310');assert page.thermo_result is None
         page.state.set_active(0);page.calculate.clicked();pump(lambda:page.job is None,30)
-        assert 'minimum requires no imaginary' in page.status.get_text().lower()
+        assert page.thermo_result is not None and page.thermo_result['excluded_imaginary_modes']==[1]
+        assert 'floor' not in page.fields and 'imaginary_tolerance' not in page.fields
         page.state.set_active(1);page.calculate.clicked();pump(lambda:page.job is None,30)
         assert page.thermo_result is not None
         pump()

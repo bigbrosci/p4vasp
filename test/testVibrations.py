@@ -98,8 +98,10 @@ class VibrationsTest(unittest.TestCase):
         shifted=thermochemistry(dict(request,energy=-10))
         self.assertAlmostEqual(shifted['free_energy_eV'],r['free_energy_eV']-10,12)
         self.assertAlmostEqual(shifted['correction_eV'],r['correction_eV'],12)
-        floor=thermochemistry(dict(request,floor=350))
-        self.assertEqual(floor['effective_cm1'],[350,350,400,500,600])
+        legacy=thermochemistry(dict(request,floor=350,imaginary_tolerance=9999))
+        self.assertEqual(legacy['effective_cm1'],[200,300,400,500,600])
+        self.assertNotIn('floor',legacy['request_settings'])
+        self.assertNotIn('imaginary_tolerance',legacy['request_settings'])
 
     def test_gas_pressure_symmetry_spin_and_count_validation(self):
         data=self.data(imaginary=())
@@ -112,15 +114,24 @@ class VibrationsTest(unittest.TestCase):
             with self.assertRaises(ValueError):thermochemistry(dict(request,**changes))
 
     def test_imaginary_exclusion_and_low_frequency_policy(self):
-        data=self.data()
-        for changes in ({'state':'minimum'},{'confirm_exclusions':False},{'selected':[0,1]},
-                        {'temperature':0},{'floor':-1},{'selected':[1,1]}):
+        data=self.data(imaginary=(1,2,3))
+        data['modes'][3]['cm1']=20
+        data['modes'][4]['cm1']=50
+        data['modes'][5]['cm1']=80
+        original=copy.deepcopy(data)
+        # All imaginary modes are removed even if explicitly selected.
+        r=thermochemistry(self.request(data,selected=list(range(6)),state='minimum',confirm_exclusions=False))
+        self.assertEqual(r['effective_cm1'],[50,50,80])
+        self.assertEqual(r['selected_modes'],[4,5,6])
+        self.assertEqual(r['excluded_imaginary_modes'],[1,2,3])
+        self.assertEqual(r['frequency_policy'],dict(real_floor_cm1=50.,imaginary='exclude_all',stationary_point_check=False))
+        self.assertEqual(data,original)
+        for changes in ({'confirm_exclusions':False,'selected':[3]}, {'temperature':0},{'selected':[1,1]}):
             with self.assertRaises(ValueError):thermochemistry(self.request(data,**changes))
-        data=self.data(imaginary=(1,2))
-        with self.assertRaises(ValueError):thermochemistry(self.request(data,selected=[2,3,4,5]))
-        r=thermochemistry(self.request(data,selected=[2,3,4,5],imaginary_tolerance=150))
-        self.assertEqual(r['excluded_modes'],[1,2])
-        self.assertEqual(r['request_settings']['imaginary_tolerance'],150)
+        # A gas also excludes all unstable vibrational slots rather than rejecting the state.
+        gas=thermochemistry(self.request(data,selected=[],model='gas',geometry='linear',symmetry='1',spin='0',state='minimum'))
+        self.assertEqual(gas['effective_cm1'],[])
+        self.assertEqual(gas['excluded_imaginary_modes'],[1,2,3])
 
 
 if __name__=='__main__':unittest.main()

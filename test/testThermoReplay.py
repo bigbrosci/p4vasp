@@ -16,11 +16,13 @@ class ReplayTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="thermo ' 测试 ") as temporary:
             root=Path(temporary)
             for model in ('harmonic','gas'):
-                path=write_calculation(root/model,imaginary=(1,) if model=='harmonic' else ())
+                path=write_calculation(root/model,imaginary=(1,2,3) if model=='harmonic' else ())
                 data=read_outcar(path)
+                data['modes'][3]['cm1']=20
+                data['modes'][5]['cm1']=30
                 request=dict(action='thermo',data=data,model=model,state='ts' if model=='harmonic' else 'minimum',
                              temperature='345',pressure='200000',geometry='linear',symmetry='2',spin='1',
-                             selected=[1,2,3,4,5] if model=='harmonic' else [5],confirm_exclusions=True,
+                             selected=list(range(6)) if model=='harmonic' else [5],confirm_exclusions=True,
                              floor='250',energy='-15.2',imaginary_tolerance='0')
                 result=thermochemistry(request)
                 report,script=save_thermochemistry(root/(model+'.json'),data,result)

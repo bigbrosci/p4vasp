@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 固定50cm⁻¹实频下限与全部虚频排除（2026-11-07）
+
+- 按用户最新规则，热化学正实频低于50统一按50（含ZPE/热项/熵），50及以上不变，全部虚频/零频过滤，删除floor/tolerance输入，旧request对应字段忽略且不写入新settings。不再因虚频数量拒绝计算，Stationary point只记录标签；额外剔除正实频仍需确认。gas_mode_count统一前后端：3N-6/5减去虚频数、最低0，按假定虚频占振动自由度建议最高实频并确认；不自动区分虚频的平动/转动来源。无正实频的harmonic仍拒绝空求和。
+- 结果新增frequency_policy/excluded_imaginary_modes/warnings，界面显示固定规则及排除编号，独立脚本复制政策并按有效频率重算。8后端（20/50/80边界、多虚频含主动选中也过滤、不改原数据、legacy忽略、气相空振动项及原解析/解析公式/压力自旋对称数）、2独立F/G脚本（新增低频/多虚频、与原结果12位一致）、实际GTK频率全流程通过，已查看移除字段后的主面板截图；编译/diff通过。未重复8GTK/33启动或跨平台验收/打包。
+- 用户明确本次只改程序，不重算或操作R25；此轮仅合成输入和临时文件，不读改R25、不提交用户目录，用户自行移除。memory/双语记录/指南同步；原样例删除保持不提交。已交付Windows旧包未包含本次变更。
+
 ## R25低NWRITE频率OUTCAR兼容修复（2026-11-07）
 
 - 用户报告本地R25/OUTCAR在频率面板打开空白。实际只读复现read_outcar报VRHFIN缺失：该VASP6.5.1/IBRION5/NWRITE0输出没有VRHFIN/per-potential POMASS，元素仅POTCAR行、质量在单行汇总。vibrations.py新增POTCAR/TITEL元素后备（支持赝势后缀/重复列表），POMASS解析同一行全部数值；保留原VRHFIN、质量处理及约束核对。无GUI布局/原生改动。

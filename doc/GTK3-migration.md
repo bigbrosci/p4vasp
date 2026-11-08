@@ -77,6 +77,10 @@ The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
 the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived
 scientific worker. Selecting Ideal gas opens a bounded, scrollable parameter dialog;
 confirmation starts the calculation and confirms the displayed mode selection.
+The frequency policy is fixed: positive modes below 50 cm^-1 use 50, all
+imaginary modes are excluded, and stationary-point labels do not gate calculation.
+The floor/tolerance entries are removed. Gas mode selection reduces vibrational
+slots by the excluded imaginary-mode count and requires review.
 Result export creates a JSON/Python pair through `thermo_replay.py`; the script
 recalculates with ASE independently of GTK/p4vasp and source files. Timers stop on unmap/destroy, pending workers are cancelled,
 and display offsets do not mutate the active system. Focused checks:

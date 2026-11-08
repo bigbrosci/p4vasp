@@ -7,7 +7,7 @@ from p4vasp.gtk3.mode_view import ModeView
 from p4vasp.gtk3.install_hint import InstallHint
 from p4vasp.gtk3.file_dialogs import CompactFileDialog, fit_dialog
 from p4vasp.thermo_replay import save_thermochemistry
-from p4vasp.vibrations import task, displaced_structure
+from p4vasp.vibrations import task, displaced_structure, gas_mode_count
 
 
 def entry(value=''):
@@ -44,7 +44,7 @@ class GasThermoDialog:
 
     def update_modes(self,preserve=False):
         page=self.page;n=len(page.data['symbols'])
-        count={'nonlinear':max(0,3*n-6),'linear':max(0,3*n-5),'monatomic':0}[self.geometry.get_active_text()]-(page.state.get_active()==1)
+        count=gas_mode_count(page.data,self.geometry.get_active_text())
         candidates=sorted((i for i,m in enumerate(page.data['modes']) if not m['imaginary'] and m['cm1']>0),key=lambda i:page.data['modes'][i]['cm1'],reverse=True)
         current=[i for i,row in enumerate(page.store) if row[0]]
         self.chosen=current if preserve and len(current)==count else sorted(candidates[:max(0,count)])
@@ -134,20 +134,20 @@ class VibrationsPage(Gtk.Box):
         for label in ('Harmonic (adsorbate / local modes)','Ideal gas (molecule)'):self.model.append_text(label)
         self.model.set_active(0)
         self.state=Gtk.ComboBoxText()
-        for label in ('Minimum','Transition state (one imaginary mode)'):self.state.append_text(label)
+        for label in ('Minimum','Transition state'):self.state.append_text(label)
         self.state.set_active(0)
         self.geometry=Gtk.ComboBoxText()
         for label in ('nonlinear','linear','monatomic'):self.geometry.append_text(label)
         self.geometry.set_active(0)
-        self.fields={k:entry(v) for k,v in (('temperature','298.15'),('pressure','101325'),('symmetry','1'),('spin','0'),('floor','0'),('imaginary_tolerance','0'),('energy',''))}
-        items=[('Model',self.model),('Stationary point',self.state),('T (K)',self.fields['temperature']),
-               ('P (Pa, gas only)',self.fields['pressure']),('Low-frequency floor (cm⁻¹)',self.fields['floor']),
-               ('Imaginary tolerance (cm⁻¹)',self.fields['imaginary_tolerance']),('Electronic energy (eV, optional)',self.fields['energy'])]
-        self.fields['imaginary_tolerance'].set_tooltip_text('Default 0: no imaginary modes ignored. Raise only for identified numerical/translation artifacts; exclusions still require confirmation.')
+        self.fields={k:entry(v) for k,v in (('temperature','298.15'),('pressure','101325'),('symmetry','1'),('spin','0'),('energy',''))}
+        items=[('Model',self.model),('Stationary point (label only)',self.state),('T (K)',self.fields['temperature']),
+               ('P (Pa, gas only)',self.fields['pressure']),('Electronic energy (eV, optional)',self.fields['energy'])]
         for i,(label,widget) in enumerate(items):
             grid.attach(Gtk.Label(label=label,xalign=0),0,i,1,1);grid.attach(widget,1,i,1,1)
         box.pack_start(grid,False,False,0)
-        self.confirm=Gtk.CheckButton(label='I confirm the selected / excluded modes shown in the frequency table')
+        policy=Gtk.Label(label='Real modes below 50 cm⁻¹ use 50 cm⁻¹; all imaginary modes are excluded.',xalign=0)
+        policy.set_line_wrap(True);policy.set_max_width_chars(70);box.pack_start(policy,False,False,0)
+        self.confirm=Gtk.CheckButton(label='I confirm any additional real-mode exclusions shown in the table')
         box.pack_start(self.confirm,False,False,0)
         actions=Gtk.Box(spacing=7)
         self.gas_select=Gtk.Button(label='Select highest gas vibrational modes')
@@ -230,6 +230,8 @@ class VibrationsPage(Gtk.Box):
             if result['H_eV'] is not None:lines.append('H = %.8f eV'%result['H_eV'])
             if result['electronic_energy_eV'] is not None:lines.append('%s = %.8f eV'%(result['kind'],result['free_energy_eV']))
             lines.append('Selected modes: %s | Excluded: %s'%(result['selected_modes'],result['excluded_modes']))
+            lines.append('Real-frequency minimum: 50 cm⁻¹ | Imaginary modes excluded: %s'%result['excluded_imaginary_modes'])
+            lines.extend(result.get('warnings',[]))
             self.result.set_text('\n'.join(lines));self.status.set_text('Correction calculated. Settings and effective frequencies are included when saving.')
         self.controls();return False
 
@@ -267,7 +269,7 @@ class VibrationsPage(Gtk.Box):
     def select_gas(self,*_):
         if not self.data:return
         n=len(self.data['symbols']);geometry=self.geometry.get_active_text()
-        count={'nonlinear':max(0,3*n-6),'linear':max(0,3*n-5),'monatomic':0}[geometry]-(self.state.get_active()==1)
+        count=gas_mode_count(self.data,geometry)
         candidates=sorted((i for i,m in enumerate(self.data['modes']) if not m['imaginary'] and m['cm1']>0),
                           key=lambda i:self.data['modes'][i]['cm1'],reverse=True)
         if count<0 or len(candidates)<count:self.status.set_text('Insufficient real modes for the chosen gas geometry.');return

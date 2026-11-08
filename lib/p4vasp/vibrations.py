@@ -142,6 +142,14 @@ def displaced_structure(data, mode_index, scale):
     return structure
 
 
+def gas_mode_count(data, geometry):
+    """Gas vibrational slots after excluding imaginary modes (no state test)."""
+    base={'monatomic':0,'linear':max(0,3*len(data['symbols'])-5),
+          'nonlinear':max(0,3*len(data['symbols'])-6)}[geometry]
+    imaginary=sum(bool(mode['imaginary']) for mode in data['modes'])
+    return max(0,base-imaginary)
+
+
 def thermochemistry(request):
     import ase
     import numpy as np
@@ -151,23 +159,19 @@ def thermochemistry(request):
     selected=request['selected']
     if len(selected)!=len(set(selected)) or any(type(i)!=int or not 0<=i<len(modes) for i in selected):
         raise ValueError('Invalid thermochemistry mode selection.')
-    tolerance=float(request.get('imaginary_tolerance',0))
-    if not math.isfinite(tolerance) or tolerance<0:raise ValueError('Imaginary tolerance must be nonnegative and finite.')
-    imaginary=sum(m['imaginary'] and m['cm1']>tolerance for m in modes)
+    imaginary=sum(bool(mode['imaginary']) for mode in modes)
     state=request.get('state','minimum')
     if state not in ('minimum','ts'):raise ValueError('Choose minimum or transition state.')
-    if (state=='minimum' and imaginary) or (state=='ts' and imaginary!=1):
-        raise ValueError('A minimum requires no imaginary modes; a first-order transition state requires exactly one (above the explicit imaginary tolerance).')
-    if any(modes[i]['imaginary'] or modes[i]['cm1']<=0 for i in selected):
-        raise ValueError('Only positive real frequencies may enter thermochemistry.')
-    if len(selected)!=len(modes) and not request.get('confirm_exclusions'):
-        raise ValueError('Confirm the excluded modes before calculation.')
+    # Imaginary and zero modes are always excluded, even in external requests.
+    selected=[i for i in selected if not modes[i]['imaginary'] and modes[i]['cm1']>0]
+    if any(not mode['imaginary'] and mode['cm1']>0 and i not in selected for i,mode in enumerate(modes)) and not request.get('confirm_exclusions'):
+        raise ValueError('Confirm the excluded real modes before calculation.')
     temperature=float(request['temperature'])
     pressure=float(request.get('pressure',101325)) if request['model']=='gas' else 101325.
-    floor=float(request.get('floor',0));energy=request.get('energy')
+    floor=50.;energy=request.get('energy')
     potential=0. if energy in (None,'') else float(energy)
     if not all(math.isfinite(v) for v in (temperature,pressure,floor,potential)) or temperature<=0 or pressure<=0 or floor<0:
-        raise ValueError('Temperature/pressure must be positive and finite; the frequency floor must be nonnegative.')
+        raise ValueError('Temperature/pressure must be positive and finite; electronic energy must be finite.')
     frequencies=[max(float(modes[i]['cm1']),floor) for i in selected]
     energies=[f*units.invcm for f in frequencies]
     model=request['model']
@@ -187,7 +191,7 @@ def thermochemistry(request):
         linear=len(atoms)>1 and inertias[0]/max(inertias[-1],1e-20)<1e-6
         actual='monatomic' if len(atoms)==1 else ('linear' if linear else 'nonlinear')
         if geometry!=actual:raise ValueError('Geometry choice does not match the imported molecule (%s).'%actual)
-        expected={'monatomic':0,'linear':3*len(atoms)-5,'nonlinear':3*len(atoms)-6}[geometry]-(state=='ts')
+        expected=gas_mode_count(data,geometry)
         if len(selected)!=expected:raise ValueError('Select exactly %d molecular vibrational modes; exclude translations/rotations explicitly.'%expected)
         thermo=IdealGasThermo(energies,geometry,atoms=atoms,symmetrynumber=symmetry,spin=spin,
                              potentialenergy=potential,vib_selection='all')
@@ -205,7 +209,11 @@ def thermochemistry(request):
             'correction_eV':float(free-potential),'electronic_energy_eV':None if energy in (None,'') else potential,
             'selected_modes':[modes[i]['index'] for i in selected],
             'excluded_modes':[m['index'] for i,m in enumerate(modes) if i not in selected],
-            'effective_cm1':frequencies,'request_settings':{k:v for k,v in request.items() if k!='data'}}
+            'effective_cm1':frequencies,
+            'excluded_imaginary_modes':[mode['index'] for mode in modes if mode['imaginary']],
+            'frequency_policy':{'real_floor_cm1':50.,'imaginary':'exclude_all','stationary_point_check':False},
+            'warnings':['All %d imaginary modes excluded; stationary-point character is not validated.'%imaginary] if imaginary else [],
+            'request_settings':{k:v for k,v in request.items() if k not in ('data','floor','imaginary_tolerance')}}
 
 
 def run_request(request):
