@@ -45,6 +45,7 @@ def main():
         button.emit('clicked');pump()
         page=frame.embedded_applet.page
         assert page.view.get_mapped() and len(page.store)==6
+        assert page.thermo.get_expanded()
         assert [column.get_title() for column in page.tree.get_columns()]==['Mode','cm⁻¹','Type']
         for width in (700,900,1200):
             frame.root_window.resize(width,750)
@@ -56,8 +57,13 @@ def main():
             if width==700:
                 widget=frame.root_window
                 surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
-                widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-compact.png')
-        frame.root_window.resize(1050,800);pump()
+                widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-compact.png')
+        frame.root_window.resize(1050,800)
+        for _ in range(15):pump();time.sleep(.02)
+        assert page.tools.get_orientation()==Gtk.Orientation.HORIZONTAL
+        x,y=page.displacement.translate_coordinates(page.tools,0,0)
+        assert x>=page.periodic_controls.get_allocated_width()
+
         assert page.play.get_active() and page.timer is not None
         initial=json.dumps(page.view.positions)
         pump(lambda:json.dumps(page.view.positions)!=initial)
@@ -87,7 +93,7 @@ def main():
         for _ in range(10):pump();time.sleep(.02)
         widget=frame.root_window
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
-        widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-periodic.png')
+        widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-periodic.png')
         for widget in page.repeat:widget.set_value(1)
         pump()
         adj=page.scale.get_adjustment()
@@ -114,7 +120,16 @@ def main():
         page.calculate.clicked();pump(lambda:page.job is None,30);GLib.source_remove(timer)
         assert ticks and page.thermo_result is not None,page.status.get_text()
         assert page.thermo_result['kind']=='F' and page.thermo_result['excluded_modes']==[1]
+        assert page.result_panel.stack.get_visible_child_name()=='result'
+        assert page.calculate.is_sensitive() and page.save_thermo.is_sensitive()
+        assert page.result_panel.names['free_energy_eV'].get_text()=='Total F'
+        assert 'ΔF' in page.result_panel.summary.get_text()
+        assert abs(float(page.result_panel.values['ZPE_eV'].get_text())-page.thermo_result['ZPE_eV'])<1e-6
+        x,y=page.result_panel.translate_coordinates(page.thermo_content,0,0)
+        assert x>=page.thermo_box.get_allocated_width()
+
         page.fields['temperature'].set_text('310');assert page.thermo_result is None
+        assert page.result_panel.stack.get_visible_child_name()=='empty'
         page.state.set_active(0);page.calculate.clicked();pump(lambda:page.job is None,30)
         assert page.thermo_result is not None and page.thermo_result['excluded_imaginary_modes']==[1]
         assert 'floor' not in page.fields and 'imaginary_tolerance' not in page.fields
@@ -124,10 +139,11 @@ def main():
         position=page.save_button.translate_coordinates(frame.root_window,0,0)
         assert position[0]+page.save_button.get_allocated_width()<=frame.root_window.get_allocated_width()
         def capture(name):
+            frame.root_window.present()
             for _ in range(8):pump();time.sleep(.03)
             widget=frame.root_window
             surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
-            widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/'+name+'.png')
+            widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/'+name+'.png')
         capture('p4vasp-vibrations-thermo')
         # Switch panels: animation/timers must stop, then returning must reload modes.
         page.play.set_active(True)
@@ -170,7 +186,7 @@ def main():
             assert position[1]+button.get_allocated_height()<=dialog.get_allocated_height()
             assert dialog.get_allocated_width()<=640 and dialog.get_allocated_height()<=480,(dialog.get_allocated_width(),dialog.get_allocated_height())
             surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,dialog.get_allocated_width(),dialog.get_allocated_height())
-            dialog.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-gas-thermo-dialog.png')
+            dialog.check_resize();dialog.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-gas-thermo-dialog.png')
             browser.dialog.response(Gtk.ResponseType.OK);answers.append('valid');return False
         from unittest.mock import patch
         from types import SimpleNamespace
@@ -182,6 +198,9 @@ def main():
         assert answers==['invalid','invalid conditions','valid']
         assert page.thermo_result is not None and page.thermo_result['kind']=='G',page.status.get_text()
         assert page.thermo_result['temperature_K']==350 and page.thermo_result['pressure_Pa']==200000
+        assert 'ΔG' in page.result_panel.summary.get_text()
+        assert '350 K' in page.result_panel.conditions.get_text() and '200000 Pa' in page.result_panel.conditions.get_text()
+        capture('p4vasp-thermochemistry-gas-result')
         assert page.fields['temperature'].get_text()=='350' and page.fields['pressure'].get_text()=='200000'
         assert page.thermo_result['request_settings']['spin']=='1.0'
         assert page.thermo_result['request_settings']['symmetry']=='2'

@@ -4,6 +4,7 @@ from pathlib import Path
 import time
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.mode_view import ModeView
+from p4vasp.gtk3.thermo_result import ThermoResult
 from p4vasp.gtk3.install_hint import InstallHint
 from p4vasp.gtk3.file_dialogs import CompactFileDialog, fit_dialog
 from p4vasp.thermo_replay import save_thermochemistry
@@ -126,28 +127,36 @@ class VibrationsPage(Gtk.Box):
             self.repeat.append(value);self.periodic_controls.pack_start(value,False,False,0)
             value.connect('value-changed',self.repeat_changed)
         self.cell_visible.connect('toggled',lambda widget:self.view.set_cell_visible(widget.get_active()))
-        self.pack_start(self.periodic_controls,False,False,0)
-        self.pack_start(playback,False,False,0)
-        self.pack_start(self.mode_info,False,False,0)
-        displacement=Gtk.Box(spacing=7)
-        displacement.pack_start(Gtk.Label(label='Scale × mode vector'),False,False,0)
+        tool_left=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
+        tool_left.pack_start(self.periodic_controls,False,False,0)
+        tool_left.pack_start(playback,False,False,0)
+        self.tools=Gtk.Box(spacing=12);self.tools.pack_start(tool_left,False,False,0)
+        self.tools.connect('size-allocate',self.resize_tools)
+        self.pack_start(self.tools,False,False,0)
+        displacement=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=3);self.displacement=displacement
+        scale_label=Gtk.Label(label='Scale × mode vector',xalign=0)
+        displacement.pack_start(scale_label,False,False,0)
         self.scale=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,-1,1,.1)
         self.scale.set_digits(1);self.scale.set_round_digits(1);self.scale.set_value(0);self.scale.set_hexpand(True)
         for v in (-1,0,1):self.scale.add_mark(v,Gtk.PositionType.BOTTOM,None)
         displacement.pack_start(self.scale,True,True,0)
+        scale_actions=Gtk.Box(spacing=5)
         reset=Gtk.Button(label='Zero');reset.connect('clicked',self.zero)
         self.save_button=Gtk.Button(label='Save new POSCAR')
-        displacement.pack_start(reset,False,False,0);displacement.pack_start(self.save_button,False,False,0)
-        self.pack_start(displacement,False,False,0)
+        scale_actions.pack_start(reset,False,False,0);scale_actions.pack_start(self.save_button,False,False,0)
+        displacement.pack_start(scale_actions,False,False,0)
+        self.tools.pack_start(displacement,True,True,0)
+        self.pack_start(self.mode_info,False,False,0)
         self.accept_flags=Gtk.CheckButton(label='Confirm export without selective-dynamics flags')
         self.accept_flags.set_tooltip_text('Required only when no matching POSCAR/CONTCAR can supply the original flags.')
         self.pack_start(self.accept_flags,False,False,0)
-        thermo=Gtk.Expander(label='Thermochemistry — ASE');thermo.set_expanded(False)
+        thermo=Gtk.Expander(label='Thermochemistry — ASE');thermo.set_expanded(True);self.thermo=thermo
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5);self.thermo_box=box
         grid=Gtk.Grid(column_spacing=10,row_spacing=5)
         self.model=Gtk.ComboBoxText()
-        for label in ('Harmonic (adsorbate / local modes)','Ideal gas (molecule)'):self.model.append_text(label)
+        for label in ('Harmonic','Ideal gas'):self.model.append_text(label)
         self.model.set_active(0)
+        self.model.set_tooltip_text('Harmonic: surface / local vibrational modes. Ideal gas: isolated molecule.')
         self.state=Gtk.ComboBoxText()
         for label in ('Minimum','Transition state'):self.state.append_text(label)
         self.state.set_active(0)
@@ -155,20 +164,27 @@ class VibrationsPage(Gtk.Box):
         for label in ('nonlinear','linear','monatomic'):self.geometry.append_text(label)
         self.geometry.set_active(0)
         self.fields={k:entry(v) for k,v in (('temperature','298.15'),('pressure','101325'),('symmetry','1'),('spin','0'),('energy',''))}
-        items=[('Model',self.model),('Stationary point (label only)',self.state),('T (K)',self.fields['temperature']),
-               ('P (Pa, gas only)',self.fields['pressure']),('Electronic energy (eV, optional)',self.fields['energy'])]
+        items=[('Model',self.model),('State',self.state),('T (K)',self.fields['temperature']),
+               ('P (Pa)',self.fields['pressure']),('E (eV)',self.fields['energy'])]
+        self.state.set_tooltip_text('Stationary-point label only; all imaginary modes are excluded.')
+        self.fields['energy'].set_tooltip_text('Optional electronic energy; leave empty for correction only.')
+        for combo in (self.model,self.state):
+            for renderer in combo.get_cells():
+                renderer.set_property('ellipsize',3);renderer.set_property('width-chars',12);renderer.set_property('max-width-chars',16)
         for i,(label,widget) in enumerate(items):
             grid.attach(Gtk.Label(label=label,xalign=0),0,i,1,1);grid.attach(widget,1,i,1,1)
         box.pack_start(grid,False,False,0)
         policy=Gtk.Label(label='Real modes below 50 cm⁻¹ use 50 cm⁻¹; all imaginary modes are excluded.',xalign=0)
-        policy.set_line_wrap(True);policy.set_max_width_chars(70);box.pack_start(policy,False,False,0)
-        actions=Gtk.Box(spacing=7)
+        policy.set_line_wrap(True);policy.set_max_width_chars(28);box.pack_start(policy,False,False,0)
+        actions=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
         self.calculate=Gtk.Button(label='Calculate correction')
         self.save_thermo=Gtk.Button(label='Save result + Python script')
         for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
-        self.result=Gtk.Label(xalign=0);self.result.set_selectable(True);self.result.set_line_wrap(True);self.result.set_max_width_chars(90)
-        box.pack_start(self.result,False,False,0);thermo.add(box);self.pack_start(thermo,False,False,0)
+        self.result_panel=ThermoResult();self.result=self.result_panel.summary
+        thermo_content=Gtk.Box(spacing=12);self.thermo_content=thermo_content
+        thermo_content.pack_start(box,False,False,0);thermo_content.pack_start(self.result_panel,True,True,0)
+        thermo.add(thermo_content);self.pack_start(thermo,False,False,0)
         self.status=Gtk.Label(label='Load a VASP frequency OUTCAR. Animation is schematic; Scale is dimensionless.',xalign=0)
         self.status.set_line_wrap(True);self.status.set_max_width_chars(90);self.status.set_selectable(True)
         self.pack_start(self.status,False,False,0)
@@ -186,6 +202,22 @@ class VibrationsPage(Gtk.Box):
         self.connect('unmap',lambda *_:self.pause())
         self.connect('destroy',self.destroyed)
         self.controls()
+
+    def resize_tools(self,widget,allocation):
+        orientation=Gtk.Orientation.HORIZONTAL if allocation.width>=820 else Gtk.Orientation.VERTICAL
+        if widget.get_orientation()!=orientation:widget.set_orientation(orientation)
+
+    def reveal_result(self):
+        if not self.alive or self.thermo_result is None:return False
+        parent=self.get_parent()
+        while parent is not None and not isinstance(parent,Gtk.ScrolledWindow):parent=parent.get_parent()
+        if parent is not None:
+            adjustment=parent.get_vadjustment()
+            location=self.result_panel.translate_coordinates(self,0,0)
+            if location:
+                bottom=location[1]+self.result_panel.get_allocated_height()
+                adjustment.set_value(max(adjustment.get_value(),min(adjustment.get_upper()-adjustment.get_page_size(),bottom-adjustment.get_page_size())))
+        return False
 
     def repeat_changed(self,*_):
         if self.repeat_updating or not self.data:return
@@ -222,7 +254,7 @@ class VibrationsPage(Gtk.Box):
         if self.play.get_active():self.play.set_active(False)
 
     def invalidate(self,*_):
-        self.thermo_result=None;self.result.set_text('');self.controls()
+        self.thermo_result=None;self.result_panel.clear();self.controls()
 
     def set_data(self,data):
         self.pause();self.data=data;self.mode=0;self.accept_flags.set_active(False);self.scale.set_value(0)
@@ -243,24 +275,20 @@ class VibrationsPage(Gtk.Box):
         self.cancel();self.request_id+=1;token=self.request_id
         def callback(result,error):GLib.idle_add(self.finished,token,kind,result,error)
         self.job=task(request,callback);self.status.set_text('Reading modes…' if kind=='read' else 'Calculating thermochemistry…')
+        if kind=='thermo':self.result_panel.clear('Calculating…')
         self.controls();self.job.start()
 
     def finished(self,token,kind,result,error):
         if not self.alive or token!=self.request_id:return False
         self.job=None
-        if error:self.status.set_text(error)
+        if error:
+            self.status.set_text(error)
+            if kind=='thermo':self.result_panel.clear(error)
         elif kind=='read':self.set_data(result)
         else:
-            self.thermo_result=result
-            lines=['ASE %s | %s correction = %.8f eV'%(result['ase_version'],result['kind'],result['correction_eV']),
-                   'ZPE = %.8f eV | S = %.10f eV/K | T S = %.8f eV'%(result['ZPE_eV'],result['S_eV_per_K'],result['TS_eV']),
-                   'U = %.8f eV'%result['U_eV']]
-            if result['H_eV'] is not None:lines.append('H = %.8f eV'%result['H_eV'])
-            if result['electronic_energy_eV'] is not None:lines.append('%s = %.8f eV'%(result['kind'],result['free_energy_eV']))
-            lines.append('Selected modes: %s | Excluded: %s'%(result['selected_modes'],result['excluded_modes']))
-            lines.append('Real-frequency minimum: 50 cm⁻¹ | Imaginary modes excluded: %s'%result['excluded_imaginary_modes'])
-            lines.extend(result.get('warnings',[]))
-            self.result.set_text('\n'.join(lines));self.status.set_text('Correction calculated. Settings and effective frequencies are included when saving.')
+            self.thermo_result=result;self.result_panel.show_result(result)
+            self.status.set_text('Correction calculated. Save the result and standalone Python script.')
+            GLib.timeout_add(80,self.reveal_result)
         self.controls();return False
 
     def cancel(self):

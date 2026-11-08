@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Scale工具区与默认展开的右侧热化学结果（2026-11-07）
+
+- 用户要求Scale放Cell/播放右侧、Thermochemistry默认展开、结果右置并美化。VibrationsPage工具区左右分组，左Cell XYZ+播放，右Scale/Zero/POSCAR，内容宽>=820横排，窄时上下避免裁切；模式说明单独下方。热化学默认展开，紧凑参数/计算/保存列在左，新增gtk3/thermo_result.py卡片在右：强调ΔF/G，ZPE/U/H/S/TS/E/Total F或G按值/单位对齐，条件与模式处理分组，E留空显示—且标correction only。
+- 计算后等布局80ms自动揭示结果，过期/销毁回调跳过；参数变更清空卡片并禁保存，错误显示右侧消息。Model标签简化Harmonic/Ideal gas，tooltip保留模型含义；气相弹窗/固定50/虚频排除/科学计算/原始导出不变，Glade/adapter/applet宿主无修改。
+- 实际Linux GTK频率完整合成流程通过：默认展开、700/900/1200宽频率三列完整、1050宽Scale在右、结果卡片位于设置右侧、F/G字段/单位/温压值、计算保存可用、参数失效清空、既有周期/动画/Scale/POSCAR/气相弹窗/双文件保存通过；8 GTK、33面板启动（GLUT不含）、编译/diff通过。已查看F/G右侧卡片截图。首轮测试截图曾待布局GTK断言，check_resize后重跑无断言；结果80ms后滚动以避免按空卡片高度定位。科学后端本次未改未重跑；Mac/Windows未验收，未打EXE，未操作R25。指南/架构/双语同步，无关删除保留不提交。
+
 ## 频率晶胞/XYZ显示重复与Show样式统一（2026-11-07）
 
 - 按用户要求新增频率Cell（默认开）及X/Y/Z SpinButton（1..5，初始1）。periodic_preview.py按真实晶格向量（含斜胞）仅映射显示平衡坐标并生成平移副本/去重晶胞线；按副本平衡距离成键，可显示扩展区域跨边界连接。ModeView以固定图像偏移应用每帧原模式，所有副本同相；显示原子上限12000，超限回退控件原值，换文件重复数归1。热化学、Scale导出和原数据不变，扩展中保存仍原晶胞原子。

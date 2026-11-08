@@ -86,8 +86,13 @@ the Show applet and molecular previews. Native primitive resolution defaults
 to 32 and the structure drawer honors that default; rebuild the native extension
 on each target machine for this quality change.
 The frequency table has only Mode/cm^-1/Type columns; checkbox selection is
-removed. Playback and mode text occupy full-width rows below the responsive
-Paned, preserving a 300-pixel frequency region. Harmonic calculations use all
+removed. Below the responsive Paned, a two-column tool area places Cell/playback on
+the left and Scale/export on the right, stacking at narrow widths while
+preserving the 300-pixel frequency region. Thermochemistry is expanded by
+default, with compact settings on the left and `thermo_result.py` rendering
+a result card on the right (highlighted correction, quantity/value/unit rows,
+conditions and mode policy). Calculation completion reveals the result after
+layout; invalidation clears it. Harmonic calculations use all
 positive modes; gas selection remains in the parameter dialog.
 The frequency policy is fixed: positive modes below 50 cm^-1 use 50, all
 imaginary modes are excluded, and stationary-point labels do not gate calculation.
