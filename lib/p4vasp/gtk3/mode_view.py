@@ -7,7 +7,7 @@ import math
 import cairo
 from p4vasp.gtk3 import Gtk, Gdk
 from p4vasp.periodic_preview import geometry, bonds
-from p4vasp.viewer_style import display_values, RADIUS_FACTOR, BOND_FACTOR, BOND_COLOR, BOND_RADIUS
+from p4vasp.viewer_style import display_values, RADIUS_FACTOR, BOND_FACTOR, BOND_COLOR, BOND_RADIUS, CELL_LINE_WIDTH
 
 
 class ModeView(Gtk.DrawingArea):
@@ -83,7 +83,7 @@ class ModeView(Gtk.DrawingArea):
         points=[project(p) for p in self.display_positions()]
         # Draw the lattice behind atoms/bonds so the frame cannot hide a mode.
         if self.show_cell:
-            cr.set_source_rgb(0,0,0);cr.set_line_width(1.)
+            cr.set_source_rgb(0,0,0);cr.set_line_width(CELL_LINE_WIDTH)
             for a,b in self.cell_edges:
                 cr.move_to(*project(a)[:2]);cr.line_to(*project(b)[:2])
             cr.stroke()

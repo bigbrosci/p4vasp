@@ -40,11 +40,18 @@ class VisNavDrawer : public VisDrawer{
   void _antialiasing(){
     if (antialiasing_flag){
       glEnable(GL_LINE_SMOOTH);
+#ifdef GL_MULTISAMPLE
+      glEnable(GL_MULTISAMPLE);
+#endif
       glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
       glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
       glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
     }
     else{
+      glDisable(GL_LINE_SMOOTH);
+#ifdef GL_MULTISAMPLE
+      glDisable(GL_MULTISAMPLE);
+#endif
       glHint(GL_POINT_SMOOTH_HINT,GL_FASTEST);
       glHint(GL_LINE_SMOOTH_HINT,GL_FASTEST);
       glHint(GL_POLYGON_SMOOTH_HINT,GL_FASTEST);

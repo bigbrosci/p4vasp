@@ -45,7 +45,10 @@ VisFLWindow::~VisFLWindow(){
 VisFLWindow::VisFLWindow(int x,int y,int w,int h, const char *title):
   Fl_Gl_Window(x,y,w,h,title)
 {
-  mode(FL_RGB|FL_DOUBLE|FL_DEPTH);
+  // Prefer multisampling, but keep working on displays without an MSAA visual.
+  int base_mode = FL_RGB|FL_DOUBLE|FL_DEPTH;
+  mode(Fl_Gl_Window::can_do(base_mode|FL_MULTISAMPLE)
+       ? base_mode|FL_MULTISAMPLE : base_mode);
   this->win=NULL;
   gl_init_flag=0;
   callback(win_close_callback);

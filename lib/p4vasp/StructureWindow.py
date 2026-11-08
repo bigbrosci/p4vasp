@@ -28,6 +28,7 @@ import math
 import _cp4vasp
 import cp4vasp
 import p4vasp.cStructure
+from p4vasp.viewer_style import CELL_LINE_WIDTH
 from p4vasp import *
 from p4vasp.matrix import *
 
@@ -48,6 +49,7 @@ class StructureWindow:
         self.navigator.setBackground(1.0, 1.0, 1.0)
         self.structure_drawer    = cp4vasp.VisStructureDrawer()
         self.structure_drawer.setCellColor(0.0, 0.0, 0.0)
+        self.structure_drawer.setCellLineWidth(CELL_LINE_WIDTH)
         self.arrows_drawer       = cp4vasp.VisStructureArrowsDrawer(self.structure_drawer)
         self.arrows_drawer.red   =0.5
         self.arrows_drawer.green =1.0
@@ -232,6 +234,7 @@ class StructureWindow:
             self.navigator.setBackground(1.0, 1.0, 1.0)
             self.structure_drawer    = cp4vasp.VisStructureDrawer()
             self.structure_drawer.setCellColor(0.0, 0.0, 0.0)
+            self.structure_drawer.setCellLineWidth(CELL_LINE_WIDTH)
             self.arrows_drawer       = cp4vasp.VisStructureArrowsDrawer(self.structure_drawer)
             self.arrows_drawer.red   =0.5
             self.arrows_drawer.green =1.0

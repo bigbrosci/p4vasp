@@ -1,6 +1,7 @@
 """Shared ball-and-stick appearance; never change scientific atom data."""
 import math
 
+CELL_LINE_WIDTH = 1
 RADIUS_FACTOR = .5
 BOND_FACTOR = 1.2
 BOND_COLOR = (.5,.5,.7)

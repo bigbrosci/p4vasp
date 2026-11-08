@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Show晶胞细线与真实抗锯齿（2026-11-08）
+
+- 用户希望Show接近频率效果，重点是粗糙box线。原生cell默认2→1，与viewer_style.CELL_LINE_WIDTH和ModeView共用整数1（native setter要求int）；StructureWindow创建/重开都设细线。VisFLWindow按can_do选择MSAA visual，否则回退；VisNavDrawer启停线平滑/MSAA并采用更柔和的ambient .4/diffuse .7/specular .35、shininess32、左上光源。drawCell scoped alpha blending且暂时禁用MSAA以确保实际线覆盖，结束恢复GL状态，保留深度/选择/相机逻辑。
+- 本机Linux原生重编译通过；实际GL探针Mesa4.5/llvmpipe、samples4/buffers1。第一轮直接MSAA+线平滑仍无中间灰，改cell独立alpha覆盖后实际Show截图边缘45灰阶；新testShowQuality.py同图AA关闭/开启为0/45，断言真实像素而非只验flag，同时检查相机/坐标/键因子不变及重开宽1。before/after截图已查看。初始float1.0传native int setter曾失败，改整数后全部重跑通过，不将失败记为验收。
+- 实际Show导入/更新、居中/重复/重开、Delete/Builder/标记、C++框选/深度/隐藏/副本/Esc/Side/Space/旋转通过；实际频率完整流程、8 GTK、33面板（GLUT除外）、57基础通过，编译/diff通过。新测试只合成数据，不读改R25。未其他显卡/Mac/Windows验收、未重打EXE；同原生导航器其他预览也采用新光照，仍不保证与Cairo像素相同。其他设备需重编译，本机重启即可。指南/架构/当日双语同步，用户无关删除和R25不提交。
 
 ## Scale工具区与默认展开的右侧热化学结果（2026-11-07）
 

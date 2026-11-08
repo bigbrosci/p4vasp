@@ -148,3 +148,25 @@ fltk-config and Python development libraries. It checks toggle rectangle
 selection, periodic images, hidden/occluded atoms, idle-Escape clearing, drag cancellation, camera views,
 and legacy Space/rotation controls. It does not use the separate GLUT viewer
 or validate scientific calculations.
+
+## Native Show stroke and lighting quality (2026-11-08)
+
+`VisFLWindow` prefers an available multisample visual and falls back to the
+existing RGB/double/depth visual. `VisNavDrawer` honors the antialias toggle,
+uses softer ambient/diffuse/specular lighting, and retains native selection and
+camera transforms. Cell outlines share the 1-pixel default with ModeView.
+`VisStructureDrawer::drawCell()` blends alpha coverage while temporarily disabling
+multisampling for line rasterization (needed on the tested llvmpipe driver),
+then restores GL attributes before opaque spheres/bonds. Rebuild the extension
+on the target device and restart the application.
+
+Focused actual pixel/state regression (synthetic skew cell, display required):
+
+```bash
+PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/testShowQuality.py
+```
+
+This compares smoothing off/on and checks preserved coordinates/camera/bond
+state plus the default stroke after reopening. On the tested Linux Mesa driver,
+line intermediate-gray levels changed from 0 to 45 and the visual had 4 samples.
+This is local-driver evidence, not a guarantee for every graphics device.

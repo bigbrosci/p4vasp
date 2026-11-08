@@ -84,6 +84,7 @@ def main():
         window.hide(); window.show()
         centered(window)
         assert window.getMultiple() == repeat
+        assert window.structure_drawer.getCellLineWidth()==1
         assert abs(window.getRadiusFactor()-.5) < 1e-8
         if w == 900:
             window.showCell(0)

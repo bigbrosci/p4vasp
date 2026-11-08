@@ -68,7 +68,7 @@ VisStructureDrawer::VisStructureDrawer():VisPrimitiveDrawer(){
   bond_factor=1.0;
   bond_radius =0.1;
   radius_factor=1.0;
-  cell_line_width=2;
+  cell_line_width=1;
   cell_red       =1.0;
   cell_green     =1.0;
   cell_blue      =1.0;
@@ -876,8 +876,20 @@ void VisStructureDrawer::drawCell(){
 #if VERBOSE>0
   printf("VisStructureDrawer::drawCell()\n");
 #endif
+  // Alpha coverage needs blending; GL_LINE_SMOOTH alone leaves jagged edges.
+  // Restore all modified state before drawing opaque atoms and bonds.
+  glPushAttrib(GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_LINE_BIT|GL_HINT_BIT|GL_CURRENT_BIT);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  // Some drivers ignore alpha line coverage while multisampling is enabled.
+  // Use alpha-smoothed strokes here; retain multisampling for solid geometry.
+#ifdef GL_MULTISAMPLE
+  glDisable(GL_MULTISAMPLE);
+#endif
+  // The navigator controls whether line smoothing is enabled.
+  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
   glColor3f(cell_red,cell_green,cell_blue);
-  glLineWidth(cell_line_width); 
+  glLineWidth(cell_line_width);
 
   GLboolean lightflag = glIsEnabled(GL_LIGHTING);
   glDisable(GL_LIGHTING);
@@ -925,6 +937,7 @@ void VisStructureDrawer::drawCell(){
   if (lightflag){
     glEnable(GL_LIGHTING);
   }
+  glPopAttrib();
 }
 
 

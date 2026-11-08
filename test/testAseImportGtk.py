@@ -51,6 +51,7 @@ def main():
         assert abs(owner.swin.getRadiusFactor()-.5)<1e-8
         assert abs(owner.swin.structure_drawer.getBondFactor()-1.2)<1e-8
         assert cp4vasp.getDefaultPrimitivesResolution()==32
+        assert owner.swin.structure_drawer.getCellLineWidth()==1
         assert abs(owner.swin.structure.basis[0][0]-21.2)<1e-10
         owner.swin.win.saveScreenshot('/tmp/p4vasp-ase-import-water.tga');cp4vasp.VisSync()
         crystal=Path('crystal.extxyz').resolve()

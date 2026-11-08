@@ -58,13 +58,17 @@ void VisNavDrawer::init(){
   printf("VisNavDrawer::init()\n");
 #endif
 
-  GLfloat specular [] = { 1.0, 1.0, 1.0, 1.0 };
-  GLfloat shininess [] = { 100.0 };
+  GLfloat specular [] = { 0.35f, 0.35f, 0.35f, 1.0f };
+  GLfloat shininess [] = { 32.0 };
+  GLfloat ambient [] = { 0.4f, 0.4f, 0.4f, 1.0f };
+  GLfloat diffuse [] = { 0.7f, 0.7f, 0.7f, 1.0f };
 
   glViewport(0,0,getWidth(),getHeight());
 
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
+  glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
   glClearColor(bg_red, bg_green, bg_blue, 0.0);
   glShadeModel(GL_SMOOTH);
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -116,7 +120,7 @@ void VisNavDrawer::draw(){
 #if VERBOSE>1
   printf("VisNavDrawer::draw()\n");
 #endif
-  GLfloat position [] = { 1.0, 1.0, 1.0, 0.0 };
+  GLfloat position [] = { -1.0, 1.0, 2.0, 0.0 };
 
   glViewport(0,0,getWidth(),getHeight());
 
