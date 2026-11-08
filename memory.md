@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows 最新便携包交付（2026-11-07）
+
+- 用户授权打包当前最新Windows EXE。专用Windows checkout正常fast-forward到a2019291c590f6d1ef04da47b7899ace1771074a；使用现有update-windows.sh流程：git archive隔离快照、原生重编译、主程序/独立科学worker冻结、runtime/gui/models三检查、ZIP/hash。复用已缓存CPython3.13.17/ASE3.29.0/RDKit2026.09.1；GTK主程序UCRT Python3.14.9。构建日志Windows checkout build/windows-update/a2019291-66jd864x。
+- 成品已复制到C:\Users\lqlhz\Downloads\p4vasp-20261107-221244-a2019291-mbolv7gc，双击p4vasp.exe，整个目录必须保留。旁边同名ZIP为156976870字节，SHA256 548390f2d818d96b3a617af4ddaf5e77bae6080df76d765dacbd38c36f6c0023。包内SOURCE-COMMIT记录a201929完整提交；后续文档交付提交不改变已打包源码。
+- 构建目录和Downloads迁移后均实际Windows通过runtime/gui/models：43 Glade资源无属性错误、注册面板可导入、紧凑PNG/文件夹按钮、原生渲染与重放/选择性标记、32Cu bulk构建/原生预览/真实POSCAR保存、乙醇RDKit优化/预览/三文件保存、XYZ无晶胞补box、非法多片段拒绝与取消回收。检查PATH仅Windows系统目录并清除外部解释器覆盖。另Downloads随包worker以合成6模式OUTCAR检查物理位移.4、虚频识别及ASE谐振F/理想气体G成功；ZIP CRC与SHA256一致。报告Downloads同名-checks/delivery.json及三个子报告，已查看bulk界面截图。
+- 新包包含ASE通用格式导入、频率分析与Help致谢源码。频率此次仅新包解析/热化学worker补测，未对完整频率动画/Scale交互逐项Windows验收；不是另一台干净电脑或全部科学结果/普通退出验收，未签名。交付已完成，无待后台构建。用户删除的Fe_single_atom三文件保持原状，不纳入提交；包采用已提交源码仍含该历史样例。
+
 ## 统一安装与独立命令文档（2026-11-07）
 
 - 按最新要求撤回自动source入口：Linux/macOS统一bash install.sh；统一配置~/.bashrc，末尾提示source ~/.bashrc，常用启动和top/side命令移至usage_commands.md。删除receipt与zshrc分流，Bash误source安装入口安全返回，不改变父终端选项。安装指南同步；下方自动source/zshrc记录为历史行为。

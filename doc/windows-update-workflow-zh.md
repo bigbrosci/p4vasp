@@ -134,3 +134,11 @@ PNG 重放脚本为 Windows PowerShell `.ps1`，受设备执行策略约束。
 这些是该设备当时的实际结果，不是未来每版或其他电脑的保证。
 完整历史见 [当日更新记录](../update_history/update_2026_10_29.md)，
 当前接手状态见 [memory.md](../memory.md)。
+
+## 2026-11-07 本机交付
+
+最新便携包：`C:\Users\lqlhz\Downloads\p4vasp-20261107-221244-a2019291-mbolv7gc`，双击其中的 `p4vasp.exe`；分享时发送旁边的同名 ZIP，接收者完整解压后启动，不能只复制 EXE。
+
+源码提交为 `a2019291c590f6d1ef04da47b7899ace1771074a`，自带 ASE 3.29.0 和 RDKit 2026.09.1，包含频率分析与通用结构导入。构建目录和 Downloads 均通过运行环境／界面／建模检查，另通过随包频率读取与热化学校正检查；这不代替另一台干净电脑的验收。详细检查范围和限制见 [当日更新](../update_history/update_2026_11_07.md)。
+
+ZIP 为 156,976,870 字节；SHA256：`548390f2d818d96b3a617af4ddaf5e77bae6080df76d765dacbd38c36f6c0023`。
