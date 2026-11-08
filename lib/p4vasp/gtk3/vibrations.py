@@ -29,10 +29,12 @@ class GasThermoDialog:
         for label in ('nonlinear','linear','monatomic'):self.geometry.append_text(label)
         self.geometry.set_active(page.geometry.get_active())
         self.spin=entry(page.fields['spin'].get_text());self.symmetry=entry(page.fields['symmetry'].get_text())
-        for i,(label,widget) in enumerate((('Geometry',self.geometry),('Spin S (not multiplicity)',self.spin),('Symmetry number',self.symmetry))):
+        self.temperature=entry(page.fields['temperature'].get_text())
+        self.pressure=entry(page.fields['pressure'].get_text())
+        for i,(label,widget) in enumerate((('Geometry',self.geometry),('Spin S (not multiplicity)',self.spin),('Symmetry number',self.symmetry),('Temperature (K)',self.temperature),('Pressure (Pa)',self.pressure))):
             grid.attach(Gtk.Label(label=label,xalign=0),0,i,1,1);grid.attach(widget,1,i,1,1)
         box.pack_start(grid,False,False,0)
-        conditions=Gtk.Label(label='T = %s K | P = %s Pa\n%s'%(page.fields['temperature'].get_text(),page.fields['pressure'].get_text(),page.state.get_active_text()),xalign=0)
+        conditions=Gtk.Label(label=page.state.get_active_text(),xalign=0)
         conditions.set_line_wrap(True);conditions.set_max_width_chars(50);box.pack_start(conditions,False,False,0)
         self.summary=Gtk.Label(xalign=0);self.summary.set_line_wrap(True);self.summary.set_max_width_chars(50);self.summary.set_selectable(True)
         box.pack_start(self.summary,False,False,0)
@@ -63,7 +65,13 @@ class GasThermoDialog:
                         raise ValueError('Spin must be nonnegative integer/half-integer; symmetry must be a positive integer.')
                 except ValueError as error:
                     self.error.set_text(str(error));continue
-                return self.geometry.get_active(),str(spin),str(symmetry),self.chosen
+                try:
+                    temperature=float(self.temperature.get_text());pressure=float(self.pressure.get_text())
+                    if not all(math.isfinite(value) and value>0 for value in (temperature,pressure)):
+                        raise ValueError('Temperature and pressure must be positive and finite.')
+                except ValueError as error:
+                    self.error.set_text(str(error));continue
+                return self.geometry.get_active(),str(spin),str(symmetry),self.chosen,self.temperature.get_text().strip(),self.pressure.get_text().strip()
             return None
         finally:self.dialog.destroy()
 
@@ -324,8 +332,9 @@ class VibrationsPage(Gtk.Box):
         if not self.alive:return
         if answer is None:
             self.status.set_text('Gas calculation cancelled; no calculation started.');return
-        geometry,spin,symmetry,chosen=answer
+        geometry,spin,symmetry,chosen,temperature,pressure=answer
         self.geometry.set_active(geometry);self.fields['spin'].set_text(spin);self.fields['symmetry'].set_text(symmetry)
+        self.fields['temperature'].set_text(temperature);self.fields['pressure'].set_text(pressure)
         for i,row in enumerate(self.store):row[0]=i in chosen
         self.confirm.set_active(True)
         self.run_thermo()

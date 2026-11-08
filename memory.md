@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 气相弹窗增加温度与压力（2026-11-07）
+
+- 用户要求已实现：GasThermoDialog增加Temperature(K)/Pressure(Pa)可编辑输入，初始默认298.15/101325，重开沿用主面板值。确认时正有限数校验，再同步回主面板及既有worker；取消不更改主面板。JSON与独立脚本保存实际值。无Glade/adapter/toolbar变更。
+- 本机实际GTK频率全流程通过：默认值、取消不改、零/NaN拒绝、自定义350K/200000Pa自动G、结果/JSON/脚本值一致及模拟640x480按钮位置，弹窗截图已查看；2独立脚本F/G重跑回归通过，编译/diff通过。复用前轮8GTK/33面板为历史证据，未重复执行；未Mac/Windows验收或重新生成EXE。指南/双语更新同步，用户样例删除不提交。
+
 ## 气相热化学弹窗与独立重跑脚本（2026-11-07）
 
 - 当前任务已完成源码实现：Vibrations模型选Ideal gas立即打开GasThermoDialog，输入geometry/Spin S/symmetry，显示T/P/驻点及拟纳入/排除模式；确认后自动启动既有独立ASE worker，取消不启动。主Calculate可重开；三项气相输入从主面板移至弹窗，其他条件与极小值/TS/自由度检查保留。优先保留数量匹配的用户选择，否则建议最高实频，用户明确确认而非静默排除。Glade入口/adapter/VibrationsApplet链不变。

@@ -106,11 +106,14 @@ def main():
         def cancel_gas():
             browser=getattr(page,'gas_dialog',None)
             if browser and browser.dialog.get_visible():
+                assert browser.temperature.get_text()=='298.15' and browser.pressure.get_text()=='101325'
+                browser.temperature.set_text('500');browser.pressure.set_text('200000')
                 browser.dialog.response(Gtk.ResponseType.CANCEL);return False
             return True
         GLib.timeout_add(50,cancel_gas);page.model.set_active(1)
         assert page.job is None and page.thermo_result is None
         assert 'cancelled' in page.status.get_text()
+        assert page.fields['temperature'].get_text()=='298.15' and page.fields['pressure'].get_text()=='101325'
         page.model.set_active(0)
         answers=[]
         def answer_gas():
@@ -119,8 +122,13 @@ def main():
             if not answers:
                 browser.geometry.set_active(1);browser.spin.set_text('0.3')
                 browser.dialog.response(Gtk.ResponseType.OK);answers.append('invalid');return True
-            assert 'Spin must' in browser.error.get_text()
-            browser.spin.set_text('1');browser.symmetry.set_text('2')
+            if len(answers)==1:
+                assert 'Spin must' in browser.error.get_text()
+                browser.spin.set_text('1');browser.symmetry.set_text('2')
+                browser.temperature.set_text('0');browser.pressure.set_text('nan')
+                browser.dialog.response(Gtk.ResponseType.OK);answers.append('invalid conditions');return True
+            assert 'positive and finite' in browser.error.get_text()
+            browser.temperature.set_text('350');browser.pressure.set_text('200000')
             assert browser.chosen==[5]
             dialog=browser.dialog;button=dialog.get_widget_for_response(Gtk.ResponseType.OK)
             position=button.translate_coordinates(dialog,0,0)
@@ -137,14 +145,18 @@ def main():
         with patch.object(dialogs,'workarea',return_value=SimpleNamespace(width=640,height=480)):
             page.model.set_active(1)
         pump(lambda:page.job is None,30)
-        assert answers==['invalid','valid']
+        assert answers==['invalid','invalid conditions','valid']
         assert page.thermo_result is not None and page.thermo_result['kind']=='G',page.status.get_text()
+        assert page.thermo_result['temperature_K']==350 and page.thermo_result['pressure_Pa']==200000
+        assert page.fields['temperature'].get_text()=='350' and page.fields['pressure'].get_text()=='200000'
         assert page.thermo_result['request_settings']['spin']=='1.0'
         assert page.thermo_result['request_settings']['symmetry']=='2'
         GLib.timeout_add(50,answer_save,'thermochemistry.json');page.save_thermo.clicked();pump()
         report=json.loads((folder/'thermochemistry.json').read_text())
         assert report['kind']=='G' and report['selected_modes']==[6] and report['source']==str(gas)
+        assert report['temperature_K']==350 and report['pressure_Pa']==200000
         assert (folder/'thermochemistry.py').is_file()
+        assert '350.0' in (folder/'thermochemistry.py').read_text() and '200000.0' in (folder/'thermochemistry.py').read_text()
         assert 'Saved' in page.status.get_text() and 'thermochemistry.py' in page.status.get_text()
         # Asynchronous source loading, absent constraints and explicit export confirmation.
         no_flags=write_calculation(folder/'without flags',flags=False)
