@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率晶胞/XYZ显示重复与Show样式统一（2026-11-07）
+
+- 按用户要求新增频率Cell（默认开）及X/Y/Z SpinButton（1..5，初始1）。periodic_preview.py按真实晶格向量（含斜胞）仅映射显示平衡坐标并生成平移副本/去重晶胞线；按副本平衡距离成键，可显示扩展区域跨边界连接。ModeView以固定图像偏移应用每帧原模式，所有副本同相；显示原子上限12000，超限回退控件原值，换文件重复数归1。热化学、Scale导出和原数据不变，扩展中保存仍原晶胞原子。
+- viewer_style.py共享p4vasp元素表颜色、共价半径/缺失.7后备、球比例.5、成键因子1.2、键颜色/半径；原子表仅克隆不改写。Show入口与气相预览用共享样式，频率绘图用相同值；原元素radius参考数据保留，Show默认显示改为共价球，大小控制仍可调。StructureWindow重开保存成键因子。原生VisPrimitiveDrawer默认细分16→32，VisStructureDrawer初始化尊重默认值，本机Linux重编译通过；两后端不是像素一致或同一光照/遮挡实现。
+- 证据：3纯显示几何专项通过（跨界键、斜胞/未包裹坐标、复制位移、晶胞边、非法/上限）；实际GTK全频率流程含XYZ2x2x1/Cell开关/原快照不变/扩展中保存2原子/700-1200宽、模式动画/Scale/弹窗/结果脚本通过。实际Show工具栏匹配颜色/共价大小/成键/细分32、XYZ导入/换源通过，气相原生预览/输入导出、Show/Delete/Builder/标记、居中/重复/重开也通过；8后端/2独立脚本/8 GTK/33面板启动/57基础通过，GLUT排除。编译/diff通过。
+- 初次斜胞测试预期坐标手算错误已更正后通过；一次widget.draw截图未等布局导致GTK断言，不记为视觉通过，等布局重跑后截图/tmp/p4vasp-vibrations-periodic.png已查看；Show原生TGA转换/tmp/p4vasp-show-smooth.png已查看。没有大体系性能、任意q点相位或跨平台验收；Windows旧包未更新，目标机需重编译。未读取/修改/提交R25，用户无关删除保留。指南/架构/双语记录同步，本任务已完成。
+
 ## 频率列表完整显示与移除Thermo列（2026-11-07）
 
 - 用户报告右侧列表裁切并要求删除Thermo列。确认原Paned左侧播放行撑大自然最小宽度、右侧只预留210；现播放/模式说明移至结构与列表下方整行，页内ModeView最小宽200，右侧预留300，按实际分配宽度调整分隔位置。表格仅Mode/cm⁻¹/Type三列，固定列宽60/130/100，保留表内纵向滚动和手动分隔拖动。Glade/适配器/VibrationsApplet宿主链不变，无原生改动。

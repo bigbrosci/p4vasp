@@ -25,6 +25,7 @@ from p4vasp.StructureWindow import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
 from p4vasp.util import getAtomtypes
+from p4vasp.viewer_style import covalent_atomtypes, BOND_FACTOR, BOND_COLOR, BOND_RADIUS
 import p4vasp.Selection
 import p4vasp.Structure
 import p4vasp.cStructure
@@ -105,8 +106,11 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
                 xx=0
             else:
                 yy=0
-            self.swin=StructureWindow(x=xx,y=yy,w=500,h=400,title="p4vasp Structure",atomtypes=getAtomtypes())
+            self.swin=StructureWindow(x=xx,y=yy,w=500,h=400,title="p4vasp Structure",atomtypes=covalent_atomtypes())
             self.swin.setRadiusFactor(0.5*self.radius_factor)
+            self.swin.structure_drawer.setBondFactor(BOND_FACTOR)
+            self.swin.structure_drawer.setBondColor(*BOND_COLOR)
+            self.swin.structure_drawer.setBondRadius(BOND_RADIUS)
 #      self.swin.setBackground(1,1,1)
         self.swin.show()
 

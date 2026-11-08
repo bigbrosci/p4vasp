@@ -33,14 +33,8 @@ def handle_preview_event(event):
 
 def molecular_atomtypes():
     """Preview-only covalent ball radii; leave the shared element data intact."""
-    from p4vasp.Structure import AtomInfo
-    from p4vasp.util import getAtomtypes
-    table=AtomInfo(getAtomtypes())
-    for index in range(len(table)):
-        record=table.getRecord(index)
-        radius=record.covalent
-        record.radius=radius if math.isfinite(radius) and radius>0 else .7
-    return table
+    from p4vasp.viewer_style import covalent_atomtypes
+    return covalent_atomtypes()
 
 
 def show_model_preview(structure, title, molecular=False):

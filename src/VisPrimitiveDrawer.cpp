@@ -28,7 +28,7 @@
 #include <stdio.h>
 #include <p4vasp/Exceptions.h>
 
-int  default_primitives_resolution=16;
+int  default_primitives_resolution=32;
 int  getDefaultPrimitivesResolution(){return default_primitives_resolution;}
 void setDefaultPrimitivesResolution(int r){default_primitives_resolution=r;}
 

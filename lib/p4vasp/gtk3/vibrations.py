@@ -115,6 +115,18 @@ class VibrationsPage(Gtk.Box):
         self.mode_scroll=scroll
         split.connect('size-allocate',self.resize_split)
         self.pack_start(split,True,True,0)
+        self.periodic_controls=Gtk.Box(spacing=6)
+        self.cell_visible=Gtk.CheckButton(label='Cell');self.cell_visible.set_active(True)
+        self.periodic_controls.pack_start(self.cell_visible,False,False,0)
+        self.repeat=[];self.repeat_updating=False
+        for axis in ('X','Y','Z'):
+            self.periodic_controls.pack_start(Gtk.Label(label=axis),False,False,0)
+            value=Gtk.SpinButton.new_with_range(1,5,1);value.set_value(1);value.set_width_chars(1)
+            value.set_tooltip_text('Display repetitions along lattice '+axis+' (does not change the structure)')
+            self.repeat.append(value);self.periodic_controls.pack_start(value,False,False,0)
+            value.connect('value-changed',self.repeat_changed)
+        self.cell_visible.connect('toggled',lambda widget:self.view.set_cell_visible(widget.get_active()))
+        self.pack_start(self.periodic_controls,False,False,0)
         self.pack_start(playback,False,False,0)
         self.pack_start(self.mode_info,False,False,0)
         displacement=Gtk.Box(spacing=7)
@@ -175,6 +187,15 @@ class VibrationsPage(Gtk.Box):
         self.connect('destroy',self.destroyed)
         self.controls()
 
+    def repeat_changed(self,*_):
+        if self.repeat_updating or not self.data:return
+        try:
+            self.view.set_repeats(tuple(widget.get_value_as_int() for widget in self.repeat))
+        except ValueError as error:
+            self.status.set_text(str(error));self.repeat_updating=True
+            for widget,value in zip(self.repeat,self.view.repeats):widget.set_value(value)
+            self.repeat_updating=False
+
     def resize_split(self,split,allocation):
         if allocation.width==self.split_width:return
         self.split_width=allocation.width
@@ -190,6 +211,7 @@ class VibrationsPage(Gtk.Box):
         self.save_button.set_sensitive(bool(imaginary and (self.data['constraints_source'] or self.accept_flags.get_active())))
         self.calculate.set_sensitive(ready)
         self.tree.set_sensitive(ready)
+        self.periodic_controls.set_sensitive(ready)
         self.thermo_box.set_sensitive(ready)
         self.accept_flags.set_sensitive(bool(ready and not self.data['constraints_source']))
         self.save_thermo.set_sensitive(self.thermo_result is not None and self.job is None)
@@ -210,6 +232,9 @@ class VibrationsPage(Gtk.Box):
             self.store.append([not mode['imaginary'] and mode['cm1']>0,mode['index'],
                                ('%.4f'%mode['cm1'])+(' i' if mode['imaginary'] else ''),'Imaginary' if mode['imaginary'] else 'Real'])
         self.invalidate();self.view.set_data(data)
+        self.repeat_updating=True
+        for widget in self.repeat:widget.set_value(1)
+        self.repeat_updating=False
         self.tree.get_selection().select_path(0)
         self.status.set_text('%d modes | %s. %s'%(len(data['modes']),data['vector_convention'],' '.join(data['warnings'])))
         self.controls()

@@ -77,6 +77,14 @@ The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
 the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived
 scientific worker. Selecting Ideal gas opens a bounded, scrollable parameter dialog;
 confirmation starts the calculation and confirms the displayed mode selection.
+The mode preview now draws skew-cell lattice edges and display-only X/Y/Z
+replicas (1..5, up to 12000 displayed atoms), wraps only a display copy of
+equilibrium positions, and discovers bonds across displayed neighboring cells.
+Replicas move in phase; thermochemistry and POSCAR export use only original atoms.
+`viewer_style.py` shares covalent radii, element colors and bond defaults with
+the Show applet and molecular previews. Native primitive resolution defaults
+to 32 and the structure drawer honors that default; rebuild the native extension
+on each target machine for this quality change.
 The frequency table has only Mode/cm^-1/Type columns; checkbox selection is
 removed. Playback and mode text occupy full-width rows below the responsive
 Paned, preserving a 300-pixel frequency region. Harmonic calculations use all

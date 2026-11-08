@@ -70,6 +70,26 @@ def main():
             page.scale.set_value(scale);pump()
             assert not page.play.get_active() and page.timer is None
             assert abs(page.view.positions[0][0]-(4+scale*.4))<1e-12
+        snapshot=json.dumps(page.data,sort_keys=True)
+        page.repeat[0].set_value(2);page.repeat[1].set_value(2);pump()
+        assert page.view.repeats==(2,2,1) and len(page.view.indices)==8
+        assert len(page.view.cell_edges)>12
+        display=page.view.display_positions()
+        for index,offset,position in zip(page.view.indices,page.view.offsets,display):
+            for axis in range(3):assert abs(position[axis]-page.view.positions[index][axis]-offset[axis])<1e-12
+        page.cell_visible.set_active(False);assert not page.view.show_cell
+        page.cell_visible.set_active(True);assert page.view.show_cell
+        assert json.dumps(page.data,sort_keys=True)==snapshot
+        with tempfile.TemporaryDirectory() as expanded:
+            target=Path(expanded)/'POSCAR';page.export_poscar(target)
+            assert len(Structure(str(target)))==2
+            assert page.view.repeats==(2,2,1)
+        for _ in range(10):pump();time.sleep(.02)
+        widget=frame.root_window
+        surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
+        widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-periodic.png')
+        for widget in page.repeat:widget.set_value(1)
+        pump()
         adj=page.scale.get_adjustment()
         assert adj.get_lower()==-1 and adj.get_upper()==1 and adj.get_step_increment()==.1
         def answer_save(name='POSCAR_displaced'):

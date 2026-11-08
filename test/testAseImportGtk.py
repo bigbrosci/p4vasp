@@ -42,6 +42,15 @@ def main():
         from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
         owner=next(a for a in applets() if isinstance(a,StructureWindowApplet))
         assert len(owner.swin.structure)==3
+        from p4vasp.util import getAtomtypes
+        from p4vasp.viewer_style import display_values
+        table=getAtomtypes();record=owner.swin.structure_drawer.info.getRecord(0)
+        radii,colors=display_values(['O'],[.66],[[1,0,0]])
+        assert abs(record.radius-radii[0])<1e-6
+        assert abs(record.red-colors[0][0])<1e-6
+        assert abs(owner.swin.getRadiusFactor()-.5)<1e-8
+        assert abs(owner.swin.structure_drawer.getBondFactor()-1.2)<1e-8
+        assert cp4vasp.getDefaultPrimitivesResolution()==32
         assert abs(owner.swin.structure.basis[0][0]-21.2)<1e-10
         owner.swin.win.saveScreenshot('/tmp/p4vasp-ase-import-water.tga');cp4vasp.VisSync()
         crystal=Path('crystal.extxyz').resolve()

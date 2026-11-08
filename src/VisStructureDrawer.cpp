@@ -190,7 +190,7 @@ void VisStructureDrawer::init(){
   if (quadObj1==NULL){  
     quadObj1 = gluNewQuadric();
   }*/
-  setPrimitivesResolution(16);  
+  setPrimitivesResolution(getDefaultPrimitivesResolution());
   is_init=true;
 }
 

@@ -72,6 +72,7 @@ class StructureWindow:
         self.structure=None
         self._needs_initial_fit=True
         self._radius_factor=self.structure_drawer.getRadiusFactor()
+        self._bond_factor=self.structure_drawer.getBondFactor()
         self.visible=1
         self.multiple=(1,1,1)
         self.dsx=2
@@ -253,6 +254,7 @@ class StructureWindow:
             self.navigator.append(self.neg_isosurface_drawer)
             self.win.setDrawer(self.navigator)
             self.setRadiusFactor(self._radius_factor)
+            self.structure_drawer.setBondFactor(self._bond_factor)
             self.setMultiple(*self.multiple)
             self._needs_initial_fit=True
             self.setStructure(self.structure)
@@ -317,6 +319,7 @@ class StructureWindow:
             self.neg_isosurface_drawer=None
             self.isosurface_drawer=None
             self.arrows_drawer=None
+            self._bond_factor=self.structure_drawer.getBondFactor()
             self.structure_drawer=None
             self.navigator=None
             print("StructureWindow.hide a")
