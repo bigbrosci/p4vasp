@@ -1,17 +1,71 @@
 """Frequency selection, display-only animation, signed displacement and ASE UI."""
-import json
 import math
 from pathlib import Path
 import time
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.mode_view import ModeView
 from p4vasp.gtk3.install_hint import InstallHint
-from p4vasp.gtk3.file_dialogs import CompactFileDialog
+from p4vasp.gtk3.file_dialogs import CompactFileDialog, fit_dialog
+from p4vasp.thermo_replay import save_thermochemistry
 from p4vasp.vibrations import task, displaced_structure
 
 
 def entry(value=''):
     widget=Gtk.Entry();widget.set_text(str(value));widget.set_width_chars(9);return widget
+
+
+class GasThermoDialog:
+    """Review gas parameters and the exact proposed modes before automatic work."""
+    def __init__(self,page):
+        self.page=page
+        self.dialog=Gtk.Dialog(title='Gas molecule thermochemistry',transient_for=page.parent(),modal=True,use_header_bar=False)
+        self.dialog.add_buttons('Cancel',Gtk.ResponseType.CANCEL,'Calculate',Gtk.ResponseType.OK)
+        fit_dialog(self.dialog,page.parent(),500,300)
+        content=self.dialog.get_content_area();content.set_border_width(10)
+        scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
+        box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=9);scroll.add(box);content.pack_start(scroll,True,True,0)
+        grid=Gtk.Grid(column_spacing=10,row_spacing=8)
+        self.geometry=Gtk.ComboBoxText()
+        for label in ('nonlinear','linear','monatomic'):self.geometry.append_text(label)
+        self.geometry.set_active(page.geometry.get_active())
+        self.spin=entry(page.fields['spin'].get_text());self.symmetry=entry(page.fields['symmetry'].get_text())
+        for i,(label,widget) in enumerate((('Geometry',self.geometry),('Spin S (not multiplicity)',self.spin),('Symmetry number',self.symmetry))):
+            grid.attach(Gtk.Label(label=label,xalign=0),0,i,1,1);grid.attach(widget,1,i,1,1)
+        box.pack_start(grid,False,False,0)
+        conditions=Gtk.Label(label='T = %s K | P = %s Pa\n%s'%(page.fields['temperature'].get_text(),page.fields['pressure'].get_text(),page.state.get_active_text()),xalign=0)
+        conditions.set_line_wrap(True);conditions.set_max_width_chars(50);box.pack_start(conditions,False,False,0)
+        self.summary=Gtk.Label(xalign=0);self.summary.set_line_wrap(True);self.summary.set_max_width_chars(50);self.summary.set_selectable(True)
+        box.pack_start(self.summary,False,False,0)
+        self.error=Gtk.Label(xalign=0);self.error.set_line_wrap(True);self.error.set_max_width_chars(50);box.pack_start(self.error,False,False,0)
+        self.geometry.connect('changed',lambda *_:self.update_modes())
+        self.update_modes(preserve=True)
+
+    def update_modes(self,preserve=False):
+        page=self.page;n=len(page.data['symbols'])
+        count={'nonlinear':max(0,3*n-6),'linear':max(0,3*n-5),'monatomic':0}[self.geometry.get_active_text()]-(page.state.get_active()==1)
+        candidates=sorted((i for i,m in enumerate(page.data['modes']) if not m['imaginary'] and m['cm1']>0),key=lambda i:page.data['modes'][i]['cm1'],reverse=True)
+        current=[i for i,row in enumerate(page.store) if row[0]]
+        self.chosen=current if preserve and len(current)==count else sorted(candidates[:max(0,count)])
+        valid=count>=0 and len(self.chosen)==count
+        self.dialog.set_response_sensitive(Gtk.ResponseType.OK,valid)
+        included=[page.data['modes'][i]['index'] for i in self.chosen]
+        excluded=[m['index'] for i,m in enumerate(page.data['modes']) if i not in self.chosen]
+        self.summary.set_text('Selected modes: %s\nExcluded modes: %s\n%s'%(included,excluded,
+            'Calculate confirms these molecular modes. Highest real modes are proposed if the current count differs. Cancel to review animations or edit the table.' if valid else 'Insufficient real modes for this geometry / stationary point.'))
+
+    def run(self):
+        self.dialog.show_all()
+        try:
+            while self.dialog.run()==Gtk.ResponseType.OK:
+                try:
+                    spin=float(self.spin.get_text());symmetry=int(self.symmetry.get_text())
+                    if not math.isfinite(spin) or spin<0 or abs(2*spin-round(2*spin))>1e-8 or symmetry<1:
+                        raise ValueError('Spin must be nonnegative integer/half-integer; symmetry must be a positive integer.')
+                except ValueError as error:
+                    self.error.set_text(str(error));continue
+                return self.geometry.get_active(),str(spin),str(symmetry),self.chosen
+            return None
+        finally:self.dialog.destroy()
 
 
 class VibrationsPage(Gtk.Box):
@@ -79,8 +133,7 @@ class VibrationsPage(Gtk.Box):
         self.geometry.set_active(0)
         self.fields={k:entry(v) for k,v in (('temperature','298.15'),('pressure','101325'),('symmetry','1'),('spin','0'),('floor','0'),('imaginary_tolerance','0'),('energy',''))}
         items=[('Model',self.model),('Stationary point',self.state),('T (K)',self.fields['temperature']),
-               ('P (Pa, gas only)',self.fields['pressure']),('Gas geometry',self.geometry),('Symmetry number (gas)',self.fields['symmetry']),
-               ('Spin S (gas)',self.fields['spin']),('Low-frequency floor (cm⁻¹)',self.fields['floor']),
+               ('P (Pa, gas only)',self.fields['pressure']),('Low-frequency floor (cm⁻¹)',self.fields['floor']),
                ('Imaginary tolerance (cm⁻¹)',self.fields['imaginary_tolerance']),('Electronic energy (eV, optional)',self.fields['energy'])]
         self.fields['imaginary_tolerance'].set_tooltip_text('Default 0: no imaginary modes ignored. Raise only for identified numerical/translation artifacts; exclusions still require confirmation.')
         for i,(label,widget) in enumerate(items):
@@ -91,7 +144,7 @@ class VibrationsPage(Gtk.Box):
         actions=Gtk.Box(spacing=7)
         self.gas_select=Gtk.Button(label='Select highest gas vibrational modes')
         self.calculate=Gtk.Button(label='Calculate correction')
-        self.save_thermo=Gtk.Button(label='Save thermochemistry')
+        self.save_thermo=Gtk.Button(label='Save result + Python script')
         for widget in (self.gas_select,self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
         self.result=Gtk.Label(xalign=0);self.result.set_selectable(True);self.result.set_line_wrap(True);self.result.set_max_width_chars(90)
@@ -109,6 +162,7 @@ class VibrationsPage(Gtk.Box):
         self.calculate.connect('clicked',self.compute)
         self.save_thermo.connect('clicked',self.export_thermo)
         for widget in (self.model,self.state,self.geometry,*self.fields.values()):widget.connect('changed',self.invalidate)
+        self.model.connect('changed',self.model_changed)
         self.confirm.connect('toggled',self.invalidate)
         self.accept_flags.connect('toggled',lambda *_:self.controls())
         self.connect('unmap',lambda *_:self.pause())
@@ -258,8 +312,30 @@ class VibrationsPage(Gtk.Box):
             try:self.export_poscar(path);self.status.set_text('Saved '+path)
             except Exception as error:self.status.set_text(str(error))
 
+    def model_changed(self,*_):
+        if self.model.get_active()==1 and self.data is not None and self.job is None:
+            self.gas_parameters()
+
+    def gas_parameters(self):
+        if not self.data or self.job:return
+        self.pause();self.invalidate()
+        self.gas_dialog=GasThermoDialog(self)
+        answer=self.gas_dialog.run()
+        if not self.alive:return
+        if answer is None:
+            self.status.set_text('Gas calculation cancelled; no calculation started.');return
+        geometry,spin,symmetry,chosen=answer
+        self.geometry.set_active(geometry);self.fields['spin'].set_text(spin);self.fields['symmetry'].set_text(symmetry)
+        for i,row in enumerate(self.store):row[0]=i in chosen
+        self.confirm.set_active(True)
+        self.run_thermo()
+
     def compute(self,*_):
         if not self.data:return
+        if self.model.get_active()==1:self.gas_parameters()
+        else:self.run_thermo()
+
+    def run_thermo(self):
         self.invalidate();self.pause()
         request={'action':'thermo','data':self.data,'selected':[i for i,row in enumerate(self.store) if row[0]],
                  'model':'gas' if self.model.get_active()==1 else 'harmonic',
@@ -270,13 +346,14 @@ class VibrationsPage(Gtk.Box):
 
     def export_thermo(self,*_):
         if not self.thermo_result:return
-        path=self.destination('Save thermochemistry report','thermochemistry.json')
+        path=self.destination('Save result and matching Python script','thermochemistry.json')
         if path:
             try:
-                result=dict(self.thermo_result,source=self.data['path'])
-                with open(path,'x',encoding='utf-8') as output:json.dump(result,output,indent=2)
-                self.status.set_text('Saved '+path)
+                report,script=save_thermochemistry(path,self.data,self.thermo_result)
+                self.status.set_text('Saved %s and %s. Re-run: python %s (requires ASE and NumPy).'%(report,script,script.name))
             except Exception as error:self.status.set_text(str(error))
 
     def destroyed(self,*_):
         self.alive=False;self.pause();self.cancel()
+        dialog=getattr(self,'gas_dialog',None)
+        if dialog and dialog.dialog.get_visible():dialog.dialog.response(Gtk.ResponseType.CANCEL)

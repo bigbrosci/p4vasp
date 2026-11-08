@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 气相热化学弹窗与独立重跑脚本（2026-11-07）
+
+- 当前任务已完成源码实现：Vibrations模型选Ideal gas立即打开GasThermoDialog，输入geometry/Spin S/symmetry，显示T/P/驻点及拟纳入/排除模式；确认后自动启动既有独立ASE worker，取消不启动。主Calculate可重开；三项气相输入从主面板移至弹窗，其他条件与极小值/TS/自由度检查保留。优先保留数量匹配的用户选择，否则建议最高实频，用户明确确认而非静默排除。Glade入口/adapter/VibrationsApplet链不变。
+- 新thermo_replay.py用于两种模型的JSON+同名Python双文件导出，任一已存在拒绝覆盖并清理本次已创建的另一文件。脚本内嵌结构/质量/原频率摘要/有效频率/设置，只依赖ASE+NumPy，无需原OUTCAR/GUI/p4vasp；固定本次选择重算，不运行DFT。直接python thermochemistry.py输出thermochemistry_rerun.json，--output可换新名字，保留覆盖保护；脚本注明ASE版本依赖，版本不同时警告。用户外部私有脚本仅只读借鉴，未修改或复制其物种表/错误的频率去重逻辑。
+- 证据：2项独立重跑专项通过，分别真实ASE计算F/G后移除原OUTCAR/POSCAR、清PYTHONPATH并以-I独立执行脚本，数值与原结果12位小数一致；默认/自定义输出、重复拒绝、双文件冲突保护/清理通过。7既有科学后端通过；实际Linux GTK全流程通过，新增弹窗取消/非法自旋/几何与模式确认/自动G计算/真实双文件保存，原动画/Scale/POSCAR/F/加载/取消保留；8 GTK与33面板启动通过，不含GLUT。编译/diff检查通过。
+- 小屏幕首轮与第二轮GUI检查发现自然尺寸/桌面边框仍溢出，不计通过；缩至500x300并滚动内容后模拟640x480下实际窗口552x389、动作位于范围内，截图/tmp/p4vasp-gas-thermo-dialog.png已查看。早期挂起modal测试进程已终止。仅本机Linux/合成输入验证，未实测Mac/Windows；已交付a201929旧EXE不含本次弹窗/脚本，未自动重新打包。指南与当日双语记录同步；用户Fe_single_atom删除保持不提交。
+
 ## Windows 最新便携包交付（2026-11-07）
 
 - 用户授权打包当前最新Windows EXE。专用Windows checkout正常fast-forward到a2019291c590f6d1ef04da47b7899ace1771074a；使用现有update-windows.sh流程：git archive隔离快照、原生重编译、主程序/独立科学worker冻结、runtime/gui/models三检查、ZIP/hash。复用已缓存CPython3.13.17/ASE3.29.0/RDKit2026.09.1；GTK主程序UCRT Python3.14.9。构建日志Windows checkout build/windows-update/a2019291-66jd864x。

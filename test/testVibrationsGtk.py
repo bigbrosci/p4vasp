@@ -103,13 +103,49 @@ def main():
         assert len(page.store)==6
         gas=write_calculation(folder/'gas',imaginary=())
         page.load_path(gas);pump(lambda:page.job is None,30)
-        page.model.set_active(1);page.geometry.set_active(1);page.gas_select.clicked()
-        assert sum(row[0] for row in page.store)==1
-        page.confirm.set_active(True);page.calculate.clicked();pump(lambda:page.job is None,30)
+        def cancel_gas():
+            browser=getattr(page,'gas_dialog',None)
+            if browser and browser.dialog.get_visible():
+                browser.dialog.response(Gtk.ResponseType.CANCEL);return False
+            return True
+        GLib.timeout_add(50,cancel_gas);page.model.set_active(1)
+        assert page.job is None and page.thermo_result is None
+        assert 'cancelled' in page.status.get_text()
+        page.model.set_active(0)
+        answers=[]
+        def answer_gas():
+            browser=getattr(page,'gas_dialog',None)
+            if not browser or not browser.dialog.get_visible():return True
+            if not answers:
+                browser.geometry.set_active(1);browser.spin.set_text('0.3')
+                browser.dialog.response(Gtk.ResponseType.OK);answers.append('invalid');return True
+            assert 'Spin must' in browser.error.get_text()
+            browser.spin.set_text('1');browser.symmetry.set_text('2')
+            assert browser.chosen==[5]
+            dialog=browser.dialog;button=dialog.get_widget_for_response(Gtk.ResponseType.OK)
+            position=button.translate_coordinates(dialog,0,0)
+            assert position[0]+button.get_allocated_width()<=dialog.get_allocated_width()
+            assert position[1]+button.get_allocated_height()<=dialog.get_allocated_height()
+            assert dialog.get_allocated_width()<=640 and dialog.get_allocated_height()<=480,(dialog.get_allocated_width(),dialog.get_allocated_height())
+            surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,dialog.get_allocated_width(),dialog.get_allocated_height())
+            dialog.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-gas-thermo-dialog.png')
+            browser.dialog.response(Gtk.ResponseType.OK);answers.append('valid');return False
+        from unittest.mock import patch
+        from types import SimpleNamespace
+        import p4vasp.gtk3.file_dialogs as dialogs
+        GLib.timeout_add(80,answer_gas)
+        with patch.object(dialogs,'workarea',return_value=SimpleNamespace(width=640,height=480)):
+            page.model.set_active(1)
+        pump(lambda:page.job is None,30)
+        assert answers==['invalid','valid']
         assert page.thermo_result is not None and page.thermo_result['kind']=='G',page.status.get_text()
+        assert page.thermo_result['request_settings']['spin']=='1.0'
+        assert page.thermo_result['request_settings']['symmetry']=='2'
         GLib.timeout_add(50,answer_save,'thermochemistry.json');page.save_thermo.clicked();pump()
         report=json.loads((folder/'thermochemistry.json').read_text())
         assert report['kind']=='G' and report['selected_modes']==[6] and report['source']==str(gas)
+        assert (folder/'thermochemistry.py').is_file()
+        assert 'Saved' in page.status.get_text() and 'thermochemistry.py' in page.status.get_text()
         # Asynchronous source loading, absent constraints and explicit export confirmation.
         no_flags=write_calculation(folder/'without flags',flags=False)
         def answer_open():

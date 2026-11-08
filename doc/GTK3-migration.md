@@ -75,11 +75,15 @@ was exercised on Linux; macOS execution has not been verified in this session.
 The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
 `VibrationsApplet`, whose page uses a GTK/Cairo 3D projection, independently of
 the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived
-scientific worker. Timers stop on unmap/destroy, pending workers are cancelled,
+scientific worker. Selecting Ideal gas opens a bounded, scrollable parameter dialog;
+confirmation starts the calculation and confirms the displayed mode selection.
+Result export creates a JSON/Python pair through `thermo_replay.py`; the script
+recalculates with ASE independently of GTK/p4vasp and source files. Timers stop on unmap/destroy, pending workers are cancelled,
 and display offsets do not mutate the active system. Focused checks:
 
 ```bash
 PYTHONPATH=lib:src P4VASP_HOME="$PWD" .venv-ase/bin/python test/testVibrations.py
+PYTHONPATH=lib:src P4VASP_HOME="$PWD" .venv-ase/bin/python test/testThermoReplay.py
 PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/testVibrationsGtk.py
 ```
 
