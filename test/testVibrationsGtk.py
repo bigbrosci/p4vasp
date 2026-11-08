@@ -7,7 +7,7 @@ import sys
 import tempfile
 import time
 import traceback
-from vibration_fixtures import write_calculation
+from vibration_fixtures import write_calculation,write_energy_calculation
 
 
 def main():
@@ -20,7 +20,7 @@ def main():
     root=Path(__file__).resolve().parents[1]
     assert Gtk.init_check()[0]
     with tempfile.TemporaryDirectory(prefix='vibration GUI ') as temporary:
-        folder=Path(temporary);path=write_calculation(folder/'calculation')
+        folder=Path(temporary);path=write_energy_calculation(folder/'calculation')
         original=path.read_bytes();original_poscar=(path.parent/'POSCAR').read_bytes()
         os.chdir(folder);sys.argv=['p4v.py',str(path)]
         namespace={'__name__':'vibrations_regression'}
@@ -46,6 +46,8 @@ def main():
         page=frame.embedded_applet.page
         assert page.view.get_mapped() and len(page.store)==6
         assert page.thermo.get_expanded()
+        assert page.fields['energy'].get_text()=='-10.25'
+        assert 'ionic step 1' in page.fields['energy'].get_tooltip_text()
         assert page.mode_info.get_parent() is page.preview_overlay
         assert page.preview_overlay.get_overlay_pass_through(page.mode_info)
         assert page.mode_info.get_halign()==Gtk.Align.START and page.mode_info.get_valign()==Gtk.Align.START
@@ -134,6 +136,46 @@ def main():
         x,y=page.result_panel.translate_coordinates(page.thermo_content,0,0)
         assert x>=page.thermo_box.get_allocated_width()
 
+        assert page.thermo_result['electronic_energy_eV']==-10.25
+        assert page.thermo_result['electronic_energy_source']['ionic_step']==1
+        assert abs(page.thermo_result['free_energy_eV']-(-10.25+page.thermo_result['correction_eV']))<1e-12
+        GLib.timeout_add(50,answer_save,'auto_energy.json');page.save_thermo.clicked();pump()
+        auto_report=json.loads((folder/'auto_energy.json').read_text())
+        assert auto_report['electronic_energy_eV']==-10.25 and auto_report['electronic_energy_source']['reader']=='ASE vasp-out'
+        assert 'ionic_step' in (folder/'auto_energy.py').read_text()
+        external=write_energy_calculation(folder/'optimized energy')
+        external.write_text(external.read_text().split('VRHFIN =C:')[0])  # Ordinary relaxation output, no modes.
+        snapshot=json.dumps(page.data,sort_keys=True)
+        def answer_energy(target=None):
+            dialog=getattr(page,'energy_dialog',None)
+            if dialog and dialog.dialog.get_visible():
+                if target is None:dialog.dialog.response(Gtk.ResponseType.CANCEL)
+                else:dialog.select_file(target);dialog.dialog.response(Gtk.ResponseType.OK)
+                return False
+            return True
+        GLib.timeout_add(50,answer_energy,external);page.energy_open.clicked();pump(lambda:page.job is None,30)
+        assert page.fields['energy'].get_text()=='-12.25'
+        assert page.energy_source['ionic_step']=='last' and page.energy_source['path']==str(external)
+        assert json.dumps(page.data,sort_keys=True)==snapshot
+        page.calculate.clicked();pump(lambda:page.job is None,30)
+        assert page.thermo_result['electronic_energy_eV']==-12.25
+        assert page.thermo_result['electronic_energy_source']['ionic_step']=='last'
+        GLib.timeout_add(50,answer_save,'external_energy.json');page.save_thermo.clicked();pump()
+        external_report=json.loads((folder/'external_energy.json').read_text())
+        assert external_report['source']==str(path)
+        assert external_report['electronic_energy_source']['path']==str(external)
+        assert external_report['electronic_energy_source']['ionic_step']=='last'
+        kept=page.thermo_result
+        GLib.timeout_add(50,answer_energy);page.energy_open.clicked();pump()
+        assert page.thermo_result is kept and page.fields['energy'].get_text()=='-12.25'
+        missing=folder/'OUTCAR_no_energy';missing.write_text('no energy here')
+        GLib.timeout_add(50,answer_energy,missing);page.energy_open.clicked();pump(lambda:page.job is None,30)
+        assert page.thermo_result is kept and page.fields['energy'].get_text()=='-12.25'
+        assert 'No ionic-step energy' in page.status.get_text()
+        page.fields['energy'].set_text('-15.5');page.calculate.clicked();pump(lambda:page.job is None,30)
+        assert page.thermo_result['electronic_energy_eV']==-15.5
+        assert page.thermo_result['electronic_energy_source']['reader']=='manual'
+        page.fields['energy'].set_text('-10.25')
         page.fields['temperature'].set_text('310');assert page.thermo_result is None
         assert page.result_panel.stack.get_visible_child_name()=='empty'
         page.state.set_active(0);page.calculate.clicked();pump(lambda:page.job is None,30)
@@ -162,6 +204,7 @@ def main():
         assert len(page.store)==6
         gas=write_calculation(folder/'gas',imaginary=())
         page.load_path(gas);pump(lambda:page.job is None,30)
+        assert page.fields['energy'].get_text()==''
         def cancel_gas():
             browser=getattr(page,'gas_dialog',None)
             if browser and browser.dialog.get_visible():

@@ -19,6 +19,43 @@ def number(text):
     return value
 
 
+def ionic_energy(path, step='first'):
+    """Read a chosen ionic endpoint, keeping its energy convention explicit."""
+    if step not in ('first','last'):raise ValueError('Choose first or last ionic step.')
+    path=Path(path).resolve()
+    def record(value,quantity,reader):
+        return {'value_eV':value,'ionic_step':1 if step=='first' else 'last',
+                'quantity':quantity,'reader':reader,'path':str(path)}
+    try:
+        from ase.io import read
+        image=read(str(path),format='vasp-out',index=0 if step=='first' else -1)
+        value=float(image.get_potential_energy())
+        if math.isfinite(value):return record(value,'energy(sigma->0)','ASE vasp-out')
+    except Exception:
+        pass
+    current=None
+    with path.open(errors='replace') as source:
+        for line in source:
+            if re.search(r'free energy\s+TOTEN\s*=',line):
+                if current is not None and step=='first':return current
+                match=re.search(r'TOTEN\s*=\s*('+NUMBER+r')',line)
+                if not match:return None
+                try:value=number(match[1])
+                except ValueError:return None
+                current=record(value,'free energy TOTEN (fallback)','p4vasp OUTCAR')
+            match=re.search(r'energy\(sigma->0\)\s*=\s*('+NUMBER+r')',line)
+            if match:
+                try:value=number(match[1])
+                except ValueError:return None
+                current=record(value,'energy(sigma->0)','p4vasp OUTCAR')
+                if step=='first':return current
+    return current
+
+
+def first_ionic_energy(path):
+    return ionic_energy(path,'first')
+
+
 def read_outcar(path):
     import numpy as np
     from ase import Atoms
@@ -117,7 +154,10 @@ def read_outcar(path):
         mode['max_displacement']=float(np.linalg.norm(vector,axis=1).max())
     if len(modes)<3*n:warnings.append('A reduced set of modes was printed; verify the active/fixed degrees of freedom before thermochemistry.')
     stream=StringIO();write(stream,atoms,format='vasp',direct=False,sort=False,vasp5=True)
-    return {'path':str(path),'symbols':species,'positions':positions.tolist(),'cell':atoms.cell.array.tolist(),
+    energy=first_ionic_energy(path)
+    return {'electronic_energy_eV':energy['value_eV'] if energy is not None else None,
+            'electronic_energy_source':energy,
+            'path':str(path),'symbols':species,'positions':positions.tolist(),'cell':atoms.cell.array.tolist(),
             'masses':atoms.get_masses().tolist(),'modes':modes,'poscar':stream.getvalue(),
             'mass_source':mass_source,
             'radii':[float(covalent_radii[z]) for z in atoms.numbers],
@@ -207,6 +247,7 @@ def thermochemistry(request):
             'H_eV':None if enthalpy is None else float(enthalpy),'S_eV_per_K':float(entropy),
             'TS_eV':float(temperature*entropy),'free_energy_eV':float(free),
             'correction_eV':float(free-potential),'electronic_energy_eV':None if energy in (None,'') else potential,
+            'electronic_energy_source':request.get('energy_source'),
             'selected_modes':[modes[i]['index'] for i in selected],
             'excluded_modes':[m['index'] for i,m in enumerate(modes) if i not in selected],
             'effective_cm1':frequencies,
@@ -219,6 +260,10 @@ def thermochemistry(request):
 def run_request(request):
     try:
         if request['action']=='read':return read_outcar(request['path'])
+        if request['action']=='energy':
+            result=ionic_energy(request['path'],request.get('step','last'))
+            if result is None:raise ValueError('No ionic-step energy found in the selected OUTCAR.')
+            return result
         if request['action']=='thermo':return thermochemistry(request)
         raise ValueError('Unknown vibration operation.')
     except ImportError as error:

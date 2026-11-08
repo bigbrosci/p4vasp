@@ -6,9 +6,9 @@ from pathlib import Path
 import tempfile
 import unittest
 from ase import units
-from p4vasp.vibrations import read_outcar,thermochemistry,displaced_structure
+from p4vasp.vibrations import read_outcar,thermochemistry,displaced_structure,first_ionic_energy,ionic_energy,run_request
 from p4vasp.Structure import Structure
-from vibration_fixtures import write_calculation
+from vibration_fixtures import write_calculation,write_energy_calculation
 
 
 class VibrationsTest(unittest.TestCase):
@@ -17,6 +17,29 @@ class VibrationsTest(unittest.TestCase):
         self.addCleanup(self.temporary.cleanup)
 
     def data(self,**kwargs):return read_outcar(write_calculation(self.root/str(len(list(self.root.iterdir()))),**kwargs))
+
+    def test_first_ionic_energy_ase_and_fallback(self):
+        path=write_energy_calculation(self.root/'energy')
+        result=read_outcar(path)
+        self.assertEqual(result['electronic_energy_eV'],-10.25)
+        self.assertEqual(result['electronic_energy_source']['reader'],'ASE vasp-out')
+        self.assertEqual(result['electronic_energy_source']['ionic_step'],1)
+        last=run_request(dict(action='energy',path=str(path),step='last'))
+        self.assertEqual(last['value_eV'],-12.25)
+        self.assertEqual(last['ionic_step'],'last')
+        self.assertEqual(last['reader'],'ASE vasp-out')
+        short=self.root/'short-OUTCAR'
+        short.write_text('free energy TOTEN = -20 eV\nenergy(sigma->0) = -19.5\nfree energy TOTEN = -30 eV\nenergy(sigma->0) = -29.5\n')
+        energy=first_ionic_energy(short)
+        self.assertEqual(energy['value_eV'],-19.5)
+        self.assertEqual(energy['reader'],'p4vasp OUTCAR')
+        self.assertEqual(ionic_energy(short,'last')['value_eV'],-29.5)
+        short.write_text('free energy TOTEN = 0 eV\nfree energy TOTEN = -30 eV\nenergy(sigma->0) = -29.5\n')
+        energy=first_ionic_energy(short)
+        self.assertEqual(energy['value_eV'],0)
+        self.assertIn('fallback',energy['quantity'])
+        short.write_text('no ionic energy')
+        self.assertIsNone(first_ionic_energy(short))
 
     def test_physical_vectors_scale_sign_and_selective_flags(self):
         data=self.data();self.assertEqual(len(data['modes']),6)

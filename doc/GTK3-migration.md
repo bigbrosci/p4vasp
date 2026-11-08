@@ -173,3 +173,14 @@ This compares smoothing off/on and checks preserved coordinates/camera/bond
 state plus the default stroke after reopening. On the tested Linux Mesa driver,
 line intermediate-gray levels changed from 0 to 45 and the visual had 4 samples.
 This is local-driver evidence, not a guarantee for every graphics device.
+
+### Thermochemistry energy endpoints (2026-11-08)
+
+Frequency loading fills E from ionic step 1. The energy entry's Open OUTCAR
+button uses the same cancellable worker with action `energy` to read the last
+ionic step from a separate file, leaving frequency data unchanged. ASE's
+vasp-out reader supplies sigma->0 energy; a p4vasp block parser handles reduced
+headers and labels any TOTEN fallback. Reports/replay retain energy provenance;
+changing frequency source clears/refills the entry, while cancelling/failing an
+energy-only load preserves the previous result. No new process type or native
+extension changes are needed.

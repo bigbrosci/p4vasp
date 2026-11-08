@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## E自动读第一步与单独OUTCAR末步选择（2026-11-08）
+
+- 用户确认频率任务第一个ionic step能量正确，要求E右侧可另开OUTCAR取最后一步。vibrations.py新增ionic_energy/first_ionic_energy：优先ASE vasp-out index0/-1的sigma->0，简化输出失败时p4vasp按第一/最后能量块解析，缺sigma时明确标TOTEN fallback。频率快照带electronic_energy_eV/source；run_request新增energy动作，复用既有可取消worker，不新增长驻进程。
+- set_data默认填频率第一步，换源缺能量清空；E右侧Open OUTCAR用CompactFileDialog读取另一个普通优化/静态OUTCAR末步，只更改E和energy_source，不换结构/模式/显示/Scale。手工编辑/清空保留；另选文件取消或失败保留原能量/结果。计算/JSON/脚本记录energy_source(path、首/末步、类型、reader)，总F/G加实际E，独立脚本仍不读取源文件。
+- 9后端专项通过（合成ASE可读3帧首-10.25/末-12.25、简化首末、sigma优先、TOTEN0回退/无能量）；2独立脚本回归通过。实际GTK完整频率流程通过自动E/tooltip、总能量、手工覆盖/来源、另选无模式OUTCAR末步、频率快照不变、取消/失败不改、保存两类来源、换源清空、700-1200布局及原操作；已查看700宽新按钮/自动值截图。8 GTK/33面板（GLUT不含）、编译/diff通过。
+- 本机Linux合成数据验收，未读改R25、未跨平台或重打EXE，无原生改动不重编译；Windows worker现有ase.io.vasp hiddenimport覆盖新读取路径，但未冻结实测。指南/架构/双语同步，用户无关删除保留不提交，本任务完成。
+
 ## POSCAR固定标记自动保留/缺失直接导出（2026-11-08）
 
 - 按用户要求删除Confirm export without selective-dynamics flags及其阻挡。选择虚频后保存按钮不再依赖约束来源；匹配POSCAR/CONTCAR的固定标记自动保留，找不到则沿用无约束POSCAR，不补猜标记、不需确认。读取器/坐标/Scale/模式判断/已有文件保护不改。

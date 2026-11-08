@@ -82,7 +82,7 @@ class VibrationsPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=7)
         self.set_border_width(8)
         self.data=None;self.mode=0;self.job=None;self.timer=None;self.alive=True;self.thermo_result=None
-        self.request_id=0;self.pending_path=None
+        self.request_id=0;self.pending_path=None;self.energy_source=None
         top=Gtk.Box(spacing=7)
         self.open_button=Gtk.Button(label='Open frequency OUTCAR')
         self.cancel_button=Gtk.Button(label='Cancel');self.cancel_button.set_sensitive(False)
@@ -168,10 +168,14 @@ class VibrationsPage(Gtk.Box):
         for label in ('nonlinear','linear','monatomic'):self.geometry.append_text(label)
         self.geometry.set_active(0)
         self.fields={k:entry(v) for k,v in (('temperature','298.15'),('pressure','101325'),('symmetry','1'),('spin','0'),('energy',''))}
+        self.energy_open=Gtk.Button(label='Open OUTCAR')
+        self.energy_open.set_tooltip_text('Read the LAST ionic-step energy from a different OUTCAR; keep the frequency structure and modes.')
+        self.fields['energy'].set_width_chars(6)
+        energy_row=Gtk.Box(spacing=5);energy_row.pack_start(self.fields['energy'],True,True,0);energy_row.pack_start(self.energy_open,False,False,0)
         items=[('Model',self.model),('State',self.state),('T (K)',self.fields['temperature']),
-               ('P (Pa)',self.fields['pressure']),('E (eV)',self.fields['energy'])]
+               ('P (Pa)',self.fields['pressure']),('E (eV)',energy_row)]
         self.state.set_tooltip_text('Stationary-point label only; all imaginary modes are excluded.')
-        self.fields['energy'].set_tooltip_text('Optional electronic energy; leave empty for correction only.')
+        self.fields['energy'].set_tooltip_text('First ionic-step OUTCAR energy is filled automatically when available; editable, empty for correction only.')
         for combo in (self.model,self.state):
             for renderer in combo.get_cells():
                 renderer.set_property('ellipsize',3);renderer.set_property('width-chars',12);renderer.set_property('max-width-chars',16)
@@ -199,6 +203,7 @@ class VibrationsPage(Gtk.Box):
         self.play.connect('toggled',self.play_toggled)
         self.scale.connect('value-changed',self.scale_changed)
         self.save_button.connect('clicked',self.save)
+        self.energy_open.connect('clicked',self.open_energy)
         self.calculate.connect('clicked',self.compute)
         self.save_thermo.connect('clicked',self.export_thermo)
         for widget in (self.model,self.state,self.geometry,*self.fields.values()):widget.connect('changed',self.invalidate)
@@ -262,6 +267,7 @@ class VibrationsPage(Gtk.Box):
     def set_data(self,data):
         self.pause();self.data=data;self.mode=0;self.scale.set_value(0)
         self.source.set_text(data['path']);self.source.set_tooltip_text(data['path'])
+        self.apply_energy(data.get('electronic_energy_source'))
         self.store.clear()
         for mode in data['modes']:
             self.store.append([not mode['imaginary'] and mode['cm1']>0,mode['index'],
@@ -274,10 +280,27 @@ class VibrationsPage(Gtk.Box):
         self.status.set_text('%d modes | %s. %s'%(len(data['modes']),data['vector_convention'],' '.join(data['warnings'])))
         self.controls()
 
+    def apply_energy(self,record):
+        self.energy_source=record
+        self.fields['energy'].set_text('' if record is None else repr(float(record['value_eV'])))
+        if record is None:
+            tip='No first-step OUTCAR energy found. Enter manually or choose another OUTCAR.'
+        else:
+            step='ionic step 1' if record['ionic_step']==1 else 'last ionic step'
+            tip='Read from %s: %s (%s).\n%s\nEditable.'%(step,record['quantity'],record['reader'],record['path'])
+        self.fields['energy'].set_tooltip_text(tip)
+
+    def open_energy(self,*_):
+        if self.data is None or self.job:return
+        directory=Path(self.energy_source['path']).parent if self.energy_source else Path(self.data['path']).parent
+        self.energy_dialog=CompactFileDialog(self.parent(),directory,'Open energy OUTCAR (last ionic step)')
+        path=self.energy_dialog.run()
+        if path:self.start({'action':'energy','path':path,'step':'last'},'energy')
+
     def start(self,request,kind):
         self.cancel();self.request_id+=1;token=self.request_id
         def callback(result,error):GLib.idle_add(self.finished,token,kind,result,error)
-        self.job=task(request,callback);self.status.set_text('Reading modes…' if kind=='read' else 'Calculating thermochemistry…')
+        self.job=task(request,callback);self.status.set_text({'read':'Reading modes…','energy':'Reading last ionic-step energy…','thermo':'Calculating thermochemistry…'}[kind])
         if kind=='thermo':self.result_panel.clear('Calculating…')
         self.controls();self.job.start()
 
@@ -288,6 +311,9 @@ class VibrationsPage(Gtk.Box):
             self.status.set_text(error)
             if kind=='thermo':self.result_panel.clear(error)
         elif kind=='read':self.set_data(result)
+        elif kind=='energy':
+            self.apply_energy(result)
+            self.status.set_text('E updated from the selected OUTCAR, last ionic step. Frequency data unchanged.')
         else:
             self.thermo_result=result;self.result_panel.show_result(result)
             self.status.set_text('Correction calculated. Save the result and standalone Python script.')
@@ -393,6 +419,14 @@ class VibrationsPage(Gtk.Box):
                  'state':'ts' if self.state.get_active()==1 else 'minimum','geometry':self.geometry.get_active_text(),
                  'confirm_exclusions':self.model.get_active()==1}
         request.update({key:widget.get_text().strip() for key,widget in self.fields.items()})
+        text=request['energy']
+        provenance=None
+        if text:
+            provenance={'reader':'manual'}
+            try:
+                if self.energy_source and float(text)==self.energy_source['value_eV']:provenance=self.energy_source
+            except ValueError:pass
+        request['energy_source']=provenance
         self.start(request,'thermo')
 
     def export_thermo(self,*_):
