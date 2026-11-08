@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## R25低NWRITE频率OUTCAR兼容修复（2026-11-07）
+
+- 用户报告本地R25/OUTCAR在频率面板打开空白。实际只读复现read_outcar报VRHFIN缺失：该VASP6.5.1/IBRION5/NWRITE0输出没有VRHFIN/per-potential POMASS，元素仅POTCAR行、质量在单行汇总。vibrations.py新增POTCAR/TITEL元素后备（支持赝势后缀/重复列表），POMASS解析同一行全部数值；保留原VRHFIN、质量处理及约束核对。无GUI布局/原生改动。
+- 实际R25修复后识别Cu48/Zn16/H2/O1、67原子、9模式、3虚频(41.175864/164.078614/603.853579 cm^-1)、4种正确质量，匹配POSCAR约束。实际GTK通过Open按钮读取、列表/三维显示/动画、模式9 Scale .2及临时POSCAR逐坐标/前64原子固定标记核对，截图/tmp/p4vasp-R25-frequency.png已查看；原R25文件未改。
+- 8后端测试通过（新增合成POTCAR/TITEL后备、后缀/重复列表、单行质量、质量加权位移/标记），2独立脚本回归通过，编译/diff通过。只本机Linux，未重跑全套GTK/启动或Mac/Windows验证/打包。指南/当日双语同步；R25未跟踪目录（含用户计算与POTCAR）及原样例删除不纳入提交。
+
 ## 气相弹窗增加温度与压力（2026-11-07）
 
 - 用户要求已实现：GasThermoDialog增加Temperature(K)/Pressure(Pa)可编辑输入，初始默认298.15/101325，重开沿用主面板值。确认时正有限数校验，再同步回主面板及既有worker；取消不更改主面板。JSON与独立脚本保存实际值。无Glade/adapter/toolbar变更。

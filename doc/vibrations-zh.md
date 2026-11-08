@@ -28,6 +28,8 @@ bash install/install-ase.sh
 
 读取最后一组模式数据，优先使用该次输出末尾的 `Eigenvectors after division by SQRT(mass)` 实际位移段；若只有动力学矩阵的质量加权本征向量，则按对应原子的 OUTCAR `POMASS` 除以 √mass。**不再额外归一化最大位移。**缺少必要质量或坐标／模式不一致会报错，不回退到早先完整模式组。
 
+兼容低输出级别（例如 `NWRITE=0`）的 OUTCAR：没有 `VRHFIN` 时从 `POTCAR:`／`TITEL` 读取元素，支持一行集中列出各元素的 `POMASS`；无需另行提供 POTCAR。
+
 使用模式表中的平衡坐标，而不是有限差分过程最后一个被扰动的结构。晶胞、元素顺序来自 OUTCAR；有完整 POMASS 时也用于热化学，否则实际位移段允许使用 ASE 标准质量并显示提示。首版最多 10,000 原子。
 
 在同目录寻找 POSCAR／CONTCAR，仅当元素顺序、晶胞及平衡坐标一致时，才继承选择性动力学标记。找不到匹配文件时明确提示，导出前必须勾选 **Confirm export without selective-dynamics flags**；不会猜测哪些原子应固定。精度／周期等价平移使坐标不匹配时同样不能保证恢复原标记。缩减模式集会提示核对自由度，不能从列表存在推断频率计算完整或收敛。

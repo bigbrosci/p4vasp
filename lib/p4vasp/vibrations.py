@@ -28,7 +28,7 @@ def read_outcar(path):
     from ase.io import read, write
     from io import StringIO
     path=Path(path).resolve()
-    counts=[]; symbols=[]; masses=[]; cell=None; groups=[]; group=None
+    counts=[]; symbols=[]; potential_symbols=[]; masses=[]; cell=None; groups=[]; group=None
     with path.open(errors='replace') as source:
         for line in source:
             if 'ions per type' in line:
@@ -37,8 +37,10 @@ def read_outcar(path):
                     raise ValueError('Invalid OUTCAR atom counts (maximum 10000 atoms).')
             match=re.search(r'VRHFIN\s*=\s*([A-Z][a-z]?)\s*:',line)
             if match:symbols.append(match[1])
-            match=re.search(r'POMASS\s*=\s*('+NUMBER+')',line)
-            if match:masses.append(number(match[1]))
+            match=re.match(r'^\s*(?:POTCAR:|TITEL\s*=)\s+\S+\s+([A-Z][a-z]?)(?:_[^\s]+)?(?:\s|$)',line)
+            if match:potential_symbols.append(match[1])
+            match=re.search(r'POMASS\s*=\s*('+NUMBER+r'(?:\s+'+NUMBER+r')*)',line)
+            if match:masses.extend(number(value) for value in match[1].split())
             elif re.search(r'POMASS\s*=',line):raise ValueError('Invalid OUTCAR POMASS.')
             if 'direct lattice vectors' in line.lower():
                 cell=[[number(v) for v in next(source,'').split()[:3]] for _ in range(3)]
@@ -76,7 +78,8 @@ def read_outcar(path):
     group=groups[-1]; modes=group['modes']; n=sum(counts)
     if [m['index'] for m in modes]!=list(range(1,len(modes)+1)) or len(modes)>3*n:
         raise ValueError('Incomplete or inconsistent mode numbering.')
-    if cell is None or len(symbols)<len(counts):raise ValueError('OUTCAR lattice or VRHFIN species are missing.')
+    if len(symbols)<len(counts):symbols=potential_symbols
+    if cell is None or len(symbols)<len(counts):raise ValueError('OUTCAR lattice or species (VRHFIN/POTCAR/TITEL) are missing.')
     species=[s for s,count in zip(symbols,counts) for _ in range(count)]
     if any(s not in atomic_numbers for s in species):raise ValueError('Unknown OUTCAR element.')
     positions=np.array(modes[0]['positions'])

@@ -37,6 +37,22 @@ class VibrationsTest(unittest.TestCase):
         self.assertAlmostEqual(reread[0][0],4.08)
         self.assertEqual(reread.info[0].element.strip(),'C')
 
+    def test_low_nwrite_species_and_mass_summary(self):
+        # Reduced-verbosity OUTCAR may omit VRHFIN/per-potential masses entirely.
+        for marker in ('POTCAR:', 'TITEL ='):
+            path=write_calculation(self.root/marker.replace(':','').replace('=',''),physical=False)
+            text=path.read_text().replace('VRHFIN =C: s2p2',marker+' PAW_PBE C_sv 01Jan2000')
+            text=text.replace('VRHFIN =O: s2p4',marker+' PAW_PBE O 01Jan2000')
+            text=text.replace('POMASS = 12.000;','').replace('POMASS = 16.000;','')
+            text=marker+' PAW_PBE C_sv 01Jan2000\n'+marker+' PAW_PBE O 01Jan2000\n'+text
+            path.write_text(text+'\n Mass of Ions in am\n POMASS = 12.000 16.000\n')
+            data=read_outcar(path)
+            self.assertEqual(data['symbols'],['C','O'])
+            self.assertEqual(data['masses'],[12,16])
+            self.assertEqual(data['constraints_source'],'POSCAR')
+            self.assertAlmostEqual(data['modes'][0]['vectors'][0][0],.4/math.sqrt(12))
+            self.assertAlmostEqual(data['modes'][0]['vectors'][1][0],-.2/math.sqrt(16))
+
     def test_mass_weighted_conversion_and_missing_flags(self):
         data=self.data(physical=False,flags=False)
         self.assertAlmostEqual(data['modes'][0]['vectors'][0][0],.4/math.sqrt(12))
