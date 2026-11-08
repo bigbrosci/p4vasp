@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-07. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率列表完整显示与移除Thermo列（2026-11-07）
+
+- 用户报告右侧列表裁切并要求删除Thermo列。确认原Paned左侧播放行撑大自然最小宽度、右侧只预留210；现播放/模式说明移至结构与列表下方整行，页内ModeView最小宽200，右侧预留300，按实际分配宽度调整分隔位置。表格仅Mode/cm⁻¹/Type三列，固定列宽60/130/100，保留表内纵向滚动和手动分隔拖动。Glade/适配器/VibrationsApplet宿主链不变，无原生改动。
+- 移除可见Thermo开关及失去对应操作的额外实频确认/主面板最高频按钮；表面谐振每次自动用全部正实频，气相在已有参数弹窗筛选/确认，内部仍存模式选择供计算。切回Harmonic不会沿用气相只选部分的旧状态。固定50与全部虚频排除保持。
+- 实际Linux GTK完整频率合成流程通过：700/900/1200宽下三列表头/列宽均在可见区域、列表右沿不越主窗口、初始布局截图/tmp/p4vasp-vibrations-compact.png已查看；原动画/Scale/POSCAR/气相弹窗/自动计算/脚本保存及gas→harmonic恢复全部实频通过。8 GTK/33面板启动通过（GLUT不含），编译/diff通过；没有重跑科学后端（本次未改），未Mac/Windows验收或新EXE。指南/架构/双语同步；只合成数据，不操作R25，用户无关删除/目录不提交。
+
 ## 固定50cm⁻¹实频下限与全部虚频排除（2026-11-07）
 
 - 按用户最新规则，热化学正实频低于50统一按50（含ZPE/热项/熵），50及以上不变，全部虚频/零频过滤，删除floor/tolerance输入，旧request对应字段忽略且不写入新settings。不再因虚频数量拒绝计算，Stationary point只记录标签；额外剔除正实频仍需确认。gas_mode_count统一前后端：3N-6/5减去虚频数、最低0，按假定虚频占振动自由度建议最高实频并确认；不自动区分虚频的平动/转动来源。无正实频的harmonic仍拒绝空求和。

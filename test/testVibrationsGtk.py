@@ -45,6 +45,19 @@ def main():
         button.emit('clicked');pump()
         page=frame.embedded_applet.page
         assert page.view.get_mapped() and len(page.store)==6
+        assert [column.get_title() for column in page.tree.get_columns()]==['Mode','cm⁻¹','Type']
+        for width in (700,900,1200):
+            frame.root_window.resize(width,750)
+            for _ in range(15):pump();time.sleep(.02)
+            rect=page.tree.get_visible_rect()
+            assert sum(column.get_width() for column in page.tree.get_columns())<=rect.width, (width,rect.width)
+            x,y=page.mode_scroll.translate_coordinates(frame.root_window,0,0)
+            assert x>=0 and x+page.mode_scroll.get_allocated_width()<=frame.root_window.get_allocated_width(),width
+            if width==700:
+                widget=frame.root_window
+                surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
+                widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-compact.png')
+        frame.root_window.resize(1050,800);pump()
         assert page.play.get_active() and page.timer is not None
         initial=json.dumps(page.view.positions)
         pump(lambda:json.dumps(page.view.positions)!=initial)
@@ -76,7 +89,7 @@ def main():
         else:raise AssertionError('Existing output was overwritten')
         assert path.read_bytes()==original and (path.parent/'POSCAR').read_bytes()==original_poscar
         expander=next(child for child in page.get_children() if isinstance(child,Gtk.Expander))
-        expander.set_expanded(True);page.state.set_active(1);page.confirm.set_active(True)
+        expander.set_expanded(True);page.state.set_active(1)
         ticks=[];timer=GLib.timeout_add(10,lambda:(ticks.append(1),True)[1])
         page.calculate.clicked();pump(lambda:page.job is None,30);GLib.source_remove(timer)
         assert ticks and page.thermo_result is not None,page.status.get_text()
@@ -159,6 +172,9 @@ def main():
         assert (folder/'thermochemistry.py').is_file()
         assert '350.0' in (folder/'thermochemistry.py').read_text() and '200000.0' in (folder/'thermochemistry.py').read_text()
         assert 'Saved' in page.status.get_text() and 'thermochemistry.py' in page.status.get_text()
+        # Hidden gas choices must never restrict a later harmonic calculation.
+        page.model.set_active(0);page.calculate.clicked();pump(lambda:page.job is None,30)
+        assert page.thermo_result['selected_modes']==list(range(1,7))
         # Asynchronous source loading, absent constraints and explicit export confirmation.
         no_flags=write_calculation(folder/'without flags',flags=False)
         def answer_open():

@@ -77,6 +77,10 @@ The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
 the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived
 scientific worker. Selecting Ideal gas opens a bounded, scrollable parameter dialog;
 confirmation starts the calculation and confirms the displayed mode selection.
+The frequency table has only Mode/cm^-1/Type columns; checkbox selection is
+removed. Playback and mode text occupy full-width rows below the responsive
+Paned, preserving a 300-pixel frequency region. Harmonic calculations use all
+positive modes; gas selection remains in the parameter dialog.
 The frequency policy is fixed: positive modes below 50 cm^-1 use 50, all
 imaginary modes are excluded, and stationary-point labels do not gate calculation.
 The floor/tolerance entries are removed. Gas mode selection reduces vibrational

@@ -53,7 +53,7 @@ class GasThermoDialog:
         included=[page.data['modes'][i]['index'] for i in self.chosen]
         excluded=[m['index'] for i,m in enumerate(page.data['modes']) if i not in self.chosen]
         self.summary.set_text('Selected modes: %s\nExcluded modes: %s\n%s'%(included,excluded,
-            'Calculate confirms these molecular modes. Highest real modes are proposed if the current count differs. Cancel to review animations or edit the table.' if valid else 'Insufficient real modes for this geometry / stationary point.'))
+            'Calculate confirms these molecular modes. Highest real modes are proposed if the current count differs. Cancel to review mode animations.' if valid else 'Insufficient real modes for this geometry / stationary point.'))
 
     def run(self):
         self.dialog.show_all()
@@ -89,9 +89,9 @@ class VibrationsPage(Gtk.Box):
         self.source.set_ellipsize(3);self.source.set_hexpand(True)
         for widget in (self.open_button,self.cancel_button,self.source):top.pack_start(widget,widget is self.source,True,0)
         self.pack_start(top,False,False,0)
-        split=Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+        split=Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL);self.split=split;self.split_width=None
         left=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
-        self.view=ModeView();left.pack_start(self.view,True,True,0)
+        self.view=ModeView();self.view.set_size_request(200,200);left.pack_start(self.view,True,True,0)
         playback=Gtk.Box(spacing=6)
         self.play=Gtk.ToggleButton(label='Play / Pause')
         self.amplitude=Gtk.SpinButton.new_with_range(.1,10,.1);self.amplitude.set_value(1)
@@ -100,20 +100,23 @@ class VibrationsPage(Gtk.Box):
         for label,widget in (('',self.play),('Amp. ×',self.amplitude),('Period (s)',self.period)):
             if label:playback.pack_start(Gtk.Label(label=label),False,False,0)
             playback.pack_start(widget,False,False,0)
-        left.pack_start(playback,False,False,0)
         self.mode_info=Gtk.Label(xalign=0);self.mode_info.set_line_wrap(True);self.mode_info.set_max_width_chars(55)
-        left.pack_start(self.mode_info,False,False,0)
-        split.pack1(left,resize=True,shrink=False)
+        split.pack1(left,resize=True,shrink=True)
         self.store=Gtk.ListStore(bool,int,str,str)
         self.tree=Gtk.TreeView(model=self.store)
-        toggle=Gtk.CellRendererToggle();toggle.connect('toggled',self.toggle_mode)
-        self.tree.append_column(Gtk.TreeViewColumn('Thermo',toggle,active=0))
-        for label,column in (('Mode',1),('cm⁻¹',2),('Type',3)):
-            self.tree.append_column(Gtk.TreeViewColumn(label,Gtk.CellRendererText(),text=column))
+        for label,column,width in (('Mode',1,60),('cm⁻¹',2,130),('Type',3,100)):
+            renderer=Gtk.CellRendererText()
+            tree_column=Gtk.TreeViewColumn(label,renderer,text=column)
+            tree_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);tree_column.set_fixed_width(width)
+            self.tree.append_column(tree_column)
         self.tree.get_selection().connect('changed',self.select_mode)
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        scroll.set_size_request(210,230);scroll.add(self.tree);split.pack2(scroll,resize=False,shrink=False)
-        split.set_position(430);self.pack_start(split,True,True,0)
+        scroll.set_size_request(300,230);scroll.add(self.tree);split.pack2(scroll,resize=False,shrink=False)
+        self.mode_scroll=scroll
+        split.connect('size-allocate',self.resize_split)
+        self.pack_start(split,True,True,0)
+        self.pack_start(playback,False,False,0)
+        self.pack_start(self.mode_info,False,False,0)
         displacement=Gtk.Box(spacing=7)
         displacement.pack_start(Gtk.Label(label='Scale × mode vector'),False,False,0)
         self.scale=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,-1,1,.1)
@@ -147,13 +150,10 @@ class VibrationsPage(Gtk.Box):
         box.pack_start(grid,False,False,0)
         policy=Gtk.Label(label='Real modes below 50 cm⁻¹ use 50 cm⁻¹; all imaginary modes are excluded.',xalign=0)
         policy.set_line_wrap(True);policy.set_max_width_chars(70);box.pack_start(policy,False,False,0)
-        self.confirm=Gtk.CheckButton(label='I confirm any additional real-mode exclusions shown in the table')
-        box.pack_start(self.confirm,False,False,0)
         actions=Gtk.Box(spacing=7)
-        self.gas_select=Gtk.Button(label='Select highest gas vibrational modes')
         self.calculate=Gtk.Button(label='Calculate correction')
         self.save_thermo=Gtk.Button(label='Save result + Python script')
-        for widget in (self.gas_select,self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
+        for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
         self.result=Gtk.Label(xalign=0);self.result.set_selectable(True);self.result.set_line_wrap(True);self.result.set_max_width_chars(90)
         box.pack_start(self.result,False,False,0);thermo.add(box);self.pack_start(thermo,False,False,0)
@@ -166,16 +166,19 @@ class VibrationsPage(Gtk.Box):
         self.play.connect('toggled',self.play_toggled)
         self.scale.connect('value-changed',self.scale_changed)
         self.save_button.connect('clicked',self.save)
-        self.gas_select.connect('clicked',self.select_gas)
         self.calculate.connect('clicked',self.compute)
         self.save_thermo.connect('clicked',self.export_thermo)
         for widget in (self.model,self.state,self.geometry,*self.fields.values()):widget.connect('changed',self.invalidate)
         self.model.connect('changed',self.model_changed)
-        self.confirm.connect('toggled',self.invalidate)
         self.accept_flags.connect('toggled',lambda *_:self.controls())
         self.connect('unmap',lambda *_:self.pause())
         self.connect('destroy',self.destroyed)
         self.controls()
+
+    def resize_split(self,split,allocation):
+        if allocation.width==self.split_width:return
+        self.split_width=allocation.width
+        split.set_position(max(0,min(int(allocation.width*.55),allocation.width-300)))
 
     def parent(self):
         window=self.get_toplevel();return window if isinstance(window,Gtk.Window) else None
@@ -185,7 +188,7 @@ class VibrationsPage(Gtk.Box):
         imaginary=ready and self.data['modes'][self.mode]['imaginary']
         self.scale.set_sensitive(imaginary);self.play.set_sensitive(ready)
         self.save_button.set_sensitive(bool(imaginary and (self.data['constraints_source'] or self.accept_flags.get_active())))
-        self.calculate.set_sensitive(ready);self.gas_select.set_sensitive(ready)
+        self.calculate.set_sensitive(ready)
         self.tree.set_sensitive(ready)
         self.thermo_box.set_sensitive(ready)
         self.accept_flags.set_sensitive(bool(ready and not self.data['constraints_source']))
@@ -206,7 +209,7 @@ class VibrationsPage(Gtk.Box):
         for mode in data['modes']:
             self.store.append([not mode['imaginary'] and mode['cm1']>0,mode['index'],
                                ('%.4f'%mode['cm1'])+(' i' if mode['imaginary'] else ''),'Imaginary' if mode['imaginary'] else 'Real'])
-        self.confirm.set_active(False);self.invalidate();self.view.set_data(data)
+        self.invalidate();self.view.set_data(data)
         self.tree.get_selection().select_path(0)
         self.status.set_text('%d modes | %s. %s'%(len(data['modes']),data['vector_convention'],' '.join(data['warnings'])))
         self.controls()
@@ -259,24 +262,6 @@ class VibrationsPage(Gtk.Box):
         self.static_preview();self.controls()
         # A frequency click starts its mode; slider movement switches to static preview.
         self.play.set_active(True)
-
-    def toggle_mode(self,renderer,path):
-        index=int(path);mode=self.data['modes'][index]
-        if mode['imaginary'] or mode['cm1']<=0:return
-        self.store[path][0]=not self.store[path][0]
-        self.confirm.set_active(False);self.invalidate()
-
-    def select_gas(self,*_):
-        if not self.data:return
-        n=len(self.data['symbols']);geometry=self.geometry.get_active_text()
-        count=gas_mode_count(self.data,geometry)
-        candidates=sorted((i for i,m in enumerate(self.data['modes']) if not m['imaginary'] and m['cm1']>0),
-                          key=lambda i:self.data['modes'][i]['cm1'],reverse=True)
-        if count<0 or len(candidates)<count:self.status.set_text('Insufficient real modes for the chosen gas geometry.');return
-        chosen=set(candidates[:count])
-        for i,row in enumerate(self.store):row[0]=i in chosen
-        self.confirm.set_active(False);self.invalidate()
-        self.status.set_text('Selected %d highest real modes. Inspect the table and confirm exclusions before calculating.'%count)
 
     def play_toggled(self,*_):
         if self.play.get_active() and self.data:
@@ -338,7 +323,6 @@ class VibrationsPage(Gtk.Box):
         self.geometry.set_active(geometry);self.fields['spin'].set_text(spin);self.fields['symmetry'].set_text(symmetry)
         self.fields['temperature'].set_text(temperature);self.fields['pressure'].set_text(pressure)
         for i,row in enumerate(self.store):row[0]=i in chosen
-        self.confirm.set_active(True)
         self.run_thermo()
 
     def compute(self,*_):
@@ -348,10 +332,11 @@ class VibrationsPage(Gtk.Box):
 
     def run_thermo(self):
         self.invalidate();self.pause()
-        request={'action':'thermo','data':self.data,'selected':[i for i,row in enumerate(self.store) if row[0]],
+        request={'action':'thermo','data':self.data,'selected':([i for i,row in enumerate(self.store) if row[0]] if self.model.get_active()==1 else
+                             [i for i,mode in enumerate(self.data['modes']) if not mode['imaginary'] and mode['cm1']>0]),
                  'model':'gas' if self.model.get_active()==1 else 'harmonic',
                  'state':'ts' if self.state.get_active()==1 else 'minimum','geometry':self.geometry.get_active_text(),
-                 'confirm_exclusions':self.confirm.get_active()}
+                 'confirm_exclusions':self.model.get_active()==1}
         request.update({key:widget.get_text().strip() for key,widget in self.fields.items()})
         self.start(request,'thermo')
 
