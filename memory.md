@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-10. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Windows新版构建交付（2026-11-10）
+
+- 用户授权更新EXE，现有update-windows.sh在Windows checkout快进至0ed090d78dd4d619bc539046c73d26837fc4327b；隔离原生编译、主程序和ASE/RDKit worker打包成功。日志：Windows checkout的build/windows-update/0ed090d7-rx70hnsi。
+- 产物目录：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261110-002141-0ed090d7-g7r84bku，内含p4vasp.exe；同级同名.zip及.zip.sha256。SHA256：8c417e19eac64a497002f1b26481afe75526badab04f40a3be77b62c29ece920。
+- 成品runtime/gui/models三份report.json的ok均True（同级-checks目录）：43 Glade资源无property错误、原生绘制/PNG/选择性标记、GUI启动、ASE bulk/XYZ、RDKit乙醇及导出/多片段拒绝/取消回收。ASE3.29.0/RDKit2026.09.1，GUI Python3.14.9、worker3.13.17。本次未单独做成品频率页/真实R25或干净另一台Windows验收；不能把这些检查当作全部科学功能通过。未复制到桌面/Downloads。无进一步构建待自动执行；本次后续文档提交不改变已打包源码。
 
 ## 热化学计算按钮文案（2026-11-09）
 
