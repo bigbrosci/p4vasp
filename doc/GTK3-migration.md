@@ -86,14 +86,16 @@ the Show applet and molecular previews. Native primitive resolution defaults
 to 32 and the structure drawer honors that default; rebuild the native extension
 on each target machine for this quality change.
 The frequency table has only Mode/cm^-1/Type columns; checkbox selection is
-removed. Below the responsive Paned, a two-column tool area places Cell/playback on
-the left and Scale/export on the right, stacking at narrow widths while
-preserving the 300-pixel frequency region. Thermochemistry is expanded by
-default, with compact settings on the left and `thermo_result.py` rendering
-a result table on the right (energy item, equation, eV value, kJ/mol value;
-correction row in bold, entropy explicitly per K,
-conditions, with the actual ASE version in its title). Policy/mode provenance
-stays in exported data, and the result frame fills the same height as settings.
+removed. A homogeneous two-column Gtk.Grid organizes three rows: preview/modes,
+Cell and playback/Scale and export, then thermochemistry parameters/results.
+Horizontal separators and an input-pass-through vertical overlay separator align
+all six cells. FlowBox controls wrap within their cells; the old Paned,
+responsive orientation callbacks and thermochemistry Expander are removed.
+Parameters remain visible. `thermo_result.py` provides a compact four-column
+result table (energy item, equation, eV, kJ/mol), wrapped headings, bold correction
+and entropy explicitly per K. The page removes the nested result-card border;
+its actual ASE version remains in the title. Policy/mode provenance stays in
+exported data. Dependency hints remain available before loading data.
 The selected mode caption is a top-left, input-pass-through Gtk.Overlay child
 over ModeView; it no longer occupies a separate row. Calculation completion reveals the result after
 layout; invalidation clears it. Harmonic calculations use all
@@ -195,8 +197,7 @@ stock replacements with fallback, transparent theme padding trimmed, and a
 persistent Gtk.SizeGroup(BOTH) for equal button dimensions. Menu icons and
 other applet toolbars are unchanged.
 
-The frequency page defers responsive tool orientation changes to an idle
-callback after allocation and queues a fresh resize. Changing minimum widths
-inside size-allocate could leave the viewport at the previous wider extent.
-The GUI regression measures all nine button/icon allocations and alternates
-narrow/wide sizes before checking frequency table bounds.
+The frequency page now uses the homogeneous grid described above, superseding
+its former deferred orientation changes. The GUI regression measures all nine
+button/icon allocations and alternates narrow/wide sizes while checking equal
+cell widths, matching row heights and frequency-table bounds.

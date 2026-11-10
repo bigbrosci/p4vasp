@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率页三行两列网格（2026-11-09）
+
+- 当前任务完成：gtk3/vibrations.py以同宽Gtk.Grid替代Paned/独立工具组/热化学Expander。三行分别结构/波数、Cell播放/Scale、热化学参数/结果；横线及输入穿透的中线分隔，FlowBox局部换行。结果四列表头换行、列宽紧凑，页面去掉嵌套结果卡边框；加载成功后隐藏安装提示。科学计算/模式向量/保存逻辑未变。
+- 本机Linux实际GTK合成OUTCAR完整流程通过，反复700/900/1200/700/1050/700/1200宽验证六格坐标、同宽同高、列表与结果边界；动画/周期副本/Scale/能量选择/气相/双文件保存回归通过。最终气相结果截图已查看；8 GTK测试、33面板启动（不含GLUT）、编译/diff通过。证据：/tmp/p4vasp-six-cell-{layout,gtk,smoke}.log。
+- 指南/架构/当日双语已同步。未重跑科学后端或原生测试，无原生改动；未操作R25、未Mac/Windows实测或重打EXE。下一步仅按新指令继续，旧Windows打包状态不由本次推断。
+
 ## 左侧九按钮统一尺寸（2026-11-09）
 
 - 用户报告新增frequency按钮小。链路frame.glade toolbar→GTK3 adapter（PNG32/stock主题默认小尺寸）→p4v.Frame.createFrame→现有点击分发。Frame仅对主侧栏规范：DND图标大小、实际32×32居中画布保持纵横比、主题图标/stock回退、去掉主题多余透明留白，Gtk.SizeGroup BOTH及homogeneous统一九按钮尺寸；标签/tooltip/功能不改，不改菜单或其他工具栏图标。

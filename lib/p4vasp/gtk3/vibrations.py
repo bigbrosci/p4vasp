@@ -82,7 +82,7 @@ class VibrationsPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=7)
         self.set_border_width(8)
         self.data=None;self.mode=0;self.job=None;self.timer=None;self.alive=True;self.thermo_result=None
-        self.request_id=0;self.pending_path=None;self.energy_source=None;self.tools_resize_pending=False
+        self.request_id=0;self.pending_path=None;self.energy_source=None
         top=Gtk.Box(spacing=7)
         self.open_button=Gtk.Button(label='Open frequency OUTCAR')
         self.cancel_button=Gtk.Button(label='Cancel');self.cancel_button.set_sensitive(False)
@@ -90,19 +90,36 @@ class VibrationsPage(Gtk.Box):
         self.source.set_ellipsize(3);self.source.set_hexpand(True)
         for widget in (self.open_button,self.cancel_button,self.source):top.pack_start(widget,widget is self.source,True,0)
         self.pack_start(top,False,False,0)
-        split=Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL);self.split=split;self.split_width=None
+        self.layout_grid=Gtk.Grid(column_spacing=12,row_spacing=7)
+        self.layout_grid.set_column_homogeneous(True)
+        self.cells=[]
+        compact_css=Gtk.CssProvider()
+        compact_css.load_from_data(b'spinbutton button {min-width: 14px; padding: 1px;} spinbutton entry {min-width: 22px; padding: 2px;} flowboxchild {padding: 0;}')
+        def add_flow(flow,widget):
+            flow.add(widget);widget.get_parent().get_style_context().add_provider(compact_css,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        def cell(widget,title=None,expand=False):
+            box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=6);box.set_border_width(6)
+            box.set_hexpand(True);box.set_vexpand(expand)
+            if title:
+                label=Gtk.Label(xalign=0);label.set_markup('<b>'+title+'</b>');box.pack_start(label,False,False,0)
+            box.pack_start(widget,True,True,0);self.cells.append(box)
+            return box
         left=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
         self.view=ModeView();self.view.set_size_request(200,200)
         self.preview_overlay=Gtk.Overlay();self.preview_overlay.add(self.view)
         left.pack_start(self.preview_overlay,True,True,0)
-        playback=Gtk.Box(spacing=6)
+        playback=Gtk.FlowBox();playback.set_selection_mode(Gtk.SelectionMode.NONE)
+        playback.set_min_children_per_line(1);playback.set_max_children_per_line(3)
+        playback.set_column_spacing(3);playback.set_row_spacing(3)
         self.play=Gtk.ToggleButton(label='Play / Pause')
         self.amplitude=Gtk.SpinButton.new_with_range(.1,10,.1);self.amplitude.set_value(1)
         self.period=Gtk.SpinButton.new_with_range(.2,10,.1);self.period.set_value(1.5)
-        self.amplitude.set_width_chars(4);self.period.set_width_chars(4)
+        self.amplitude.set_width_chars(2);self.period.set_width_chars(2)
+        for widget in (self.amplitude,self.period):widget.get_style_context().add_provider(compact_css,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         for label,widget in (('',self.play),('Amp. ×',self.amplitude),('Period (s)',self.period)):
-            if label:playback.pack_start(Gtk.Label(label=label),False,False,0)
-            playback.pack_start(widget,False,False,0)
+            group=Gtk.Box(spacing=3)
+            if label:group.pack_start(Gtk.Label(label=label),False,False,0)
+            group.pack_start(widget,False,False,0);add_flow(playback,group)
         self.mode_info=Gtk.Label(xalign=0);self.mode_info.set_line_wrap(True);self.mode_info.set_max_width_chars(28)
         self.mode_info.set_halign(Gtk.Align.START);self.mode_info.set_valign(Gtk.Align.START)
         self.mode_info.set_margin_start(8);self.mode_info.set_margin_top(8)
@@ -110,51 +127,49 @@ class VibrationsPage(Gtk.Box):
         self.mode_info.get_style_context().add_class('mode-caption')
         self.mode_info.get_style_context().add_provider(css,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         self.preview_overlay.add_overlay(self.mode_info);self.preview_overlay.set_overlay_pass_through(self.mode_info,True)
-        split.pack1(left,resize=True,shrink=True)
+        self.layout_grid.attach(cell(left,'Structure',True),0,0,1,1)
         self.store=Gtk.ListStore(bool,int,str,str)
         self.tree=Gtk.TreeView(model=self.store)
-        for label,column,width in (('Mode',1,60),('cm⁻¹',2,130),('Type',3,100)):
+        for label,column,width in (('Mode',1,48),('cm⁻¹',2,100),('Type',3,90)):
             renderer=Gtk.CellRendererText()
             tree_column=Gtk.TreeViewColumn(label,renderer,text=column)
             tree_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);tree_column.set_fixed_width(width)
             self.tree.append_column(tree_column)
         self.tree.get_selection().connect('changed',self.select_mode)
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        scroll.set_size_request(300,230);scroll.add(self.tree);split.pack2(scroll,resize=False,shrink=False)
-        self.mode_scroll=scroll
-        split.connect('size-allocate',self.resize_split)
-        self.pack_start(split,True,True,0)
-        self.periodic_controls=Gtk.Box(spacing=6)
+        scroll.set_size_request(240,245);scroll.add(self.tree);self.mode_scroll=scroll
+        self.layout_grid.attach(cell(scroll,'Vibrational modes',True),1,0,1,1)
+        self.periodic_controls=Gtk.FlowBox();self.periodic_controls.set_selection_mode(Gtk.SelectionMode.NONE)
+        self.periodic_controls.set_min_children_per_line(1);self.periodic_controls.set_max_children_per_line(4)
+        self.periodic_controls.set_column_spacing(3);self.periodic_controls.set_row_spacing(3)
         self.cell_visible=Gtk.CheckButton(label='Cell');self.cell_visible.set_active(True)
-        self.periodic_controls.pack_start(self.cell_visible,False,False,0)
+        add_flow(self.periodic_controls,self.cell_visible)
         self.repeat=[];self.repeat_updating=False
         for axis in ('X','Y','Z'):
-            self.periodic_controls.pack_start(Gtk.Label(label=axis),False,False,0)
+            group=Gtk.Box(spacing=3);group.pack_start(Gtk.Label(label=axis),False,False,0)
             value=Gtk.SpinButton.new_with_range(1,5,1);value.set_value(1);value.set_width_chars(1)
+            value.get_style_context().add_provider(compact_css,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
             value.set_tooltip_text('Display repetitions along lattice '+axis+' (does not change the structure)')
-            self.repeat.append(value);self.periodic_controls.pack_start(value,False,False,0)
+            self.repeat.append(value);group.pack_start(value,False,False,0);add_flow(self.periodic_controls,group)
             value.connect('value-changed',self.repeat_changed)
         self.cell_visible.connect('toggled',lambda widget:self.view.set_cell_visible(widget.get_active()))
         tool_left=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
         tool_left.pack_start(self.periodic_controls,False,False,0)
         tool_left.pack_start(playback,False,False,0)
-        self.tools=Gtk.Box(spacing=12);self.tools.pack_start(tool_left,False,False,0)
-        self.tools.connect('size-allocate',self.resize_tools)
-        self.pack_start(self.tools,False,False,0)
+        self.layout_grid.attach(cell(tool_left,'Cell and playback'),0,2,1,1)
         displacement=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=3);self.displacement=displacement
         scale_label=Gtk.Label(label='Scale × mode vector',xalign=0)
         displacement.pack_start(scale_label,False,False,0)
         self.scale=Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL,-1,1,.1)
         self.scale.set_digits(1);self.scale.set_round_digits(1);self.scale.set_value(0);self.scale.set_hexpand(True)
         for v in (-1,0,1):self.scale.add_mark(v,Gtk.PositionType.BOTTOM,None)
-        displacement.pack_start(self.scale,True,True,0)
+        displacement.pack_start(self.scale,False,False,0)
         scale_actions=Gtk.Box(spacing=5)
         reset=Gtk.Button(label='Zero');reset.connect('clicked',self.zero)
         self.save_button=Gtk.Button(label='Save new POSCAR')
         scale_actions.pack_start(reset,False,False,0);scale_actions.pack_start(self.save_button,False,False,0)
         displacement.pack_start(scale_actions,False,False,0)
-        self.tools.pack_start(displacement,True,True,0)
-        thermo=Gtk.Expander(label='Thermochemistry — ASE');thermo.set_expanded(True);self.thermo=thermo
+        self.layout_grid.attach(cell(displacement,'Mode displacement'),1,2,1,1)
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5);self.thermo_box=box
         grid=Gtk.Grid(column_spacing=10,row_spacing=5)
         self.model=Gtk.ComboBoxText()
@@ -190,14 +205,29 @@ class VibrationsPage(Gtk.Box):
         for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
         self.result_panel=ThermoResult()
+        self.result_panel.get_style_context().remove_class('thermo-card')
+        self.result_panel.set_shadow_type(Gtk.ShadowType.NONE)
+        self.result_panel.get_child().set_border_width(0)
         box.set_valign(Gtk.Align.FILL);self.result_panel.set_valign(Gtk.Align.FILL)
-        thermo_content=Gtk.Box(spacing=12);self.thermo_content=thermo_content
-        thermo_content.pack_start(box,False,False,0);thermo_content.pack_start(self.result_panel,True,True,0)
-        thermo.add(thermo_content);self.pack_start(thermo,False,False,0)
+        self.thermo=cell(box,'Thermochemistry parameters')
+        self.layout_grid.attach(self.thermo,0,4,1,1)
+        self.layout_grid.attach(cell(self.result_panel),1,4,1,1)
+        self.thermo_content=self.layout_grid
+        self.row_separators=[]
+        for row in (1,3):
+            line=Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL)
+            self.layout_grid.attach(line,0,row,2,1);self.row_separators.append(line)
+        table=Gtk.Overlay();table.add(self.layout_grid)
+        self.column_separator=Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        self.column_separator.set_halign(Gtk.Align.CENTER);self.column_separator.set_valign(Gtk.Align.FILL)
+        table.add_overlay(self.column_separator);table.set_overlay_pass_through(self.column_separator,True)
+        frame=Gtk.Frame();frame.set_shadow_type(Gtk.ShadowType.IN);frame.add(table)
+        self.pack_start(frame,True,True,0)
         self.status=Gtk.Label(label='Load a VASP frequency OUTCAR. Animation is schematic; Scale is dimensionless.',xalign=0)
         self.status.set_line_wrap(True);self.status.set_max_width_chars(90);self.status.set_selectable(True)
         self.pack_start(self.status,False,False,0)
-        self.pack_start(InstallHint('ASE','install-ase.sh'),False,False,0)
+        self.install_hint=InstallHint('ASE','install-ase.sh');self.install_hint.set_no_show_all(True)
+        self.pack_start(self.install_hint,False,False,0)
         self.open_button.connect('clicked',self.open)
         self.cancel_button.connect('clicked',lambda *_:self.cancel())
         self.play.connect('toggled',self.play_toggled)
@@ -211,20 +241,6 @@ class VibrationsPage(Gtk.Box):
         self.connect('unmap',lambda *_:self.pause())
         self.connect('destroy',self.destroyed)
         self.controls()
-
-    def resize_tools(self,widget,allocation):
-        orientation=Gtk.Orientation.HORIZONTAL if allocation.width>=820 else Gtk.Orientation.VERTICAL
-        if widget.get_orientation()!=orientation and not self.tools_resize_pending:
-            # Changing requisitions during allocation can leave the viewport
-            # stuck at its previous minimum width. Apply after this layout pass.
-            self.tools_resize_pending=True;GLib.idle_add(self.apply_tools_orientation)
-
-    def apply_tools_orientation(self):
-        self.tools_resize_pending=False
-        if not self.alive:return False
-        orientation=Gtk.Orientation.HORIZONTAL if self.tools.get_allocated_width()>=820 else Gtk.Orientation.VERTICAL
-        self.tools.set_orientation(orientation);self.queue_resize()
-        return False
 
     def reveal_result(self):
         if not self.alive or self.thermo_result is None:return False
@@ -247,11 +263,6 @@ class VibrationsPage(Gtk.Box):
             for widget,value in zip(self.repeat,self.view.repeats):widget.set_value(value)
             self.repeat_updating=False
 
-    def resize_split(self,split,allocation):
-        if allocation.width==self.split_width:return
-        self.split_width=allocation.width
-        split.set_position(max(0,min(int(allocation.width*.55),allocation.width-300)))
-
     def parent(self):
         window=self.get_toplevel();return window if isinstance(window,Gtk.Window) else None
 
@@ -266,6 +277,7 @@ class VibrationsPage(Gtk.Box):
         self.thermo_box.set_sensitive(ready)
         self.save_thermo.set_sensitive(self.thermo_result is not None and self.job is None)
         self.cancel_button.set_sensitive(self.job is not None)
+        self.install_hint.set_visible(self.data is None)
 
     def pause(self):
         if self.timer:GLib.source_remove(self.timer);self.timer=None

@@ -23,11 +23,13 @@ class ThermoResult(Gtk.Frame):
         self.store=Gtk.ListStore(str,str,str,str,str,str,int);self.row_index={}
         self.table=Gtk.TreeView(model=self.store);self.table.set_enable_search(False)
         self.table.set_grid_lines(Gtk.TreeViewGridLines.BOTH);self.table.set_tooltip_column(4)
-        for index,(title,width) in enumerate((('Energy item',110),('Equation',150),('Value in eV',145),('Value in kJ/mol',165))):
-            renderer=Gtk.CellRendererText();renderer.set_property('xalign',1. if index>=2 else 0.)
+        for index,(title,width) in enumerate((('Energy item',80),('Equation',110),('Value in eV',100),('Value in kJ/mol',115))):
+            renderer=Gtk.CellRendererText();renderer.set_property('xalign',1. if index>=2 else 0.);renderer.set_property('size-points',9.)
             if index>=2:renderer.set_property('family','monospace')
             column=Gtk.TreeViewColumn(title,renderer,text=index,foreground=5,weight=6)
-            column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);column.set_fixed_width(width)
+            column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);column.set_fixed_width(width);column.set_resizable(True)
+            header=Gtk.Label(label=title.replace('Energy item','Energy\nitem').replace('Value in ','Value in\n'))
+            header.set_justify(Gtk.Justification.CENTER);column.set_widget(header);header.show()
             self.table.append_column(column)
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.set_min_content_height(205);scroll.add(self.table);self.table_scroll=scroll
@@ -54,7 +56,7 @@ class ThermoResult(Gtk.Frame):
               ('ZPE_eV','ZPE','½ Σ hν'),
               ('U_eV','U','E + ZPE + U_th' if gas else 'E + ZPE + U_v'),
               ('H_eV','H','U + k_B T' if gas else '—'),
-              ('S_eV_per_K','S (per K)','S_t+S_r+S_v+S_e' if gas else 'S_v'),
+              ('S_eV_per_K','S (per K)','Σ S_i' if gas else 'S_v'),
               ('TS_eV','T × S','T × S'),
               ('correction_eV','Δ'+kind,base+' − E − TS'),
               ('free_energy_eV','Total '+kind,base+' − TS'))

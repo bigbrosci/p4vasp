@@ -58,7 +58,13 @@ def main():
             icons=images(item)
             assert len(icons)==1 and icons[0].get_allocated_width()==32 and icons[0].get_allocated_height()==32,(item.get_label(),[(icon.get_allocated_width(),icon.get_allocated_height()) for icon in icons])
         assert page.view.get_mapped() and len(page.store)==6
-        assert page.thermo.get_expanded()
+        assert page.thermo.get_mapped()
+        assert page.layout_grid.get_column_homogeneous()
+        assert len(page.cells)==6 and len(page.row_separators)==2
+        assert not page.install_hint.get_visible()
+        for index,widget in enumerate(page.cells):
+            assert page.layout_grid.child_get_property(widget,'left-attach')==index%2
+            assert page.layout_grid.child_get_property(widget,'top-attach')==(index//2)*2
         assert page.fields['energy'].get_text()=='-10.25'
         assert 'ionic step 1' in page.fields['energy'].get_tooltip_text()
         assert page.mode_info.get_parent() is page.preview_overlay
@@ -75,6 +81,10 @@ def main():
                 position=page.mode_scroll.translate_coordinates(frame.root_window,0,0)
                 return position[0]+page.mode_scroll.get_allocated_width()<=frame.root_window.get_allocated_width()
             pump(fits,5)
+            for index in range(0,6,2):
+                a,b=page.cells[index:index+2]
+                assert abs(a.get_allocated_width()-b.get_allocated_width())<=1
+                assert a.get_allocated_height()==b.get_allocated_height()
             rect=page.tree.get_visible_rect()
             assert sum(column.get_width() for column in page.tree.get_columns())<=rect.width, (width,rect.width)
             x,y=page.mode_scroll.translate_coordinates(frame.root_window,0,0)
@@ -85,9 +95,13 @@ def main():
                 widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vibrations-compact.png')
         frame.root_window.resize(1050,800)
         for _ in range(15):pump();time.sleep(.02)
-        assert page.tools.get_orientation()==Gtk.Orientation.HORIZONTAL
-        x,y=page.displacement.translate_coordinates(page.tools,0,0)
-        assert x>=page.periodic_controls.get_allocated_width()
+        for row in range(3):
+            a,b=page.cells[row*2:row*2+2]
+            assert abs(a.get_allocated_width()-b.get_allocated_width())<=1
+            assert a.get_allocated_height()==b.get_allocated_height()
+            assert a.get_allocation().y==b.get_allocation().y
+        x,y=page.displacement.translate_coordinates(page.layout_grid,0,0)
+        assert x>=page.cells[2].get_allocated_width()
 
         assert page.play.get_active() and page.timer is not None
         initial=json.dumps(page.view.positions)
@@ -139,8 +153,7 @@ def main():
         except FileExistsError:pass
         else:raise AssertionError('Existing output was overwritten')
         assert path.read_bytes()==original and (path.parent/'POSCAR').read_bytes()==original_poscar
-        expander=next(child for child in page.get_children() if isinstance(child,Gtk.Expander))
-        expander.set_expanded(True);page.state.set_active(1)
+        page.state.set_active(1)
         ticks=[];timer=GLib.timeout_add(10,lambda:(ticks.append(1),True)[1])
         page.calculate.clicked();pump(lambda:page.job is None,30);GLib.source_remove(timer)
         assert ticks and page.thermo_result is not None,page.status.get_text()
@@ -217,7 +230,7 @@ def main():
             surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
             widget.check_resize();widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/'+name+'.png')
         capture('p4vasp-vibrations-thermo')
-        assert page.result_panel.get_allocated_height()==page.thermo_box.get_allocated_height()
+        assert page.cells[4].get_allocated_height()==page.cells[5].get_allocated_height()
         assert sum(column.get_width() for column in page.result_panel.table.get_columns())<=page.result_panel.table.get_visible_rect().width
         mx,my=page.mode_info.translate_coordinates(page.preview_overlay,0,0)
         assert 0<=mx<=16 and 0<=my<=16
