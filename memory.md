@@ -2,6 +2,10 @@
 
 Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 热化学计算按钮文案（2026-11-09）
+
+- gtk3/vibrations.py将Calculate correction改为Get Thermochemistry，回调及计算不变，操作指南同步。实际Linux完整合成频率GTK回归通过，最终结果截图已查看按钮显示，编译/diff通过；未跨平台/重打EXE。
+
 ## 首步能量排除电子SCF中间值（2026-11-09）
 
 - 用户指定桌面R25并报告E=6548.33227256。只读核验OUTCAR：该值来自Iteration 1(1)电子迭代，正式首个FREE ENERGIE汇总sigma->0=-215.08849841（without entropy=-214.90142429）。原ASE index0优先路径误取电子步，原fallback也未区分。

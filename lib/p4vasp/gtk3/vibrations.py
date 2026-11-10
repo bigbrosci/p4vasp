@@ -200,7 +200,7 @@ class VibrationsPage(Gtk.Box):
         policy=Gtk.Label(label='Real modes below 50 cm⁻¹ use 50 cm⁻¹; all imaginary modes are excluded.',xalign=0)
         policy.set_line_wrap(True);policy.set_max_width_chars(28);box.pack_start(policy,False,False,0)
         actions=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5)
-        self.calculate=Gtk.Button(label='Calculate correction')
+        self.calculate=Gtk.Button(label='Get Thermochemistry')
         self.save_thermo=Gtk.Button(label='Save result + Python script')
         for widget in (self.calculate,self.save_thermo):actions.pack_start(widget,False,False,0)
         box.pack_start(actions,False,False,0)
