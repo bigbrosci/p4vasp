@@ -44,6 +44,19 @@ def main():
         button=frame.xml.get_widget('astart p4vasp.applet.VibrationsApplet.VibrationsApplet')
         button.emit('clicked');pump()
         page=frame.embedded_applet.page
+        sidebar=[item for item in frame.toolbar.get_children() if isinstance(item,Gtk.ToolButton)]
+        assert len(sidebar)==9
+        assert frame.toolbar.get_icon_size()==Gtk.IconSize.DND
+        for _ in range(10):pump();time.sleep(.02)
+        assert len({(item.get_allocated_width(),item.get_allocated_height()) for item in sidebar})==1
+        def images(widget):
+            found=[widget] if isinstance(widget,Gtk.Image) else []
+            if isinstance(widget,Gtk.Container):
+                for child in widget.get_children():found.extend(images(child))
+            return found
+        for item in sidebar:
+            icons=images(item)
+            assert len(icons)==1 and icons[0].get_allocated_width()==32 and icons[0].get_allocated_height()==32,(item.get_label(),[(icon.get_allocated_width(),icon.get_allocated_height()) for icon in icons])
         assert page.view.get_mapped() and len(page.store)==6
         assert page.thermo.get_expanded()
         assert page.fields['energy'].get_text()=='-10.25'
@@ -53,13 +66,19 @@ def main():
         assert page.mode_info.get_halign()==Gtk.Align.START and page.mode_info.get_valign()==Gtk.Align.START
         assert 'Mode 1 |' in page.mode_info.get_text() and 'max' not in page.mode_info.get_text()
         assert [column.get_title() for column in page.tree.get_columns()]==['Mode','cm⁻¹','Type']
-        for width in (700,900,1200):
+        for width in (700,900,1200,700,1050,700,1200):
             frame.root_window.resize(width,750)
             for _ in range(15):pump();time.sleep(.02)
+            frame.root_window.check_resize()
+            for _ in range(5):pump();time.sleep(.02)
+            def fits():
+                position=page.mode_scroll.translate_coordinates(frame.root_window,0,0)
+                return position[0]+page.mode_scroll.get_allocated_width()<=frame.root_window.get_allocated_width()
+            pump(fits,5)
             rect=page.tree.get_visible_rect()
             assert sum(column.get_width() for column in page.tree.get_columns())<=rect.width, (width,rect.width)
             x,y=page.mode_scroll.translate_coordinates(frame.root_window,0,0)
-            assert x>=0 and x+page.mode_scroll.get_allocated_width()<=frame.root_window.get_allocated_width(),width
+            assert x>=0 and x+page.mode_scroll.get_allocated_width()<=frame.root_window.get_allocated_width(),(width,x,page.mode_scroll.get_allocated_width(),frame.root_window.get_allocated_width(),page.get_allocated_width(),frame.toolbar.get_allocated_width())
             if width==700:
                 widget=frame.root_window
                 surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())

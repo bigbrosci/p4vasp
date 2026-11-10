@@ -82,7 +82,7 @@ class VibrationsPage(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=7)
         self.set_border_width(8)
         self.data=None;self.mode=0;self.job=None;self.timer=None;self.alive=True;self.thermo_result=None
-        self.request_id=0;self.pending_path=None;self.energy_source=None
+        self.request_id=0;self.pending_path=None;self.energy_source=None;self.tools_resize_pending=False
         top=Gtk.Box(spacing=7)
         self.open_button=Gtk.Button(label='Open frequency OUTCAR')
         self.cancel_button=Gtk.Button(label='Cancel');self.cancel_button.set_sensitive(False)
@@ -214,7 +214,17 @@ class VibrationsPage(Gtk.Box):
 
     def resize_tools(self,widget,allocation):
         orientation=Gtk.Orientation.HORIZONTAL if allocation.width>=820 else Gtk.Orientation.VERTICAL
-        if widget.get_orientation()!=orientation:widget.set_orientation(orientation)
+        if widget.get_orientation()!=orientation and not self.tools_resize_pending:
+            # Changing requisitions during allocation can leave the viewport
+            # stuck at its previous minimum width. Apply after this layout pass.
+            self.tools_resize_pending=True;GLib.idle_add(self.apply_tools_orientation)
+
+    def apply_tools_orientation(self):
+        self.tools_resize_pending=False
+        if not self.alive:return False
+        orientation=Gtk.Orientation.HORIZONTAL if self.tools.get_allocated_width()>=820 else Gtk.Orientation.VERTICAL
+        self.tools.set_orientation(orientation);self.queue_resize()
+        return False
 
     def reveal_result(self):
         if not self.alive or self.thermo_result is None:return False

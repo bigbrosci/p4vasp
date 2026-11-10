@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-08. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 左侧九按钮统一尺寸（2026-11-09）
+
+- 用户报告新增frequency按钮小。链路frame.glade toolbar→GTK3 adapter（PNG32/stock主题默认小尺寸）→p4v.Frame.createFrame→现有点击分发。Frame仅对主侧栏规范：DND图标大小、实际32×32居中画布保持纵横比、主题图标/stock回退、去掉主题多余透明留白，Gtk.SizeGroup BOTH及homogeneous统一九按钮尺寸；标签/tooltip/功能不改，不改菜单或其他工具栏图标。
+- 验证发现只设toolbar DND仍有Open图像分配16×32，已改实际pixbuf画布。扩展测试还暴露频率resize_tools在分配过程中改orientation导致viewport卡旧宽775，现改idle后变方向并queue_resize；不只是放宽测试，700/900/1200/700/1050/700/1200反复尺寸均验证列表边界。
+- 本机Linux实际Frame九按钮宽高相同、九图标均32×32、频率点击/默认状态/完整周期/模式/能量/气相/报告脚本流程通过；最终小窗口截图已查看。8 GTK/33面板（GLUT除外）、编译/diff通过。前轮尺寸失败不计通过，最终修复后完整重跑通过。未实测其他设备/DPI或新Windows包，无原生改动/重编译，未操作R25/无关删除。指南/架构/当日双语同步。
 
 ## 热化学结果四列表格与kJ/mol显示（2026-11-08）
 

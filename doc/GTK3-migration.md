@@ -185,3 +185,18 @@ headers and labels any TOTEN fallback. Reports/replay retain energy provenance;
 changing frequency source clears/refills the entry, while cancelling/failing an
 energy-only load preserves the previous result. No new process type or native
 extension changes are needed.
+
+## Uniform main sidebar (2026-11-09)
+
+`frame.glade` defines the nine ToolButtons; the GTK3 adapter loads file icons
+at source size and legacy stock icons at theme-dependent size. Frame.createFrame
+normalizes only this toolbar: 32-pixel aspect-preserving icon canvases, themed
+stock replacements with fallback, transparent theme padding trimmed, and a
+persistent Gtk.SizeGroup(BOTH) for equal button dimensions. Menu icons and
+other applet toolbars are unchanged.
+
+The frequency page defers responsive tool orientation changes to an idle
+callback after allocation and queues a fresh resize. Changing minimum widths
+inside size-allocate could leave the viewport at the previous wider extent.
+The GUI regression measures all nine button/icon allocations and alternates
+narrow/wide sizes before checking frequency table bounds.

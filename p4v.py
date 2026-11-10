@@ -287,6 +287,38 @@ class Frame(SystemListListener):
         self.system_options.show()
         self.menubar=xml.get_widget("menubar")
         self.toolbar=xml.get_widget("toolbar")
+        # File icons are 32 px; use the same size for theme/stock icons too.
+        self.toolbar.set_icon_size(gtk.IconSize.DND)
+        self.toolbar_size_group=gtk.SizeGroup(mode=gtk.SizeGroupMode.BOTH)
+        icon_names={'gtk-open':'document-open','gtk-edit':'document-edit',
+                    'gtk-media-play':'media-playback-start','gtk-index':'view-list-symbolic'}
+        theme=gtk.IconTheme.get_default()
+        for button in self.toolbar.get_children():
+            if isinstance(button,gtk.ToolButton):
+                image=button.get_icon_widget()
+                pixels=image.get_pixbuf() if isinstance(image,gtk.Image) and image.get_storage_type()==gtk.ImageType.PIXBUF else None
+                if pixels is None:
+                    stock=button.get_stock_id();name=icon_names.get(stock,stock)
+                    try:pixels=theme.load_icon(name,32,gtk.IconLookupFlags.FORCE_SIZE) if name and theme.has_icon(name) else None
+                    except gtk.GLib.Error:pixels=None
+                    if pixels is None and stock:pixels=button.render_icon_pixbuf(stock,gtk.IconSize.DND)
+                if pixels is not None:
+                    # Theme icons may contain large transparent margins (notably Play).
+                    if button.get_icon_widget() is None and pixels.get_has_alpha():
+                        raw=pixels.get_pixels();stride=pixels.get_rowstride();channels=pixels.get_n_channels()
+                        visible=[(x,y) for y in range(pixels.get_height()) for x in range(pixels.get_width())
+                                 if raw[y*stride+x*channels+channels-1]>0]
+                        if visible:
+                            xs,ys=zip(*visible);x,y=min(xs),min(ys)
+                            pixels=pixels.new_subpixbuf(x,y,max(xs)-x+1,max(ys)-y+1)
+                    width,height=pixels.get_width(),pixels.get_height();scale=32./max(width,height)
+                    width,height=max(1,round(width*scale)),max(1,round(height*scale))
+                    pixels=pixels.scale_simple(width,height,gtk.GdkPixbuf.InterpType.BILINEAR)
+                    canvas=gtk.GdkPixbuf.Pixbuf.new(gtk.GdkPixbuf.Colorspace.RGB,True,8,32,32);canvas.fill(0)
+                    pixels.copy_area(0,0,width,height,canvas,(32-width)//2,(32-height)//2)
+                    image=gtk.Image.new_from_pixbuf(canvas);button.set_icon_widget(image);image.show()
+                button.set_homogeneous(True)
+                self.toolbar_size_group.add_widget(button)
 
         # Automatic file logging disabled; restore the next line to re-enable it.
         # setMessageDriver(FrameMessageDriver(xml,"p4vasp.log"))
