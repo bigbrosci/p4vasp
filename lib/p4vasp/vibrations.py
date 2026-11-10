@@ -26,17 +26,21 @@ def ionic_energy(path, step='first'):
     def record(value,quantity,reader):
         return {'value_eV':value,'ionic_step':1 if step=='first' else 'last',
                 'quantity':quantity,'reader':reader,'path':str(path)}
-    try:
-        from ase.io import read
-        image=read(str(path),format='vasp-out',index=0 if step=='first' else -1)
-        value=float(image.get_potential_energy())
-        if math.isfinite(value):return record(value,'energy(sigma->0)','ASE vasp-out')
-    except Exception:
-        pass
+    # Electronic SCF iterations also print sigma->0 energies. Only the
+    # FREE ENERGIE summary identifies a completed ionic step in real OUTCARs.
+    with path.open(errors='replace') as source:
+        has_summaries=any('FREE ENERGIE OF THE ION-ELECTRON SYSTEM' in line for line in source)
+    in_summary=not has_summaries
     current=None
     with path.open(errors='replace') as source:
         for line in source:
-            if re.search(r'free energy\s+TOTEN\s*=',line):
+            if 'FREE ENERGIE OF THE ION-ELECTRON SYSTEM' in line:
+                if current is not None and step=='first':return current
+                in_summary=True
+            elif re.search(r'Iteration\s+\d+\(',line):
+                in_summary=False
+            if not in_summary:continue
+            if re.search(r'free\s+energy\s+TOTEN\s*=',line):
                 if current is not None and step=='first':return current
                 match=re.search(r'TOTEN\s*=\s*('+NUMBER+r')',line)
                 if not match:return None

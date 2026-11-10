@@ -182,9 +182,10 @@ This is local-driver evidence, not a guarantee for every graphics device.
 
 Frequency loading fills E from ionic step 1. The energy entry's Open OUTCAR
 button uses the same cancellable worker with action `energy` to read the last
-ionic step from a separate file, leaving frequency data unchanged. ASE's
-vasp-out reader supplies sigma->0 energy; a p4vasp block parser handles reduced
-headers and labels any TOTEN fallback. Reports/replay retain energy provenance;
+ionic step from a separate file, leaving frequency data unchanged. The p4vasp
+parser reads sigma->0 from completed FREE ENERGIE ionic summaries, excluding
+electronic SCF iteration energies even when ASE would return them. Reduced
+fixtures without summary headings remain supported; TOTEN fallback is labeled. Reports/replay retain energy provenance;
 changing frequency source clears/refills the entry, while cancelling/failing an
 energy-only load preserves the previous result. No new process type or native
 extension changes are needed.

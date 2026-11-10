@@ -22,12 +22,12 @@ class VibrationsTest(unittest.TestCase):
         path=write_energy_calculation(self.root/'energy')
         result=read_outcar(path)
         self.assertEqual(result['electronic_energy_eV'],-10.25)
-        self.assertEqual(result['electronic_energy_source']['reader'],'ASE vasp-out')
+        self.assertEqual(result['electronic_energy_source']['reader'],'p4vasp OUTCAR')
         self.assertEqual(result['electronic_energy_source']['ionic_step'],1)
         last=run_request(dict(action='energy',path=str(path),step='last'))
         self.assertEqual(last['value_eV'],-12.25)
         self.assertEqual(last['ionic_step'],'last')
-        self.assertEqual(last['reader'],'ASE vasp-out')
+        self.assertEqual(last['reader'],'p4vasp OUTCAR')
         short=self.root/'short-OUTCAR'
         short.write_text('free energy TOTEN = -20 eV\nenergy(sigma->0) = -19.5\nfree energy TOTEN = -30 eV\nenergy(sigma->0) = -29.5\n')
         energy=first_ionic_energy(short)
@@ -40,6 +40,27 @@ class VibrationsTest(unittest.TestCase):
         self.assertIn('fallback',energy['quantity'])
         short.write_text('no ionic energy')
         self.assertIsNone(first_ionic_energy(short))
+
+    def test_ionic_summary_excludes_scf_energies(self):
+        path=self.root/'OUTCAR'
+        path.write_text("""Iteration 1( 1)
+ free energy TOTEN = 6548.30512693 eV
+ energy without entropy = 6548.35941819 energy(sigma->0) = 6548.33227256
+ FREE ENERGIE OF THE ION-ELECTRON SYSTEM (eV)
+ -----------------
+ free  energy   TOTEN = -215.27557254 eV
+ energy  without entropy= -214.90142429 energy(sigma->0) = -215.08849841
+ Iteration 2( 1)
+ free energy TOTEN = 999 eV
+ energy(sigma->0) = 1000
+ FREE ENERGIE OF THE ION-ELECTRON SYSTEM (eV)
+ free  energy   TOTEN = -216 eV
+ energy(sigma->0) = -215.5
+ Iteration 3( 1)
+ energy(sigma->0) = 2000
+""")
+        self.assertEqual(first_ionic_energy(path)['value_eV'],-215.08849841)
+        self.assertEqual(ionic_energy(path,'last')['value_eV'],-215.5)
 
     def test_physical_vectors_scale_sign_and_selective_flags(self):
         data=self.data();self.assertEqual(len(data['modes']),6)

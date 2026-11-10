@@ -178,7 +178,7 @@ def main():
         assert abs(page.thermo_result['free_energy_eV']-(-10.25+page.thermo_result['correction_eV']))<1e-12
         GLib.timeout_add(50,answer_save,'auto_energy.json');page.save_thermo.clicked();pump()
         auto_report=json.loads((folder/'auto_energy.json').read_text())
-        assert auto_report['electronic_energy_eV']==-10.25 and auto_report['electronic_energy_source']['reader']=='ASE vasp-out'
+        assert auto_report['electronic_energy_eV']==-10.25 and auto_report['electronic_energy_source']['reader']=='p4vasp OUTCAR'
         assert 'ionic_step' in (folder/'auto_energy.py').read_text()
         external=write_energy_calculation(folder/'optimized energy')
         external.write_text(external.read_text().split('VRHFIN =C:')[0])  # Ordinary relaxation output, no modes.

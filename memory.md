@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 首步能量排除电子SCF中间值（2026-11-09）
+
+- 用户指定桌面R25并报告E=6548.33227256。只读核验OUTCAR：该值来自Iteration 1(1)电子迭代，正式首个FREE ENERGIE汇总sigma->0=-215.08849841（without entropy=-214.90142429）。原ASE index0优先路径误取电子步，原fallback也未区分。
+- vibrations.ionic_energy改直接按正式离子汇总读取首/末sigma->0，跳过SCF中间能量并兼容free多空格；该步缺sigma保留明确TOTEN回退，无汇总的精简fixture仍支持。来源变p4vasp OUTCAR，GUI/JSON沿用现有来源传递。真实R25首步函数及完整read_outcar快照均=-215.08849841，末步=-215.08007107；未修改文件或重新计算。
+- 10后端测试（新增SCF前后干扰及未完成末步回归）、2独立脚本、完整合成频率实际GTK通过，首次GUI旧ASE来源断言更新后重跑通过（/tmp/p4vasp-ionic-summary-gtk.log）；编译/diff通过。真实R25只验证读取及快照，未做GUI热化学计算；未跨平台/EXE打包。指南及双语同步。
+
 ## 结果单行表头与单元格复制（2026-11-09）
 
 - thermo_result.py删除表头强制换行；TreeView禁整行选择，左键释放在单元格内启动只读Entry，支持原生文字选择/Ctrl+C/右键复制，不连接写回处理。链路仍为原Glade/adapter/VibrationsApplet→结果组件，无入口变化。
