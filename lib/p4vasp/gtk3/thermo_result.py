@@ -22,20 +22,38 @@ class ThermoResult(Gtk.Frame):
         content.pack_start(self.conditions,False,False,0)
         self.store=Gtk.ListStore(str,str,str,str,str,str,int);self.row_index={}
         self.table=Gtk.TreeView(model=self.store);self.table.set_enable_search(False)
+        self.table.get_selection().set_mode(Gtk.SelectionMode.NONE)
+        self.table.connect('button-release-event',self.select_cell)
         self.table.set_grid_lines(Gtk.TreeViewGridLines.BOTH);self.table.set_tooltip_column(4)
         for index,(title,width) in enumerate((('Energy item',80),('Equation',110),('Value in eV',100),('Value in kJ/mol',115))):
             renderer=Gtk.CellRendererText();renderer.set_property('xalign',1. if index>=2 else 0.);renderer.set_property('size-points',9.)
+            renderer.set_property('editable',True)
+            renderer.connect('editing-started',self.select_text)
             if index>=2:renderer.set_property('family','monospace')
             column=Gtk.TreeViewColumn(title,renderer,text=index,foreground=5,weight=6)
             column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);column.set_fixed_width(width);column.set_resizable(True)
             column.set_expand(True)  # Share spare width instead of stretching only the final column.
-            header=Gtk.Label(label=title.replace('Energy item','Energy\nitem').replace('Value in ','Value in\n'))
+            header=Gtk.Label(label=title)
             header.set_justify(Gtk.Justification.CENTER);column.set_widget(header);header.show()
             self.table.append_column(column)
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.set_min_content_height(205);scroll.add(self.table);self.table_scroll=scroll
         content.pack_start(scroll,True,True,0)
         self.clear()
+
+    def select_cell(self,table,event):
+        if event.button!=1:return False
+        hit=table.get_path_at_pos(int(event.x),int(event.y))
+        if hit is None:return False
+        path,column,_,_=hit
+        table.set_cursor(path,column,True)
+        return True
+
+    @staticmethod
+    def select_text(renderer,entry,path):
+        # A read-only Entry supplies native selection, Ctrl+C and Copy menu.
+        entry.set_editable(False)
+        entry.select_region(0,-1)
 
     def clear(self,message='Choose a model and calculate.'):
         self.title.set_markup('<b>Thermochemistry Results</b>')

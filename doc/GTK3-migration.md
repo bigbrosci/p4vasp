@@ -92,9 +92,10 @@ Horizontal separators and an input-pass-through vertical overlay separator align
 all six cells. FlowBox controls wrap within their cells; the old Paned,
 responsive orientation callbacks and thermochemistry Expander are removed.
 Parameters remain visible. `thermo_result.py` provides a compact four-column
-result table (energy item, equation, eV, kJ/mol), wrapped headings, bold correction
+result table (energy item, equation, eV, kJ/mol), single-line headings, bold correction
 and entropy explicitly per K. The page removes the nested result-card border;
-its actual ASE version remains in the title. Policy/mode provenance stays in
+its actual ASE version remains in the title. Result cells open read-only Entry
+text selectors on click, supporting native clipboard copying without model writes. Policy/mode provenance stays in
 exported data. Dependency hints remain available before loading data.
 The selected mode caption is a top-left, input-pass-through Gtk.Overlay child
 over ModeView; it no longer occupies a separate row. Calculation completion reveals the result after

@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 结果单行表头与单元格复制（2026-11-09）
+
+- thermo_result.py删除表头强制换行；TreeView禁整行选择，左键释放在单元格内启动只读Entry，支持原生文字选择/Ctrl+C/右键复制，不连接写回处理。链路仍为原Glade/adapter/VibrationsApplet→结果组件，无入口变化。
+- 本机实际GTK宽表截图已查看；独立检查点击电子能单元格、只读状态、选择/剪贴板精确为6548.332273、底层值不变及单行表头通过，450/700/1200列宽回归通过。完整合成频率GUI通过（/tmp/p4vasp-thermo-copy.log），编译/diff通过。未跨平台/打包EXE、未改科学计算。
+
 ## 热化学表格宽度分配（2026-11-09）
 
 - thermo_result.py四列均开启expand，GTK剩余宽度不再全归最右列，保留紧凑基础列宽和用户拖动。实际Linux独立GTK在450/700/1200宽验证余量均分（整数余数最多3px），1200时列宽272/302/292/310，宽表截图已查看；完整频率合成GTK回归通过（/tmp/p4vasp-thermo-columns.log）。初始独立检查Stack显示顺序及余数断言已纠正，不计作通过。编译/diff通过，未改科学数据，未跨平台/打包EXE。
