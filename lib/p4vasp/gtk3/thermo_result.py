@@ -28,6 +28,7 @@ class ThermoResult(Gtk.Frame):
             if index>=2:renderer.set_property('family','monospace')
             column=Gtk.TreeViewColumn(title,renderer,text=index,foreground=5,weight=6)
             column.set_sizing(Gtk.TreeViewColumnSizing.FIXED);column.set_fixed_width(width);column.set_resizable(True)
+            column.set_expand(True)  # Share spare width instead of stretching only the final column.
             header=Gtk.Label(label=title.replace('Energy item','Energy\nitem').replace('Value in ','Value in\n'))
             header.set_justify(Gtk.Justification.CENTER);column.set_widget(header);header.show()
             self.table.append_column(column)

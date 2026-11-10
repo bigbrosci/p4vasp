@@ -2,6 +2,10 @@
 
 Last updated: 2026-11-09. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 热化学表格宽度分配（2026-11-09）
+
+- thermo_result.py四列均开启expand，GTK剩余宽度不再全归最右列，保留紧凑基础列宽和用户拖动。实际Linux独立GTK在450/700/1200宽验证余量均分（整数余数最多3px），1200时列宽272/302/292/310，宽表截图已查看；完整频率合成GTK回归通过（/tmp/p4vasp-thermo-columns.log）。初始独立检查Stack显示顺序及余数断言已纠正，不计作通过。编译/diff通过，未改科学数据，未跨平台/打包EXE。
+
 ## 频率页三行两列网格（2026-11-09）
 
 - 当前任务完成：gtk3/vibrations.py以同宽Gtk.Grid替代Paned/独立工具组/热化学Expander。三行分别结构/波数、Cell播放/Scale、热化学参数/结果；横线及输入穿透的中线分隔，FlowBox局部换行。结果四列表头换行、列宽紧凑，页面去掉嵌套结果卡边框；加载成功后隐藏安装提示。科学计算/模式向量/保存逻辑未变。
