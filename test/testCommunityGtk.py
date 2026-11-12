@@ -39,7 +39,7 @@ for title, detail, filename, crop in CONTACTS:
     assert viewer.image.get_pixbuf().get_height() == original.get_height()
     viewer.fit()
     drain()
-    if filename == 'qq.jpg':
+    if filename == 'QQ.jpg':
         win = viewer.get_window()
         Gdk.pixbuf_get_from_window(win, 0, 0, viewer.get_allocated_width(), viewer.get_allocated_height()).savev('/tmp/p4vasp-community-viewer.png', 'png', [], [])
     viewer.destroy()

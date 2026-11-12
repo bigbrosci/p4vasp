@@ -68,9 +68,9 @@ def load_chinese_font():
 
 
 CONTACTS = (
-    ('QQ群', 'p4vasp · 群号 1131610080', 'qq.jpg', (215, 850, 855, 855)),
+    ('QQ群', 'p4vasp · 群号 1131610080', 'QQ.jpg', (215, 850, 855, 855)),
     ('QQ群 V', '大师兄科研群-V · 群号 1012023869', 'QQgroup_V.jpg', (200, 740, 885, 885)),
-    ('微信', 'BigBroSci · 扫码添加微信', 'wechat.jpg', (120, 360, 870, 870)),
+    ('微信', 'BigBroSci · 扫码添加微信', 'WeChat.jpg', (120, 360, 870, 870)),
     ('微信公众号', '扫码关注公众号', 'public-account.jpg', None),
 )
 
@@ -161,7 +161,7 @@ class CommunityPage(Gtk.ScrolledWindow):
                 self.buttons.append(button)
             except Exception:
                 card.pack_start(Gtk.Label(label='二维码图片无法读取'), False, False, 0)
-            if filename == 'qq.jpg':
+            if filename == 'QQ.jpg':
                 copy = Gtk.Button(label='复制群号')
                 copy.connect('clicked', self.copy_qq)
                 self.copy_button = copy
