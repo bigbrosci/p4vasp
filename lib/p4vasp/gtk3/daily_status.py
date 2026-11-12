@@ -28,7 +28,10 @@ class DailyStatus:
     def refresh(self, today=None):
         if self.idle:
             quote = quote_for_day(self.records, today)
-            text = quote['text']+' ——《'+quote['source']+'》'
+            if quote.get('language') == 'en':
+                text = quote['text']+' — '+quote['source']
+            else:
+                text = quote['text']+' ——《'+quote['source']+'》'
             self.label.set_text(text)
             self.label.set_tooltip_text(text+'\n'+quote['url'])
         return True

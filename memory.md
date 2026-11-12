@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-11. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 中英文每日一句与wikidog致谢（2026-11-11）
+
+- 用户要求采纳wikidog于11月10日建议：名言除中文外加入英文。daily.json保留12中文并每3条后插入1英文，共16条/16天离线日期循环；新增可选language字段，daily_status英文按作者/作品展示，旧条目中文书名号及坏文件后备保持。英文3条Emerson Self-Reliance及1条Hamlet，核对全文来源见词库README。
+- acknowledgments.json新增wikidog/既有QQ65387222/建议中英文名句/2026-11-10，不改旧Windows建议、不增加捐款。Frame原状态区/Glade/adapter与Help菜单入口不变。
+- 本Mac实际testDailyStatusGtk通过（新增双语/来源、原日期稳定/循环、700/900宽对齐、状态/错误优先、进度/计时器清理）；英文Label及真实致谢Dialog精确行检查通过，截图/tmp/p4vasp-{english-quote,wikidog-credit}.png已查看。JSON解析、编译/diff通过；非跨平台或EXE验收，无原生修改。任务完成，重启生效；既有cODP生成差异保留。
+
 ## Help and Support 图片整理（2026-11-11）
 
 - 按用户要求新增根目录figures/，迁移根目录3张原图与data/community三张运行时图片，逐字节对比HEAD均相同；新增用户已移入checkout的QQgroup_V.jpg（大师兄科研群-V，1012023869），原图保留、仅内存裁剪。图标/字体位图/历史文档截图保留原路径；已向用户说明此范围，未收到扩大范围答复。

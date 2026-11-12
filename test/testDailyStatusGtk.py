@@ -21,7 +21,9 @@ def drain():
 
 driver=msg();label=driver.statusbar;progress=driver.progressbar
 records=load_quotes();day=date(2026,11,4)
-assert len(records)==12
+assert len(records)==16
+assert sum(r.get('language')=='en' for r in records)==4
+assert sum(r.get('language')=='zh' for r in records)==12
 assert quote_for_day(records,day)==quote_for_day(records,day)
 assert quote_for_day(records,day)!=quote_for_day(records,day+timedelta(days=1))
 assert quote_for_day(records,day)==quote_for_day(records,day+timedelta(days=len(records)))
@@ -40,6 +42,12 @@ for width in (900,700):
     assert fx>=frame.xml.get_widget('toolbar').get_allocated_width()
 window.resize(900,650);drain()
 Gdk.pixbuf_get_from_window(window.get_window(),0,0,window.get_allocated_width(),window.get_allocated_height()).savev('/tmp/p4vasp-daily-quote.png','png',[],[])
+for language in ('zh','en'):
+    sample_day=next(day+timedelta(days=i) for i in range(len(records)) if quote_for_day(records,day+timedelta(days=i)).get('language')==language)
+    driver.daily_status.refresh(sample_day);drain()
+    assert quote_for_day(records,sample_day)['text'] in label.get_text()
+    assert label.create_pango_layout(label.get_text()).get_unknown_glyphs_count()==0
+    assert quote_for_day(records,sample_day)['url'] in label.get_tooltip_text()
 driver.status('Parsing synthetic file');driver.step(1,3);drain()
 assert label.get_text()=='Parsing synthetic file' and progress.get_visible()
 driver.daily_status.refresh(day+timedelta(days=1))
