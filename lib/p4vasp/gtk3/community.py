@@ -1,6 +1,7 @@
 """User-supplied community QR images; originals are never rewritten."""
 import ctypes
 import ctypes.util
+import sys
 from pathlib import Path
 
 import p4vasp
@@ -15,11 +16,16 @@ def load_chinese_font():
     global _font_loaded
     if _font_loaded:
         return
+    if sys.platform == 'darwin':
+        # Quartz uses PangoCoreTextFontMap, not PangoFcFontMap. Passing it to
+        # pango_fc_* can crash the process; use macOS's system CJK fonts.
+        _font_loaded = True
+        return
     path = Path(p4vasp.p4vasp_home)/'data/fonts/NotoSansSC-Regular.otf'
     try:
         if not path.is_file():
             return
-        if __import__('sys').platform == 'win32':
+        if sys.platform == 'win32':
             loaded = ctypes.windll.gdi32.AddFontResourceExW(str(path), 0x10, None)
         else:
             library = ctypes.util.find_library('fontconfig')
@@ -39,7 +45,7 @@ def load_chinese_font():
             gi.require_version('PangoCairo', '1.0')
             from gi.repository import PangoCairo
             font_map = PangoCairo.FontMap.get_default()
-            if __import__('sys').platform != 'win32':
+            if sys.platform != 'win32':
                 # Pango may own a separate FcConfig once GTK has rendered text.
                 # Register against that config too, then invalidate its font cache.
                 cairo = ctypes.CDLL(ctypes.util.find_library('pangocairo-1.0'))

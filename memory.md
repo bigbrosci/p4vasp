@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-10. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-11. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## macOS Resources字体崩溃修复（2026-11-11）
+
+- 用户点击Database → Resources出现PANGO_IS_FC_FONT_MAP断言及SIGSEGV。community.load_chinese_font在darwin直接使用系统中文字体，避免将CoreText映射传给PangoFc；Linux/Windows加载路径保留。入口仍为frame菜单→DBApplet/ResourceHubApplet→resources.glade/GTK3 adapter→CommunityPage，无布局或原生改动。
+- 本Mac实际DBApplet启动检查、8项GTK3回归通过；中文无缺字、三张二维码、复制群号、放大弹窗和重复调用检查通过；真实映射900×640窗口截图/tmp/p4vasp-macos-community.png已查看，中文/按钮/二维码完整。沙箱GUI初次退出134，桌面权限执行后通过；临时脚本首轮Pango导入错误已更正，Offscreen初图裁切后改真实窗口确认。Offscreen弹窗Gdk origin警告及既有主题SVG/弃用警告不计作全部清理。
+- 纯Python修复，重启p4v即可；未重编译、跨平台复测或打包EXE。既有odpdom/cODP.py生成差异保留不提交。任务完成，下一步用户实际点击复核；不自动执行其他旧待办。详情见update_history/update_2026_11_11.md。
 
 ## Windows新版构建交付（2026-11-10）
 
