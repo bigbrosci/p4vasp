@@ -69,6 +69,7 @@ def load_chinese_font():
 
 CONTACTS = (
     ('QQ群', 'p4vasp · 群号 1131610080', 'qq.jpg', (215, 850, 855, 855)),
+    ('QQ群 V', '大师兄科研群-V · 群号 1012023869', 'QQgroup_V.jpg', (200, 740, 885, 885)),
     ('微信', 'BigBroSci · 扫码添加微信', 'wechat.jpg', (120, 360, 870, 870)),
     ('微信公众号', '扫码关注公众号', 'public-account.jpg', None),
 )
@@ -149,7 +150,7 @@ class CommunityPage(Gtk.ScrolledWindow):
             caption.set_max_width_chars(22)
             card.pack_start(caption, False, False, 0)
             try:
-                original = GdkPixbuf.Pixbuf.new_from_file(str(Path(p4vasp.p4vasp_home)/'data/community'/filename))
+                original = GdkPixbuf.Pixbuf.new_from_file(str(Path(p4vasp.p4vasp_home)/'figures'/filename))
                 qr = qr_image(original, crop)
                 button = Gtk.Button()
                 button.add(Gtk.Image.new_from_pixbuf(scaled(qr, 200/qr.get_width())))

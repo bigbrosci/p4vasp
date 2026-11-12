@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-11. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Help and Support 图片整理（2026-11-11）
+
+- 按用户要求新增根目录figures/，迁移根目录3张原图与data/community三张运行时图片，逐字节对比HEAD均相同；新增用户已移入checkout的QQgroup_V.jpg（大师兄科研群-V，1012023869），原图保留、仅内存裁剪。图标/字体位图/历史文档截图保留原路径；已向用户说明此范围，未收到扩大范围答复。
+- Database → Resources → Help and Support替换旧中文页签；CommunityPage加载figures/下四张二维码，现有p4vasp群号复制不变。Windows spec增加figures，未重打包。指南、figures README和旧目录迁移说明同步。
+- 本Mac实际testCommunityGtk（四图、裁剪、中文、剪贴板、缩放/原图/窄窗口）、testResourceHubGtk（含英文页签）及DBApplet启动通过；真实950×750页面截图/tmp/p4vasp-support-four.png已查看，四图/相邻控制完整。Resources退出仍有Vector析构警告及旧主题SVG警告，未修复；手机扫码有效性/其他平台/新EXE未验证。编译与diff检查通过，无原生变更。既有cODP.py差异保留不提交。
+- 任务完成；后续按新指令，未自动迁移程序内部位图。详情见update_history/update_2026_11_11.md新增章节。
+
 ## macOS Resources字体崩溃修复（2026-11-11）
 
 - 用户点击Database → Resources出现PANGO_IS_FC_FONT_MAP断言及SIGSEGV。community.load_chinese_font在darwin直接使用系统中文字体，避免将CoreText映射传给PangoFc；Linux/Windows加载路径保留。入口仍为frame菜单→DBApplet/ResourceHubApplet→resources.glade/GTK3 adapter→CommunityPage，无布局或原生改动。

@@ -534,17 +534,17 @@ Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构�
 
 ### Useful tools and links
 
-Database → Resources 的顶部标签为 Databases、Useful tools and links、交流与支持；p4vasp data 已移至 Models 最右侧。Useful tools and links 包含 [VASPwiki](https://vasp.at/wiki/Main_page) 、[大师兄网站](https://www.bigbrosci.com/zh-cn/latest/)、[ASE](https://docs.ase-lib.org/)、[Pymatgen](https://pymatgen.org/)、[phonopy](https://phonopy.github.io/phonopy/) 和 [Cantera](https://cantera.org/)。点击卡片后，下方显示网址并自动复制到剪贴板，与 Databases 相同；剪贴板不可用时可选中网址按 Ctrl+C。
+Database → Resources 的顶部标签为 Databases、Useful tools and links、Help and Support；p4vasp data 已移至 Models 最右侧。Useful tools and links 包含 [VASPwiki](https://vasp.at/wiki/Main_page) 、[大师兄网站](https://www.bigbrosci.com/zh-cn/latest/)、[ASE](https://docs.ase-lib.org/)、[Pymatgen](https://pymatgen.org/)、[phonopy](https://phonopy.github.io/phonopy/) 和 [Cantera](https://cantera.org/)。点击卡片后，下方显示网址并自动复制到剪贴板，与 Databases 相同；剪贴板不可用时可选中网址按 Ctrl+C。
 
 ## 关于与贡献署名
 
 Help → About 分别列出原作者 Orest Dubay、Python 2→3 移植的主要贡献者 Bigbrosci／Whitehare2023，以及 p4vasp-py3 后续维护与新功能开发者 Bigbrosci。保留原版权、既有GPL许可及无担保声明；详见 [版权与贡献说明](../AUTHORS.md)。关于窗口内容可选中复制、滚动，较长路径也会折行。
 
-### 交流与支持
+### Help and Support
 
-打开 **Database → Resources → 交流与支持**，可查看p4vasp QQ群、微信和微信公众号二维码。点击二维码打开大图，可选择适应窗口、100%、缩放或查看原图；大图可滚动，关闭按钮在底部。QQ群号1131610080可直接复制，微信显示的是昵称BigBroSci。
+打开 **Database → Resources → Help and Support**，可查看p4vasp QQ群、大师兄科研群-V（群号1012023869）、微信和微信公众号二维码。点击二维码打开大图，可选择适应窗口、100%、缩放或查看原图；大图可滚动，关闭按钮在底部。QQ群号1131610080可直接复制，微信显示的是昵称BigBroSci。
 
-Linux/Windows 使用程序自带的开源中文字体，仅在本程序内加载；macOS 使用系统中文字体，避免调用不兼容的 Fontconfig 后端。无需手动安装字体。图片在 `data/community/`，更换方法见该目录README。图片来源为维护者提供，手机扫码及二维码有效期需实际确认。
+Linux/Windows 使用程序自带的开源中文字体，仅在本程序内加载；macOS 使用系统中文字体，避免调用不兼容的 Fontconfig 后端。无需手动安装字体。图片在 `figures/`，更换方法见该目录 README。图片来源为维护者提供，手机扫码及二维码有效期需实际确认。
 
 ### 可选建模依赖的安装提示
 

@@ -135,7 +135,7 @@ class ResourceHubApplet(Applet):
         notebook.append_page(self.useful_tools, Gtk.Label(label='Useful tools and links'))
         from p4vasp.gtk3.community import CommunityPage
         self.community = CommunityPage(self.parent_window)
-        notebook.append_page(self.community, Gtk.Label(label='交流与支持'))
+        notebook.append_page(self.community, Gtk.Label(label='Help and Support'))
         self.xml.get_widget('resource_host').pack_start(notebook, True, True, 0)
         self.refresh(); self.panel.show_all()
 

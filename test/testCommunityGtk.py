@@ -20,13 +20,13 @@ page = CommunityPage(lambda: window)
 window.add(page)
 window.show_all()
 drain()
-assert len(page.buttons) == 3
+assert len(page.buttons) == 4
 assert page.create_pango_layout('交流与支持 微信 微信公众号 群号 关闭 适应窗口 查看原图').get_unknown_glyphs_count() == 0
 page.copy_button.clicked()
 assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == '1131610080'
 root = Path(__file__).resolve().parents[1]
 for title, detail, filename, crop in CONTACTS:
-    original = GdkPixbuf.Pixbuf.new_from_file(str(root/'data/community'/filename))
+    original = GdkPixbuf.Pixbuf.new_from_file(str(root/'figures'/filename))
     if crop:
         x, y, w, h = crop
         assert x >= 0 and y >= 0 and x+w <= original.get_width() and y+h <= original.get_height()
@@ -54,4 +54,4 @@ loop.run()
 drain()
 assert page.get_allocated_width() <= 420
 window.destroy()
-print('Community GTK: Chinese glyphs, three QR images, crop bounds, clipboard, zoom/original and narrow layout passed')
+print('Community GTK: Chinese glyphs, four QR images, crop bounds, clipboard, zoom/original and narrow layout passed')

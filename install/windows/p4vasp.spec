@@ -9,7 +9,7 @@ hidden += ['numpy', 'cairo', 'gi.repository.PangoCairo', 'gi.repository.GdkPixbu
            'p4vasp.render_studio', 'p4vasp.render_recipe']
 a = Analysis(
     [str(root / 'p4v.py')], pathex=[str(root / 'lib')],
-    binaries=[], datas=[(str(root / 'data'), 'data'), (str(root / 'LICENSE'), '.'),
+    binaries=[], datas=[(str(root / 'data'), 'data'), (str(root / 'figures'), 'figures'), (str(root / 'LICENSE'), '.'),
                        (str(Path(sys.prefix)/'share/licenses'), 'dependency-licenses')],
     hiddenimports=hidden, hookspath=[],
     runtime_hooks=[str(root / 'install/windows/runtime_hook.py')],
