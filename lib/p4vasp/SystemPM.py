@@ -1178,6 +1178,23 @@ class PoscarSystemPM(SystemPM):
 
 
 
+class XdatcarSystemPM(SystemPM):
+    """A trajectory with independent initial/final frames and no inferred results."""
+    def __init__(self,path):
+        from p4vasp.xdatcar import XdatcarSequence
+        path=os.path.abspath(os.fspath(path))
+        sequence=XdatcarSequence(path)
+        SystemPM.__init__(self,path)
+        self.add('PATH',os.path.dirname(path))
+        self.add('NAME',os.path.basename(path))
+        self.add('PROGRAM','XDATCAR')
+        self.add('INCAR',Incar())
+        self.add('INITIAL_STRUCTURE',sequence[0])
+        self.add('FINAL_STRUCTURE',sequence[-1])
+        self.add('STRUCTURE_SEQUENCE',sequence)
+        self.add('STRUCTURE_SEQUENCE_L',sequence)
+
+
 class DoscarSystemPM(SystemPM):
     """Standalone total DOS, including Fermi energy, without requiring a POSCAR."""
     def __init__(self,path="DOSCAR"):
@@ -1243,6 +1260,8 @@ def getSystem(path):
     path=os.fspath(path)
     if os.path.isdir(path):
         return OldSystemPM(path)
+    elif os.path.basename(path).upper()=="XDATCAR":
+        return XdatcarSystemPM(path)
     elif os.path.basename(path).upper()=="OUTCAR":
         return VibrationSystemPM(path)
     elif os.path.basename(path).upper()=="DOSCAR":

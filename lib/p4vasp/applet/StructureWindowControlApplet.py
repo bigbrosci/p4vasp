@@ -62,6 +62,7 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         self.charge_density_fileselection=None
         self.subtrchgcar=None
         self.chgcar=None
+        self.play_flag=0
     def notifyAtomSelection(self, sel,origin):
         pass
 ##    self.atom_selection.set_text(sel.encode(self.structure))
@@ -71,6 +72,7 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
 #      self.swin().selectAtom(i,nx,ny,nz)
 
     def setSystem(self,s):
+        if s is not self.system and self.play_flag:self.on_stop_clicked_handler(None)
         self.system=s
         self.updateSystem()
 
@@ -119,7 +121,7 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
                     omenu.set_history(I)
                 I+=1
             if swsystem.STRUCTURE_SEQUENCE_L is not None:
-                item=gtk.MenuItem("Arbitrary Sequence")
+                item=gtk.MenuItem("XDATCAR trajectory" if swsystem.PROGRAM=="XDATCAR" else "Arbitrary Sequence")
                 item.connect("activate",self.on_structureitem_clicked_handler,
                 swa.UNDEFINED_SEQUENCE)
                 menu.append(item)
@@ -437,7 +439,13 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
 #    print "setStructure"
 
     def setSeqIndex(self,index):
-        self.getSWinApplet().setIndex(index)
+        owner=self.getSWinApplet()
+        switched=False
+        if owner.system is not None and owner.system.PROGRAM=='XDATCAR':
+            switched=owner.sequencetype!=owner.UNDEFINED_SEQUENCE
+            owner.sequencetype=owner.UNDEFINED_SEQUENCE
+        owner.setIndex(index)
+        if switched:self.createMenuItems()
         index=self.getSWinApplet().index
         entry=self.xml.get_widget("seq_entry")
         if entry is not None:
@@ -454,6 +462,11 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         self.setSeqIndex(self.getSWinApplet().index-1)
 
     def on_play_clicked_handler(self,w):
+        if getattr(self,'play_flag',0):self.on_stop_clicked_handler(w)
+        owner=self.getSWinApplet()
+        if owner.system is not None and owner.system.PROGRAM=='XDATCAR':
+            if owner.sequencetype!=owner.UNDEFINED_SEQUENCE or owner.index>=len(owner.system.STRUCTURE_SEQUENCE_L)-1:
+                self.setSeqIndex(0)
         index=self.getSWinApplet().index
         self.play_flag=1
         self.play_id=gobject.timeout_add(200,self.play_callback)
@@ -783,6 +796,7 @@ class StructureWindowControlApplet(Applet,p4vasp.Selection.SelectionListener):
         self.swin().redraw()
 
     def destroy(self):
+        self.on_stop_clicked_handler(None)
         if self.applet_activated in applets().notify_on_activate:
             applets().notify_on_activate.remove(self.applet_activated)
 

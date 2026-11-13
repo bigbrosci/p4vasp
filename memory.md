@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-12. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-13. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## XDATCAR完整轨迹与Control播放（2026-11-13）
+
+- 用户放入根目录XDATCAR，报告只能显示最后结构。getSystem原走PoscarSystemPM、缺少轨迹属性。新增xdatcar.XdatcarSequence按帧文件偏移索引，逐帧用Structure/POSCAR读取（支持Direct/Cartesian、VASP4/5、重复完整头变胞、坏/缺帧拒绝），无需ASE；XdatcarSystemPM提供完整序列和独立首末快照，不推断邻目录能量/力。
+- 原frame.glade Control→swincontrol.glade/GTK3 adapter→StructureWindowControlApplet/StructureWindowApplet链保持。XDATCAR默认完整轨迹，菜单名XDATCAR trajectory；单帧Initial/Final看首末，播放/步进自动回全序列，到末停止再播重头，重复播放不叠计时器，换系统/销毁停止；普通POSCAR返回初始视图，XML序列语义保留。源文件必须原位不变，新增帧需重开，序号从0起。
+- 本Linux实际GTK/原生CLI及File/Open、首末/前后、定时进帧/暂停/重播/重复点击、返回POSCAR通过；用户根目录XDATCAR只读识别71原子1000帧，原生核对0/499/999坐标与中段定时前进。Control及两张原生帧图已查看。3专项（含变胞/VASP4/截断/非有限）、现有ASE导入实际GTK、8 GTK及33面板启动（不含GLUT）通过；编译/diff通过。GUI初轮检查导入顺序及返回POSCAR样例缺CONTCAR已纠正，最终重跑通过，不计失败为通过。
+- 文档usage_commands/GTK架构/当日双语同步。证据/tmp/p4vasp-xdatcar-{gtk,import-regression,gtk-base,smoke}.log。未跨平台/重打EXE，无原生改动不需重编译；用户XDATCAR保持未跟踪不提交。任务完成，重启源码版生效；不自动构建Windows。
 
 ## 半月总结与最新Windows交付（2026-11-12）
 

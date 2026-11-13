@@ -84,6 +84,13 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
         if not self.pin_status:
             if x is not self.system and self.swin is not None:
                 self.swin._needs_initial_fit=True
+            if x is not self.system and x is not None:
+                if x.PROGRAM=='XDATCAR':
+                    self.sequencetype=self.UNDEFINED_SEQUENCE
+                    self.index=0
+                elif self.system is not None and self.system.PROGRAM=='XDATCAR':
+                    self.sequencetype=self.INITIAL_SEQUENCE
+                    self.index=0
             self.system=x
             self.updateSystem()
 

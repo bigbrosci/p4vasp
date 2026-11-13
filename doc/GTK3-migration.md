@@ -203,3 +203,24 @@ The frequency page now uses the homogeneous grid described above, superseding
 its former deferred orientation changes. The GUI regression measures all nine
 button/icon allocations and alternates narrow/wide sizes while checking equal
 cell widths, matching row heights and frequency-table bounds.
+
+## XDATCAR trajectory playback (2026-11-13)
+
+`getSystem` dispatches XDATCAR to XdatcarSystemPM, not PoscarSystemPM.
+`xdatcar.py` indexes validated frame offsets and parses individual frames through
+Structure's POSCAR reader; no ASE dependency or all-frame geometry cache.
+Initial/final are independent snapshots. Repeated complete headers allow
+per-frame cells; keep the source file unchanged while open.
+
+The existing frame.glade Control ToolButton and swincontrol.glade resources load
+through the unchanged GTK3 adapter. StructureWindowApplet defaults XDATCAR to
+its full structure sequence. StructureWindowControlApplet labels it XDATCAR
+trajectory, switches single-frame endpoint views back to the sequence on step/play,
+restarts from the beginning at the end, and avoids duplicate playback timers.
+System changes/destruction stop the timer. XML trajectories retain their existing
+sequence semantics; no native renderer/binding changes.
+
+Focused checks: `test/testXdatcar.py`, `test/testXdatcarGtk.py` with PYTHONPATH=lib:src
+and P4VASP_HOME set to the checkout. The latter exercises real Frame/native viewer,
+CLI, File/Open, endpoints, timer progression and normal POSCAR return. Optional
+user XDATCAR samples are read only, not included in Git.
