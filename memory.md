@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-11. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-12. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 半月总结与最新Windows交付（2026-11-12）
+
+- 用户要求10/29—11/12半月汇总和最新EXE。中文28项功能/用法总结仅交付桌面：/mnt/c/Users/lqlhz/Desktop/p4vasp_近半个月更新总结_2026-10-29至2026-11-12.md；核对逐日记录与指南、UTF-8/围栏及桌面副本一致，不把历史平台测试写成本次通过。
+- Windows更新器从4add680023c752fdb01d60c6adbf0e55910ce482隔离重编译/冻结成功，日志build/windows-update/4add6800-n4026gyq。产物：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261112-211415-4add6800-gkmr_u_4\p4vasp.exe，同级同名.zip/.zip.sha256，SHA256=01e8e4261b52ffe6607fc6d2b3d65d5adff49ceb678f3eed035cb7f5e4f4ee6e。
+- 成品runtime/gui/models三报告ok=True；额外核对_internal/figures四张运行时图片及daily.json16条名句存在、SOURCE-COMMIT一致。成品帮助页人工交互/扫码、频率R25、另一台干净Windows未另验收；不以文件存在推断功能全通过。EXE/ZIP留Windows checkout，未另复制到桌面。本文档后续提交不改变已冻结源码，无待自动继续构建事项。
 
 ## 中英文每日一句与wikidog致谢（2026-11-11）
 
