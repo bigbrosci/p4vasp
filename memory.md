@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 扩展全层依赖审计（2026-11-14）
+
+- 用户补充“不限Python2/GTK，其他未知库也检查”。新增doc/dependency-inventory-2026-11-14-zh.md并与前份报告互链：覆盖科学/传递库、原生ELF、ctypes字体/平台接口、构建/文档命令、内置PDF/UUID/ODP、GLTT/xmllib及Windows冻结样包。无应用/环境修改。
+- 只读发行元数据：GTK Python3.14.4 NumPy2.3.5；ASE环境Python3.14.6/ASE3.29.0/NumPy2.5.4/SciPy1.18.1/Matplotlib3.11.2/Pillow13；SMILES环境RDKit2026.9.1/NumPy2.5.4/Pillow13。ASE元数据要求SciPy/Matplotlib/typing_extensions，RDKit要求NumPy/Pillow，不是无直接import就可删。新增实际stringformat缺xmllib，uuid/Collada/polyfunc仅导入通过。
+- readelf核对现役_cp4vasp9条直接NEEDED，系统GL/GLU/GLUT/FLTK及字体库可定位，glutInit符号存在但未开窗；Ubuntu脚本未显式列GLUT，干净设备依赖仍需核验。构建命令可找到，epydoc/doxygen/povray未找到，后者不等于.pov文件导出失败。
+- 11/12的4add680包作为静态样本（非当前源码新EXE）：GUI_internal1444文件154557675字节，worker_internal616文件180276495字节，176 DLL；NumPy双份隔离有ABI原因。worker有SciPy/PIL/RDKit，无Matplotlib目录，spec明确排除；目录清单非完整模块/功能验证。版本固定不覆盖全部间接依赖，pip list缓存不是安装锁文件。未联网、未跨平台运行/重建/GUI或用户数据操作，未生成完整SBOM/漏洞扫描；UTF8/链接/差异检查通过。只交付审计，待用户指定清理范围。
+
 ## Python2/旧GTK及冗余代码审计（2026-11-14）
 
 - 用户仅授权先找出来再清理，本轮无应用/安装/打包改动。报告doc/legacy-code-audit-2026-11-14-zh.md，基线38c344d；跟踪1740文件、282 Python AST全解析通过（3.14.6），静态导入/注册/Glade/构建/冻结/重复内容核对。238旧名候选含compat别名/局部变量等假阳性，不作错误计数。
