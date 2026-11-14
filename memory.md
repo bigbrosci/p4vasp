@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-13. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Python2/旧GTK及冗余代码审计（2026-11-14）
+
+- 用户仅授权先找出来再清理，本轮无应用/安装/打包改动。报告doc/legacy-code-audit-2026-11-14-zh.md，基线38c344d；跟踪1740文件、282 Python AST全解析通过（3.14.6），静态导入/注册/Glade/构建/冻结/重复内容核对。238旧名候选含compat别名/局部变量等假阳性，不作错误计数。
+- /usr/bin/python3 3.14.4临时对象探针复现Property.thread.isAlive AttributeError、StructuredDictionary.__cmp__缺cmp、SQLiteDBI(':memory:')缺pysqlite2、Color除法TypeError；VAC仍调用不存在time.clock为源码+环境证据未执行任务。历史PIL/QD分别缺Image/Qd，Tk2先缺tkinter且源码有Tkinter未绑定；PS/PDF/FIG/SVG仅导入通过，非导出验收。
+- 候选：loadGlade_old/data/glade、仍注册的Commit/LegacyDB/SQL链、旧Makefile python2及distutils入口、QuickDraw/wx/Tk/PIL后端、SetupProfile_old和旧生成文档。必须保留：现役GTK3/适配层/data/glade2、graph仍用的顶层gtk、compat全局别名、现役导出后端、FLTK/ODP源及SWIG生成/复制关系。doc/api925文件32094794字节不在Windows datas，不能把清理量等同EXE缩小。
+- 无GUI/科学/原生/跨平台测试，无用户计算/数据库操作；未读XDATCAR，保持未跟踪不提交。仅文档核对/UTF8/差异，详细检查范围和分批建议见报告。审计完成，下一步需用户指定清理批次，本记录不授权自动清理或构建。
 
 ## XDATCAR完整轨迹与Control播放（2026-11-13）
 
