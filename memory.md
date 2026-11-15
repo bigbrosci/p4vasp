@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第四批：PS/EPS/PDF文件输出（2026-11-14）
+
+- 用户继续，Windows明确最后打包。旧PS/PDF字符串写wb、PDF PathLike误走默认路径及压缩页Python2字节处理已修。新增piddle/fileio.py标准库ByteBuffer（Latin1单字节、实际tell偏移）及路径/二进制流输出边界；保留StringIO旧视图，拒普通文本文件流防UTF8/换行损坏；调用方流不关闭，路径with关闭，带前缀binary流xref保持绝对偏移。无全局getFileObject重写，其他旧后端不混入。
+- PS先收集/编码尾部，finally恢复code/文档页标记；PDF先完整序列化再开路径，序列化失败不截断已有文件（非磁盘故障原子事务）。PDFStream长度按字节，zlib.compress+标准base64.a85encode替代旧字节算法，终止符不被换行切开。源pdfdoc保留原Latin1编码，未新增库/改默认压缩策略/坐标/科学数据。
+- testVectorExport7项通过：真实中文/特殊字符路径PS/PDF、binary/StringIO不关流、压缩流独立解码、带前缀xref、多页混合压缩、拒文本流、编码失败保留文件及PS状态；独立核对xref/startxref对象偏移、声明流长和解码内容。修前5项失败，压缩检查最初需去除流末CRLF后解码，已区分检查修正。旧DrawingValues5通过。
+- 实际testVectorExportGtk通过DOS Export Data对话框Export按钮的PS/EPS/PDF写出、扩展名匹配、PDF结构及DOS样本不变，截图/tmp/p4vasp-vector-export-dialog.png已查看；57基础/8 GTK/33面板（不含GLUT）、编译/diff通过，证据/tmp/p4vasp-vector-{before,after,gtk,base,gtk-base,smoke}.log。无外部PDF/PS阅读器/渲染器（未安装）、任意Unicode字体/旧图像分支/跨平台/用户数据/新EXE验收。文档状态与双语同步，XDATCAR不提交；旧字典排序/历史组件及其他已列接口仍待后续，不自动升库。
+
 ## 旧接口第三批：绘图值比较及除法（2026-11-14）
 
 - 用户继续并明确Windows EXE最后统一更新。调用检查：现役Cairo透明色及PS/PDF状态缓存用==/!=，旧__cmp__未被Python3运算符调用；StructuredDictionary.__cmp__无现役调用/明确总排序语义，未改字典/序列化分派，不注入全局cmp。

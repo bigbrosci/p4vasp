@@ -183,7 +183,7 @@ class PDFCanvas(Canvas):
 
         if hasattr(file, 'write'):
             self.pdf.save(fileobj=file)
-        elif isinstance(file, str):
+        elif isinstance(file, (str, os.PathLike)):
             self.pdf.save(filename=file)
         else:
             self.pdf.save()

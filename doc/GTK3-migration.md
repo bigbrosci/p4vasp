@@ -241,6 +241,29 @@ are retained; protocol-2/current pickle roundtrips passed, but historical user
 XML sessions were not validated. Focused checks: test/testDrawingValues.py and,
 with a display, test/testDrawingValuesGtk.py.
 
-PS/PDF text-stream generation passed; direct path output still fails on existing
-str/bytes mixing. That is a separate pending export fix, not resolved by value
-semantics. No new third-party dependency or native rebuild is needed.
+PS/PDF file output was repaired in the subsequent byte-output batch below.
+No new third-party dependency or native rebuild is needed.
+
+## PS/PDF byte output (2026-11-14)
+
+The existing Graph export dialog still loads graphwindow.glade through the GTK3
+adapter and dispatches Export.exportPS/exportEPS/exportPDF. A small internal
+piddle/fileio.py buffers legacy Latin-1 strings into bytes, keeping PDF offsets
+byte-based; paths are written in binary mode and closed by the exporter. Caller
+binary streams stay open. StringIO remains a legacy in-memory text view; actual
+text-file streams are rejected to avoid encoding/newline corruption. PathLike
+PDF paths are supported. Prefixed binary streams retain correct absolute xrefs.
+
+PS finalization state is restored even on encoding errors. Serialization happens
+before opening a target path, so serialization errors do not truncate an existing
+file; this is not an atomic-write guarantee against disk errors. PDF page streams
+use actual byte lengths; optional zlib/ASCII85 compression uses standard-library
+byte APIs. Existing old image/PIL helpers are not modernized by this change.
+
+Focused checks: test/testVectorExport.py and test/testVectorExportGtk.py.
+Tests validate xref/startxref, object/stream offsets, decompress content, multiple
+pages, ownership and failed serialization. Actual DOS dialog output was verified
+for PS/EPS/PDF without modifying DOS samples. No external PS/PDF renderer is
+available here: signatures/structure/decoded streams are checked, not visual
+rendering by an independent reader. Unicode file paths are supported; arbitrary
+Unicode font embedding and historical image branches remain outside this batch.

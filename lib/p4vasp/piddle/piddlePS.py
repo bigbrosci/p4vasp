@@ -39,6 +39,7 @@ piddlePS - a PostScript backend for the PIDDLE drawing module
 
 from p4vasp.piddle.piddle import *
 import string, io
+from p4vasp.piddle.fileio import write_bytes
 import p4vasp.piddle.piddlePSmetrics as piddlePSmetrics # for font info
 import math
 
@@ -426,32 +427,21 @@ translate
 
         # save() will now become part of the spec.
         file = file or self.filename
-        fileobj = getFileObject(file)
-        fileobj.write(string.join(self.code, linesep))
-        # here's a hack. we might want to be able to add more after saving so
-        # preserve the current code ???
         preserveCode = self.code
-        self.code = finalizationCode = [""]
-
-        # might be able to move these things into DSC class & use a save state call
         preserve_inPageFlag = self._inPageFlag
         preserve_inDocumentFlag = self._inDocumentFlag
-
-        # now do finalization code in via self.code
-        # first question: are we in the middle of a page?
-
-        if self._inPageFlag:
-            self.psEndPage()
-
-        self.psEndDocument()  # depends on _inDocumentFlag :(
-
-        fileobj.write(string.join(finalizationCode, linesep))
-        #  fileobj.close()  ### avoid this for now
-        ## clean up my mess: This is not a good way to do things FIXME!!! ???
-        self.code = preserveCode
-        self._inPageFlag = preserve_inPageFlag
-        self._inDocumentFlag = preserve_inDocumentFlag
-
+        try:
+            self.code = [""]
+            if self._inPageFlag:
+                self.psEndPage()
+            self.psEndDocument()
+            content=string.join(preserveCode,linesep)+string.join(self.code,linesep)
+            data=content.encode('latin-1')
+        finally:
+            self.code=preserveCode
+            self._inPageFlag=preserve_inPageFlag
+            self._inDocumentFlag=preserve_inDocumentFlag
+        write_bytes(file,data)
 
 
     def stringWidth(self, s, font=None):

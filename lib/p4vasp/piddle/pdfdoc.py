@@ -33,6 +33,8 @@ except:
 
 from p4vasp.piddle.pdfgeom import bezierArc
 
+from p4vasp.piddle.fileio import ByteBuffer,stream_offset,write_bytes
+import base64
 import p4vasp.piddle.pdfutils as pdfutils
 from p4vasp.piddle.pdfutils import LINEEND   # this constant needed in both
 import p4vasp.piddle.pdfmetrics
@@ -165,15 +167,13 @@ class PDFDocument:
         f.write(str(self.startxref)  + LINEEND)
 
     def SaveToFile(self, filename):
-        fileobj = open(filename, 'wb')
-        self.SaveToFileObject(fileobj)
-        fileobj.close()
+        self.SaveToFileObject(filename)
 
     def SaveToFileObject(self, fileobj):
         """Open a file, and ask each object in turn to write itself to
         the file.  Keep track of the file position at each point for
         use in the index at the end"""
-        f = fileobj
+        f = ByteBuffer(stream_offset(fileobj))
         i = 1
         self.xref = []
         f.write("%PDF-1.2" + LINEEND)  # for CID support
@@ -188,6 +188,7 @@ class PDFDocument:
         self.writeXref(f)
         self.writeTrailer(f)
         f.write('%%EOF')  # no lineend needed on this one!
+        write_bytes(fileobj,f.getvalue())
 
         # with the Mac, we need to tag the file in a special
         #way so the system knows it is a PDF file.
@@ -469,25 +470,20 @@ class PDFStream(PDFObject):
         if self.data == None:
              self.data = TestStream
 
+        raw=self.data.encode('latin-1') if isinstance(self.data,str) else self.data
         if self.compression == 1:
-            comp = zlib.compress(self.data)   #this bit is very fast...
-            base85 = pdfutils._AsciiBase85Encode(comp) #...sadly this isn't
-            wrapped = pdfutils._wrap(base85)
-            data_to_write = wrapped
+            encoded=base64.a85encode(zlib.compress(raw)).decode('ascii')
+            data_to_write=(pdfutils._wrap(encoded)+'~>').encode('ascii')
         else:
-            data_to_write = self.data
-        # the PDF length key should contain the length including
-        # any extra LF pairs added by Print on DOS.
-
-        #lines = len(string.split(self.data,'\n'))
-        #length = len(self.data) + lines   # one extra LF each
-        length = len(data_to_write) + len(LINEEND)    #AR 19980202
+            data_to_write=raw
+        ending=LINEEND.encode('ascii')
+        length=len(data_to_write)+len(ending)
         if self.compression:
             file.write('<< /Length %d /Filter [/ASCII85Decode /FlateDecode]>>' % length + LINEEND)
         else:
             file.write('<< /Length %d >>' % length + LINEEND)
         file.write('stream' + LINEEND)
-        file.write(data_to_write + LINEEND)
+        file.write(data_to_write+ending)
         file.write('endstream' + LINEEND)
 
 class PDFImage(PDFObject):
