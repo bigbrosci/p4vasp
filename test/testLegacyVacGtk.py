@@ -39,6 +39,8 @@ def main():
                 time.sleep(.002)
             assert not len(scheduler())
         drain();frame=getAppletFrame();systemlist()[0].add('CSTRUCTURE_SEQUENCE_L',frames)
+        systemlist()[0].add('PARAMETERS',{'POTIM':2})
+        callback_errors=[];sys.excepthook=lambda *args:callback_errors.append(args)
         applet=appletfactory().create('p4vasp.applet.VACApplet.VACApplet');frame.showApplet(applet);drain()
         applet.xml.get_widget('multi').set_active(False)
         applet.xml.get_widget('init_entry').set_text('0')
@@ -47,11 +49,34 @@ def main():
         assert abs(applet.vac[0]-1)<1e-12
         assert applet.xml.get_widget('fft_button').get_sensitive()
         assert applet.canvas is not None and len(applet.graphdata[0][0])==4
+        original_vac=applet.vac.copy()
+        applet.xml.get_widget('optionmenu1').set_active(1);drain()
+        assert applet.showtype==1
+        for count in (4,5):
+            for filtered in (False,True):
+                applet.vac=original_vac.copy() if count==4 else np.r_[original_vac,original_vac[-1]*.9]
+                applet.xml.get_widget('filter_button').set_active(filtered)
+                assert applet.xml.get_widget('wleft_entry').get_sensitive()==filtered
+                applet.xml.get_widget('wleft_entry').set_text('7')
+                applet.xml.get_widget('wright_entry').set_text('7')
+                applet.xml.get_widget('wpolyn_entry').set_text('3')
+                applet.xml.get_widget('fft_button').clicked();drain()
+                assert len(applet.freq)==count and np.isfinite(applet.freq).all()
+                assert len(applet.graphdata[0][0])==count//2
+                if not filtered:np.testing.assert_allclose(applet.freq,np.abs(np.fft.fft(applet.vac)),rtol=1e-12)
+        for index in range(4):
+            applet.xml.get_widget('winopt').set_active(index)
+            applet.xml.get_widget('fft_button').clicked();drain()
+            assert applet.windowfunction==index and np.isfinite(applet.freq).all()
+        applet.xml.get_widget('optionmenu1').set_active(2);drain()
+        assert applet.showtype==2
+        assert len(applet.graphdata)==2
         widget=frame.root_window;widget.resize(1200,850);drain();widget.check_resize();drain()
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
-        widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-legacy-vac.png')
+        widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-legacy-fft.png')
         assert not errors,errors
-        print('PASS actual VAC page / Calculate button / scheduler / finite numerical result / visible graph',flush=True)
+        assert not callback_errors,callback_errors
+        print('PASS actual VAC page / Read VAC / FFT button / odd-even / filter toggle / VAC+FFT graphs',flush=True)
 
 if __name__=='__main__':
     try:main()

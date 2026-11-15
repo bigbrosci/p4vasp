@@ -69,28 +69,19 @@ def savitzky_reg(data,position,dimension):
     newdat=sum(coefs*A[position])
     return newdat
 
+def _savitzky_golay_point(freq,index,nleft,nright,dimension):
+    # Clip both edges, including signals shorter than the requested window.
+    start=max(0,index-nleft)
+    stop=min(len(freq),index+nright+1)
+    data=freq[start:stop]
+    return savitzky_reg(data,index-start,min(dimension,len(data)))
+
+
 def savitzky_golay_filter(freq,nleft,nright,dimension):
-    """digital filter in the time domain. window
-    of dimension nleft+nright is moving along data.
-    data in the window are fitted by polynom of
-    dimension order.
-    """
-    freq_=[]
-    for i in range(len(freq)):
-        if i>=nleft and i<=(len(freq)-nright):
-            data=freq[i-nleft:i+nright+1]
-            position=nleft
-        elif i<nleft and i<=(len(freq)-nright):
-            data=freq[:i+nright+1]
-            position=len(data)-nright
-        elif i>=nleft and i>(len(freq)-nright):
-            data=freq[i-nleft:]
-            position=nleft
-        dimension_=dimension
-        if len(data)<dimension:dimension_=len(data)
-        regdat=savitzky_reg(data,position,dimension_)
-        freq_.append(regdat)
-    return freq_
+    """Local polynomial fit; dimension is the historical number of terms."""
+    if nleft<0 or nright<0 or dimension<0:raise ValueError('Filter parameters must be nonnegative.')
+    if dimension==0:return list(freq)
+    return [_savitzky_golay_point(freq,i,nleft,nright,dimension) for i in range(len(freq))]
 
 def window_function(vac,param):
     """window function for filtering
@@ -321,7 +312,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
 
         freq=self.freq
         if len(freq):
-            outf=zeros((len(freq)/2,2),Float)
+            outf=zeros((len(freq)//2,2),Float)
             try:
                 timestep=self.system.PARAMETERS["POTIM"]*1e-15
             except:
@@ -329,7 +320,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
                 l=self.xml.get_widget("selectionlabel")
                 l.set_markup("<span foreground=\"red\">POTIM not known, using 1.\nResult is not correctly scaled.</span>")
                 timestep=1e-15
-            for i in range(len(freq)/2):
+            for i in range(len(freq)//2):
                 point=i/float(len(freq))/2.997925e10/timestep
                 outf[i]=[point,2/self.Wss*freq[i]*0.7]
             self.setGraphData([[outf]])
@@ -371,20 +362,9 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
         self.updateGraph()
 
     def on_filter_button_toggled_handler(self,*arg):
-        if self.xml.get_widget("wleft_entry").state==4:
-            self.xml.get_widget("wleft_entry").set_sensitive(True)
-            self.xml.get_widget("wright_entry").set_sensitive(True)
-            self.xml.get_widget("wpolyn_entry").set_sensitive(True)
-            self.xml.get_widget("wleft_lab").set_sensitive(True)
-            self.xml.get_widget("wright_lab").set_sensitive(True)
-            self.xml.get_widget("wpolyn_lab").set_sensitive(True)
-        else:
-            self.xml.get_widget("wleft_entry").set_sensitive(False)
-            self.xml.get_widget("wright_entry").set_sensitive(False)
-            self.xml.get_widget("wpolyn_entry").set_sensitive(False)
-            self.xml.get_widget("wleft_lab").set_sensitive(False)
-            self.xml.get_widget("wright_lab").set_sensitive(False)
-            self.xml.get_widget("wpolyn_lab").set_sensitive(False)
+        enabled=self.xml.get_widget('filter_button').get_active()
+        for name in ('wleft_entry','wright_entry','wpolyn_entry','wleft_lab','wright_lab','wpolyn_lab'):
+            self.xml.get_widget(name).set_sensitive(enabled)
     def on_multi_toggled_handler(self,*arg):
         self.multi=self.xml.get_widget("multi").get_active()
 
@@ -396,16 +376,26 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
     def fftGen(self):
         msg().status('Calculating window function')
         yield 1
+        if len(self.vac)<2:
+            msg().error('Read at least two VAC samples before FFT.')
+            return
+        filtered=self.xml.get_widget('filter_button').get_active()
+        if filtered:
+            try:
+                wleft=int(self.xml.get_widget('wleft_entry').get_text())
+                wright=int(self.xml.get_widget('wright_entry').get_text())
+                wpolyn=int(self.xml.get_widget('wpolyn_entry').get_text())
+                if min(wleft,wright,wpolyn)<0:raise ValueError
+            except ValueError:
+                msg().error('Filter widths and polynomial terms must be nonnegative integers.')
+                return
         if self.windowfunction!=0:
             windowfunction=window_function(self.vac,self.windowfunction)
             vac=self.vac*windowfunction
         else: vac=self.vac*1
         self.freq=abs(fft(vac))
         yield 1
-        if self.xml.get_widget("wleft_entry").state!=4:
-            wleft=int(self.xml.get_widget("wleft_entry").get_text())
-            wright=int(self.xml.get_widget("wright_entry").get_text())
-            wpolyn=int(self.xml.get_widget("wpolyn_entry").get_text())
+        if filtered:
             scheduleFirst(self.savitzky_golay_filterGen(self.freq,wleft,wright,wpolyn))
             yield 1
         Wss=0
@@ -428,20 +418,9 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
             for i in range(len(freq)):
                 msg().step(i,len(freq))
                 yield 1
-                if i>=nleft and i<=(len(freq)-nright):
-                    data=freq[i-nleft:i+nright+1]
-                    position=nleft
-                elif i<nleft and i<=(len(freq)-nright):
-                    data=freq[:i+nright+1]
-                    position=len(data)-nright
-                elif i>=nleft and i>(len(freq)-nright):
-                    data=freq[i-nleft:]
-                    position=nleft
-                dimension_=dimension
-                if len(data)<dimension:dimension_=len(data)
-                regdat=savitzky_reg(data,position,dimension_)
+                regdat=_savitzky_golay_point(freq,i,nleft,nright,dimension)
                 freq_.append(regdat)
-            msg().step(i,len(freq))
+            msg().step(len(freq),len(freq))
             msg().step(0,1)
             self.freq=freq_
         else:

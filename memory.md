@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第二批：VAC/FFT与滤波（2026-11-14）
+
+- 用户“继续”按前批待办推进，仍不升级库。VAC.updateGraph数组/range的len(freq)/2改//2，保留Python2前半谱整数截断；fftGen及filter开关回调的两处.state改用get_active，六个输入/标签同步敏感状态。Read VAC→FFT及VAC/FFT/VAC+FFT菜单、四窗函数保留。
+- 测试暴露默认7+7窗大于短谱时data未初始化，以及左边缘拟合位置偏移；新增共享单点拟合按start/stop裁边，position=index-start，项数限可用样本，供纯函数/调度生成器共用。保留历史dimension为项数，0旁路；无效滤波参数或VAC不足2样本提示且不覆盖原结果。原幅度Wss/0.7及频轴转换未改，不宣称科学归一化完整正确。
+- 新testLegacyFFT六项（含子场景）：奇偶/4窗、解析8点单频、短序列大窗、两端多项式、坏参数及空/单点保护；与独立polynomial.polyfit及解析谱比较通过。前轮源码真实.state/未初始化data失败已复现；测试world双轴夹具补齐后通过。testLegacyVacGtk扩展真实按钮、过滤敏感、奇偶谱、实际下拉四窗/双图、信号异常捕获，最终截图/tmp/p4vasp-legacy-fft.png已查看。首轮真实控件暴露第二处.state及夹具缺POTIM，修正后全程重跑，不计失败通过。
+- 既有6线程/VAC、57基础、8 GTK、33面板（GLUT除外）及编译/diff通过；证据/tmp/p4vasp-fft-{before,after,gtk,runtime,base,gtk-base,smoke}.log。无用户轨迹读取/跨平台/EXE/原生重编；XDATCAR不提交。审计/用法/维护指南/双语同步，旧布局裁字保留。仍待旧比较/序列化/历史分支及VAC物理时间轴/归一化等独立核验；不自动扩大成库升级/清理。
+
 ## 保存基线与旧接口修复第一批（2026-11-14）
 
 - 用户授权保存当前能运行版本并开始；明确选择“先修复旧接口，暂不升级库”。修复前本机8 GTK及实际ASE导入/原生Show合成检查通过。源码49ff6cd建标签checkpoint/2026-11-14-before-legacy-interface-fixes并已推送；本机build/checkpoints/2026-11-14-49ff6cd-before-legacy-fixes保存Git源码archive、原有Linux扩展、三个新采环境快照及基线日志/README/SHA256SUMS，摘要全核对，临时独立目录解压+原生/源码导入通过。不是整机/venv镜像，标签不含二进制；本批不动库，原环境保留。备份目录已Git忽略，用户XDATCAR未纳入。
