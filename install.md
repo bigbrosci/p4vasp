@@ -319,30 +319,23 @@ The Windows packaging pipeline now builds a private official-CPython model-worke
 Windows打包流程已加入独立ASE／RDKit计算程序，首次构建下载专用缓存，不改系统Python。运行时自动调用，用户无需配置解释器路径；保留整个目录及model-worker。整包构建／交付以当日更新记录实际结果为准，11月1日旧包不因此自动获得依赖。
 
 
-Legacy Makefiles / 历史构建入口
-----------------------------
+Current native build / 当前原生构建入口
+-------------------------------------
 
-Install this Python 3 branch from the repository root with `bash install.sh`.
-To rebuild without installing system dependencies or launching the GUI, use
-`bash install.sh --build-only`. Platform wrappers use `install/build-unix-py3.sh`,
-which compiles the preserved src/ and odpdom/ sources directly.
-
-`src/Makefile`, `src/Makefile.MacOS` and `odpdom/Makefile` are historical Python 2
-builds, disabled by default with a migration message. This applies to clean
-recipes too. For deliberate historical inspection, for example:
+From the repository root:
 
 ```bash
-cd src
-make -n P4VASP_ALLOW_LEGACY_BUILD=1 clean
+bash install.sh
+# Rebuild only, without system package installation or GUI launch:
+bash install.sh --build-only
 ```
 
-The flag only bypasses the guard; it does not modernize Python 2 commands or
-make this route supported on Python 3. `-n` prints recipes without running them.
-Do not use the historical clean/build route to repair a current installation.
-Native C++/ODP sources, generated-wrapper locations and current installers remain
-in place. Legacy Glade resources and saved-profile classes are not removed.
+Platform wrappers use `install/build-unix-py3.sh`, which compiles src/ and
+odpdom/ sources directly. The obsolete Python 2 files `src/Makefile`,
+`src/Makefile.MacOS`, `odpdom/Makefile` and their dedicated
+`src/Configuration.mk` were removed on 2026-11-14. Their history remains in Git;
+the transitional P4VASP_ALLOW_LEGACY_BUILD flag no longer applies.
 
-本分支统一从仓库根目录运行`bash install.sh`；仅重编译可用
-`bash install.sh --build-only`。三个旧Makefile默认停止并提示正确入口，
-包括clean。显式历史开关仅用于有意检查旧流程，不代表已支持Python 3；
-上述`-n`命令只显示操作，不执行清理。当前安装器和原生源码保留原位。
+本分支统一使用以上安装/重编译命令。四个旧构建文件已删除，历史内容可从Git查阅；
+C++/ODP源码、生成包装文件位置和当前构建脚本保留原位。其他历史脚本和旧界面资源
+仍需逐项评估，不代表所有旧依赖已清理。

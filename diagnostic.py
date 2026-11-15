@@ -135,7 +135,7 @@ try:
   import _cp4vasp
 except:
   print("""Can not import _cp4vasp. Have you compiled and installed it ?
-(make; make install)
+From the repository root, run: bash install.sh --build-only
 """)
   s="/usr/include/python/Python.h"
   if not os.path.exists(s):
@@ -144,8 +144,8 @@ You probably will not be able to compile, since Python.h is missing.
 It is expected to be in %s.
 Most likely you do not have the python development headders installed.
 They are usually located in a package called python-devel (or something like that).
-If you have the headders at a non-standart path, you will need to modify
-your Makefiles (mainly thesrc/Makefile).
+For the current Python 3 build requirements and interpreter selection,
+see install.md and install/build-unix-py3.sh.
 """)
   if "usage" not in lower(strcmd("fltk-config")):
     print("""

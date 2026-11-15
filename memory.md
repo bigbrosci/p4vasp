@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第八批：删除已退役构建文件（2026-11-14）
+
+- 用户明确批准删除无用旧入口。删除src/Makefile、src/Makefile.MacOS、odpdom/Makefile及仅供前两者使用的src/Configuration.mk；不复制归档，Git保留历史。上一批临时P4VASP_ALLOW_LEGACY_BUILD开关随之撤销。install.md改为当前安装/重编译命令，diagnostic.py错误提示去除旧make/Makefile建议。
+- 当前install/build-unix-py3.sh完整编译src/odpdom并链接Linux扩展成功，GTK/Cairo/_cp4vasp导入通过；8 GTK、57基础通过，bash语法、Linux安装器dry-run构建路由、Python编译和diff检查通过。证据/tmp/p4vasp-removed-make-{build,gtk,base}.log。不是Mac/Windows或完整GUI流程验收，无EXE/升库；原修前备份不变。
+- 引用核对未发现现役构建使用删除文件。install/configure.py仍是独立历史配置生成器（根Configuration.mk，与删除的src配置不同），src/fltk-config.py/旧Glade/其他历史脚本本批未删除或执行，不宣称全部清理。用户XDATCAR未读未提交；后续继续逐项核对资源/历史工具，Windows最后。
+
 ## 旧接口第七批：旧构建入口保护（2026-11-14）
 
 - 核对当前install.sh→平台bootstrap/wrapper→build-unix-py3.sh，后者直接编译src/odpdom，不调用三个旧Makefile。src/Makefile、src/Makefile.MacOS、odpdom/Makefile增加默认解析阶段停止提示，指向仓库根bash install.sh；保留原规则，显式P4VASP_ALLOW_LEGACY_BUILD=1可绕过，但不代表Python3兼容。clean同样受保护，install.md说明。
