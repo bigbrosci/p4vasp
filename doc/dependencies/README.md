@@ -97,3 +97,6 @@ checkpoint/2026-11-14-before-legacy-interface-fixes
 随后第二批修复VAC／FFT的整数计数、GTK过滤开关及滤波边界错误，仍使用原有库版本和同一个修复前标签；详细行为见[界面说明](../interface-guide-zh.md)。无需为本批普通代码修复重复采集环境快照。
 
 第三批已处理PIDDLE颜色/字体的Python3值比较及正向颜色除法，保持库版本不变；旧字典排序仍待明确语义；PS/PDF二进制输出已在随后的第四批修复（见GTK3架构文档），不新增第三方依赖。用户明确Windows EXE最后统一更新，在这些源码维护批次中不自动打包。
+
+
+第六批将旧SQL导入延迟到显式使用旧面板/结果时；现役Resources和完整注册在阻断SQL导入的进程中通过。保留类路径、Glade和注册供旧会话兼容，未迁移pysqlite2/MySQL驱动，也不代表Windows冻结依赖已移除。依赖环境未变，不重复采集快照；兼容检查范围见[GTK3架构说明](../GTK3-migration.md)。

@@ -290,3 +290,19 @@ now cover all seven formats. The local GdkPixbuf SVG loader independently
 rendered exported DOS and its PNG was inspected; no new renderer was installed.
 External Xfig/Grace readers, arbitrary FIG Unicode fonts/images, full SVG image
 branches and cross-platform rendering remain unverified.
+
+
+### Legacy SQL import boundary (2026-11-14)
+
+DBApplet remains the Resources entry. Its module and CommitApplet no longer
+import db/SQLSystemPM eagerly: legacy constructors load getDatabase, and legacy
+result selection loads SQLSystemPM. Class/module names, Glade files, registration
+and saved-profile handling remain intact. Do not remove Commit registration based
+on its hidden menu: profiles and Windows hidden-import collection use it.
+
+`test/testLegacyDatabaseIsolation.py` checks full Frame/factory/Resources startup
+with SQL imports blocked, synthetic legacy XML constructors, and a synthetic
+selection callback in fresh GTK processes. No user database is connected. This
+is not full legacy SQL/session acceptance; pysqlite2 remains an unresolved legacy
+requirement. Local imports may still be collected by packaging, so this change
+makes no bundle-size or SQL-driver removal claim.

@@ -25,10 +25,7 @@ from p4vasp.util import ParseException
 from p4vasp import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
-from p4vasp.db import *
 from p4vasp.SystemPM import *
-from p4vasp.SQLSystemPM import *
-from p4vasp.db import *
 import p4vasp.Selection
 from p4vasp import gtk3 as gtk
 from p4vasp.gtk3 import gobject
@@ -36,11 +33,12 @@ from p4vasp.gtk3 import pango
 
 
 class CommitApplet(Applet):
-    menupath=None  # The toolbar Commit shortcut remains available.
+    menupath=None  # Retained for old sessions; no current menu/toolbar shortcut.
     def __init__(self):
         Applet.__init__(self)
         self.gladefile="commit.glade"
         self.gladename="applet_frame"
+        from p4vasp.db import getDatabase
         self.database=getDatabase()
         if self.database is not None:
             self.database.connect()

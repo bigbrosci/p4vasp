@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第六批：Resources与旧SQL延迟加载（2026-11-14）
+
+- 现役DBApplet/完整面板注册不再提前导入db或SQLSystemPM；LegacyDBApplet/CommitApplet仅在显式构造时加载getDatabase，旧结果选择时才加载SQLSystemPM。保留历史类名、模块路径、Glade、注册和会话处理；未删除SQL功能、迁移驱动或裁剪冻结依赖。修正Commit菜单注释，面板smoke仅对显式旧SQL面板注入空数据库。
+- 新3项独立进程GTK检查通过：阻断SQL导入的完整Frame/注册/Resources/SetupProfile启动、合成旧XML类路径构造、合成旧选择回调。修前2失败，修后3通过；不连接用户数据库，不代表真实旧SQL/完整用户会话验收。Resources真实网格/复制/编辑检查通过，截图/tmp/p4vasp-online-links.png已查看；退出时既有cmatrix析构警告仍存在。
+- 本机57基础、8 GTK、33面板（GLUT除外）、编译及diff通过。日志/tmp/p4vasp-sql-{isolation-before,isolation-after,resources,gtk,smoke,base}.log。无依赖升级、用户XDATCAR读取/提交、原生重编、跨平台或新EXE；Windows仍最后。下一步可评估无主旧构建/资源引用，先查打包及兼容边界，不据年代直接删除。
+
 ## 旧接口第五批：FIG/SVG及DATA/AGR核对（2026-11-14）
 
 - 用户同意下一计划首项，仍不升级库/科学公式，Windows最后。真实导出基线复现FIG _makeCustomColor用%x格式化float；SVG默认Font.face只读赋值、旧Latin1声明与实际文本编码不一致、未转义XML及后备字体覆盖也经专项确认。DATA/AGR成功回读，未改实现/精度。

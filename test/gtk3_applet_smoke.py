@@ -1,4 +1,4 @@
-"""Isolated applet startup check; uses an empty database and a synthetic structure.
+"""Isolated applet startup; synthetic structure, empty DB only for explicit legacy SQL.
 
 Run: python3 test/gtk3_applet_smoke.py p4vasp.applet.BuilderApplet.BuilderApplet
 Requires GTK3/Cairo, a display, and the compiled cp4vasp extension.
@@ -9,11 +9,12 @@ root=Path(__file__).resolve().parents[1]
 os.chdir(root);sys.path[:0]=[str(root/'lib'),str(root/'src')];os.environ['P4VASP_HOME']=str(root)
 from p4vasp import gtk3 as gtk
 from p4vasp.gtk3.glade import XML
-import p4vasp.db
 class EmptyDatabase(list):
  def connect(self):pass
  def query(self,*args):return []
-p4vasp.db.getDatabase=lambda:EmptyDatabase()
+if sys.argv[1].endswith(('.CommitApplet','.LegacyDBApplet')):
+ import p4vasp.db
+ p4vasp.db.getDatabase=lambda:EmptyDatabase()
 namespace={'__name__':'p4v_smoke'}
 exec(compile(open('p4v.py').read().split('\nschedule(init())')[0],'p4v.py','exec'),namespace)
 from p4vasp.applet import appletfactory,applets,setAppletFrame

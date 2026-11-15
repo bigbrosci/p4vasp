@@ -25,10 +25,7 @@ from p4vasp.util import ParseException
 from p4vasp import *
 from p4vasp.store import *
 from p4vasp.applet.Applet import *
-from p4vasp.db import *
 from p4vasp.SystemPM import *
-from p4vasp.SQLSystemPM import *
-from p4vasp.db import *
 import p4vasp.Selection
 from p4vasp import gtk3 as gtk
 from p4vasp.gtk3 import gobject
@@ -111,6 +108,7 @@ class LegacyDBApplet(Applet):
         self.gladefile="db.glade"
         self.gladename="applet_frame"
         self.noselflag=0
+        from p4vasp.db import getDatabase
         self.database=getDatabase()
         self.selected_id =None
         self.selected_dbi=None
@@ -155,6 +153,7 @@ class LegacyDBApplet(Applet):
             dbi=self.model.query.container[di]
             Id=rec[0]
             print(("selected",Id,dbi.name,di,rec))
+            from p4vasp.SQLSystemPM import SQLSystemPM
             systemlist().setTemporaryActive(SQLSystemPM(dbi,Id))
             self.selected_id =Id
             self.selected_dbi=dbi
