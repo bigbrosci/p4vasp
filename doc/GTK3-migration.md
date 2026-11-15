@@ -267,3 +267,26 @@ for PS/EPS/PDF without modifying DOS samples. No external PS/PDF renderer is
 available here: signatures/structure/decoded streams are checked, not visual
 rendering by an independent reader. Unicode file paths are supported; arbitrary
 Unicode font embedding and historical image branches remain outside this batch.
+
+## Remaining graph formats (2026-11-14)
+
+The existing graphwindow.glade export dialog and Export dispatch were exercised
+for DATA/AGR/FIG/SVG as well as PS/EPS/PDF. DATA and AGR implementations are
+unchanged: tests compare numeric output at the existing formatting precision
+and parse exported AGR using the project reader; this is not a lossless-double
+or external-Grace rendering guarantee.
+
+FIG custom RGB values are explicitly converted to integers before hexadecimal
+formatting, font names accept case variants, and owned UTF-8 output files close
+on write errors. SVG uses matching UTF-8 declaration/output, SVG/XLink namespaces
+and no obsolete external DTD. Text and style attributes are XML-escaped. Font
+fallback construction no longer mutates read-only Font objects and retains all
+fallback faces; default family is the CSS generic sans-serif. Save entry points
+share the same output implementation. Neither exporter gains a new dependency.
+
+Focused test/testOtherGraphExports.py covers numeric roundtrips, SVG Unicode/XML,
+font-state preservation, FIG records and file ownership. Actual DOS dialog tests
+now cover all seven formats. The local GdkPixbuf SVG loader independently
+rendered exported DOS and its PNG was inspected; no new renderer was installed.
+External Xfig/Grace readers, arbitrary FIG Unicode fonts/images, full SVG image
+branches and cross-platform rendering remain unverified.

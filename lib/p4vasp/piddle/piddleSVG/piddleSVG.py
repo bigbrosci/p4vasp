@@ -49,13 +49,11 @@ Greg Landrum (greglandrum@earthlink.net) 3/10/2000
 from p4vasp.piddle.piddle import *
 import p4vasp.piddle.pdfmetrics as pdfmetrics # for font info
 import string, os, types
+from xml.sax.saxutils import escape,quoteattr
 
 from math import *
 
-SVG_HEADER = """<?xml version="1.0" encoding="iso-8859-1"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 03December 1999//EN"
-"SVG-19991203.dtd">
-"""
+SVG_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n'
 
 def _ColorToSVG(color):
   """ convenience function for converting a PIDDLE color to an SVG color
@@ -92,7 +90,7 @@ class SVGCanvas( Canvas ):
 
   def _initOutput(self):
     self._txt = SVG_HEADER +\
-                '<svg xml:space="preserve" width="%dpx" height="%dpx">\n'%self.size
+                '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="%dpx" height="%dpx">\n'%self.size
 
   def _findExternalFontName(self, font):       #copied from piddlePDF by cwl- hack away!
         """Attempts to return proper font name.
@@ -145,26 +143,9 @@ class SVGCanvas( Canvas ):
       Defaults to 'sansserif'
       This should work when an array of font faces are passed in.
     """
-    fontStr = ''
-    if font.face is None:
-      font.face = 'sansserif'
-    if type(font.face) == StringType:
-      if len(string.split(font.face)) > 1:
-        familyStr = '\'%s\''%font.face
-      else:
-        familyStr = font.face
-    else:
-      face = font.face[0]
-      if len(string.split(face)) > 1:
-        familyStr = '\'%s\''%(face)
-      else:
-        familyStr = face
-      for i in range(1,len(font.face)):
-        face = font.face[i]
-        if len(string.split(face)) > 1:
-          familyStr = ', \'%s\''%(face)
-        else:
-          familyStr = familyStr + ', %s'%face
+    faces=font.face or 'sans-serif'
+    if isinstance(faces,str):faces=[faces]
+    familyStr=', '.join("'%s'"%face if len(face.split())>1 else face for face in faces)
     if font.italic:
       styleStr = 'font-style:italic;'
     else:
@@ -245,15 +226,12 @@ class SVGCanvas( Canvas ):
       filename = self.name
     else:
       filename = self.name + '.' + type
-    outFile = open(filename,'w+')
-    outFile.write(self._txt+'</svg>')
-    outFile.close()
+    self.save_(filename)
     print(filename, "saved")
 
   def save_(self, path):
-    outFile = open(path,'w+')
-    outFile.write(self._txt+'</svg>')
-    outFile.close()
+    with open(path,'w',encoding='utf-8',newline='\n') as outFile:
+      outFile.write(self._txt+'</svg>')
 
 
   #------------- drawing methods --------------
@@ -472,8 +450,8 @@ class SVGCanvas( Canvas ):
     self._txt = self._txt + outStr
 
   def _drawStringOneLine(self,line,x,y,fontStr,svgColor):
-    styleStr = 'style="%s stroke:%s"'%(fontStr,svgColor)
-    return '  <text %s x="%.2f" y="%.2f">%s</text>\n'%(styleStr,x,y,line)
+    styleStr = 'style='+quoteattr('%s stroke:%s'%(fontStr,svgColor))
+    return '  <text %s x="%.2f" y="%.2f">%s</text>\n'%(styleStr,x,y,escape(line))
 
   def drawFigure(self, partList,
                  edgeColor=None, edgeWidth=None, fillColor=None, closed=0):

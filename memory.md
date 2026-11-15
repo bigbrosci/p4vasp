@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第五批：FIG/SVG及DATA/AGR核对（2026-11-14）
+
+- 用户同意下一计划首项，仍不升级库/科学公式，Windows最后。真实导出基线复现FIG _makeCustomColor用%x格式化float；SVG默认Font.face只读赋值、旧Latin1声明与实际文本编码不一致、未转义XML及后备字体覆盖也经专项确认。DATA/AGR成功回读，未改实现/精度。
+- FIG显式int RGB、常用字体名lower匹配，with管理UTF8输出以异常关闭。SVG UTF8声明+写入一致，SVG/XLink命名空间，去旧外部DTD，escape文字/quoteattr样式，本地构造字体列表不改Font，默认sans-serif；save委托save_避免重复写法。无需新库。
+- 新testOtherGraphExports5项通过数据/AGR（原精度）回读、Unicode/XML/默认及列表字体不变、FIG颜色/转义/大小写、故障关闭。修前1通过1失败3错误；GUI探针最初DATA文件大小和data=None期望源假设已纠正，不计为应用缺陷。testVectorExportGtk扩展真实七格式按钮/扩展名、DATA数值、AGR项目读回、SVG XML、原PS/PDF及源DOS不变通过；GdkPixbuf现有SVG加载器独立渲染，/tmp/p4vasp-exported-dos-svg.png已查看（曲线/标签），无新增安装。
+- 既有7矢量输出、5绘图值、57基础、8 GTK、33面板（GLUT除外）、编译/diff通过；日志/tmp/p4vasp-other-{formats-before,formats-after,exports-gtk,formats-base,formats-gtk-base,formats-smoke}.log。外部Xfig/Grace及PS/PDF阅读器/任意FIG Unicode字体/图像分支/跨平台/EXE未验收；DATA原g精度不等于全双精度无损。指南/架构/审计/双语同步，XDATCAR不读取不提交；原备份和标签不变。下一步按已定路线评估旧SQL/历史组件引用与会话兼容，尚未执行归档或库升级。
+
 ## 旧接口第四批：PS/EPS/PDF文件输出（2026-11-14）
 
 - 用户继续，Windows明确最后打包。旧PS/PDF字符串写wb、PDF PathLike误走默认路径及压缩页Python2字节处理已修。新增piddle/fileio.py标准库ByteBuffer（Latin1单字节、实际tell偏移）及路径/二进制流输出边界；保留StringIO旧视图，拒普通文本文件流防UTF8/换行损坏；调用方流不关闭，路径with关闭，带前缀binary流xref保持绝对偏移。无全局getFileObject重写，其他旧后端不混入。

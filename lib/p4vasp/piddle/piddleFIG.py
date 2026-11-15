@@ -375,22 +375,22 @@ class FIGCanvas(Canvas):
             file = self.name
             if not file.endswith(".fig"):
                 file = file+".fig"
-        f = open(file, "w")
-        header = self.header_fmt % {
-            "orientation": self.Portrait,
-            "justification": self.CenterJust,
-            # units only affects the rules displayed in xfig, not the internal
-            # units used in the file format
-            "units": self.Metric,
-            "papersize": self.A4,
-            "magnification": 100,
-            "multiple-page": self.SinglePage,
-            "transparent-color": self.BackgroundTransp
-            }
-        f.write(header)
-        for line in self.color_code+self.code:
-            f.write(line)
-            f.write("\n")
+        with open(file,"w",encoding="utf-8",newline="\n") as f:
+            header = self.header_fmt % {
+                "orientation": self.Portrait,
+                "justification": self.CenterJust,
+                # units only affects the rules displayed in xfig, not the internal
+                # units used in the file format
+                "units": self.Metric,
+                "papersize": self.A4,
+                "magnification": 100,
+                "multiple-page": self.SinglePage,
+                "transparent-color": self.BackgroundTransp
+                }
+            f.write(header)
+            for line in self.color_code+self.code:
+                f.write(line)
+                f.write("\n")
 
     def drawLine(self, x1, y1, x2, y2, color=None, width=None):
         """
@@ -555,7 +555,7 @@ class FIGCanvas(Canvas):
     def _makeCustomColor(self, color):
         code = self.color_fmt % (
             self.color_nr,
-            255*color.red, 255*color.green, 255*color.blue)
+            int(255*color.red), int(255*color.green), int(255*color.blue))
         self.color_nr = self.color_nr + 1
         self.color_code.append(code)
         return self.color_nr-1
@@ -664,7 +664,7 @@ class FIGCanvas(Canvas):
         if font.face is None:
             face = self.defaultFace
         else:
-            face = font.face
+            face = font.face.lower() if isinstance(font.face,str) else font.face
         fig_font = self.font_map[face]
         if not (font.bold or font.italic):
             fig_font = fig_font[self.Normal]

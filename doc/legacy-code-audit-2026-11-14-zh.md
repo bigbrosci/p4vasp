@@ -16,6 +16,8 @@
 
 第四批已修复前述PS/PDF路径输出的str/bytes问题：新增内部字节缓冲与输出边界，PDF索引/流长度按字节，压缩页用标准库zlib/ASCII85；PS状态在失败后恢复，序列化失败不先截断目标。7项专项及真实DOS导出按钮→PS/EPS/PDF通过，含中文路径、二进制流、兼容StringIO、多页/压缩及xref核对。未使用外部阅读器渲染；任意Unicode字体和图片嵌入仍未验证，不把结构检查写成完整格式支持。
 
+第五批已核对其余DATA/AGR/FIG/SVG：DATA/AGR数值回读通过，未修改实现；FIG修复RGB十六进制浮点格式错误、字体名大小写和异常关闭；SVG修复字体只读修改、UTF8声明/命名空间、文本/属性转义和后备字体列表。5项专项与真实DOS七格式导出通过，并通过现有系统GdkPixbuf独立渲染DOS SVG查看结果。未安装依赖；外部Xfig/Grace、FIG任意Unicode字体/图片及SVG图片分支未完整验收。
+
 ## 1. 结论
 
 项目不是仍在运行Python 2／GTK2的程序：当前主入口使用Python 3、PyGObject、GTK3和Cairo，Unix及Windows构建入口也已使用Python 3。真正的问题是：新运行时之下仍保留旧接口、过渡适配、历史功能及旧构建入口。
