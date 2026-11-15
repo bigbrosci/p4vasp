@@ -1,8 +1,33 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-06。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-14。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
+
+## 当前交付（2026-11-14）
+
+最新构建源码为`58e353dc12181e0b4c17604479c90f16bd480ac7`。EXE完整路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261114-221532-58e353dc-uhsvnjm6\p4vasp.exe
+```
+
+同级ZIP：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261114-221532-58e353dc-uhsvnjm6.zip
+```
+
+ZIP为157631180字节，SHA256：`9130b10606b2822989b30f70bd6a8ac0cfd2b8fb628a951f058db2e473f17540`，另有同名`.zip.sha256`。
+保留整个解压目录的`_internal`与`model-worker`，双击p4vasp.exe；不能只复制EXE。
+
+本机Windows UCRT64完整重编译/打包，隔离环境runtime/gui/models报告均通过，随包ASE3.29.0、RDKit2026.09.1；
+新增Models按需加载及手动ChatGPT复制入口已包含。独立核对源码标记、43现行布局、旧Glade缺席及ZIP CRC/摘要。
+另一台干净Windows和全部科学流程仍未验收。构建日志在Windows checkout的
+`build/windows-update/58e353dc-ev9tc_kn`，成品报告在交付目录同级的`p4vasp-20261114-221532-58e353dc-uhsvnjm6-checks`。
+后续纯交付文档提交不会改变SOURCE-COMMIT，也不需要重复构建。
+
+下列11月6日和11月5日路径为历史交付记录，日常使用优先以上新版。
 
 ## 随包ASE与RDKit（2026-11-06）
 

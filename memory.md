@@ -2,12 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
-## 当前接手检查点：保存与Windows构建（2026-11-14）
+## 当前接手检查点：保存与Windows交付完成（2026-11-14）
 
-- 用户确认保留轻量复制入口、暂不扩展AI；当前授权收尾记录并生成最新Windows EXE，撤销此前“Windows最后暂缓”的当前限制（历史记录保留）。应用已保存/推送至dc5b29c；待办为本次Windows构建与结果回填，不继续扩大清理/性能功能。
-- Windows只读预检通过：C:\msys64\home\lqlhz\p4vasp-checkout，p4vasp-py3/origin正确且干净，预检源码4add680。准备同步新源码，现有发布包保留。模型自检适配按需gas_phase_page，新增初始隐藏页检查；runtime增加复制摘要/完整输入/剪贴板验收。
-- 未解决项：bulk紧凑窗口要求480x320但本机基线/新代码均532x409；完整testBulkGtk不算通过。旧SQL驱动/字典旧排序/历史后端及全依赖升级未处理，用户XDATCAR不读不删不提交。
-- 下一步：推送构建准备提交→Windows更新器隔离编译/冻结→runtime/gui/models成品报告→核对来源/ZIP摘要并记录路径。此处为构建前状态，不代表新EXE已生成，跨设备/干净机验收待定。
+- 用户决定保留轻量复制入口、不扩展AI，本次收尾和Windows构建已完成。源码基线58e353dc12181e0b4c17604479c90f16bd480ac7（含全部近期修复、清理、Models按需加载和复制入口），既有修前标签/本机备份及旧发行包保留。工作区仅用户XDATCAR未跟踪，不读不删不提交。
+- 新EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261114-221532-58e353dc-uhsvnjm6\p4vasp.exe；同级p4vasp-20261114-221532-58e353dc-uhsvnjm6.zip及.zip.sha256，ZIP 157631180字节，SHA256=9130b10606b2822989b30f70bd6a8ac0cfd2b8fb628a951f058db2e473f17540。必须保留整个目录（_internal、model-worker），不能单拎EXE。未另复制到桌面。
+- Windows UCRT64原生完整重编译/冻结成功，隔离环境runtime/gui/models三成品报告ok=True且frozen=True。涵盖43布局、保存对话框、复制摘要/完整POSCAR/INCAR及剪贴板、原生画图/PNG/固定标记、ASE读XYZ/32Cu建模/预览/保存、RDKit乙醇生成/预览/三输入导出及取消。ASE3.29.0、RDKit2026.09.1、worker Python3.13.17；SOURCE-COMMIT一致，独立ZIP CRC/摘要核对通过，包内无旧data/glade。
+- 证据在Windows checkout：build/windows-update/58e353dc-ev9tc_kn（native/package日志），dist/windows-releases/p4vasp-20261114-221532-58e353dc-uhsvnjm6-checks（runtime/gui/models报告）。Linux启动日志/tmp/p4vasp-windows-20261114.log及准备检查/tmp/p4vasp-windows-prep-{models,context}.log。成品结果与先前Linux测试分开记录；仍非另一台干净Windows/全部科学场景/正常退出全面验收。
+- 保留待办：Linux bulk紧凑窗口480x320断言旧/新均532x409，完整testBulkGtk不计通过；旧SQL驱动、字典旧排序及历史后端未全部清理。未升级依赖版本，不扩展AI或另启动性能任务。当前无待自动构建事项；后续按新指令继续。交付记录后续文档提交不改变已冻结源码，不因此重复打包。
 
 ## 手动ChatGPT问答：本地结构摘要复制（2026-11-14）
 
