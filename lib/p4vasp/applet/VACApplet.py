@@ -216,7 +216,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
             name=system.current("NAME")
             if name is not None:
                 self.world[0].subtitle="(%s)"%name
-            t0=time.clock()
+            t0=time.perf_counter()
             natoms=None
             if self.multi:
                 totalnumconfigs=0
@@ -233,7 +233,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
                     initconfigs=0
                 allcarts=zeros((totalnumconfigs-initconfigs,natoms,3),Float)
 
-                t1=time.clock()
+                t1=time.perf_counter()
                 indx=0
                 for si in range(len(systems)):
                     ss=systems[si].CSTRUCTURE_SEQUENCE_L
@@ -247,7 +247,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
                         numconfigs=len(ss)  # total number of configs
                         for i in range(initconfigs,numconfigs):
                             if indx%50==0:
-                                msg().status("Reading %s positions (%f s)"%(systems[si].NAME,time.clock()-t1))
+                                msg().status("Reading %s positions (%f s)"%(systems[si].NAME,time.perf_counter()-t1))
                                 msg().step(indx,len(allcarts))
                                 yield 1
                             ss[i].setCarthesian()
@@ -259,7 +259,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
             else:
                 s=system
                 ss=s.CSTRUCTURE_SEQUENCE_L
-                t1=time.clock()
+                t1=time.perf_counter()
                 msg().message('t(parsing): %f'%(t1-t0))
 
                 numconfigs=len(ss)  # total number of configs
@@ -272,7 +272,7 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
                 for i in range(initconfigs,numconfigs):
                     indx=i-initconfigs
                     if indx%50==0:
-                        msg().status("Reading positions (%f s)"%(time.clock()-t1))
+                        msg().status("Reading positions (%f s)"%(time.perf_counter()-t1))
                         msg().step(indx,numconfigs-initconfigs)
                         yield 1
                     ss[i].setCarthesian()
@@ -295,13 +295,13 @@ class VACApplet(GraphWindowApplet,p4vasp.Selection.SelectionListener):
                     yield 1
 
             msg().step(0,1)
-            t2=time.clock()
+            t2=time.perf_counter()
             msg().message('t(velocities): %f'%(t2-t1))
             msg().status('Calculating VAC')
             yield 1
             scheduleFirst(self.giveVacGen(velocities))  ###???????
             yield 1
-            t3=time.clock()
+            t3=time.perf_counter()
             msg().message('t(vac):%f'%(t3-t2))
         else:
             self.vac=[]

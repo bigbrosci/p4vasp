@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 保存基线与旧接口修复第一批（2026-11-14）
+
+- 用户授权保存当前能运行版本并开始；明确选择“先修复旧接口，暂不升级库”。修复前本机8 GTK及实际ASE导入/原生Show合成检查通过。源码49ff6cd建标签checkpoint/2026-11-14-before-legacy-interface-fixes并已推送；本机build/checkpoints/2026-11-14-49ff6cd-before-legacy-fixes保存Git源码archive、原有Linux扩展、三个新采环境快照及基线日志/README/SHA256SUMS，摘要全核对，临时独立目录解压+原生/源码导入通过。不是整机/venv镜像，标签不含二进制；本批不动库，原环境保留。备份目录已Git忽略，用户XDATCAR未纳入。
+- Property.isPending以局部thread快照调用is_alive，保留现有默认has_threading=0；VAC七处clock换perf_counter，仅修改耗时显示，不改数值算法。A03比较/序列化/历史分支及所有包版本暂不动。
+- 新testLegacyRuntime六项：真实Thread未启/运行/结束，Property真实require单次读取及notify（仅测试中启线程），单/多系统VAC含选择/跳帧与独立解析式1e-12比较。修复前2个isAlive及4个clock失败，修复后全通过；初始无显示导入崩溃及缺INITIAL_STRUCTURE测试夹具已纠正，不冒充应用修复。实际testLegacyVacGtk通过真实Read VAC按钮、调度/有限数值/曲线，最终1200宽截图已查看；旧左控制列仍裁字，未改布局。
+- 57基础、8 GTK、33面板启动（GLUT除外）、编译/diff通过；日志/tmp/p4vasp-legacy-{before,after,vac-gtk,base,gtk,smoke}.log。未测FFT/滤波/真实用户轨迹、Mac/Windows或新EXE，无原生变更不重编。静态新发现VAC FFT分支len(freq)/2整数计数问题，记录候选而未混入本批，不能把VAC计算通过当FFT通过。审计报告/依赖维护说明/双语同步；本批完成，后续按明确新任务推进。
+
 ## 依赖维护第一批：统一目录与版本快照（2026-11-14）
 
 - 用户同意先做清单/快照/安装说明，并强调长期维护。入口doc/dependencies/README.md；catalog.json集中分层用途、profile、来源和平台包映射，不重复维护精确版本或改变安装行为；缺GLUT平台项保留pending。现有安装/构建源继续是执行权威，未增加第二套安装器/锁文件。

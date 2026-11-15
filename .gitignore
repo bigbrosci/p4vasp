@@ -34,3 +34,5 @@ odpdom/cODP_wrap.cpp
 .venv-smiles/
 
 .venv-ase/
+
+/build/checkpoints/

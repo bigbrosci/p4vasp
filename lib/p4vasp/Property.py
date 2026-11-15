@@ -123,8 +123,9 @@ class Property:
 
     def isPending(self):
         """Returns true if the property is being read in thread."""
-        if self.thread is not None:
-            return self.thread.isAlive()
+        thread=self.thread
+        if thread is not None:
+            return thread.is_alive()
         return 0
 
     def isGenerating(self):
