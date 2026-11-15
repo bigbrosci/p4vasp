@@ -95,3 +95,5 @@ checkpoint/2026-11-14-before-legacy-interface-fixes
 第一批仅将Property线程状态改为is_alive、VAC耗时改为perf_counter，保留原有线程开关和计算公式。其他审计项与依赖版本升级另行处理。
 
 随后第二批修复VAC／FFT的整数计数、GTK过滤开关及滤波边界错误，仍使用原有库版本和同一个修复前标签；详细行为见[界面说明](../interface-guide-zh.md)。无需为本批普通代码修复重复采集环境快照。
+
+第三批已处理PIDDLE颜色/字体的Python3值比较及正向颜色除法，保持库版本不变；旧字典排序和PS/PDF二进制文件输出仍分别待处理。用户明确Windows EXE最后统一更新，在这些源码维护批次中不自动打包。

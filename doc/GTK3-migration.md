@@ -224,3 +224,23 @@ Focused checks: `test/testXdatcar.py`, `test/testXdatcarGtk.py` with PYTHONPATH=
 and P4VASP_HOME set to the checkout. The latter exercises real Frame/native viewer,
 CLI, File/Open, endpoints, timer progression and normal POSCAR return. Optional
 user XDATCAR samples are read only, not included in Git.
+
+## Drawing value semantics (2026-11-14)
+
+PIDDLE Color and Font now implement Python 3 value equality, used by GTK3/Cairo
+transparent-color checks and PS/PDF state caching. Color compares exact RGB
+components and retains its tuple hash; the old weighted __cmp__ is not used as
+an equality or ordering rule. Color/scalar division forwards to its existing
+__div__ implementation. Scalar/Color remains unsupported through Python 3
+operators; legacy explicit methods remain available.
+
+Font equality uses face/size/bold/italic/underline; hashing uses the same fields,
+so a mutable fallback-face list is unhashable. No sorting order is introduced.
+Class names, instance fields, constructors and read-only attribute behavior
+are retained; protocol-2/current pickle roundtrips passed, but historical user
+XML sessions were not validated. Focused checks: test/testDrawingValues.py and,
+with a display, test/testDrawingValuesGtk.py.
+
+PS/PDF text-stream generation passed; direct path output still fails on existing
+str/bytes mixing. That is a separate pending export fix, not resolved by value
+semantics. No new third-party dependency or native rebuild is needed.

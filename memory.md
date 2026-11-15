@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第三批：绘图值比较及除法（2026-11-14）
+
+- 用户继续并明确Windows EXE最后统一更新。调用检查：现役Cairo透明色及PS/PDF状态缓存用==/!=，旧__cmp__未被Python3运算符调用；StructuredDictionary.__cmp__无现役调用/明确总排序语义，未改字典/序列化分派，不注入全局cmp。
+- piddle.Color新增精确RGB __eq__，保留现有tuple哈希，避免旧加权亮度把不同RGB当相等；__truediv__复用原__div__，保留旧显式方法，不新增反向除法或大小排序。Font按face/size/bold/italic/underline相等并同字段哈希，face为可变list时正常不可哈希；构造/字段/只读属性不变。
+- 修前4项值对象检查3失败1错误，修后5项（含PS/PDF文本流）全通过；protocol2/current pickle往返、不同颜色同亮度/哈希/列表字体/非同类/除零均核对，但未加载真实旧XML会话。2实际Gtk/Cairo像素检查通过透明clone不画/透明清屏及颜色除法+字体绘制，截图/tmp/p4vasp-drawing-values.png已查看。57基础、8 GTK、真实DOS缩放/刻度/样本保持、33面板启动（GLUT除外）、编译/diff通过；日志/tmp/p4vasp-drawing-{before,gtk,base,gtk-base,dos,smoke}.log。
+- 新实际问题：临时路径PSCanvas.save/PDFCanvas.save均str→binary TypeError（PDF BytesIO同样失败），StringIO均生成成功；不是当前值比较引入，待下一批文件I/O修复，不宣称完整导出通过。无用户数据读写/升级库/原生重编/跨平台/EXE，XDATCAR保留不提交。审计/架构/维护说明/双语同步；下步可在现有授权方向处理该导出缺陷，Windows统一留最后。
+
 ## 旧接口第二批：VAC/FFT与滤波（2026-11-14）
 
 - 用户“继续”按前批待办推进，仍不升级库。VAC.updateGraph数组/range的len(freq)/2改//2，保留Python2前半谱整数截断；fftGen及filter开关回调的两处.state改用get_active，六个输入/标签同步敏感状态。Read VAC→FFT及VAC/FFT/VAC+FFT菜单、四窗函数保留。

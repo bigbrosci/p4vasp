@@ -154,6 +154,9 @@ class Color:
 	def __div__(self,x):
 		return Color(self.red/x, self.green/x, self.blue/x)
 
+	# Python 3 forward division, preserving the explicit legacy method.
+	__truediv__ = __div__
+
 	def __rdiv__(self,x):
 		return Color(self.red/x, self.green/x, self.blue/x)
 
@@ -168,6 +171,11 @@ class Color:
 
 	def __hash__(self):
 		return hash( (self.red, self.green, self.blue) )
+
+	def __eq__(self,other):
+		if not isinstance(other,Color):
+			return NotImplemented
+		return (self.red,self.green,self.blue)==(other.red,other.green,other.blue)
 
 	def __cmp__(self,other):
 		try:
@@ -354,6 +362,18 @@ class Font:
         # typeface -- a name or set of names, interpreted by the Canvas,
         # or "None" to indicate the Canvas-specific default typeface
         d["face"] = face
+
+    def _value_key(self):
+        return (self.face,self.size,self.bold,self.italic,self.underline)
+
+    def __eq__(self,other):
+        if not isinstance(other,Font):
+            return NotImplemented
+        return self._value_key()==other._value_key()
+
+    def __hash__(self):
+        # A mutable list of fallback faces remains unhashable.
+        return hash(self._value_key())
 
     def __cmp__(self, other):
         """Compare two fonts to see if they're the same."""
