@@ -1,3 +1,9 @@
+# Historical Python 2 build, retained for reference and explicit legacy use.
+# Current installation: from the repository root, run bash install.sh.
+ifneq ($(P4VASP_ALLOW_LEGACY_BUILD),1)
+$(error Historical Python 2 Makefile disabled. Run bash install.sh from the repository root; see install.md. For deliberate legacy use only set P4VASP_ALLOW_LEGACY_BUILD=1)
+endif
+
 CPP     = g++
 LD      = g++
 LIBS    =

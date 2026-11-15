@@ -100,3 +100,6 @@ checkpoint/2026-11-14-before-legacy-interface-fixes
 
 
 第六批将旧SQL导入延迟到显式使用旧面板/结果时；现役Resources和完整注册在阻断SQL导入的进程中通过。保留类路径、Glade和注册供旧会话兼容，未迁移pysqlite2/MySQL驱动，也不代表Windows冻结依赖已移除。依赖环境未变，不重复采集快照；兼容检查范围见[GTK3架构说明](../GTK3-migration.md)。
+
+
+第七批为src/Makefile、src/Makefile.MacOS及odpdom/Makefile增加旧Python2入口保护；当前统一安装/重编译入口见[安装说明](../../install.md)。显式历史开关不提供现代兼容保证。原生源码与环境未变，本批未重编译，也不生成新依赖快照。

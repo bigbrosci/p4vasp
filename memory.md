@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第七批：旧构建入口保护（2026-11-14）
+
+- 核对当前install.sh→平台bootstrap/wrapper→build-unix-py3.sh，后者直接编译src/odpdom，不调用三个旧Makefile。src/Makefile、src/Makefile.MacOS、odpdom/Makefile增加默认解析阶段停止提示，指向仓库根bash install.sh；保留原规则，显式P4VASP_ALLOW_LEGACY_BUILD=1可绕过，但不代表Python3兼容。clean同样受保护，install.md说明。
+- 本机9项make -n检查通过（各all/clean默认拒绝无recipe输出、显式开关clean打印），日志/tmp/p4vasp-legacy-build-guards.log；5个当前入口bash -n及Linux install.sh --dry-run --build-only路由通过。未实际make/清理/安装/重编译/GUI/跨平台或EXE验收；MacOS命名Makefile仅在本机GNU make解析，不算Mac验证。
+- 无库升级/资源删除/旧类移动；用户XDATCAR保留不读取不提交。下一步仍可评估loadGlade_old及旧data/glade逐项资源引用/发行包边界，需兼容证据后再归档；Windows最后，原回退标签不变。
+
 ## 旧接口第六批：Resources与旧SQL延迟加载（2026-11-14）
 
 - 现役DBApplet/完整面板注册不再提前导入db或SQLSystemPM；LegacyDBApplet/CommitApplet仅在显式构造时加载getDatabase，旧结果选择时才加载SQLSystemPM。保留历史类名、模块路径、Glade、注册和会话处理；未删除SQL功能、迁移驱动或裁剪冻结依赖。修正Commit菜单注释，面板smoke仅对显式旧SQL面板注入空数据库。
