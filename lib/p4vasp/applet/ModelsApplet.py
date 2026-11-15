@@ -22,26 +22,48 @@ class ModelsApplet(Applet):
 
     def initUI(self):
         self.notebook = Gtk.Notebook()
-        for title in ('single atom', 'gas phase', 'bulk', 'surface', 'p4vasp data'):
-            if title == 'single atom': page = SingleAtomPage()
-            elif title == 'gas phase': page = GasPhasePage()
-            elif title == 'bulk':
+        self._page_contents = {}
+        self._page_hosts = {}
+        for index, title in enumerate(('single atom', 'gas phase', 'bulk', 'surface', 'p4vasp data')):
+            if index == 0:
+                page = SingleAtomPage()
+                self.single_atom_page = page
+                self._page_contents[index] = page
+            elif index == 2:
                 page = Gtk.ScrolledWindow()
                 page.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-                self.bulk_page = BulkPage()
-                page.add(self.bulk_page)
-            elif title == 'p4vasp data':
-                page = ElementTable(self.store, self.parent_window, message)
-                self.element_table = page
-            else: page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-            if title == 'single atom': self.single_atom_page = page
+            else:
+                page = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+            self._page_hosts[index] = page
             self.notebook.append_page(page, Gtk.Label(label=title))
         self.xml.get_widget('models_host').pack_start(self.notebook, True, True, 0)
         self.notebook.connect('switch-page', self.switch_page)
         self.panel.show_all()
 
     def switch_page(self, notebook, page, index):
-        if index == 1: page.refresh()
+        if index in self._page_contents:
+            if index == 1:
+                self._page_contents[index].refresh()
+            return
+        # Keep every page for this applet's lifetime so edits and running jobs
+        # survive tab switches. GasPhasePage already refreshes on construction.
+        if index == 1:
+            content = GasPhasePage()
+        elif index == 2:
+            content = BulkPage()
+            self.bulk_page = content
+        elif index == 4:
+            content = ElementTable(self.store, self.parent_window, message)
+            self.element_table = content
+        else:
+            return
+        host = self._page_hosts[index]
+        if index == 2:
+            host.add(content)
+        else:
+            host.pack_start(content, True, True, 0)
+        self._page_contents[index] = content
+        host.show_all()
 
     def parent_window(self):
         parent=self.panel.get_toplevel()

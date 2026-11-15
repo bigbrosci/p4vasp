@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 流畅度第一批：Models按需创建标签页（2026-11-14）
+
+- 用户授权优化运行流畅度，仍不升库/改科学公式，Windows最后。测量发现Models.initUI一次创建隐藏气相/bulk/元素表；改为首次switch-page构造，稳定host保持标签及bulk ScrolledWindow，实例复用保留输入/脏表；gas首次依构造扫描一次，重访仍刷新。必须host.show_all显示动态viewport。未改启动时的模块导入或把所有耗时转后台。
+- 同一临时benchmark七次initUI、后六暖中位13.1256ms→5.1569ms（约61%减少，只计页面构造，不是全程序/首次标签打开/大文件/渲染收益）。证据/tmp/p4vasp-models-bench-{before,after}.log，脚本/tmp/p4vasp-models-bench.py；初始cProfile套smoke因os._exit未保存，改为直接runcall/initUI计时，不冒充完整启动分析。
+- 新testModelsLazyGtk通过真实临时库/资源，验证隐藏构造/scan均0、首次scan1/重访2、只构造一次、新XYZ出现、选中分子charge/bulk字段/未保存表编辑不丢及viewport mapped。初始夹具未选分子导致charge被正常清空，已补明确选择；非应用修复。截图/tmp/p4vasp-models-lazy-bulk.png已查看。9 GTK、57基础、33面板和Resources网格/复制/保存检查通过，编译/diff通过。
+- 限制：testBulkGtk真实ASE构建/32原子预览/保存取消等前序断言通过，但最终480x320紧凑窗口断言失败，实际532x409；通过git show读取066fa5f的ModelsApplet原实现注入对照同样失败，不能记全项通过。日志/tmp/p4vasp-models-bulk-{baseline,current}.log及bulk.log；普通原生窗口截图全黑不作视觉成功证据。既有cmatrix退出和PyGObject弃用警告保留。
+- 当前优化及验证完成，界面指南/架构/双语同步；未读取/提交XDATCAR、重编原生、跨平台或EXE。后续优先定位bulk紧凑布局限制，其他流畅度瓶颈继续先测量再改，不自动启动库升级或Windows构建。
+
 ## 旧接口第九批：移除旧Glade目录及加载器（2026-11-14）
 
 - 用户批准继续，删除data/glade全部44个旧布局/图片（264639字节）及util.loadGlade_old；Git保存历史，不复制归档。data/glade2无改动、loadGlade/GTK3适配器/历史会话类保留；仓库运行源码无旧函数/真正libglade导入残留。外部插件若曾调用已移除接口需迁移到现行资源，不提供假兼容别名。

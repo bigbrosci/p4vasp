@@ -483,6 +483,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 从左侧 **Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列五个标签页，与 Resources 的标签页样式一致：
 **single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 支持本地分子库与SMILES，bulk使用ASE生成体相，surface暂时留空。
 Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料表从 Resources 移到 Models，Commit 快捷入口已移除。
+首次打开Models只创建默认单原子页；气相、bulk和元素资料表在首次点击对应标签时创建，之后复用，切换标签保留输入和未保存的元素编辑。气相页再次进入时仍刷新本地XYZ文件列表；首次进入不重复扫描。首次访问各页仍需完成该页自身加载，不代表全部计算在后台执行。
 
 ### 单原子输入生成
 

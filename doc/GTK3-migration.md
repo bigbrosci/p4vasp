@@ -323,3 +323,29 @@ and 124 file-image references passed locally; the nine GTK tests and 33 applet
 startup checks passed. This does not validate external plugins or all scientific
 workflows. Windows GUI spec still collects data recursively; this source tree
 no longer contains the removed directory, but no new bundle was built.
+
+
+### Models: defer unopened tab construction (2026-11-14)
+
+ModelsApplet initially constructs only SingleAtomPage. Stable notebook hosts
+preserve tab labels/order and the bulk ScrolledWindow. GasPhasePage, BulkPage
+and ElementTable are created on their first switch-page signal and retained
+for the applet lifetime. Show the host too, including a dynamically created
+viewport. GasPhasePage refreshes in its constructor; revisit refreshes once,
+while keeping the existing selected-molecule edit-preservation behavior.
+No asynchronous GTK widget creation or scientific formula changes are involved.
+First access to a tab still pays its construction cost.
+
+A real-GTK regression uses a temporary XYZ/resource library to verify zero
+hidden constructors/scans initially, one scan on first gas entry, refresh after
+adding a file, and retained charge/bulk/dirty-table edits without reconstruction.
+The smoke check now selects tabs before accessing their deferred contents.
+Local seven-sample initUI measurements (warm median of the final six) changed
+from 13.126 ms to 5.157 ms. These exclude imports, full startup/rendering and
+large-library latency; they are not an overall application speed guarantee.
+
+The existing testBulkGtk workflow reached its final compact-window assertion
+but failed at 532x409 against 480x320. The unchanged baseline reproduced exactly
+the same dimensions. Earlier build/preview/save assertions passed, but the
+whole test is not counted as passing; the compact-layout issue remains open.
+The separate lazy bulk offscreen screenshot was inspected successfully.
