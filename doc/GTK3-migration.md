@@ -349,3 +349,26 @@ but failed at 532x409 against 480x320. The unchanged baseline reproduced exactly
 the same dimensions. Earlier build/preview/save assertions passed, but the
 whole test is not counted as passing; the compact-layout issue remains open.
 The separate lazy bulk offscreen screenshot was inspected successfully.
+
+
+### Local chat-context clipboard action (2026-11-14)
+
+Frame.createFrame adds Edit / Copy for ChatGPT... using the existing menu builder;
+no Glade layout or left-toolbar item is added. The callback uses repository
+findActive (never creates a Show applet), snapshots the active system's Show
+source sequence/index when available, otherwise INITIAL_STRUCTURE. It does not
+copy wrapped/hidden/replicated rendering data or auxiliary model/frequency previews.
+The p4vasp.chat_context helper summarizes composition/count/physical cell vectors;
+normalization uses a private copy, preserving the snapshot and input flags.
+
+The GTK3 dialog uses the shared screen-fitting helper, read-only preview, two
+unchecked inclusion options and native clipboard. INCAR is loaded only on opt-in;
+full POSCAR uses the existing writer with all source atoms. Character count is
+shown without a fabricated token estimate. No network client, API key, browser
+launch or external dependency is introduced. This is manual context preparation,
+not an AI session or a complete VASP input export.
+
+Four focused helper tests and the real Frame/menu/GTK clipboard test cover source
+frame selection, scaling/flags preservation, omitted coordinates, inclusion options,
+lazy INCAR and unchanged input. Offscreen dialog content was inspected on a test
+white backdrop; the test does not establish Windows/macOS clipboard behavior.

@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 手动ChatGPT问答：本地结构摘要复制（2026-11-14）
+
+- 用户同意复制结构/参数并关注数字token；实现Edit→Copy for ChatGPT...（Frame动态菜单，无左栏/Glade改动）。默认摘要含来源、原子数、组成、物理晶胞矢量，无逐原子坐标；完整POSCAR和INCAR手动勾选，字符数不冒充token。无网络/API/自动浏览器/依赖，不自动产生API费。
+- chat_context.capture_structure优先同一当前体系Show的原始序列/index并复制，否则INITIAL_STRUCTURE；不取渲染包装/隐藏/扩展，也不自动取Models/振动独立预览或未写回编辑。format_context只规范化私有副本用于晶胞摘要，完整writer保留源全部原子/固定标记；快照在对话框打开时固定，INCAR仅勾选读取并缓存。不是完整计算输入导出。
+- 新4纯检查通过，覆盖摘要省坐标/物理scale、原数据不变、完整POSCAR回读含F/T、帧/体系选择和无结构。真实Frame菜单/GTK预览/双选项/懒读取INCAR/剪贴板回读通过；截图/tmp/p4vasp-chat-context.png白底离屏内容已查看（最初透明背景截图不作为完整视觉依据）。9 GTK、57基础、33面板通过，编译/diff及文档链接通过；证据/tmp/p4vasp-chat-context-{unit,gtk,base,gtk-base,smoke}.log。既有cmatrix退出警告保留。
+- 界面指南/架构/双语同步；未发任何结构给聊天服务、未读取用户XDATCAR、原生/跨平台/EXE未验收，Windows仍最后。此功能完成；bulk紧凑窗口旧问题仍见流畅度检查点，不因本任务改写为已修。
+
 ## 流畅度第一批：Models按需创建标签页（2026-11-14）
 
 - 用户授权优化运行流畅度，仍不升库/改科学公式，Windows最后。测量发现Models.initUI一次创建隐藏气相/bulk/元素表；改为首次switch-page构造，稳定host保持标签及bulk ScrolledWindow，实例复用保留输入/脏表；gas首次依构造扫描一次，重访仍刷新。必须host.show_all显示动态viewport。未改启动时的模块导入或把所有耗时转后台。

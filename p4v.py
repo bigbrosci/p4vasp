@@ -286,6 +286,7 @@ class Frame(SystemListListener):
 #    self.system_options.set_menu(menu)
         self.system_options.show()
         self.menubar=xml.get_widget("menubar")
+        self.getMenuItem(["Edit", "Copy for ChatGPT..."]).connect("activate", self.copy_chat_context)
         self.toolbar=xml.get_widget("toolbar")
         # File icons are 32 px; use the same size for theme/stock icons too.
         self.toolbar.set_icon_size(gtk.IconSize.DND)
@@ -380,6 +381,19 @@ class Frame(SystemListListener):
                     return x
         m.add(self.createSubmenus(l))
         return self.getMenuItem(l,m)
+
+    def copy_chat_context(self, *args):
+        from p4vasp.chat_context import capture_structure
+        from p4vasp.gtk3.chat_context import ChatContextDialog
+        from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
+        system = getCurrentSystemPM()
+        try:
+            viewer = applets().findActive(StructureWindowApplet)
+            structure, source = capture_structure(system, viewer)
+            loader = (lambda: system.INCAR) if system is not None else None
+            return ChatContextDialog(self.root_window, structure, source, loader)
+        except Exception as error:
+            msg().confirm_error('Cannot copy chat context: %s' % error)
 
     def createHelpMenu(self):
         helpitem=gtk.MenuItem("Help")
