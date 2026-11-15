@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧Glade与打包引用专项核对（2026-11-14）
+
+- 用户要求核对，Windows最后。本轮不删除/改UI/改spec；报告doc/legacy-glade-resources-2026-11-14-zh.md逐项列14旧布局和30旧图片。旧目录44文件264639字节，30图片均与现行副本SHA256相同；14布局虽有同名现行副本但内容不同。旧frame标准XML解析失败，13份其余可解析，不算古老libglade可用性验收。
+- 当前43布局124处文件图片引用按GTK3适配器候选顺序全部可解析、0旧目录、0缺失；loadGlade_old仅见定义但外部插件未核验。Windows GUI spec复制整个data，旧目录会随包进入；worker无项目data显式输入。此为静态配置证据，未执行Windows打包/估算ZIP收益。
+- 新跑8 GTK资源/行为、33面板启动通过（不含GLUT），证据/tmp/p4vasp-glade-audit-{gtk,smoke}.log；逐文件临时JSON/脚本同前缀。无布局视觉修复声明/完整科学流程/跨平台/原生重编/库升级。下一步可成批删除旧目录和旧函数并验证现役资源；本轮尚未执行，用户XDATCAR未读未提交。
+
 ## 旧接口第八批：删除已退役构建文件（2026-11-14）
 
 - 用户明确批准删除无用旧入口。删除src/Makefile、src/Makefile.MacOS、odpdom/Makefile及仅供前两者使用的src/Configuration.mk；不复制归档，Git保留历史。上一批临时P4VASP_ALLOW_LEGACY_BUILD开关随之撤销。install.md改为当前安装/重编译命令，diagnostic.py错误提示去除旧make/Makefile建议。
