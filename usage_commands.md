@@ -4,7 +4,7 @@
 
 ```bash
 bash install.sh
-source ~/.bashrc
+source ~/.zshrc    # macOS 默认 zsh；Bash 使用 source ~/.bashrc
 ```
 
 在计算文件所在目录运行，文件名可替换成实际路径。
@@ -28,7 +28,7 @@ p4v POSCAR -o side.png --view side
 
 图片保存在当前目录；已有同名图片会被覆盖。更多参数见 [图片导出指南](doc/render-cli.md)。
 
-macOS 的 zsh 终端也可手动执行 `source ~/.bashrc`；新开的 zsh 终端需要重新加载。已有 Bash 专用配置的 `.bashrc` 应在 Bash 终端加载。
+请以安装末尾打印的 source 路径为准：zsh 使用 `.zshrc`（尊重 `ZDOTDIR`），Bash 使用 `.bashrc`。新开的对应 shell 终端自动加载别名。
 
 ## XDATCAR轨迹播放
 

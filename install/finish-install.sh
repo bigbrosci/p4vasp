@@ -18,10 +18,12 @@ finish_install() {
     local launch_command alias_definition
     printf -v launch_command 'bash %q' "$ROOT/p4v.sh"
     # Quote the alias value as literal shell text, including unusual path names.
-    alias_definition="${launch_command//\'/\'\\\'\'}"
-    alias_definition="alias p4v='$alias_definition'"
+    printf -v alias_definition 'alias p4v=%q' "$launch_command"
     local rc_file config_output shell_result='SKIPPED (--deps-only).' configured=0
     rc_file="$HOME/.bashrc"
+    if [[ "${SHELL:-}" == */zsh || "${SHELL:-}" == zsh ]]; then
+        rc_file="${ZDOTDIR:-$HOME}/.zshrc"
+    fi
     # Optional explicit destination for automation; never change HOME for tests.
     if [[ -n "${P4VASP_SHELL_RC:-}" ]]; then
         rc_file="$P4VASP_SHELL_RC"
@@ -46,7 +48,13 @@ finish_install() {
     echo
     if [[ "$configured" -eq 1 ]]; then
         echo 'NEXT STEP: Run this command in your terminal:'
-        echo '  source ~/.bashrc'
+        if [[ "$rc_file" == "$HOME/.bashrc" ]]; then
+            echo '  source ~/.bashrc'
+        elif [[ "$rc_file" == "$HOME/.zshrc" ]]; then
+            echo '  source ~/.zshrc'
+        else
+            printf '  source %q\n' "$rc_file"
+        fi
     elif [[ "${CONFIGURE_SHELL:-1}" -eq 1 ]]; then
         echo 'NEXT STEP: Resolve the command-setup error above and rerun the installer.'
     else

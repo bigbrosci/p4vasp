@@ -93,17 +93,13 @@ Linux 和 macOS 统一使用：
 bash install.sh
 ```
 
-安装成功后，按末尾英文提示在当前终端执行：
+安装成功后，按末尾英文提示加载命令：macOS 常用的 zsh 执行 `source ~/.zshrc`，Bash 执行 `source ~/.bashrc`。
 
-```bash
-source ~/.bashrc
-```
-
-安装器统一将 `p4v` 别名写入 `~/.bashrc`，Mac 的 zsh 终端也可以手动执行上述 source 命令加载该别名。不要使用 `source install.sh`。zsh 默认不会在新终端读取 `.bashrc`，因此新开的 zsh 终端需要再次执行 `source ~/.bashrc`。如果已有 `.bashrc` 包含 Bash 专用配置，zsh 加载时可能报错，此时请在 Bash 终端使用这套流程。
+安装器按用户登录 shell（`$SHELL`）选择配置文件，zsh 使用 `${ZDOTDIR:-$HOME}/.zshrc`，其他 shell 沿用 `.bashrc`；仅提供 Bash/zsh 别名配置。显式 `P4VASP_SHELL_RC` 优先，末尾打印实际写入文件的 source 命令。新开的对应 shell 终端会自动读取配置，无需重复手动加载。不要使用 `source install.sh`；安装脚本仍通过 `bash install.sh` 执行。
 
 配置使用独立标记区块，重复安装只更新该区块，保留其他内容；修改已有文件前在实际配置文件同目录备份，保留权限与符号链接。`--deps-only` 不配置别名；`--no-launch`／`--build-only` 成功后仍配置。失败会显示原因，不提示配置成功。
 
-启动、结构查看与 top／side 图片导出命令见 [常用命令](usage_commands.md)。安装末尾只保留安装结果、`source ~/.bashrc` 下一步及该文档入口。
+启动、结构查看与 top／side 图片导出命令见 [常用命令](usage_commands.md)。安装末尾只保留安装结果、对应配置文件的 `source` 下一步及该文档入口。
 
 无显示环境时跳过预览并明确提示GUI未验证；`--no-launch`、`--build-only`、`--deps-only` 不打开界面。启动失败不会显示GUI成功，初始化超过60秒会退出。两秒预览仅验证启动，不代表完整功能或科学计算验证。日常 `bash p4v.sh`／`p4v` 不会自动关闭。
 
@@ -264,15 +260,11 @@ calculation inputs. Record destination-machine checks separately from historical
 Starting with the magic `p4v` command
 --------------------------
 
-The installer configures the `p4v` alias in `~/.bashrc` on Linux and macOS.
-Run `bash install.sh`, then load it in your current terminal:
-
-```bash
-source ~/.bashrc
-```
-
-In zsh, repeat this load in each new terminal. Existing Bash-specific rc content
-may require using a Bash terminal instead. See [usage commands](usage_commands.md).
+Run `bash install.sh`, then use the source command printed at the end.
+The installer selects the rc file from `$SHELL`: zsh uses `${ZDOTDIR:-$HOME}/.zshrc`
+(normally `source ~/.zshrc` on macOS); Bash uses `~/.bashrc`.
+`P4VASP_SHELL_RC` overrides the destination. New matching shell terminals load
+the alias automatically. See [usage commands](usage_commands.md).
 
 GTK3 GUI runtime
 --------------------------

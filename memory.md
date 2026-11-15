@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 安装收尾按shell配置（2026-11-14）
+
+- 用户指出Mac末尾不应统一source bashrc。finish-install.sh恢复按SHELL选择：zsh用ZDOTDIR或HOME的.zshrc，其余沿用.bashrc，显式P4VASP_SHELL_RC优先；提示实际写入路径。仍用bash install.sh，不加载/迁移旧用户配置。此前统一bashrc记录为旧行为。
+- 本Mac Bash3.2下特殊路径alias单引号拼接失败，改printf %q生成完整alias值；临时rc特殊路径/幂等/备份/权限/符号链接、zsh加载调用/自定义覆盖、失败/deps-only测试通过。初次5项中3失败：旧引号、Linux无display夹具在Mac不适用、zsh命令解析需eval；分别修实现和夹具后5项通过，10统一安装检查通过。使用临时配置和启动stub，未修改真实用户rc/安装依赖/运行GUI或重编原生。
+- install.md/usage_commands.md/入口help同步。下一步按新指令；现有用户若仅source zshrc，旧bashrc里的alias不会自动迁移，应在后续安装时按新逻辑配置。详见update_history/update_2026_11_14.md。
+
 ## 当前接手检查点：保存与Windows交付完成（2026-11-14）
 
 - 用户决定保留轻量复制入口、不扩展AI，本次收尾和Windows构建已完成。源码基线58e353dc12181e0b4c17604479c90f16bd480ac7（含全部近期修复、清理、Models按需加载和复制入口），既有修前标签/本机备份及旧发行包保留。工作区仅用户XDATCAR未跟踪，不读不删不提交。

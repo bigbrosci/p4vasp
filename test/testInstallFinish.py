@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -22,7 +23,7 @@ class FinishTest(unittest.TestCase):
                  P4VASP_RELOAD_RECEIPT=str(receipt) if receipt else '',P4VASP_CALLER_SHELL='bash' if receipt else '')
         if zdotdir is not None:
             env.update(ZDOTDIR=str(zdotdir),P4VASP_SHELL_RC='')
-        return subprocess.run(['bash','-c','set -euo pipefail; ROOT="$TEST_ROOT"; LAUNCH="$TEST_LAUNCH"; CONFIGURE_SHELL="$TEST_CONFIGURE"; APP_ARGS=(); source "$FINISH_SCRIPT"; finish_install'],
+        return subprocess.run(['bash','-c','set -euo pipefail; uname() { echo Linux; }; ROOT="$TEST_ROOT"; LAUNCH="$TEST_LAUNCH"; CONFIGURE_SHELL="$TEST_CONFIGURE"; APP_ARGS=(); source "$FINISH_SCRIPT"; finish_install'],
                               env=env,text=True,capture_output=True)
 
     def test_success_quoted_alias_and_repeat_install(self):
@@ -32,7 +33,7 @@ class FinishTest(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertIn('GUI startup check: PASSED',result.stdout)
             self.assertIn('Command setup: CONFIGURED',result.stdout)
-            self.assertIn('source ~/.bashrc',result.stdout)
+            self.assertIn('source ',result.stdout)
             for command in ('p4v POSCAR','p4v test.xyz','p4v OUTCAR','p4v POSCAR -o top.png --view top','p4v POSCAR -o side.png --view side'):
                 self.assertNotIn(command,result.stdout)
             self.assertIn('usage_commands.md',result.stdout)
@@ -85,10 +86,18 @@ class FinishTest(unittest.TestCase):
     def test_zsh_destination_and_malformed_block(self):
         with tempfile.TemporaryDirectory() as folder:
             root=Path(folder)
-            result=self.run_finish(root,launch=0,shell='zsh')
+            result=self.run_finish(root,launch=0,shell='zsh',zdotdir=root)
             self.assertEqual(result.returncode,0,result.stderr)
-            self.assertFalse((root/'.zshrc').exists())
-            self.assertIn('source ~/.bashrc',result.stdout)
+            self.assertTrue((root/'.zshrc').exists())
+            self.assertFalse((root/'.bashrc').exists())
+            self.assertIn('source '+str(root/'.zshrc'),result.stdout)
+            if shutil.which('zsh'):
+                check=subprocess.run(['zsh','-f','-c','source '+shlex.quote(str(root/'.zshrc'))+'\neval p4v'],capture_output=True,text=True)
+                self.assertEqual(check.returncode,0,check.stderr)
+            override=self.run_finish(root,launch=0,shell='zsh',rc=root/'custom-rc')
+            self.assertEqual(override.returncode,0,override.stderr)
+            self.assertTrue((root/'custom-rc').is_file())
+            self.assertIn('source '+str(root/'custom-rc'),override.stdout)
             rc=root/'.bashrc';original=BEGIN+'\n# incomplete block\n';rc.write_text(original)
             result=self.run_finish(root,launch=0)
             self.assertEqual(result.returncode,0)

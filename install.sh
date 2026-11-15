@@ -17,8 +17,8 @@ usage() {
 Usage: bash install.sh [options] [-- p4vasp arguments]
 
 Automatically selects Ubuntu/Debian, other Linux, or macOS installation.
-Successful builds configure p4v in ~/.bashrc.
-After installation, run: source ~/.bashrc
+Successful builds configure p4v in your shell rc file (zsh: ~/.zshrc; Bash: ~/.bashrc).
+After installation, run the source command shown at the end.
 Common commands: usage_commands.md
 Ubuntu/Debian: install apt dependencies, rebuild, then preview the GUI for 2 seconds if a display exists.
 Other Linux: use preinstalled dependencies, rebuild, then preview the GUI for 2 seconds if possible.
