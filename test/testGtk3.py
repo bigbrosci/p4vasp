@@ -8,10 +8,12 @@ import os
 from pathlib import Path
 import sys
 import unittest
+import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 
 from p4vasp import gtk3 as gtk
-from p4vasp.gtk3.glade import XML
+from p4vasp.gtk3.glade import _image_path
+from p4vasp.util import loadGlade
 from p4vasp.piddle.piddleGTK3.core import BasicCanvas, InteractiveCanvas
 from p4vasp.piddle.piddle import red, blue, white, Font
 
@@ -34,7 +36,7 @@ class TestGtk3(unittest.TestCase):
         self.assertGreater(len(paths), 30)
         for path in paths:
             with self.subTest(path=path.name):
-                xml = XML(str(path))
+                xml = loadGlade(path.name)
                 try:
                     self.assertEqual(xml.property_errors, [])
                     self.assertTrue(xml.widgets)
@@ -42,6 +44,26 @@ class TestGtk3(unittest.TestCase):
                     for widget in xml.widgets.values():
                         if isinstance(widget, gtk.Window):
                             widget.destroy()
+
+    def test_layout_file_images_resolve_and_decode(self):
+        # Exercise the real search order and decoder, rather than accepting a
+        # silently missing toolbar icon during layout construction.
+        count = 0
+        for path in sorted((ROOT / 'data/glade2').glob('*.glade')):
+            for prop in ET.parse(path).iter('property'):
+                value = (prop.text or '').strip()
+                if prop.get('name') not in ('icon', 'pixbuf', 'pixmap', 'file', 'filename'):
+                    continue
+                if not value or value.startswith('gtk-'):
+                    continue
+                with self.subTest(layout=path.name, icon=value):
+                    resolved = _image_path(str(path), value)
+                    self.assertIsNotNone(resolved)
+                    pixbuf = gtk.GdkPixbuf.Pixbuf.new_from_file(resolved)
+                    self.assertGreater(pixbuf.get_width(), 0)
+                    self.assertGreater(pixbuf.get_height(), 0)
+                count += 1
+        self.assertGreater(count, 0)
 
     def test_cairo_draw_and_background_restore(self):
         canvas = BasicCanvas()

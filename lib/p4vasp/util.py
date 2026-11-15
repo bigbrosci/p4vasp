@@ -481,15 +481,6 @@ def getDirFromURL(url):
             return s+os.sep
         return s
 
-def loadGlade_old(path,name=None):
-    import libglade
-    import os
-    path=p4vasp_home+"%sdata%sglade%s%s"%(os.sep,os.sep,os.sep,path)
-    if name is None:
-        return libglade.GladeXML(path)
-    else:
-        return libglade.GladeXML(path,name)
-
 def loadGlade(path,name=None):
     from p4vasp.gtk3 import glade
     import os

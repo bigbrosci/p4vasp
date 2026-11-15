@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 旧接口第九批：移除旧Glade目录及加载器（2026-11-14）
+
+- 用户批准继续，删除data/glade全部44个旧布局/图片（264639字节）及util.loadGlade_old；Git保存历史，不复制归档。data/glade2无改动、loadGlade/GTK3适配器/历史会话类保留；仓库运行源码无旧函数/真正libglade导入残留。外部插件若曾调用已移除接口需迁移到现行资源，不提供假兼容别名。
+- testGtk3资源检查改走真实util.loadGlade，新增每处文件图片按适配器路径查找并用GdkPixbuf解码；43布局和124图片引用通过。新跑9 GTK、57基础、33面板（GLUT除外）通过，Models截图/tmp/p4vasp-models-no-context.png已查看工具栏图标和元素表；不声明布局修复/完整科学验收。日志/tmp/p4vasp-remove-glade-{gtk,base,smoke}.log，编译/diff/文档及静态打包输入核对通过。
+- GUI spec仍递归收集data，但本checkout旧目录已不存在，未改spec/执行PyInstaller，不代表旧Windows包已更新或ZIP减少同样大小。未升级库/重编原生/跨平台，用户XDATCAR未读未提交。Windows仍最后；下一步可核对历史绘图后端的真实调用及打包边界，不因缺依赖直接删除。
+
 ## 旧Glade与打包引用专项核对（2026-11-14）
 
 - 用户要求核对，Windows最后。本轮不删除/改UI/改spec；报告doc/legacy-glade-resources-2026-11-14-zh.md逐项列14旧布局和30旧图片。旧目录44文件264639字节，30图片均与现行副本SHA256相同；14布局虽有同名现行副本但内容不同。旧frame标准XML解析失败，13份其余可解析，不算古老libglade可用性验收。

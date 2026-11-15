@@ -339,3 +339,9 @@ the transitional P4VASP_ALLOW_LEGACY_BUILD flag no longer applies.
 本分支统一使用以上安装/重编译命令。四个旧构建文件已删除，历史内容可从Git查阅；
 C++/ODP源码、生成包装文件位置和当前构建脚本保留原位。其他历史脚本和旧界面资源
 仍需逐项评估，不代表所有旧依赖已清理。
+
+
+旧`data/glade/`及`util.loadGlade_old`已于2026-11-14移除；当前界面使用
+`data/glade2/`和GTK3适配器，无需安装libglade。外部插件若使用旧加载函数，
+需迁移到现行布局和`util.loadGlade`，不能直接假定旧布局兼容。历史文件可从Git查阅。
+现有Windows发行包需在后续重新构建才会反映本次资源清理。

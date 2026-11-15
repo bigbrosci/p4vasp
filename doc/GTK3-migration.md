@@ -306,3 +306,20 @@ selection callback in fresh GTK processes. No user database is connected. This
 is not full legacy SQL/session acceptance; pysqlite2 remains an unresolved legacy
 requirement. Local imports may still be collected by packaging, so this change
 makes no bundle-size or SQL-driver removal claim.
+
+
+### Removal of Glade 1 resources (2026-11-14)
+
+The obsolete data/glade tree and util.loadGlade_old were removed after a
+per-file audit. data/glade2 and util.loadGlade remain the supported runtime
+entry; no layout replacement or adapter search-order change was made.
+External plugins using loadGlade_old must migrate their resources/calls; there
+is no alias pretending that old layouts can be loaded unchanged by GTK3.
+The deleted originals remain in Git history.
+
+The resource test now goes through util.loadGlade and separately resolves and
+decodes file icons with the actual GTK3 adapter/GdkPixbuf. All 43 current layouts
+and 124 file-image references passed locally; the nine GTK tests and 33 applet
+startup checks passed. This does not validate external plugins or all scientific
+workflows. Windows GUI spec still collects data recursively; this source tree
+no longer contains the removed directory, but no new bundle was built.
