@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "purpose": "Maintenance inventory, not an installer input or lockfile. Installer sources remain authoritative for package names and pins.",
+  "profiles": {
+    "gui": "Main GTK/native-viewer Python",
+    "ase": "Isolated ASE scientific Python",
+    "smiles": "Isolated RDKit scientific Python",
+    "windows-model": "Official CPython used to freeze the Windows scientific worker",
+    "build": "Python used for GUI packaging and development"
+  },
+  "python": [
+    {"id":"pygobject","distribution":"PyGObject","profiles":["gui"],"kind":"runtime","purpose":"GTK3 widgets and GI bindings","sources":["lib/p4vasp/gtk3/__init__.py","install/ubuntu-bootstrap.sh","install/macos-bootstrap.sh"]},
+    {"id":"pycairo","distribution":"pycairo","profiles":["gui"],"kind":"runtime","purpose":"Cairo rendering; platform GI-Cairo bridge is also required","sources":["lib/p4vasp/piddle/piddleGTK3/core.py","install/ubuntu-bootstrap.sh"]},
+    {"id":"numpy","distribution":"numpy","profiles":["gui","ase","smiles","windows-model"],"kind":"runtime","purpose":"Arrays and numerical geometry, directly and transitively","sources":["lib/p4vasp/Array.py","lib/p4vasp/PhononsCalculation.py","install/windows/model_worker.spec"]},
+    {"id":"pyopengl","distribution":"PyOpenGL","profiles":["gui"],"kind":"feature","purpose":"Independent K-point viewer; requires native GLUT/GLU","sources":["lib/p4vasp/applet/KpointsViewerApplet.py","lib/p4vasp/paint3d/OpenGLPaint3D.py"]},
+    {"id":"ase","distribution":"ase","profiles":["ase","windows-model"],"kind":"feature","purpose":"Bulk generation, structure formats and thermochemistry","sources":["lib/p4vasp/ase_bulk.py","lib/p4vasp/ase_import.py","lib/p4vasp/vibrations.py","install/install-ase.sh","install/windows/prepare_model_env.py"]},
+    {"id":"rdkit","distribution":"rdkit","profiles":["smiles","windows-model"],"kind":"feature","purpose":"SMILES embedding and initial force-field optimization","sources":["lib/p4vasp/smiles_builder.py","install/install-rdkit.sh","install/windows/prepare_model_env.py"]},
+    {"id":"scipy","distribution":"scipy","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE numerical dependency; not removable solely from application import counts","sources":["install/windows/model_worker.spec"]},
+    {"id":"matplotlib","distribution":"matplotlib","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE installation requirement; explicitly excluded from current frozen workers","sources":["install/install-ase.sh","install/windows/model_worker.spec"]},
+    {"id":"pillow","distribution":"Pillow","profiles":["smiles","windows-model"],"kind":"transitive","purpose":"RDKit dependency; unrelated to obsolete top-level Image imports","sources":["install/install-rdkit.sh","install/windows/model_worker.spec"]},
+    {"id":"typing-extensions","distribution":"typing_extensions","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE installation metadata requirement","sources":["install/install-ase.sh"]},
+    {"id":"pyinstaller","distribution":"PyInstaller","profiles":["build","windows-model"],"kind":"build","purpose":"Freeze executables; not a portable-user prerequisite","sources":["install/package-windows.sh","install/windows/prepare_model_env.py"]}
+  ],
+  "native": [
+    {"id":"fltk","kind":"runtime","purpose":"Native structure windows","platform_packages":{"ubuntu-debian":"libfltk1.3-dev","macos-homebrew":"fltk@1.3","windows-ucrt64":"mingw-w64-ucrt-x86_64-fltk"},"sources":["install/ubuntu-bootstrap.sh","install/macos-bootstrap.sh","install/build-unix-py3.sh"]},
+    {"id":"opengl-glu","kind":"runtime","purpose":"Native rendering and compatibility GL/GLU APIs","platform_packages":{"ubuntu-debian":"libgl1-mesa-dev, libglu1-mesa-dev","macos":"OpenGL framework","windows":"opengl32, glu32 system libraries"},"sources":["install/build-unix-py3.sh","src/VisPrimitiveDrawer.cpp"]},
+    {"id":"glut","kind":"feature","purpose":"K-point viewer; not the native Show renderer","platform_packages":{"ubuntu-debian":"Not explicitly declared in bootstrap; clean-machine package mapping pending","macos":"Platform verification pending","windows":"Packaged K-point/GLUT verification pending"},"sources":["lib/p4vasp/paint3d/OpenGLPaint3D.py","install/ubuntu-bootstrap.sh"]},
+    {"id":"gtk-font-stack","kind":"runtime","purpose":"GTK3, GLib, Pango, GdkPixbuf, Cairo and platform font backends","platform_packages":{"ubuntu-debian":"gir1.2-gtk-3.0, python3-gi, python3-gi-cairo, python3-cairo plus system transitive libraries","macos-homebrew":"gtk+3, pygobject3, py3cairo; Quartz/CoreText backend","windows-ucrt64":"gtk3, python-gobject, python-cairo plus bundled font/runtime DLLs"},"sources":["install/ubuntu-bootstrap.sh","install/macos-bootstrap.sh","lib/p4vasp/gtk3/community.py","lib/p4vasp/gtk3/macos.py"]},
+    {"id":"cpp-python-runtime","kind":"runtime","purpose":"Platform C/C++ runtime, Python ABI and window/driver dependencies","platform_packages":{"linux":"System libc/libstdc++ and matching Python ABI","macos":"System frameworks and matching Homebrew Python ABI","windows":"UCRT GUI vs official-CPython scientific worker remain isolated"},"sources":["install/build-unix-py3.sh","install/package-windows.sh"]}
+  ],
+  "tools": [
+    {"id":"native-build","kind":"build","purpose":"Compiler, SWIG, Python headers/config, fltk-config, pkg-config and platform make","sources":["install/build-unix-py3.sh","install/ubuntu-bootstrap.sh","install/macos-bootstrap.sh"]},
+    {"id":"packaging-update","kind":"build","purpose":"Git, Bash, pip/venv, PyInstaller; PowerShell for Windows orchestration/replay","sources":["install/windows/update_build.py","install/package-windows.sh","lib/p4vasp/render_recipe.py"]},
+    {"id":"api-docs","kind":"development","purpose":"epydoc/doxygen belong to historical API generation, not GUI startup","sources":["doc/Makefile"]}
+  ],
+  "vendored": [
+    {"id":"piddle-pdf","kind":"runtime","purpose":"Bundled plotting/PDF implementation with active format exporters; archive unused backends separately","sources":["lib/p4vasp/GraphCanvas.py","lib/p4vasp/piddle/pdfgen.py","lib/p4vasp/piddle/pdfdoc.py"]},
+    {"id":"odpdom","kind":"runtime","purpose":"Bundled native XML parser integrated into _cp4vasp; preserve source/license","sources":["lib/p4vasp/ODPdom.py","odpdom/COPYING","install/build-unix-py3.sh"]},
+    {"id":"legacy-uuid","kind":"legacy","purpose":"Bundled UUID used by old SQL; standard-library migration requires ID compatibility checks","sources":["lib/p4vasp/uuid.py","lib/p4vasp/db.py"]}
+  ],
+  "legacy": [
+    {"id":"sql-drivers","kind":"legacy","purpose":"pysqlite2/MySQLdb behind old SQL/Commit registration; not modern resource navigation","sources":["lib/p4vasp/db.py","lib/p4vasp/applet/CommitApplet.py","lib/p4vasp/applet/appletlist.py"]},
+    {"id":"historical-backends","kind":"legacy","purpose":"QuickDraw/wx/Tk/PIL/GLTT and xmllib branches; no automatic installation or deletion","sources":["lib/p4vasp/piddle/piddleQD.py","lib/p4vasp/piddle/piddleWX.py","lib/p4vasp/piddle/piddleTK.py","lib/p4vasp/piddle/piddleGL.py","lib/p4vasp/piddle/stringformat.py"]}
+  ]
+}

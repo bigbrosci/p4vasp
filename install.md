@@ -34,6 +34,18 @@ All modifications remain distributed under the GNU General Public License v2 (GP
 Source-code distributions
 ==========================
 
+Dependency maintenance / 依赖维护
+--------------------------------
+
+The maintained dependency inventory, environment roles and read-only version snapshots live in
+[doc/dependencies/README.md](doc/dependencies/README.md).
+It separates GUI, optional scientific workers, native/system libraries and build tools.
+The existing platform scripts remain the installation/version authority; snapshots are not lockfiles.
+
+维护者请从上述统一入口查看依赖分层及采集命令，不要把ASE／RDKit强行装进GTK解释器，
+也不要照版本快照批量安装或卸载软件。新增、升级或移除依赖时同步清单和相关说明；
+只有环境实际变化或换机/发布建立基线时才需要新快照。本次整理不改变下方安装流程。
+
 Unified installation / 统一安装入口
 --------------------------
 

@@ -1,0 +1,1127 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-11-15T00:38:50.509009+00:00",
+  "profile": "gui",
+  "source_revision": "525f3c5c775cc0ee78c0641a0c8911d2da754e99",
+  "catalog_sha256": "afaf77ff2044221d61b7daa31d373ab08ba59bf1e55eddd6de334609efad7db5",
+  "tool_sha256": "e3b6a8a36f4e4abda8e53c6e96acd3f5f4f479ad07001b9782ed67ccbeff2c77",
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64"
+  },
+  "python": {
+    "version": "3.14.4",
+    "implementation": "CPython",
+    "soabi": "cpython-314-x86_64-linux-gnu"
+  },
+  "scope": "All discoverable distribution metadata in this interpreter, not a minimum dependency set or lockfile.",
+  "limits": [
+    "No dependency import or functional check. Missing metadata need not mean missing system library.",
+    "Requirements include raw markers/extras; they are not a resolved active dependency graph.",
+    "No native-library, operating-system package or frozen-archive inventory."
+  ],
+  "declared": [
+    {
+      "id": "pygobject",
+      "distribution": "PyGObject",
+      "kind": "runtime",
+      "version": "3.56.2",
+      "status": "metadata-present"
+    },
+    {
+      "id": "pycairo",
+      "distribution": "pycairo",
+      "kind": "runtime",
+      "version": "1.27.0",
+      "status": "metadata-present"
+    },
+    {
+      "id": "numpy",
+      "distribution": "numpy",
+      "kind": "runtime",
+      "version": "2.3.5",
+      "status": "metadata-present"
+    },
+    {
+      "id": "pyopengl",
+      "distribution": "PyOpenGL",
+      "kind": "feature",
+      "version": "3.1.10",
+      "status": "metadata-present"
+    }
+  ],
+  "distributions": [
+    {
+      "name": "attrs",
+      "version": "25.4.0",
+      "requires_dist": []
+    },
+    {
+      "name": "autocommand",
+      "version": "2.2.2",
+      "requires_dist": []
+    },
+    {
+      "name": "Automat",
+      "version": "25.4.16",
+      "requires_dist": [
+        "Twisted>=16.1.1; extra == \"visualize\"",
+        "graphviz>0.5.1; extra == \"visualize\"",
+        "typing_extensions; python_version < \"3.10\""
+      ]
+    },
+    {
+      "name": "babel",
+      "version": "2.17.0",
+      "requires_dist": [
+        "backports.zoneinfo; python_version < \"3.9\" and extra == \"dev\"",
+        "freezegun~=1.0; extra == \"dev\"",
+        "jinja2>=3.0; extra == \"dev\"",
+        "pytest-cov; extra == \"dev\"",
+        "pytest>=6.0; extra == \"dev\"",
+        "pytz; extra == \"dev\"",
+        "pytz>=2015.7; python_version < \"3.9\"",
+        "setuptools; extra == \"dev\"",
+        "tzdata; sys_platform == \"win32\" and extra == \"dev\""
+      ]
+    },
+    {
+      "name": "bcrypt",
+      "version": "5.0.0",
+      "requires_dist": [
+        "mypy; extra == \"typecheck\"",
+        "pytest!=3.3.0,>=3.2.1; extra == \"tests\""
+      ]
+    },
+    {
+      "name": "blinker",
+      "version": "1.9.0",
+      "requires_dist": []
+    },
+    {
+      "name": "certifi",
+      "version": "2026.1.4",
+      "requires_dist": []
+    },
+    {
+      "name": "chardet",
+      "version": "5.2.0",
+      "requires_dist": []
+    },
+    {
+      "name": "click",
+      "version": "8.1.8",
+      "requires_dist": [
+        "colorama; platform_system == 'Windows'",
+        "importlib-metadata; python_version < '3.8'"
+      ]
+    },
+    {
+      "name": "command-not-found",
+      "version": "0.3",
+      "requires_dist": []
+    },
+    {
+      "name": "configobj",
+      "version": "5.0.9",
+      "requires_dist": []
+    },
+    {
+      "name": "constantly",
+      "version": "23.10.4",
+      "requires_dist": []
+    },
+    {
+      "name": "cryptography",
+      "version": "46.0.5",
+      "requires_dist": [
+        "bcrypt>=3.1.5 ; extra == 'ssh'",
+        "build>=1.0.0 ; extra == 'sdist'",
+        "certifi>=2024 ; extra == 'test'",
+        "check-sdist ; extra == 'pep8test'",
+        "click>=8.0.1 ; extra == 'pep8test'",
+        "cryptography-vectors==46.0.5 ; extra == 'test'",
+        "mypy>=1.14 ; extra == 'pep8test'",
+        "nox[uv]>=2024.4.15 ; extra == 'nox'",
+        "pretend>=0.7 ; extra == 'test'",
+        "pyenchant>=3 ; extra == 'docstest'",
+        "pytest-benchmark>=4.0 ; extra == 'test'",
+        "pytest-cov>=2.10.1 ; extra == 'test'",
+        "pytest-randomly ; extra == 'test-randomorder'",
+        "pytest-xdist>=3.5.0 ; extra == 'test'",
+        "pytest>=7.4.0 ; extra == 'test'",
+        "readme-renderer>=30.0 ; extra == 'docstest'",
+        "ruff>=0.11.11 ; extra == 'pep8test'",
+        "sphinx-inline-tabs ; extra == 'docs'",
+        "sphinx-rtd-theme>=3.0.0 ; extra == 'docs'",
+        "sphinx>=5.3.0 ; extra == 'docs'",
+        "sphinxcontrib-spelling>=7.3.1 ; extra == 'docstest'",
+        "typing-extensions>=4.13.2 ; python_full_version < '3.11'"
+      ]
+    },
+    {
+      "name": "dbus-python",
+      "version": "1.4.0",
+      "requires_dist": [
+        "sphinx; extra == \"doc\"",
+        "sphinx_rtd_theme; extra == \"doc\"",
+        "tap.py; extra == \"test\""
+      ]
+    },
+    {
+      "name": "distro",
+      "version": "1.9.0",
+      "requires_dist": []
+    },
+    {
+      "name": "distro-info",
+      "version": "1.15",
+      "requires_dist": []
+    },
+    {
+      "name": "httplib2",
+      "version": "0.22.0",
+      "requires_dist": [
+        "pyparsing!=3.0.0,!=3.0.1,!=3.0.2,!=3.0.3,<4,>=2.4.2; python_version > \"3.0\"",
+        "pyparsing<3,>=2.4.2; python_version < \"3.0\""
+      ]
+    },
+    {
+      "name": "hyperlink",
+      "version": "21.0.0",
+      "requires_dist": [
+        "idna>=2.5",
+        "typing; python_version < \"3.5\""
+      ]
+    },
+    {
+      "name": "idna",
+      "version": "3.11",
+      "requires_dist": [
+        "flake8 >= 7.1.1 ; extra == \"all\"",
+        "mypy >= 1.11.2 ; extra == \"all\"",
+        "pytest >= 8.3.2 ; extra == \"all\"",
+        "ruff >= 0.6.2 ; extra == \"all\""
+      ]
+    },
+    {
+      "name": "incremental",
+      "version": "24.7.2",
+      "requires_dist": [
+        "click>=6.0; extra == \"scripts\"",
+        "packaging>=17.0",
+        "tomli; python_version < \"3.11\""
+      ]
+    },
+    {
+      "name": "inflect",
+      "version": "7.5.0",
+      "requires_dist": [
+        "furo; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "more_itertools>=8.5.0",
+        "pygments; extra == \"test\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-mypy; extra == \"type\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "typeguard>=4.0.1",
+        "typing_extensions; python_version < \"3.9\""
+      ]
+    },
+    {
+      "name": "jaraco.context",
+      "version": "6.0.1",
+      "requires_dist": [
+        "backports.tarfile; python_version < \"3.12\"",
+        "furo; extra == \"doc\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "portend; extra == \"test\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest-enabler>=2.2; extra == \"test\"",
+        "pytest-mypy; extra == \"test\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"test\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\""
+      ]
+    },
+    {
+      "name": "jaraco.functools",
+      "version": "4.1.0",
+      "requires_dist": [
+        "furo; extra == \"doc\"",
+        "jaraco.classes; extra == \"test\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "more_itertools",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-mypy; extra == \"type\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\""
+      ]
+    },
+    {
+      "name": "jaraco.text",
+      "version": "4.0.0",
+      "requires_dist": [
+        "autocommand",
+        "furo; extra == \"doc\"",
+        "importlib_resources; python_version < \"3.9\"",
+        "inflect; extra == \"inflect\"",
+        "jaraco.context>=4.1",
+        "jaraco.functools",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "more_itertools",
+        "pathlib2; python_version < \"3.10\" and extra == \"test\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest-enabler>=2.2; extra == \"test\"",
+        "pytest-mypy; extra == \"test\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"test\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\""
+      ]
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "requires_dist": [
+        "Babel>=2.7 ; extra == \"i18n\"",
+        "MarkupSafe>=2.0"
+      ]
+    },
+    {
+      "name": "jsonpatch",
+      "version": "1.32",
+      "requires_dist": [
+        "jsonpointer>=1.9"
+      ]
+    },
+    {
+      "name": "jsonpointer",
+      "version": "2.4",
+      "requires_dist": []
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.19.2",
+      "requires_dist": [
+        "attrs>=22.2.0",
+        "fqdn; extra == 'format'",
+        "fqdn; extra == 'format-nongpl'",
+        "idna; extra == 'format'",
+        "idna; extra == 'format-nongpl'",
+        "importlib-resources>=1.4.0; python_version < '3.9'",
+        "isoduration; extra == 'format'",
+        "isoduration; extra == 'format-nongpl'",
+        "jsonpointer>1.13; extra == 'format'",
+        "jsonpointer>1.13; extra == 'format-nongpl'",
+        "jsonschema-specifications>=2023.03.6",
+        "pkgutil-resolve-name>=1.3.10; python_version < '3.9'",
+        "referencing>=0.28.4",
+        "rfc3339-validator; extra == 'format'",
+        "rfc3339-validator; extra == 'format-nongpl'",
+        "rfc3986-validator>0.1.0; extra == 'format-nongpl'",
+        "rfc3987; extra == 'format'",
+        "rpds-py>=0.7.1",
+        "uri-template; extra == 'format'",
+        "uri-template; extra == 'format-nongpl'",
+        "webcolors>=1.11; extra == 'format'",
+        "webcolors>=1.11; extra == 'format-nongpl'"
+      ]
+    },
+    {
+      "name": "jsonschema-specifications",
+      "version": "2023.12.1",
+      "requires_dist": [
+        "importlib-resources>=1.4.0; python_version < '3.9'",
+        "referencing>=0.31.0"
+      ]
+    },
+    {
+      "name": "launchpadlib",
+      "version": "2.1.0",
+      "requires_dist": [
+        "Sphinx; extra == \"docs\"",
+        "coverage; extra == \"test\"",
+        "httplib2",
+        "keyring; extra == \"keyring\"",
+        "lazr.restfulclient>=0.14.2",
+        "lazr.uri",
+        "pytest; extra == \"test\"",
+        "testresources; extra == \"testing\"",
+        "wadllib; extra == \"testing\""
+      ]
+    },
+    {
+      "name": "lazr.restfulclient",
+      "version": "0.14.6",
+      "requires_dist": [
+        "Sphinx; extra == \"docs\"",
+        "distro",
+        "fixtures>=1.3.0; extra == \"test\"",
+        "httplib2; python_version < \"3\"",
+        "httplib2>=0.7.7; python_version >= \"3\"",
+        "importlib-metadata; python_version < \"3.8\"",
+        "lazr.authentication; extra == \"test\"",
+        "lazr.restful>=0.11.0; extra == \"test\"",
+        "mock; python_version < \"3\" and extra == \"test\"",
+        "oauth; extra == \"test\"",
+        "oauthlib",
+        "setuptools",
+        "testtools; extra == \"test\"",
+        "wadllib>=1.1.4",
+        "wsgi_intercept; extra == \"test\"",
+        "zope.testrunner; extra == \"test\""
+      ]
+    },
+    {
+      "name": "lazr.uri",
+      "version": "1.0.6",
+      "requires_dist": [
+        "Sphinx; extra == \"docs\"",
+        "importlib-metadata; python_version < \"3.8\"",
+        "zope.testrunner; extra == \"test\""
+      ]
+    },
+    {
+      "name": "libpass",
+      "version": "1.9.3",
+      "requires_dist": [
+        "argon2-cffi>=18.2.0; extra == 'argon2'",
+        "bcrypt>=3.1.0; extra == 'bcrypt'",
+        "cryptography>=43.0.1; extra == 'totp'"
+      ]
+    },
+    {
+      "name": "linkify-it-py",
+      "version": "2.0.3",
+      "requires_dist": [
+        "black; extra == \"dev\"",
+        "coverage; extra == \"test\"",
+        "flake8; extra == \"dev\"",
+        "isort; extra == \"dev\"",
+        "myst-parser; extra == \"doc\"",
+        "pre-commit; extra == \"dev\"",
+        "pyproject-flake8; extra == \"dev\"",
+        "pytest-benchmark; extra == \"benchmark\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest; extra == \"benchmark\"",
+        "pytest; extra == \"test\"",
+        "sphinx; extra == \"doc\"",
+        "sphinx_book_theme; extra == \"doc\"",
+        "uc-micro-py"
+      ]
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "3.0.0",
+      "requires_dist": [
+        "commonmark~=0.9 ; extra == \"compare\"",
+        "coverage ; extra == \"testing\"",
+        "gprof2dot ; extra == \"profiling\"",
+        "jupyter_sphinx ; extra == \"rtd\"",
+        "linkify-it-py>=1,<3 ; extra == \"linkify\"",
+        "markdown~=3.4 ; extra == \"compare\"",
+        "mdit-py-plugins ; extra == \"plugins\"",
+        "mdit-py-plugins @ git+https://github.com/executablebooks/mdit-py-plugins@master ; extra == \"rtd\"",
+        "mdurl~=0.1",
+        "mistletoe~=1.0 ; extra == \"compare\"",
+        "mistune~=2.0 ; extra == \"compare\"",
+        "myst-parser ; extra == \"rtd\"",
+        "panflute~=2.3 ; extra == \"compare\"",
+        "pre-commit~=3.0 ; extra == \"code-style\"",
+        "psutil ; extra == \"benchmarking\"",
+        "pytest ; extra == \"benchmarking\"",
+        "pytest ; extra == \"testing\"",
+        "pytest-benchmark ; extra == \"benchmarking\"",
+        "pytest-cov ; extra == \"testing\"",
+        "pytest-regressions ; extra == \"testing\"",
+        "pyyaml ; extra == \"rtd\"",
+        "sphinx ; extra == \"rtd\"",
+        "sphinx-copybutton ; extra == \"rtd\"",
+        "sphinx-design ; extra == \"rtd\"",
+        "sphinx_book_theme ; extra == \"rtd\""
+      ]
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.3",
+      "requires_dist": []
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "requires_dist": []
+    },
+    {
+      "name": "more-itertools",
+      "version": "10.8.0",
+      "requires_dist": []
+    },
+    {
+      "name": "netifaces",
+      "version": "0.11.0",
+      "requires_dist": []
+    },
+    {
+      "name": "numpy",
+      "version": "2.3.5",
+      "requires_dist": []
+    },
+    {
+      "name": "oauthlib",
+      "version": "3.3.1",
+      "requires_dist": [
+        "blinker>=1.4.0; extra == \"signals\"",
+        "cryptography>=3.0.0; extra == \"rsa\"",
+        "cryptography>=3.0.0; extra == \"signedtoken\"",
+        "pyjwt<3,>=2.0.0; extra == \"signedtoken\""
+      ]
+    },
+    {
+      "name": "packaging",
+      "version": "26.0",
+      "requires_dist": []
+    },
+    {
+      "name": "pyasn1",
+      "version": "0.6.3",
+      "requires_dist": []
+    },
+    {
+      "name": "pyasn1_modules",
+      "version": "0.4.1",
+      "requires_dist": [
+        "pyasn1<0.7.0,>=0.4.6"
+      ]
+    },
+    {
+      "name": "pycairo",
+      "version": "1.27.0",
+      "requires_dist": []
+    },
+    {
+      "name": "pycurl",
+      "version": "7.45.7",
+      "requires_dist": []
+    },
+    {
+      "name": "Pygments",
+      "version": "2.19.2",
+      "requires_dist": [
+        "colorama>=0.4.6; extra == 'windows-terminal'"
+      ]
+    },
+    {
+      "name": "PyGObject",
+      "version": "3.56.2",
+      "requires_dist": []
+    },
+    {
+      "name": "PyHamcrest",
+      "version": "2.1.0",
+      "requires_dist": [
+        "alabaster~=0.7; extra == 'dev'",
+        "alabaster~=0.7; extra == 'docs'",
+        "black; extra == 'dev'",
+        "coverage[toml]; extra == 'dev'",
+        "coverage[toml]; extra == 'tests'",
+        "coverage[toml]; extra == 'tests-numpy'",
+        "dataclasses; (python_version < '3.7') and extra == 'dev'",
+        "dataclasses; (python_version < '3.7') and extra == 'tests'",
+        "dataclasses; (python_version < '3.7') and extra == 'tests-numpy'",
+        "doc2dash; extra == 'dev'",
+        "flake8; extra == 'dev'",
+        "mypy!=0.940; (platform_python_implementation != 'PyPy') and extra == 'dev'",
+        "mypy!=0.940; (platform_python_implementation != 'PyPy') and extra == 'tests'",
+        "mypy!=0.940; (platform_python_implementation != 'PyPy') and extra == 'tests-numpy'",
+        "numpy; extra == 'tests-numpy'",
+        "pytest-mypy-plugins; (platform_python_implementation != 'PyPy') and extra == 'dev'",
+        "pytest-mypy-plugins; (platform_python_implementation != 'PyPy') and extra == 'tests'",
+        "pytest-mypy-plugins; (platform_python_implementation != 'PyPy') and extra == 'tests-numpy'",
+        "pytest-mypy; extra == 'dev'",
+        "pytest-sugar; extra == 'dev'",
+        "pytest-sugar; extra == 'tests'",
+        "pytest-sugar; extra == 'tests-numpy'",
+        "pytest-xdist; extra == 'dev'",
+        "pytest-xdist; extra == 'tests'",
+        "pytest-xdist; extra == 'tests-numpy'",
+        "pytest>=5.0; extra == 'dev'",
+        "pytest>=5.0; extra == 'tests'",
+        "pytest>=5.0; extra == 'tests-numpy'",
+        "pyyaml; extra == 'dev'",
+        "pyyaml; extra == 'tests'",
+        "pyyaml; extra == 'tests-numpy'",
+        "sphinx~=4.0; extra == 'dev'",
+        "sphinx~=4.0; extra == 'docs'",
+        "towncrier; extra == 'dev'",
+        "tox-asdf; extra == 'dev'",
+        "tox; extra == 'dev'",
+        "twine; extra == 'dev'",
+        "types-dataclasses; (python_version < '3.7') and extra == 'dev'",
+        "types-dataclasses; (python_version < '3.7') and extra == 'tests'",
+        "types-dataclasses; (python_version < '3.7') and extra == 'tests-numpy'",
+        "types-mock; extra == 'dev'",
+        "types-mock; extra == 'tests'",
+        "types-mock; extra == 'tests-numpy'"
+      ]
+    },
+    {
+      "name": "PyJWT",
+      "version": "2.10.1",
+      "requires_dist": [
+        "coverage[toml]==5.0.4; extra == \"dev\"",
+        "coverage[toml]==5.0.4; extra == \"tests\"",
+        "cryptography>=3.4.0; extra == \"crypto\"",
+        "cryptography>=3.4.0; extra == \"dev\"",
+        "pre-commit; extra == \"dev\"",
+        "pytest<7.0.0,>=6.0.0; extra == \"dev\"",
+        "pytest<7.0.0,>=6.0.0; extra == \"tests\"",
+        "sphinx-rtd-theme; extra == \"dev\"",
+        "sphinx-rtd-theme; extra == \"docs\"",
+        "sphinx; extra == \"dev\"",
+        "sphinx; extra == \"docs\"",
+        "zope.interface; extra == \"dev\"",
+        "zope.interface; extra == \"docs\""
+      ]
+    },
+    {
+      "name": "PyOpenGL",
+      "version": "3.1.10",
+      "requires_dist": []
+    },
+    {
+      "name": "pyOpenSSL",
+      "version": "25.3.0",
+      "requires_dist": [
+        "cryptography<47,>=45.0.7",
+        "pretend; extra == \"test\"",
+        "pytest-rerunfailures; extra == \"test\"",
+        "pytest>=3.0.1; extra == \"test\"",
+        "sphinx!=5.2.0,!=5.2.0.post0,!=7.2.5; extra == \"docs\"",
+        "sphinx_rtd_theme; extra == \"docs\"",
+        "typing-extensions>=4.9; python_version < \"3.13\" and python_version >= \"3.8\""
+      ]
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.3.2",
+      "requires_dist": [
+        "jinja2 ; extra == \"diagrams\"",
+        "railroad-diagrams ; extra == \"diagrams\""
+      ]
+    },
+    {
+      "name": "pyserial",
+      "version": "3.5",
+      "requires_dist": [
+        "hidapi; extra == \"cp2110\""
+      ]
+    },
+    {
+      "name": "python-apt",
+      "version": "3.1.0+ubuntu1.1",
+      "requires_dist": []
+    },
+    {
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "requires_dist": []
+    },
+    {
+      "name": "referencing",
+      "version": "0.36.2",
+      "requires_dist": [
+        "attrs>=22.2.0",
+        "rpds-py>=0.7.0",
+        "typing-extensions>=4.4.0; python_version < '3.13'"
+      ]
+    },
+    {
+      "name": "requests",
+      "version": "2.32.5",
+      "requires_dist": [
+        "PySocks!=1.5.7,>=1.5.6; extra == \"socks\"",
+        "certifi>=2017.4.17",
+        "chardet<6,>=3.0.2; extra == \"use-chardet-on-py3\"",
+        "chardet>=3.0.2",
+        "idna<4,>=2.5",
+        "urllib3<3,>=1.21.1"
+      ]
+    },
+    {
+      "name": "rich",
+      "version": "13.9.4",
+      "requires_dist": [
+        "ipywidgets (>=7.5.1,<9) ; extra == \"jupyter\"",
+        "markdown-it-py (>=2.2.0)",
+        "pygments (>=2.13.0,<3.0.0)",
+        "typing-extensions (>=4.0.0,<5.0) ; python_version < \"3.11\""
+      ]
+    },
+    {
+      "name": "rpds-py",
+      "version": "0.27.1",
+      "requires_dist": []
+    },
+    {
+      "name": "service-identity",
+      "version": "24.2.0",
+      "requires_dist": [
+        "attrs>=19.1.0",
+        "coverage[toml]>=5.0.2; extra == 'dev'",
+        "coverage[toml]>=5.0.2; extra == 'tests'",
+        "cryptography",
+        "furo; extra == 'docs'",
+        "idna; extra == 'dev'",
+        "idna; extra == 'idna'",
+        "idna; extra == 'mypy'",
+        "mypy; extra == 'dev'",
+        "mypy; extra == 'mypy'",
+        "myst-parser; extra == 'docs'",
+        "pyasn1",
+        "pyasn1-modules",
+        "pyopenssl; extra == 'dev'",
+        "pyopenssl; extra == 'docs'",
+        "pytest; extra == 'dev'",
+        "pytest; extra == 'tests'",
+        "sphinx-notfound-page; extra == 'docs'",
+        "sphinx; extra == 'docs'",
+        "types-pyopenssl; extra == 'dev'",
+        "types-pyopenssl; extra == 'mypy'"
+      ]
+    },
+    {
+      "name": "setuptools",
+      "version": "78.1.1",
+      "requires_dist": [
+        "build[virtualenv]>=1.0.3; extra == \"test\"",
+        "filelock>=3.4.0; extra == \"test\"",
+        "furo; extra == \"doc\"",
+        "importlib_metadata>=6; python_version < \"3.10\" and extra == \"core\"",
+        "importlib_metadata>=7.0.2; python_version < \"3.10\" and extra == \"type\"",
+        "ini2toml[lite]>=0.14; extra == \"test\"",
+        "jaraco.develop>=7.21; (python_version >= \"3.9\" and sys_platform != \"cygwin\") and extra == \"test\"",
+        "jaraco.develop>=7.21; sys_platform != \"cygwin\" and extra == \"type\"",
+        "jaraco.envs>=2.2; extra == \"test\"",
+        "jaraco.functools>=4; extra == \"core\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.path>=3.7.2; extra == \"test\"",
+        "jaraco.test>=5.5; extra == \"test\"",
+        "jaraco.text>=3.7; extra == \"core\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "more_itertools; extra == \"core\"",
+        "more_itertools>=8.8; extra == \"core\"",
+        "mypy==1.14.*; extra == \"type\"",
+        "packaging>=24.2; extra == \"core\"",
+        "packaging>=24.2; extra == \"test\"",
+        "pip>=19.1; extra == \"test\"",
+        "platformdirs>=4.2.2; extra == \"core\"",
+        "pygments-github-lexers==0.0.5; extra == \"doc\"",
+        "pyproject-hooks!=1.1; extra == \"doc\"",
+        "pyproject-hooks!=1.1; extra == \"test\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-home>=0.5; extra == \"test\"",
+        "pytest-mypy; extra == \"type\"",
+        "pytest-perf; sys_platform != \"cygwin\" and extra == \"test\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "pytest-subprocess; extra == \"test\"",
+        "pytest-timeout; extra == \"test\"",
+        "pytest-xdist>=3; extra == \"test\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "ruff>=0.8.0; sys_platform != \"cygwin\" and extra == \"check\"",
+        "sphinx-favicon; extra == \"doc\"",
+        "sphinx-inline-tabs; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx-notfound-page<2,>=1; extra == \"doc\"",
+        "sphinx-reredirects; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\"",
+        "sphinxcontrib-towncrier; extra == \"doc\"",
+        "tomli-w>=1.0.0; extra == \"test\"",
+        "tomli>=2.0.1; python_version < \"3.11\" and extra == \"core\"",
+        "towncrier<24.7; extra == \"doc\"",
+        "virtualenv>=13.0.0; extra == \"test\"",
+        "wheel>=0.43.0; extra == \"core\"",
+        "wheel>=0.44.0; extra == \"test\""
+      ]
+    },
+    {
+      "name": "systemd-python",
+      "version": "235",
+      "requires_dist": []
+    },
+    {
+      "name": "Twisted",
+      "version": "25.5.0",
+      "requires_dist": [
+        "appdirs>=1.4.0; extra == 'all-non-platform'",
+        "appdirs>=1.4.0; extra == 'all_non_platform'",
+        "appdirs>=1.4.0; extra == 'conch'",
+        "appdirs>=1.4.0; extra == 'gtk-platform'",
+        "appdirs>=1.4.0; extra == 'gtk_platform'",
+        "appdirs>=1.4.0; extra == 'macos-platform'",
+        "appdirs>=1.4.0; extra == 'macos_platform'",
+        "appdirs>=1.4.0; extra == 'mypy'",
+        "appdirs>=1.4.0; extra == 'osx-platform'",
+        "appdirs>=1.4.0; extra == 'osx_platform'",
+        "appdirs>=1.4.0; extra == 'windows-platform'",
+        "appdirs>=1.4.0; extra == 'windows_platform'",
+        "attrs>=22.2.0",
+        "automat>=24.8.0",
+        "bcrypt>=3.1.3; extra == 'all-non-platform'",
+        "bcrypt>=3.1.3; extra == 'all_non_platform'",
+        "bcrypt>=3.1.3; extra == 'conch'",
+        "bcrypt>=3.1.3; extra == 'gtk-platform'",
+        "bcrypt>=3.1.3; extra == 'gtk_platform'",
+        "bcrypt>=3.1.3; extra == 'macos-platform'",
+        "bcrypt>=3.1.3; extra == 'macos_platform'",
+        "bcrypt>=3.1.3; extra == 'mypy'",
+        "bcrypt>=3.1.3; extra == 'osx-platform'",
+        "bcrypt>=3.1.3; extra == 'osx_platform'",
+        "bcrypt>=3.1.3; extra == 'windows-platform'",
+        "bcrypt>=3.1.3; extra == 'windows_platform'",
+        "constantly>=15.1",
+        "coverage~=7.5; extra == 'dev'",
+        "coverage~=7.5; extra == 'mypy'",
+        "cryptography>=3.3; extra == 'all-non-platform'",
+        "cryptography>=3.3; extra == 'all_non_platform'",
+        "cryptography>=3.3; extra == 'conch'",
+        "cryptography>=3.3; extra == 'gtk-platform'",
+        "cryptography>=3.3; extra == 'gtk_platform'",
+        "cryptography>=3.3; extra == 'macos-platform'",
+        "cryptography>=3.3; extra == 'macos_platform'",
+        "cryptography>=3.3; extra == 'mypy'",
+        "cryptography>=3.3; extra == 'osx-platform'",
+        "cryptography>=3.3; extra == 'osx_platform'",
+        "cryptography>=3.3; extra == 'windows-platform'",
+        "cryptography>=3.3; extra == 'windows_platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'all-non-platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'all_non_platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'dev'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'gtk-platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'gtk_platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'macos-platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'macos_platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'mypy'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'osx-platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'osx_platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'test'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'windows-platform'",
+        "cython-test-exception-raiser<2,>=1.0.2; extra == 'windows_platform'",
+        "h2<5.0,>=3.2; extra == 'all-non-platform'",
+        "h2<5.0,>=3.2; extra == 'all_non_platform'",
+        "h2<5.0,>=3.2; extra == 'gtk-platform'",
+        "h2<5.0,>=3.2; extra == 'gtk_platform'",
+        "h2<5.0,>=3.2; extra == 'http2'",
+        "h2<5.0,>=3.2; extra == 'macos-platform'",
+        "h2<5.0,>=3.2; extra == 'macos_platform'",
+        "h2<5.0,>=3.2; extra == 'mypy'",
+        "h2<5.0,>=3.2; extra == 'osx-platform'",
+        "h2<5.0,>=3.2; extra == 'osx_platform'",
+        "h2<5.0,>=3.2; extra == 'windows-platform'",
+        "h2<5.0,>=3.2; extra == 'windows_platform'",
+        "httpx[http2]>=0.27; extra == 'all-non-platform'",
+        "httpx[http2]>=0.27; extra == 'all_non_platform'",
+        "httpx[http2]>=0.27; extra == 'dev'",
+        "httpx[http2]>=0.27; extra == 'gtk-platform'",
+        "httpx[http2]>=0.27; extra == 'gtk_platform'",
+        "httpx[http2]>=0.27; extra == 'macos-platform'",
+        "httpx[http2]>=0.27; extra == 'macos_platform'",
+        "httpx[http2]>=0.27; extra == 'mypy'",
+        "httpx[http2]>=0.27; extra == 'osx-platform'",
+        "httpx[http2]>=0.27; extra == 'osx_platform'",
+        "httpx[http2]>=0.27; extra == 'test'",
+        "httpx[http2]>=0.27; extra == 'windows-platform'",
+        "httpx[http2]>=0.27; extra == 'windows_platform'",
+        "hyperlink>=17.1.1",
+        "hypothesis>=6.56; extra == 'all-non-platform'",
+        "hypothesis>=6.56; extra == 'all_non_platform'",
+        "hypothesis>=6.56; extra == 'dev'",
+        "hypothesis>=6.56; extra == 'gtk-platform'",
+        "hypothesis>=6.56; extra == 'gtk_platform'",
+        "hypothesis>=6.56; extra == 'macos-platform'",
+        "hypothesis>=6.56; extra == 'macos_platform'",
+        "hypothesis>=6.56; extra == 'mypy'",
+        "hypothesis>=6.56; extra == 'osx-platform'",
+        "hypothesis>=6.56; extra == 'osx_platform'",
+        "hypothesis>=6.56; extra == 'test'",
+        "hypothesis>=6.56; extra == 'windows-platform'",
+        "hypothesis>=6.56; extra == 'windows_platform'",
+        "idna>=2.4; extra == 'all-non-platform'",
+        "idna>=2.4; extra == 'all_non_platform'",
+        "idna>=2.4; extra == 'gtk-platform'",
+        "idna>=2.4; extra == 'gtk_platform'",
+        "idna>=2.4; extra == 'macos-platform'",
+        "idna>=2.4; extra == 'macos_platform'",
+        "idna>=2.4; extra == 'mypy'",
+        "idna>=2.4; extra == 'osx-platform'",
+        "idna>=2.4; extra == 'osx_platform'",
+        "idna>=2.4; extra == 'tls'",
+        "idna>=2.4; extra == 'windows-platform'",
+        "idna>=2.4; extra == 'windows_platform'",
+        "incremental>=24.7.0",
+        "mypy-zope==1.0.6; extra == 'mypy'",
+        "mypy==1.10.1; extra == 'mypy'",
+        "priority<2.0,>=1.1.0; extra == 'all-non-platform'",
+        "priority<2.0,>=1.1.0; extra == 'all_non_platform'",
+        "priority<2.0,>=1.1.0; extra == 'gtk-platform'",
+        "priority<2.0,>=1.1.0; extra == 'gtk_platform'",
+        "priority<2.0,>=1.1.0; extra == 'http2'",
+        "priority<2.0,>=1.1.0; extra == 'macos-platform'",
+        "priority<2.0,>=1.1.0; extra == 'macos_platform'",
+        "priority<2.0,>=1.1.0; extra == 'mypy'",
+        "priority<2.0,>=1.1.0; extra == 'osx-platform'",
+        "priority<2.0,>=1.1.0; extra == 'osx_platform'",
+        "priority<2.0,>=1.1.0; extra == 'windows-platform'",
+        "priority<2.0,>=1.1.0; extra == 'windows_platform'",
+        "pydoctor~=24.11.1; extra == 'dev'",
+        "pydoctor~=24.11.1; extra == 'dev-release'",
+        "pydoctor~=24.11.1; extra == 'dev_release'",
+        "pydoctor~=24.11.1; extra == 'mypy'",
+        "pyflakes~=2.2; extra == 'dev'",
+        "pyflakes~=2.2; extra == 'mypy'",
+        "pygobject; extra == 'gtk-platform'",
+        "pygobject; extra == 'gtk_platform'",
+        "pyhamcrest>=2; extra == 'all-non-platform'",
+        "pyhamcrest>=2; extra == 'all_non_platform'",
+        "pyhamcrest>=2; extra == 'dev'",
+        "pyhamcrest>=2; extra == 'gtk-platform'",
+        "pyhamcrest>=2; extra == 'gtk_platform'",
+        "pyhamcrest>=2; extra == 'macos-platform'",
+        "pyhamcrest>=2; extra == 'macos_platform'",
+        "pyhamcrest>=2; extra == 'mypy'",
+        "pyhamcrest>=2; extra == 'osx-platform'",
+        "pyhamcrest>=2; extra == 'osx_platform'",
+        "pyhamcrest>=2; extra == 'test'",
+        "pyhamcrest>=2; extra == 'windows-platform'",
+        "pyhamcrest>=2; extra == 'windows_platform'",
+        "pyobjc-core; (python_version >= '3.9') and extra == 'macos-platform'",
+        "pyobjc-core; (python_version >= '3.9') and extra == 'macos_platform'",
+        "pyobjc-core; (python_version >= '3.9') and extra == 'osx-platform'",
+        "pyobjc-core; (python_version >= '3.9') and extra == 'osx_platform'",
+        "pyobjc-core<11; (python_version < '3.9') and extra == 'macos-platform'",
+        "pyobjc-core<11; (python_version < '3.9') and extra == 'macos_platform'",
+        "pyobjc-core<11; (python_version < '3.9') and extra == 'osx-platform'",
+        "pyobjc-core<11; (python_version < '3.9') and extra == 'osx_platform'",
+        "pyobjc-framework-cfnetwork; (python_version >= '3.9') and extra == 'macos-platform'",
+        "pyobjc-framework-cfnetwork; (python_version >= '3.9') and extra == 'macos_platform'",
+        "pyobjc-framework-cfnetwork; (python_version >= '3.9') and extra == 'osx-platform'",
+        "pyobjc-framework-cfnetwork; (python_version >= '3.9') and extra == 'osx_platform'",
+        "pyobjc-framework-cfnetwork<11; (python_version < '3.9') and extra == 'macos-platform'",
+        "pyobjc-framework-cfnetwork<11; (python_version < '3.9') and extra == 'macos_platform'",
+        "pyobjc-framework-cfnetwork<11; (python_version < '3.9') and extra == 'osx-platform'",
+        "pyobjc-framework-cfnetwork<11; (python_version < '3.9') and extra == 'osx_platform'",
+        "pyobjc-framework-cocoa; (python_version >= '3.9') and extra == 'macos-platform'",
+        "pyobjc-framework-cocoa; (python_version >= '3.9') and extra == 'macos_platform'",
+        "pyobjc-framework-cocoa; (python_version >= '3.9') and extra == 'osx-platform'",
+        "pyobjc-framework-cocoa; (python_version >= '3.9') and extra == 'osx_platform'",
+        "pyobjc-framework-cocoa<11; (python_version < '3.9') and extra == 'macos-platform'",
+        "pyobjc-framework-cocoa<11; (python_version < '3.9') and extra == 'macos_platform'",
+        "pyobjc-framework-cocoa<11; (python_version < '3.9') and extra == 'osx-platform'",
+        "pyobjc-framework-cocoa<11; (python_version < '3.9') and extra == 'osx_platform'",
+        "pyopenssl>=21.0.0; extra == 'all-non-platform'",
+        "pyopenssl>=21.0.0; extra == 'all_non_platform'",
+        "pyopenssl>=21.0.0; extra == 'gtk-platform'",
+        "pyopenssl>=21.0.0; extra == 'gtk_platform'",
+        "pyopenssl>=21.0.0; extra == 'macos-platform'",
+        "pyopenssl>=21.0.0; extra == 'macos_platform'",
+        "pyopenssl>=21.0.0; extra == 'mypy'",
+        "pyopenssl>=21.0.0; extra == 'osx-platform'",
+        "pyopenssl>=21.0.0; extra == 'osx_platform'",
+        "pyopenssl>=21.0.0; extra == 'tls'",
+        "pyopenssl>=21.0.0; extra == 'windows-platform'",
+        "pyopenssl>=21.0.0; extra == 'windows_platform'",
+        "pyserial>=3.0; extra == 'all-non-platform'",
+        "pyserial>=3.0; extra == 'all_non_platform'",
+        "pyserial>=3.0; extra == 'gtk-platform'",
+        "pyserial>=3.0; extra == 'gtk_platform'",
+        "pyserial>=3.0; extra == 'macos-platform'",
+        "pyserial>=3.0; extra == 'macos_platform'",
+        "pyserial>=3.0; extra == 'mypy'",
+        "pyserial>=3.0; extra == 'osx-platform'",
+        "pyserial>=3.0; extra == 'osx_platform'",
+        "pyserial>=3.0; extra == 'serial'",
+        "pyserial>=3.0; extra == 'windows-platform'",
+        "pyserial>=3.0; extra == 'windows_platform'",
+        "python-subunit~=1.4; extra == 'dev'",
+        "python-subunit~=1.4; extra == 'mypy'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'all-non-platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'all_non_platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'gtk-platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'gtk_platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'macos-platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'macos_platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'mypy'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'osx-platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'osx_platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'serial'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'windows-platform'",
+        "pywin32!=226; (platform_system == 'Windows') and extra == 'windows_platform'",
+        "pywin32!=226; extra == 'windows-platform'",
+        "pywin32!=226; extra == 'windows_platform'",
+        "service-identity>=18.1.0; extra == 'all-non-platform'",
+        "service-identity>=18.1.0; extra == 'all_non_platform'",
+        "service-identity>=18.1.0; extra == 'gtk-platform'",
+        "service-identity>=18.1.0; extra == 'gtk_platform'",
+        "service-identity>=18.1.0; extra == 'macos-platform'",
+        "service-identity>=18.1.0; extra == 'macos_platform'",
+        "service-identity>=18.1.0; extra == 'mypy'",
+        "service-identity>=18.1.0; extra == 'osx-platform'",
+        "service-identity>=18.1.0; extra == 'osx_platform'",
+        "service-identity>=18.1.0; extra == 'tls'",
+        "service-identity>=18.1.0; extra == 'windows-platform'",
+        "service-identity>=18.1.0; extra == 'windows_platform'",
+        "sphinx-rtd-theme~=1.3; extra == 'dev'",
+        "sphinx-rtd-theme~=1.3; extra == 'dev-release'",
+        "sphinx-rtd-theme~=1.3; extra == 'dev_release'",
+        "sphinx-rtd-theme~=1.3; extra == 'mypy'",
+        "sphinx<7,>=6; extra == 'dev'",
+        "sphinx<7,>=6; extra == 'dev-release'",
+        "sphinx<7,>=6; extra == 'dev_release'",
+        "sphinx<7,>=6; extra == 'mypy'",
+        "towncrier~=23.6; extra == 'dev'",
+        "towncrier~=23.6; extra == 'dev-release'",
+        "towncrier~=23.6; extra == 'dev_release'",
+        "towncrier~=23.6; extra == 'mypy'",
+        "twisted-iocpsupport>=1.0.2; extra == 'windows-platform'",
+        "twisted-iocpsupport>=1.0.2; extra == 'windows_platform'",
+        "twistedchecker~=0.7; extra == 'dev'",
+        "twistedchecker~=0.7; extra == 'mypy'",
+        "types-pyopenssl; extra == 'mypy'",
+        "types-setuptools; extra == 'mypy'",
+        "wsproto; extra == 'all-non-platform'",
+        "wsproto; extra == 'all_non_platform'",
+        "wsproto; extra == 'gtk-platform'",
+        "wsproto; extra == 'gtk_platform'",
+        "wsproto; extra == 'macos-platform'",
+        "wsproto; extra == 'macos_platform'",
+        "wsproto; extra == 'mypy'",
+        "wsproto; extra == 'osx-platform'",
+        "wsproto; extra == 'osx_platform'",
+        "wsproto; extra == 'websocket'",
+        "wsproto; extra == 'windows-platform'",
+        "wsproto; extra == 'windows_platform'",
+        "zope-interface>=5"
+      ]
+    },
+    {
+      "name": "typeguard",
+      "version": "4.4.4",
+      "requires_dist": [
+        "importlib_metadata>=3.6; python_version < \"3.10\"",
+        "typing_extensions>=4.14.0"
+      ]
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.15.0",
+      "requires_dist": []
+    },
+    {
+      "name": "ubuntu-pro-client",
+      "version": "8001",
+      "requires_dist": [
+        "mock; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest; extra == \"test\"",
+        "pyyaml"
+      ]
+    },
+    {
+      "name": "uc-micro-py",
+      "version": "1.0.3",
+      "requires_dist": [
+        "coverage; extra == \"test\"",
+        "pytest-cov; extra == \"test\"",
+        "pytest; extra == \"test\""
+      ]
+    },
+    {
+      "name": "unattended-upgrades",
+      "version": "0.1",
+      "requires_dist": []
+    },
+    {
+      "name": "urllib3",
+      "version": "2.6.3",
+      "requires_dist": [
+        "backports-zstd>=1.0.0; (python_version < '3.14') and extra == 'zstd'",
+        "brotli>=1.2.0; (platform_python_implementation == 'CPython') and extra == 'brotli'",
+        "brotlicffi>=1.2.0.0; (platform_python_implementation != 'CPython') and extra == 'brotli'",
+        "h2<5,>=4; extra == 'h2'",
+        "pysocks!=1.5.7,<2.0,>=1.5.6; extra == 'socks'"
+      ]
+    },
+    {
+      "name": "wadllib",
+      "version": "2.0.0",
+      "requires_dist": [
+        "Sphinx; extra == \"docs\"",
+        "importlib-resources; python_version < \"3.9\"",
+        "lazr.uri",
+        "multipart; extra == \"test\""
+      ]
+    },
+    {
+      "name": "zipp",
+      "version": "3.23.0",
+      "requires_dist": [
+        "big-O; extra == \"test\"",
+        "furo; extra == \"doc\"",
+        "jaraco.functools; extra == \"test\"",
+        "jaraco.itertools; extra == \"test\"",
+        "jaraco.packaging>=9.3; extra == \"doc\"",
+        "jaraco.test; extra == \"test\"",
+        "jaraco.tidelift>=1.4; extra == \"doc\"",
+        "more_itertools; extra == \"test\"",
+        "pytest!=8.1.*,>=6; extra == \"test\"",
+        "pytest-checkdocs>=2.4; extra == \"check\"",
+        "pytest-cov; extra == \"cover\"",
+        "pytest-enabler>=2.2; extra == \"enabler\"",
+        "pytest-ignore-flaky; extra == \"test\"",
+        "pytest-mypy; extra == \"type\"",
+        "pytest-ruff>=0.2.1; sys_platform != \"cygwin\" and extra == \"check\"",
+        "rst.linker>=1.9; extra == \"doc\"",
+        "sphinx-lint; extra == \"doc\"",
+        "sphinx>=3.5; extra == \"doc\""
+      ]
+    },
+    {
+      "name": "zope.interface",
+      "version": "8.2",
+      "requires_dist": [
+        "Sphinx; extra == \"docs\"",
+        "coverage[toml]; extra == \"test\"",
+        "coverage[toml]; extra == \"testing\"",
+        "furo; extra == \"docs\"",
+        "repoze.sphinx.autointerface; extra == \"docs\"",
+        "zope.event; extra == \"test\"",
+        "zope.event; extra == \"testing\"",
+        "zope.testing; extra == \"test\"",
+        "zope.testing; extra == \"testing\""
+      ]
+    }
+  ]
+}

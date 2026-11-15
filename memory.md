@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 依赖维护第一批：统一目录与版本快照（2026-11-14）
+
+- 用户同意先做清单/快照/安装说明，并强调长期维护。入口doc/dependencies/README.md；catalog.json集中分层用途、profile、来源和平台包映射，不重复维护精确版本或改变安装行为；缺GLUT平台项保留pending。现有安装/构建源继续是执行权威，未增加第二套安装器/锁文件。
+- 新增标准库工具tools/dependency_snapshot.py：目标解释器执行，--check校验catalog/schema/源码引用；profile选择来自catalog同一处。读取发行元数据/原始Requires-Dist、平台/Python SOABI、Git及清单/工具摘要，输出只读JSON快照，独占新建拒绝覆盖；不import科学GUI库、不装卸包、不采用户/主机名、环境变量或完整解释器路径。全环境分发清单非最小依赖/活跃依赖图/锁文件/成品验收。
+- 实际生成11/14 Linux gui/ase/smiles三个快照（73/15/4项可发现发行元数据）存doc/dependencies/snapshots，核对工具/清单SHA256一致。install.md及AGENTS.md增加唯一维护入口、依赖变动时同步规则；普通源码变更不反复采集。源码快照基线525f3c5，非本次提交前全部树的冻结证明。
+- 3工具专项通过（真实catalog与坏引用/重复ID/profile拒绝，模拟缺元数据/规范化名/保留markers，真实CLI采集/不覆盖/--check）；编译、JSON/UTF8/链接/围栏/diff通过。无依赖升级/清理/原生/GUI/科学/Windows/Mac运行或EXE构建。XDATCAR仍未跟踪不提交。第一批完成；版本锁、完整SBOM、系统快照/成品裁剪及旧接口修复仍未实施，按后续明确指令继续。
+
 ## 扩展全层依赖审计（2026-11-14）
 
 - 用户补充“不限Python2/GTK，其他未知库也检查”。新增doc/dependency-inventory-2026-11-14-zh.md并与前份报告互链：覆盖科学/传递库、原生ELF、ctypes字体/平台接口、构建/文档命令、内置PDF/UUID/ODP、GLTT/xmllib及Windows冻结样包。无应用/环境修改。

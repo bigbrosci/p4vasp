@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-11-15T00:38:50.638827+00:00",
+  "profile": "smiles",
+  "source_revision": "525f3c5c775cc0ee78c0641a0c8911d2da754e99",
+  "catalog_sha256": "afaf77ff2044221d61b7daa31d373ab08ba59bf1e55eddd6de334609efad7db5",
+  "tool_sha256": "e3b6a8a36f4e4abda8e53c6e96acd3f5f4f479ad07001b9782ed67ccbeff2c77",
+  "platform": {
+    "system": "Linux",
+    "machine": "x86_64"
+  },
+  "python": {
+    "version": "3.14.6",
+    "implementation": "CPython",
+    "soabi": "cpython-314-x86_64-linux-gnu"
+  },
+  "scope": "All discoverable distribution metadata in this interpreter, not a minimum dependency set or lockfile.",
+  "limits": [
+    "No dependency import or functional check. Missing metadata need not mean missing system library.",
+    "Requirements include raw markers/extras; they are not a resolved active dependency graph.",
+    "No native-library, operating-system package or frozen-archive inventory."
+  ],
+  "declared": [
+    {
+      "id": "numpy",
+      "distribution": "numpy",
+      "kind": "runtime",
+      "version": "2.5.4",
+      "status": "metadata-present"
+    },
+    {
+      "id": "rdkit",
+      "distribution": "rdkit",
+      "kind": "feature",
+      "version": "2026.9.1",
+      "status": "metadata-present"
+    },
+    {
+      "id": "pillow",
+      "distribution": "Pillow",
+      "kind": "transitive",
+      "version": "13.0.0",
+      "status": "metadata-present"
+    }
+  ],
+  "distributions": [
+    {
+      "name": "numpy",
+      "version": "2.5.4",
+      "requires_dist": []
+    },
+    {
+      "name": "pillow",
+      "version": "13.0.0",
+      "requires_dist": [
+        "arro3-compute; extra == \"test-arrow\"",
+        "arro3-core; extra == \"test-arrow\"",
+        "coverage>=7.4.2; extra == \"tests\"",
+        "defusedxml; extra == \"tests\"",
+        "defusedxml; extra == \"xmp\"",
+        "furo; extra == \"docs\"",
+        "markdown2; extra == \"tests\"",
+        "nanoarrow; extra == \"test-arrow\"",
+        "olefile; extra == \"docs\"",
+        "olefile; extra == \"fpx\"",
+        "olefile; extra == \"mic\"",
+        "olefile; extra == \"tests\"",
+        "packaging; extra == \"tests\"",
+        "psutil; (sys_platform == \"linux\" or sys_platform == \"darwin\") and extra == \"tests\"",
+        "pyarrow; extra == \"test-arrow\"",
+        "pytest-cov; extra == \"tests\"",
+        "pytest-timeout; extra == \"tests\"",
+        "pytest-xdist; extra == \"tests\"",
+        "pytest; extra == \"tests\"",
+        "setuptools; extra == \"tests\"",
+        "sphinx-autobuild; extra == \"docs\"",
+        "sphinx-copybutton; extra == \"docs\"",
+        "sphinx-inline-tabs; extra == \"docs\"",
+        "sphinx>=8.2; extra == \"docs\"",
+        "sphinxext-opengraph; extra == \"docs\"",
+        "trove-classifiers>=2024.10.12; extra == \"tests\""
+      ]
+    },
+    {
+      "name": "pip",
+      "version": "26.1.2",
+      "requires_dist": []
+    },
+    {
+      "name": "rdkit",
+      "version": "2026.9.1",
+      "requires_dist": [
+        "Pillow",
+        "numpy"
+      ]
+    }
+  ]
+}
