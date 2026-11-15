@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 当前接手检查点：保存与Windows构建（2026-11-14）
+
+- 用户确认保留轻量复制入口、暂不扩展AI；当前授权收尾记录并生成最新Windows EXE，撤销此前“Windows最后暂缓”的当前限制（历史记录保留）。应用已保存/推送至dc5b29c；待办为本次Windows构建与结果回填，不继续扩大清理/性能功能。
+- Windows只读预检通过：C:\msys64\home\lqlhz\p4vasp-checkout，p4vasp-py3/origin正确且干净，预检源码4add680。准备同步新源码，现有发布包保留。模型自检适配按需gas_phase_page，新增初始隐藏页检查；runtime增加复制摘要/完整输入/剪贴板验收。
+- 未解决项：bulk紧凑窗口要求480x320但本机基线/新代码均532x409；完整testBulkGtk不算通过。旧SQL驱动/字典旧排序/历史后端及全依赖升级未处理，用户XDATCAR不读不删不提交。
+- 下一步：推送构建准备提交→Windows更新器隔离编译/冻结→runtime/gui/models成品报告→核对来源/ZIP摘要并记录路径。此处为构建前状态，不代表新EXE已生成，跨设备/干净机验收待定。
+
 ## 手动ChatGPT问答：本地结构摘要复制（2026-11-14）
 
 - 用户同意复制结构/参数并关注数字token；实现Edit→Copy for ChatGPT...（Frame动态菜单，无左栏/Glade改动）。默认摘要含来源、原子数、组成、物理晶胞矢量，无逐原子坐标；完整POSCAR和INCAR手动勾选，字符数不冒充token。无网络/API/自动浏览器/依赖，不自动产生API费。

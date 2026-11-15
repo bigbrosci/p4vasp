@@ -49,6 +49,7 @@ class ModelsApplet(Applet):
         # survive tab switches. GasPhasePage already refreshes on construction.
         if index == 1:
             content = GasPhasePage()
+            self.gas_phase_page = content
         elif index == 2:
             content = BulkPage()
             self.bulk_page = content

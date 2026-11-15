@@ -47,7 +47,7 @@ class ModelsLazyTest(unittest.TestCase):
                         self.assertEqual(scans.call_count, 0)
                         tabs = applet.notebook
                         tabs.set_current_page(1)
-                        gas = applet._page_contents[1]
+                        gas = applet.gas_phase_page
                         self.assertEqual(len(gas.model), 1)
                         self.assertEqual(scans.call_count, 1)
                         gas.tree.get_selection().select_iter(gas.model.get_iter_first())

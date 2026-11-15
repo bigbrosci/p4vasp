@@ -78,6 +78,16 @@ def main(args):
         s.read(StringIO('Packaged synthetic water\n1\n6 0 0\n0 6 0\n0 0 6\n'
                         'O H\n1 2\nSelective dynamics\nCartesian\n'
                         '0 0 0 F F F\n1.2 0 0 T T T\n0 1.2 0 T T T\n'))
+        from p4vasp.gtk3.chat_context import ChatContextDialog
+        from p4vasp.gtk3 import Gdk
+        context = ChatContextDialog(None, s, 'Packaged synthetic water', lambda: 'ISPIN = 2')
+        assert 'Atoms: 3' in context.text and 'POSCAR (' not in context.text
+        context.full.set_active(True);context.incar.set_active(True)
+        assert 'F F F' in context.text and 'ISPIN = 2' in context.text
+        context.copy_button.clicked()
+        assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == context.text
+        context.destroy()
+        report['checks'].append('local chat context summary/full POSCAR/INCAR and native clipboard')
         window = StructureWindow(w=600, h=450, atomtypes=getAtomtypes())
         window.setStructure(s)
         for _ in range(30):

@@ -41,6 +41,8 @@ def main(args):
         cp4vasp.VisInit()
         window=Gtk.Window();window.set_default_size(1000,700)
         models=ModelsApplet();window.add(models.createPanel());models.initUI();window.show_all()
+        assert not hasattr(models,'gas_phase_page') and not hasattr(models,'bulk_page') and not hasattr(models,'element_table')
+        report['checks'].append('Models hidden pages deferred until first tab selection')
         def pump(until=lambda:True,timeout=30):
             end=time.monotonic()+timeout
             while time.monotonic()<end:
@@ -77,7 +79,7 @@ def main(args):
         assert (out/'Cu_bulk/POSCAR').read_text()==bulk.result['poscar']
         screenshot('bulk.png');bulk.close_preview()
         report['checks'].append('actual bulk GUI -> bundled ASE -> 32 Cu atoms -> native preview -> real POSCAR save dialog')
-        models.notebook.set_current_page(1);gas=models.notebook.get_nth_page(1)
+        models.notebook.set_current_page(1);gas=models.gas_phase_page
         assert 'included' in gas.install_hint.caption.get_text()
         gas.smiles_entry.set_text('CCO');gas.build_button.clicked();pump(lambda:gas.task is None,90)
         assert gas.generated is not None,gas.status.get_text()
