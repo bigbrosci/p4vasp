@@ -106,7 +106,14 @@ def main():
         assert page.play.get_active() and page.timer is not None
         initial=json.dumps(page.view.positions)
         pump(lambda:json.dumps(page.view.positions)!=initial)
+        from types import SimpleNamespace
+        source_before=json.dumps(page.data,sort_keys=True)
+        page.view.press(page.view,SimpleNamespace(button=2,x=100,y=100,state=0))
+        page.view.release(page.view,SimpleNamespace(button=2,x=125,y=115,state=0))
+        camera_pan=page.view.pan
         page.tree.get_selection().select_path(2);pump()
+        assert page.view.pan==camera_pan and json.dumps(page.data,sort_keys=True)==source_before
+
         assert page.mode==2 and page.play.get_active()
         assert not page.scale.get_sensitive() and not page.save_button.get_sensitive()
         page.tree.get_selection().select_path(0);pump()

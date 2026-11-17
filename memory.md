@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-14. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-17. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 当前任务完成：Vibrations鼠标导航对齐Show（2026-11-17）
+
+- 用户要求以Show为准统一振动预览鼠标操作。入口Vibrations工具栏/菜单→vibrations.glade→VibrationsApplet→VibrationsPage→gtk3/mode_view.py；保留布局和Show原生实现。源码对照VisNavDrawer.cpp/vecutils.cpp：左键旋转、Ctrl左键屏幕法线旋转、中键平移、右键水平exp(.005dx)缩放；按下快照计算整次拖动、矩阵组合及旋转平移匹配Show正交导航。保留预览滚轮缩放，支持smooth、忽略水平滚动；释放/丢grab清拖动。
+- 相机状态独立于坐标，模式/播放保留；Cell/晶胞fit仍重置pan/zoom。Shift左键在Show是编辑框选，预览只读不新增选中、不旋转；后端投影/光照及预览缩放安全范围仍有差异，不宣称所有编辑手势或逐像素相同。
+- 本机Linux/WSL /usr/bin/python3 3.14.4、有DISPLAY：新5项真实GTK信号检查通过，与现有原生createrotmat3da系数（与4x4同式）核对组合旋转/屏幕roll，覆盖中键/右键/释放/grab/普通及smooth滚轮/数据不变。独立截图/tmp/p4vasp-mode-navigation.png已查看。完整合成OUTCAR GUI测试增加播放/换模式保留pan并通过，含Scale/导出标记/热化学/异步清理；日志出现2次alloc_needed绘制告警，未单独定位，不用该集成截图作完整布局验收。
+- 3周期几何、9 GTK、57基础、33面板通过，Python编译/diff/文档检查通过。日志/tmp/p4vasp-mode-nav-{test,vibrations,geometry,gtk,base,smoke}.log。未操作真实用户OUTCAR、物理鼠标操作原生Show、跨平台、原生重编或EXE构建；11/14 Windows包不含本次修复。指南/架构/11月17日双语同步，无自动继续任务，按新指令接手。
 
 ## 安装收尾按shell配置（2026-11-14）
 

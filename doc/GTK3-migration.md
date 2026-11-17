@@ -372,3 +372,34 @@ Four focused helper tests and the real Frame/menu/GTK clipboard test cover sourc
 frame selection, scaling/flags preservation, omitted coordinates, inclusion options,
 lazy INCAR and unchanged input. Offscreen dialog content was inspected on a test
 white backdrop; the test does not establish Windows/macOS clipboard behavior.
+
+
+### Vibration mouse navigation follows Show (2026-11-17)
+
+The Vibrations toolbar/Structure menu still opens vibrations.glade through
+VibrationsApplet and gtk3.vibrations.VibrationsPage; its embedded ModeView has
+no new layout or native-window dependency. Navigation now follows
+src/VisNavDrawer.cpp: left rotates, Ctrl-left spins around the screen normal,
+middle pans, right horizontal drag applies exp(0.005*dx) zoom. Rotation uses
+the column-major makerotmat4 signs/composition from vecutils.cpp, accumulated
+as a matrix rather than constrained yaw/pitch; each drag derives from the
+press snapshot, independent of intermediate motion-event count. Pan follows
+Show's orthographic width sensitivity and rotates with the camera.
+
+Wheel zoom remains a preview shortcut; smooth vertical deltas are supported,
+horizontal scroll is not misinterpreted as zoom-out. Release/grab-loss ends a
+drag. Zoom retains the preview's existing safety bounds. Fit resets pan/zoom,
+while animation/mode changes preserve navigation. Shift-left is reserved for
+Show's editing selection and does not rotate this read-only preview. Native
+Show itself, source geometry/mode normalization and scientific exports are
+unchanged; projection/lighting may still differ between the two backends.
+
+Run `test/testModeViewNavigation.py` with the GUI interpreter/display. Five
+actual GTK signal tests use native createrotmat3da coefficients as a rotation
+oracle, exercise modifiers/pan/right-zoom/release/grab/scroll and render a
+synthetic scene without changing its data. testVibrationsGtk additionally checks
+pan retention while playing and selecting another mode. On this Linux/WSL run,
+its complete synthetic regression passed but logged two alloc_needed draw
+warnings; those screenshots are not used as full-layout evidence. The separate
+navigation rendering was inspected. No physical mouse session on native Show,
+macOS/Windows run, native rebuild or Windows EXE rebuild was performed.
