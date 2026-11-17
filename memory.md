@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-17. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 氢球半径显示放大1.5倍（2026-11-17）
+
+- 用户认为H太小，按1.5倍（非加1.5Å）实现。viewer_style.ball_radius只放大H；covalent_atomtypes在显示副本改radius不改covalent，作用于Show及分子预览。ModeView新增ball_radii画球，radii保持原值用于bonds，防止放大球导致额外成键。元素资料/质量/坐标/导出不变，非H及整体尺寸控制不改。
+- 本机Linux/WSL实际GTK 6导航/显示检查通过（5原导航+1新H检查），核对H倍率、非H不变、原子表不变和边界附近只保留原C-H键；首轮测试把无向键端点顺序当作固定顺序而失败，修正夹具后通过。截图/tmp/p4vasp-hydrogen-radius.png已查看。原生ShowQuality实际Cu窗口/抗锯齿/相机状态检查通过；原生H样式副本值已核对，但未单独截图H原生窗口。日志/tmp/p4vasp-hydrogen-{radius,show}.log，编译/diff/文档核对通过。
+- 指南/架构/双语同步；未重复整套9 GTK/57基础/33面板，不把前批通过算本批。无依赖升级/原生重编/跨平台或EXE构建；源码重启生效，既有Windows包不含本次改动。当前无自动继续任务。
+
 ## 当前任务完成：Vibrations鼠标导航对齐Show（2026-11-17）
 
 - 用户要求以Show为准统一振动预览鼠标操作。入口Vibrations工具栏/菜单→vibrations.glade→VibrationsApplet→VibrationsPage→gtk3/mode_view.py；保留布局和Show原生实现。源码对照VisNavDrawer.cpp/vecutils.cpp：左键旋转、Ctrl左键屏幕法线旋转、中键平移、右键水平exp(.005dx)缩放；按下快照计算整次拖动、矩阵组合及旋转平移匹配Show正交导航。保留预览滚轮缩放，支持smooth、忽略水平滚动；释放/丢grab清拖动。

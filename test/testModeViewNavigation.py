@@ -100,6 +100,34 @@ class NavigationTest(unittest.TestCase):
         self.assertIsNone(self.view.drag)
         self.view.fit();self.assertEqual(self.view.pan,(0.,0.,0.));self.assertEqual(self.view.zoom,1.)
 
+    def test_hydrogen_ball_size_does_not_change_bonds_or_element_data(self):
+        from p4vasp.util import getAtomtypes
+        from p4vasp.viewer_style import covalent_atomtypes, BOND_FACTOR
+        table=getAtomtypes();h=table.getRecordForElement('H');c=table.getRecordForElement('C')
+        before=(h.radius,h.covalent,c.radius,c.covalent)
+        cutoff=BOND_FACTOR*(c.covalent+h.covalent)
+        data=dict(positions=[[5,5,5],[5+.9*cutoff,5,5],[5-1.1*cutoff,5,5]],
+                  cell=[[10,0,0],[0,10,0],[0,0,10]],symbols=['C','H','H'],
+                  radii=[c.covalent,h.covalent,h.covalent],colors=[[.4,.4,.4],[1,1,1],[1,1,1]])
+        original=copy.deepcopy(data)
+        self.view.set_data(data)
+        self.assertEqual(self.view.radii,[c.covalent,h.covalent,h.covalent])
+        self.assertAlmostEqual(self.view.ball_radii[1],1.5*h.covalent)
+        self.assertAlmostEqual(self.view.ball_radii[0],c.covalent)
+        self.assertEqual({tuple(sorted(pair)) for pair in self.view.bonds},{(0,1)})
+        native=covalent_atomtypes()
+        self.assertAlmostEqual(native.getRecordForElement('H').radius,1.5*h.covalent)
+        self.assertEqual(native.getRecordForElement('H').covalent,h.covalent)
+        self.assertEqual((h.radius,h.covalent,c.radius,c.covalent),before)
+        self.assertEqual(data,original)
+        self.view.set_cell_visible(False)
+        self.view.queue_draw()
+        import time
+        for _ in range(12):
+            while Gtk.events_pending():Gtk.main_iteration_do(False)
+            time.sleep(.01)
+        self.window.get_pixbuf().savev('/tmp/p4vasp-hydrogen-radius.png','png',[],[])
+
     def test_scroll_directions_and_actual_panned_rotated_drawing(self):
         event=Gdk.Event.new(Gdk.EventType.SCROLL);event.window=self.view.get_window()
         event.direction=Gdk.ScrollDirection.UP

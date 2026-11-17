@@ -7,7 +7,7 @@ import math
 import cairo
 from p4vasp.gtk3 import Gtk, Gdk
 from p4vasp.periodic_preview import geometry, bonds
-from p4vasp.viewer_style import display_values, RADIUS_FACTOR, BOND_FACTOR, BOND_COLOR, BOND_RADIUS, CELL_LINE_WIDTH
+from p4vasp.viewer_style import ball_radius, display_values, RADIUS_FACTOR, BOND_FACTOR, BOND_COLOR, BOND_RADIUS, CELL_LINE_WIDTH
 
 
 def _multiply(a, b):
@@ -47,6 +47,7 @@ class ModeView(Gtk.DrawingArea):
     def set_data(self,data):
         self.data=data;self.positions=data['positions'];self.zoom=1.
         self.radii,self.colors=display_values(data['symbols'],data['radii'],data['colors'])
+        self.ball_radii=[ball_radius(symbol,radius) for symbol,radius in zip(data['symbols'],self.radii)]
         self.set_repeats((1,1,1))
 
     def set_repeats(self,repeats):
@@ -152,7 +153,7 @@ class ModeView(Gtk.DrawingArea):
                 i,j=item;cr.set_source_rgb(*BOND_COLOR);cr.set_line_width(max(2.,factor*2*BOND_RADIUS))
                 cr.move_to(*points[i][:2]);cr.line_to(*points[j][:2]);cr.stroke()
             else:
-                x,y,_=points[item];radius=max(2.,factor*max(.15,self.radii[self.indices[item]]*RADIUS_FACTOR))
+                x,y,_=points[item];radius=max(2.,factor*max(.15,self.ball_radii[self.indices[item]]*RADIUS_FACTOR))
                 red,green,blue=self.colors[self.indices[item]]
                 gradient=cairo.RadialGradient(x-radius*.3,y-radius*.3,radius*.05,x,y,radius)
                 gradient.add_color_stop_rgb(0,min(1,red*.6+.4),min(1,green*.6+.4),min(1,blue*.6+.4))

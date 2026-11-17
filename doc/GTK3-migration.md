@@ -403,3 +403,13 @@ its complete synthetic regression passed but logged two alloc_needed draw
 warnings; those screenshots are not used as full-layout evidence. The separate
 navigation rendering was inspected. No physical mouse session on native Show,
 macOS/Windows run, native rebuild or Windows EXE rebuild was performed.
+
+
+### Hydrogen ball size (2026-11-17)
+
+viewer_style.ball_radius applies a 1.5 multiplier only to H visual radii.
+The native covalent_atomtypes copy changes radius, preserving covalent and the
+shared element catalog; Show/molecular preview use that copy. ModeView keeps
+unscaled radii for periodic bond discovery and separate ball_radii for drawing.
+Other elements and global size controls are unchanged. No native rebuild or
+Glade change is required; the existing Windows EXE does not include this update.

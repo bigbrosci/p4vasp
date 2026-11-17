@@ -8,6 +8,11 @@ BOND_COLOR = (.5,.5,.7)
 BOND_RADIUS = .1
 
 
+def ball_radius(symbol, radius):
+    """Visual ball size only: retain covalent radii for bond detection."""
+    return radius * (1.5 if str(symbol).strip() == 'H' else 1.)
+
+
 def covalent_atomtypes():
     from p4vasp.Structure import AtomInfo
     from p4vasp.util import getAtomtypes
@@ -15,6 +20,7 @@ def covalent_atomtypes():
     for index in range(len(table)):
         record=table.getRecord(index)
         record.radius=record.covalent if math.isfinite(record.covalent) and record.covalent>0 else .7
+        record.radius=ball_radius(record.element,record.radius)
     return table
 
 
