@@ -64,6 +64,11 @@ bash install/install-ase.sh
 
 ### 频率分析入口（2026-11-07）
 
+频率文件名可为`OUTCAR`或`OUTCAR_*`（如`OUTCAR_freq`，不区分大小写），
+可用`p4v OUTCAR_freq`、File/Open或振动页的Open frequency OUTCAR打开。
+仅扩展文件名识别，仍校验完整振动模式；普通优化OUTCAR不会被当作有效频率数据。
+
+
 左侧新增 **Vibrations**：可打开频率计算的 OUTCAR，左侧结构、右侧波数列表，点击模式播放；虚频可用 −1～1、步长 0.1 的无量纲 Scale 生成新 POSCAR，并通过 ASE 计算谐振子／气相热力学矫正。详细数据约定、固定标记与虚频处理见[频率分析操作指南](vibrations-zh.md)。本次为源码功能，未重新打包 Windows。
 
 

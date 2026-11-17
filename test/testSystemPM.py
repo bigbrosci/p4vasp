@@ -4,6 +4,23 @@ from tempfile import mkstemp
 from os import remove, close
 
 class TestSystemPM(unittest.TestCase):
+    def test_renamed_frequency_outcar_routing(self):
+        from pathlib import Path
+        from unittest.mock import patch
+        import importlib
+        module=importlib.import_module('p4vasp.SystemPM')
+        frequency=object();poscar=object()
+        with patch.object(module,'VibrationSystemPM',return_value=frequency) as reader, \
+             patch.object(module,'PoscarSystemPM',return_value=poscar):
+            for name in ('OUTCAR','OUTCAR_freq','outcar_FREQ','OUTCAR_2026'):
+                path=Path('/nonexistent-routing-probe')/name
+                self.assertIs(module.getSystem(path),frequency)
+                reader.assert_called_with(str(path))
+            self.assertIs(module.getSystem('/nonexistent-routing-probe/OUTCARLIKE'),poscar)
+        with patch.object(module,'VibrationSystemPM',side_effect=ValueError('No complete normal modes')):
+            with self.assertRaisesRegex(ValueError,'No complete normal modes'):
+                module.getSystem('/nonexistent-routing-probe/OUTCAR_freq')
+
     def setUp(self):
         self.paths=[]
     def tearDown(self):

@@ -21,6 +21,7 @@ def main():
     assert Gtk.init_check()[0]
     with tempfile.TemporaryDirectory(prefix='vibration GUI ') as temporary:
         folder=Path(temporary);path=write_energy_calculation(folder/'calculation')
+        path=path.rename(path.with_name('OUTCAR_freq'))
         original=path.read_bytes();original_poscar=(path.parent/'POSCAR').read_bytes()
         os.chdir(folder);sys.argv=['p4v.py',str(path)]
         namespace={'__name__':'vibrations_regression'}
@@ -41,6 +42,14 @@ def main():
         pump(lambda:not len(scheduler()))
         frame=getAppletFrame();frame.root_window.resize(1050,800)
         assert isinstance(systemlist()[0],VibrationSystemPM)
+        # File/Open must use the same renamed-frequency routing as the CLI.
+        frame.last_system_path=str(path)
+        frame.show_load_system_fileselection();pump()
+        assert frame.load_system_fileselection.get_filename()==str(path)
+        frame.load_system_selected();pump()
+        assert isinstance(systemlist()[0],VibrationSystemPM)
+        assert systemlist()[0].VIBRATIONS['path']==str(path)
+
         button=frame.xml.get_widget('astart p4vasp.applet.VibrationsApplet.VibrationsApplet')
         button.emit('clicked');pump()
         page=frame.embedded_applet.page
@@ -320,12 +329,14 @@ def main():
         assert page.thermo_result['selected_modes']==list(range(1,7))
         # Missing constraint sources export directly without adding selective dynamics.
         no_flags=write_calculation(folder/'without flags',flags=False)
+        no_flags=no_flags.rename(no_flags.with_name('OUTCAR_freq'))
         def answer_open():
             browser=getattr(page,'file_dialog',None)
             if browser and not browser.saving and browser.dialog.get_visible():
                 browser.select_file(no_flags);browser.dialog.response(Gtk.ResponseType.OK);return False
             return True
         GLib.timeout_add(50,answer_open);page.open_button.clicked();pump(lambda:page.job is None,30)
+        assert page.data['path']==str(no_flags)
         assert page.data['constraints_source'] is None
         page.scale.set_value(.1);assert page.save_button.get_sensitive()
         assert not hasattr(page,'accept_flags')

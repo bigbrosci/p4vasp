@@ -413,3 +413,14 @@ shared element catalog; Show/molecular preview use that copy. ModeView keeps
 unscaled radii for periodic bond discovery and separate ball_radii for drawing.
 Other elements and global size controls are unchanged. No native rebuild or
 Glade change is required; the existing Windows EXE does not include this update.
+
+
+### Renamed frequency OUTCAR routing (2026-11-17)
+
+SystemPM.getSystem recognizes OUTCAR and OUTCAR_* basenames case-insensitively,
+so OUTCAR_freq is routed to VibrationSystemPM instead of PoscarSystemPM.
+The frequency page already passes any explicitly selected path to its reader;
+no parser/layout change or sibling-file guessing is added. Invalid frequency
+content still raises its original error rather than falling back to POSCAR.
+The GUI regression now uses OUTCAR_freq for real CLI, File/Open and compact
+frequency-dialog loading, continuing animation/export/thermochemistry checks.

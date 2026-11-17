@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-17. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 频率文件OUTCAR_freq识别修复（2026-11-17）
+
+- 用户报告重命名OUTCAR_freq打不开。确认SystemPM.getSystem仅匹配OUTCAR，File/Open/CLI误走POSCAR；振动页显式读路径原已支持任意名。增加不区分大小写的OUTCAR_*前缀识别，保留OUTCAR及其他文件分派，不自动猜邻目录文件或放宽内容校验。
+- 新TestSystemPM路由检查覆盖OUTCAR/OUTCAR_freq/outcar_FREQ/OUTCAR_2026、OUTCARLIKE负例及坏内容异常不回退。修前58基础1失败，修后58全通过。testVibrationsGtk改用真实合成OUTCAR_freq，CLI、实际File/Open选择及振动页CompactFileDialog全部通过，后续播放/Scale/POSCAR标记/热化学/异步回归通过，输入字节保持检查通过。
+- 本机Linux/WSL /usr/bin/python3 3.14.4显示环境，证据/tmp/p4vasp-outcar-name-{before,base,gtk}.log；编译/diff/文档核对通过。未提供用户原始文件，故未独立核验其内容；未跨平台、原生重编、升级库或重打EXE。memory/指南/usage/架构/双语同步，源码重启生效，既有Windows包未包含此修复。
+
 ## 氢球半径显示放大1.5倍（2026-11-17）
 
 - 用户认为H太小，按1.5倍（非加1.5Å）实现。viewer_style.ball_radius只放大H；covalent_atomtypes在显示副本改radius不改covalent，作用于Show及分子预览。ModeView新增ball_radii画球，radii保持原值用于bonds，防止放大球导致额外成键。元素资料/质量/坐标/导出不变，非H及整体尺寸控制不改。
