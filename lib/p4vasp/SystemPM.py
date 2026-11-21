@@ -1262,7 +1262,7 @@ def getSystem(path):
         return OldSystemPM(path)
     elif os.path.basename(path).upper()=="XDATCAR":
         return XdatcarSystemPM(path)
-    elif os.path.basename(path).upper()=="OUTCAR" or os.path.basename(path).upper().startswith("OUTCAR_"):
+    elif os.path.basename(path).upper()=="OUTCAR" or os.path.basename(path).upper().startswith(("OUTCAR_", "OUTCAR-")):
         return VibrationSystemPM(path)
     elif os.path.basename(path).upper()=="DOSCAR":
         return DoscarSystemPM(path)

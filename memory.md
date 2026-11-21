@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-21. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 当前任务：11月21日Windows构建与命名扩展收尾
+
+- 用户明确要求生成最新EXE。将此前OUTCAR-兼容的三文件改动纳入本次构建，支持OUTCAR-freq、OUTCAR-frequency及混合大小写，OUTCAR_*原语义不变；CLI/File/Open/振动页仍校验真实频率内容。Linux58基础及真实合成频率GUI重新验证，日志/tmp/p4vasp-exe1121-{base,frequency}.log。
+- Windows checkout只读预检通过：C:\msys64\home\lqlhz\p4vasp-checkout，干净p4vasp-py3/origin正确，构建前基线8c9e076。准备同步源码并隔离构建，现有11月14日发行包保留。此次应包含鼠标导航、H显示1.5倍、频率文件名及实时22段等近期改动。
+- 当前仅构建准备，成品报告/目录/摘要完成后回填；不提前宣称已交付，不额外升级依赖或继续其他清理任务。
+
 ## 当前任务完成：Control／Show实时细节约70%（2026-11-21）
 
 - 用户因画质提高后操作慢要求约70%质量。Control Glade/StructureWindowControlApplet→StructureWindowApplet→StructureWindow共用原生OpenGL，不改GTK布局；viewer_style.INTERACTIVE_PRIMITIVES_RESOLUTION=22（原32）。StructureWindow在创建窗口/绘制器之前设原生默认值，适配首次GL init读取默认的机制，固定22避免每开窗口重复乘0.7；也影响使用StructureWindow的模型预览，不改Cairo振动预览。

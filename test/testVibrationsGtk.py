@@ -21,7 +21,7 @@ def main():
     assert Gtk.init_check()[0]
     with tempfile.TemporaryDirectory(prefix='vibration GUI ') as temporary:
         folder=Path(temporary);path=write_energy_calculation(folder/'calculation')
-        path=path.rename(path.with_name('OUTCAR_freq'))
+        path=path.rename(path.with_name('OUTCAR-freq'))
         original=path.read_bytes();original_poscar=(path.parent/'POSCAR').read_bytes()
         os.chdir(folder);sys.argv=['p4v.py',str(path)]
         namespace={'__name__':'vibrations_regression'}
@@ -329,7 +329,7 @@ def main():
         assert page.thermo_result['selected_modes']==list(range(1,7))
         # Missing constraint sources export directly without adding selective dynamics.
         no_flags=write_calculation(folder/'without flags',flags=False)
-        no_flags=no_flags.rename(no_flags.with_name('OUTCAR_freq'))
+        no_flags=no_flags.rename(no_flags.with_name('OUTCAR-frequency'))
         def answer_open():
             browser=getattr(page,'file_dialog',None)
             if browser and not browser.saving and browser.dialog.get_visible():

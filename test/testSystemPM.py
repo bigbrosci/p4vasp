@@ -12,7 +12,8 @@ class TestSystemPM(unittest.TestCase):
         frequency=object();poscar=object()
         with patch.object(module,'VibrationSystemPM',return_value=frequency) as reader, \
              patch.object(module,'PoscarSystemPM',return_value=poscar):
-            for name in ('OUTCAR','OUTCAR_freq','outcar_FREQ','OUTCAR_2026'):
+            for name in ('OUTCAR','OUTCAR_freq','outcar_FREQ','OUTCAR_2026',
+                         'OUTCAR-freq','OUTCAR-frequency','outcar-FREQUENCY-final'):
                 path=Path('/nonexistent-routing-probe')/name
                 self.assertIs(module.getSystem(path),frequency)
                 reader.assert_called_with(str(path))

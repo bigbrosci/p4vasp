@@ -15,7 +15,8 @@ p4v POSCAR          # 查看 VASP 结构
 p4v XDATCAR         # 打开轨迹，点击 Control 播放或逐帧查看
 p4v test.xyz        # 通过 ASE 读取 XYZ 结构
 p4v OUTCAR          # 打开频率计算 OUTCAR，再点击 Vibrations
-p4v OUTCAR_freq     # 支持带 OUTCAR_ 前缀的频率文件名（不区分大小写）
+p4v OUTCAR_freq     # 支持 OUTCAR_* 文件名（不区分大小写）
+p4v OUTCAR-freq     # 同样支持 OUTCAR-*，如 OUTCAR-frequency
 ```
 
 XYZ 导入和频率分析需要 ASE。普通优化 OUTCAR 不包含完整振动模式。

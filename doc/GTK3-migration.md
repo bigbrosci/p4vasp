@@ -417,13 +417,13 @@ Glade change is required; the existing Windows EXE does not include this update.
 
 ### Renamed frequency OUTCAR routing (2026-11-17)
 
-SystemPM.getSystem recognizes OUTCAR and OUTCAR_* basenames case-insensitively,
+SystemPM.getSystem recognizes OUTCAR, OUTCAR_* and OUTCAR-* basenames case-insensitively,
 so OUTCAR_freq is routed to VibrationSystemPM instead of PoscarSystemPM.
 The frequency page already passes any explicitly selected path to its reader;
 no parser/layout change or sibling-file guessing is added. Invalid frequency
 content still raises its original error rather than falling back to POSCAR.
-The GUI regression now uses OUTCAR_freq for real CLI, File/Open and compact
-frequency-dialog loading, continuing animation/export/thermochemistry checks.
+The GUI regression uses OUTCAR-freq for real CLI/File/Open and OUTCAR-frequency
+for compact frequency-dialog loading, continuing animation/export/thermochemistry checks.
 
 
 ### Native interactive detail reduced to about 70% (2026-11-21)
