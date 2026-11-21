@@ -16,6 +16,7 @@ def main():
     cp4vasp.VisInit()
     source=Structure();source.read(StringIO('quality\n1\n8 0 0\n2 7 0\n1 1 8\nCu\n8\nDirect\n0 0 0\n1 0 0\n0 1 0\n1 1 0\n0 0 1\n1 0 1\n0 1 1\n1 1 1\n'))
     window=StructureWindow(w=600,h=500,title='Cell antialias check',atomtypes=covalent_atomtypes())
+    assert cp4vasp.getDefaultPrimitivesResolution()==22
     window.setRadiusFactor(.3);window.setStructure(source);window.navigator.setHome();window.fitToStructure()
     assert window.structure_drawer.getCellLineWidth()==1
     original=[list(p) for p in window.structure]
@@ -39,6 +40,7 @@ def main():
         assert [[window.navigator.getRotMatElement(i,j) for j in range(4)] for i in range(4)]==matrix
         assert window.structure_drawer.getBondFactor()==1
         window.hide();window.show()
+        assert cp4vasp.getDefaultPrimitivesResolution()==22
         assert window.structure_drawer.getCellLineWidth()==1
         print('PASS native thin cell lines: hard/smooth intermediate-gray levels %s; camera/structure/bond state preserved; reopen width 1'%counts,flush=True)
 

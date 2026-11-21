@@ -1,6 +1,13 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-17. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-21. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 当前任务完成：Control／Show实时细节约70%（2026-11-21）
+
+- 用户因画质提高后操作慢要求约70%质量。Control Glade/StructureWindowControlApplet→StructureWindowApplet→StructureWindow共用原生OpenGL，不改GTK布局；viewer_style.INTERACTIVE_PRIMITIVES_RESOLUTION=22（原32）。StructureWindow在创建窗口/绘制器之前设原生默认值，适配首次GL init读取默认的机制，固定22避免每开窗口重复乘0.7；也影响使用StructureWindow的模型预览，不改Cairo振动预览。
+- 保留晶胞1像素线/抗锯齿/光照、H显示倍率、原子/成键/相机/数据；分段22/32≈69%，sphere stacks20→13，球面面片约45%。未测交互FPS、不保证主观画质/速度比例。独立导出Quality/分辨率/预设不改；原生截图反映当前实时画质。
+- 本机Linux/WSL实际ShowQuality通过22默认值、细线抗锯齿灰阶[0,45]、相机/结构/成键/重开保持；真实Control XDATCAR初末帧/步进/播放停止重启通过；14个headless导出检查通过。截图/tmp/p4vasp-interactive70-show.png已查看（由原生TGA经系统loader转换）；首次sandbox loader受D-Bus权限限制，允许显示后读取成功，非渲染故障。日志/tmp/p4vasp-interactive70-{show,control,export}.log，编译/diff/文档检查通过。
+- 无依赖升级/原生重编/跨平台或EXE打包，源码重启生效。当前工作区另有上次OUTCAR-命名扩展的SystemPM.py、testSystemPM.py、testVibrationsGtk.py三文件改动，保留并不混入本任务提交；其记忆/双语/提交推送尚未收尾，临时旧日志已失效，不宣称本次验证。原先其他旧接口待办仍不自动执行。
 
 ## 频率文件OUTCAR_freq识别修复（2026-11-17）
 

@@ -1,6 +1,9 @@
 """Shared ball-and-stick appearance; never change scientific atom data."""
 import math
 
+# Native interactive tessellation: ~70% of the former 32 segments.
+# Independent image-export quality presets do not use this setting.
+INTERACTIVE_PRIMITIVES_RESOLUTION = 22
 CELL_LINE_WIDTH = 1
 RADIUS_FACTOR = .5
 BOND_FACTOR = 1.2

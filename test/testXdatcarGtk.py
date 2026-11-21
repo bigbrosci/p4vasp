@@ -36,6 +36,7 @@ def main():
         drain();frame=getAppletFrame()
         assert isinstance(systemlist()[0],XdatcarSystemPM)
         frame.xml.get_widget('astart p4vasp.applet.StructureWindowControlApplet.StructureWindowControlApplet').emit('clicked');drain()
+        assert cp4vasp.getDefaultPrimitivesResolution()==22
         from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
         from p4vasp.applet.StructureWindowControlApplet import StructureWindowControlApplet
         owner=next(a for a in applets() if isinstance(a,StructureWindowApplet))

@@ -36,6 +36,11 @@ from p4vasp.matrix import *
 
 class StructureWindow:
     def __init__(self,x=0,y=0,w=400,h=400,title="",this=None,atomtypes=None):
+        # Native drawers read the default during their first GL init. Setting
+        # each drawer before init would be overwritten; use a fixed default,
+        # not repeated multiplication when another window is opened.
+        from p4vasp.viewer_style import INTERACTIVE_PRIMITIVES_RESOLUTION
+        cp4vasp.setDefaultPrimitivesResolution(INTERACTIVE_PRIMITIVES_RESOLUTION)
         self.x=x
         self.y=y
         self.w=w

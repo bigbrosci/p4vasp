@@ -424,3 +424,26 @@ no parser/layout change or sibling-file guessing is added. Invalid frequency
 content still raises its original error rather than falling back to POSCAR.
 The GUI regression now uses OUTCAR_freq for real CLI, File/Open and compact
 frequency-dialog loading, continuing animation/export/thermochemistry checks.
+
+
+### Native interactive detail reduced to about 70% (2026-11-21)
+
+Control uses StructureWindowControlApplet / StructureWindowApplet and the same
+FLTK/OpenGL StructureWindow as Show; its Glade/GTK3 controls are unchanged.
+StructureWindow sets the native default primitive resolution to the shared
+viewer_style.INTERACTIVE_PRIMITIVES_RESOLUTION (22, formerly 32) before creating
+drawers. Native VisStructureDrawer.init reads that default during first GL init,
+so setting a drawer's resolution before init would be overwritten. A fixed value
+avoids compounding the reduction when more native windows open. This also applies
+to previews that use StructureWindow; Cairo ModeView is unaffected.
+
+22/32 is about 69% of the segment count; sphere stacks fall from 20 to 13, giving
+about 45% of the previous sphere tessellation. Cell stroke width/antialiasing,
+lighting, atom/bond radii and scientific data are unchanged. This is not an FPS
+measurement or a guarantee of 70% perceptual quality. Independent image-export
+quality settings are unchanged; raw native screenshots reflect live geometry.
+
+Native Show quality/state/reopen and actual Control XDATCAR navigation/playback
+checks pass on this Linux/WSL device, with reduced-detail screenshot inspected.
+Fourteen headless export tests pass. No native rebuild is necessary for the Python
+default change; no macOS/Windows acceptance or new EXE build was performed.
