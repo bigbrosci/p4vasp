@@ -1,12 +1,36 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-14。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-21。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
 
-## 当前交付（2026-11-14）
+## 当前交付（2026-11-21）
 
-最新构建源码为`58e353dc12181e0b4c17604479c90f16bd480ac7`。EXE完整路径：
+冻结源码`f5de130ec89e55a76431d0edf8280a609abdd88e`，EXE完整路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261121-183334-f5de130e-cbhlyoey\p4vasp.exe
+```
+
+同级ZIP完整路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261121-183334-f5de130e-cbhlyoey.zip
+```
+
+ZIP 157639531字节，SHA256：`899c35382a75ed3a455c38276eee93608924f73e5e92039f3f79e587ed8f3336`，有同名`.zip.sha256`。
+保留整个解压目录的`_internal`和`model-worker`，不能只复制EXE。
+
+本版包含振动鼠标导航统一、H球放大、OUTCAR_freq/OUTCAR-freq/OUTCAR-frequency识别和较轻的实时渲染。
+Windows原生编译及成品runtime/gui/models检查通过，独立核对源码、43布局、无旧Glade及ZIP完整性/摘要；
+仍需另一台干净Windows及具体科研计算的实际验收。日志在Windows checkout的
+`build/windows-update/f5de130e-rkgbsiva`，报告为同级`p4vasp-20261121-183334-f5de130e-cbhlyoey-checks`。
+构建环境元数据快照见[依赖维护入口](dependencies/README.md)，并非冻结成品的完整依赖清单。
+后续交付文档提交不改变本包SOURCE-COMMIT，不因文档同步重复构建。
+
+## 历史交付（2026-11-14）
+
+当时构建源码为`58e353dc12181e0b4c17604479c90f16bd480ac7`。EXE完整路径：
 
 ```text
 C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261114-221532-58e353dc-uhsvnjm6\p4vasp.exe

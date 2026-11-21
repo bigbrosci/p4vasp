@@ -2,18 +2,20 @@
 
 Last updated: 2026-11-21. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
-## 当前任务：11月21日Windows构建与命名扩展收尾
+## 当前交付完成：11月21日Windows版
 
-- 用户明确要求生成最新EXE。将此前OUTCAR-兼容的三文件改动纳入本次构建，支持OUTCAR-freq、OUTCAR-frequency及混合大小写，OUTCAR_*原语义不变；CLI/File/Open/振动页仍校验真实频率内容。Linux58基础及真实合成频率GUI重新验证，日志/tmp/p4vasp-exe1121-{base,frequency}.log。
-- Windows checkout只读预检通过：C:\msys64\home\lqlhz\p4vasp-checkout，干净p4vasp-py3/origin正确，构建前基线8c9e076。准备同步源码并隔离构建，现有11月14日发行包保留。此次应包含鼠标导航、H显示1.5倍、频率文件名及实时22段等近期改动。
-- 当前仅构建准备，成品报告/目录/摘要完成后回填；不提前宣称已交付，不额外升级依赖或继续其他清理任务。
+- 用户要求的最新Windows EXE已完成。冻结源码f5de130ec89e55a76431d0edf8280a609abdd88e，包含此前鼠标导航、H球1.5倍、OUTCAR_*及OUTCAR-*识别、Control/Show实时22段和shell安装收尾改动；未继续额外清理/功能开发。此前三文件连字符改动已验证并提交，不再挂起。
+- EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261121-183334-f5de130e-cbhlyoey\p4vasp.exe；同级p4vasp-20261121-183334-f5de130e-cbhlyoey.zip及.zip.sha256，157639531字节，SHA256=899c35382a75ed3a455c38276eee93608924f73e5e92039f3f79e587ed8f3336。保留整个目录的_internal和model-worker，不单拎EXE；未另复制桌面，旧发行包保留。
+- 当前Windows UCRT64完整原生编译/冻结成功，隔离环境runtime/gui/models均ok=True/frozen=True，含复制/剪贴板、图形/PNG/固定标记、ASE导入与32Cu建模预览保存、RDKit乙醇生成预览导出和取消等既有成品检查。独立SOURCE-COMMIT、43布局/旧Glade缺席、ZIP CRC/SHA256核对通过；不等于逐项新功能人工鼠标或全部科学场景验收，另一台干净Windows未测。
+- 发布基线依赖快照：doc/dependencies/snapshots/2026-11-21-windows-{gui,model}-f5de130e.json，实际目标解释器采集12/22项元数据、GUI Python3.14.9/UCRT ABI与worker Python3.13.17/MSVC ABI分开；工具/清单摘要及源码核对通过，不是冻结DLL清单/锁文件。依赖清单检查及3项snapshot工具测试通过，未手工升级依赖。
+- 日志位于Windows checkout build/windows-update/f5de130e-rkgbsiva，成品报告为dist/windows-releases/p4vasp-20261121-183334-f5de130e-cbhlyoey-checks；Linux构建启动/tmp/p4vasp-windows-20261121.log，58基础/频率GUI准备验证/tmp/p4vasp-exe1121-{base,frequency}.log。指南/双语/记忆同步；后续纯文档提交不改变冻结源码，无待自动构建任务。
 
 ## 当前任务完成：Control／Show实时细节约70%（2026-11-21）
 
 - 用户因画质提高后操作慢要求约70%质量。Control Glade/StructureWindowControlApplet→StructureWindowApplet→StructureWindow共用原生OpenGL，不改GTK布局；viewer_style.INTERACTIVE_PRIMITIVES_RESOLUTION=22（原32）。StructureWindow在创建窗口/绘制器之前设原生默认值，适配首次GL init读取默认的机制，固定22避免每开窗口重复乘0.7；也影响使用StructureWindow的模型预览，不改Cairo振动预览。
 - 保留晶胞1像素线/抗锯齿/光照、H显示倍率、原子/成键/相机/数据；分段22/32≈69%，sphere stacks20→13，球面面片约45%。未测交互FPS、不保证主观画质/速度比例。独立导出Quality/分辨率/预设不改；原生截图反映当前实时画质。
 - 本机Linux/WSL实际ShowQuality通过22默认值、细线抗锯齿灰阶[0,45]、相机/结构/成键/重开保持；真实Control XDATCAR初末帧/步进/播放停止重启通过；14个headless导出检查通过。截图/tmp/p4vasp-interactive70-show.png已查看（由原生TGA经系统loader转换）；首次sandbox loader受D-Bus权限限制，允许显示后读取成功，非渲染故障。日志/tmp/p4vasp-interactive70-{show,control,export}.log，编译/diff/文档检查通过。
-- 无依赖升级/原生重编/跨平台或EXE打包，源码重启生效。当前工作区另有上次OUTCAR-命名扩展的SystemPM.py、testSystemPM.py、testVibrationsGtk.py三文件改动，保留并不混入本任务提交；其记忆/双语/提交推送尚未收尾，临时旧日志已失效，不宣称本次验证。原先其他旧接口待办仍不自动执行。
+- 无依赖升级/原生重编/跨平台或EXE打包，源码重启生效。当时另有OUTCAR-命名扩展的三文件未提交，未混入渲染提交；随后Windows任务中在f5de130完成重新验证、记录和推送。原先其他旧接口待办仍不自动执行。
 
 ## 频率文件OUTCAR_freq识别修复（2026-11-17）
 
