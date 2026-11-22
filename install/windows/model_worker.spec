@@ -11,7 +11,7 @@ datas += [(str(root/'LICENSE'),'.')]
 python_license=Path(__import__('sys').base_prefix)/'LICENSE.txt'
 if python_license.is_file():datas += [(str(python_license),'dependency-licenses/python')]
 a=Analysis([str(root/'install/windows/model_worker.py')],pathex=[str(root/'lib')],
-    datas=datas,binaries=binaries,hiddenimports=['ase.build','ase.io.vasp','ase.io.extxyz',
+    datas=datas,binaries=binaries,hiddenimports=['ase.build','ase.geometry','ase.constraints','ase.io.vasp','ase.io.extxyz',
         'ase.io.cif','ase.io.proteindatabank','ase.io.mol','ase.io.sdf','ase.io.xsf',
         'ase.io.trajectory','ase.thermochemistry','rdkit.Chem.AllChem'],
     excludes=['gi','cairo','cp4vasp','_cp4vasp','tkinter','matplotlib','PyQt5','PyQt6','PySide6'],noarchive=False)

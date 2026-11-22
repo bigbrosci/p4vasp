@@ -14,6 +14,9 @@ def main():
         if kind=='--bulk':
             from p4vasp.ase_bulk import build_bulk
             result={'ok':True,'result':build_bulk(request)}
+        elif kind=='--surface':
+            from p4vasp.ase_surface import build_surface
+            result={'ok':True,'result':build_surface(request)}
         elif kind=='--read-structure':
             from p4vasp.ase_import import read_structure
             result={'ok':True,'result':read_structure(request)}
@@ -23,7 +26,7 @@ def main():
         elif kind=='--smiles':
             from p4vasp.smiles_builder import build_geometry
             result=build_geometry(request.get('smiles'))
-        else:raise ValueError('Use --bulk, --read-structure, --vibrations or --smiles with a JSON request on stdin.')
+        else:raise ValueError('Use --bulk, --surface, --read-structure, --vibrations or --smiles with a JSON request on stdin.')
         print(json.dumps(result,ensure_ascii=True),flush=True)
         return 0
     except Exception as error:

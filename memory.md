@@ -1,6 +1,15 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-21. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 当前完成：ASE Surface首版（2026-11-22）
+
+- 用户授权先做Surface。Models→surface由空框架改为惰性滚动SurfacePage，保持五标签/左右入口不变。ase_surface.py使用现有ASE构建fcc111/100/110、bcc110/100/111、hcp0001模板，或Bulk结果快照/用户POSCAR/CIF按(h k l)切面；使用SurfaceTask复用BulkTask独立进程/60秒/取消机制，GUI不导入ASE，不引入pymatgen。
+- 参数含明确元素/a/c、原子层或ASE等价层、面内重复、每侧真空、底部几何固定层/容差。自定义指数基于输入晶胞，不自动常规胞化；指数公因子约去。用ASE get_layers/FixAtoms，替换输入旧约束；元素稳定分组后层号/固定标记与POSCAR行序对齐。10000原子/数值/退化检查；源输入不改。预览固定层标记圈，shared model preview清旧选择以免向Bulk/gas泄漏。
+- 保存新目录POSCAR+surface.json（参数/版本/层号/嵌入自定义体相），不覆盖已有目录；首版无独立重放脚本/INCAR/KPOINTS/POTCAR，无终止面枚举/极性稳定性判断/吸附物放置。默认Cu/fcc111/a3.615、4层2x2、每侧10Å、固定底2层→16原子8固定；自定义equivalent layers不等同几何原子层。详见doc/ase-surface-zh.md。
+- 本机Linux/WSL GUI /usr/bin/python3及已有.venv-ase ASE3.29.0：6核心专项通过全部模板、Cu111解析层距/双侧真空/掩码、负指数/自定义源、CIF混合元素与可移植源、坏参数及独立/Windows-source dispatcher协议。真实Surface GTK通过惰性初始化、预设指数显示、异步响应/原生16原子8标记、Bulk/实际文件导入、新目录保存/防覆盖、失效、模拟取消回调及显式page.destroy；不是整机正常退出/实际Surface进程取消的全面验收。3既有通用任务测试另覆盖真实进程取消/超时。
+- 1 Models惰性含Surface设置保留、Resources复制/表格编辑集成、9 GTK、58基础、33面板、3依赖工具及清单检查通过；编译/diff/文档核对通过。日志/tmp/p4vasp-surface-{core,gtk,task,lazy,resources,gtk-base,base,smoke,dependencies}.log，页面/tmp/p4vasp-surface-page.png、原生固定层/tmp/p4vasp-surface-preview.png已查看。初轮发现文件选择器返回str需Path转换（实现修复），预设(hkl)显示同步也已核对；offscreen父窗口/父销毁夹具改真实GtkWindow及显式page.destroy后通过，未将夹具变动写作应用修复。ASE/NumPy弃用及既有cmatrix退出告警保留。
+- Windows worker/spec及未来--check-models新增Surface生成预览保存检查，但本轮仅源码/语法/ASE源协议，不构建EXE、不声称Windows/Mac验收，11月21日包不含Surface。既有ASE依赖用途/源码索引同步，无环境或版本变化，不重复采快照。界面/安装/架构/双语同步，当前首版任务完成，无自动继续复杂终止面、吸附物或Windows构建的任务。
 
 ## 当前交付完成：11月21日Windows版
 

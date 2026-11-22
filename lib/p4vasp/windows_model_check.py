@@ -23,6 +23,7 @@ def main(args):
         from p4vasp.Structure import Structure
         import p4vasp.gtk3.bulk as bulk_module
         import p4vasp.gtk3.gas_phase as gas_module
+        import p4vasp.gtk3.surface as surface_module
         import cp4vasp
         import subprocess
         assert Gtk.init_check()[0]
@@ -79,6 +80,19 @@ def main(args):
         assert (out/'Cu_bulk/POSCAR').read_text()==bulk.result['poscar']
         screenshot('bulk.png');bulk.close_preview()
         report['checks'].append('actual bulk GUI -> bundled ASE -> 32 Cu atoms -> native preview -> real POSCAR save dialog')
+        models.notebook.set_current_page(3);surface=models.surface_page
+        surface.build_button.clicked();pump(lambda:surface.task is None,60)
+        assert surface.result is not None,surface.status.get_text()
+        assert surface.result['atoms']==16 and surface.result['fixed_atoms']==8
+        surface.preview_button.clicked();pump()
+        assert surface.preview_window.getSelectedCount()==8
+        with patch.object(surface_module,'InputFolderDialog',side_effect=auto_dialog(surface_module.InputFolderDialog,'Cu_surface')):
+            surface.save_button.clicked()
+        saved=Structure(str(out/'Cu_surface/POSCAR'))
+        assert len(saved)==16 and sum(not all(flag) for flag in saved.selective)==8
+        assert (out/'Cu_surface/surface.json').is_file()
+        screenshot('surface.png');surface.close_preview()
+        report['checks'].append('actual surface GUI -> bundled ASE Cu(111) -> fixed bottom layers/preview -> POSCAR and metadata save')
         models.notebook.set_current_page(1);gas=models.gas_phase_page
         assert 'included' in gas.install_hint.caption.get_text()
         gas.smiles_entry.set_text('CCO');gas.build_button.clicked();pump(lambda:gas.task is None,90)

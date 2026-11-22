@@ -2,7 +2,7 @@
 
 更新日期：2026年11月4日。入口：左侧 **Models → bulk**。
 
-本页在p4vasp中提供参数界面，实际晶体构建调用ASE `ase.build.bulk`，超胞调用ASE重复晶胞功能。结构直接在p4vasp原生窗口预览，可保存POSCAR。首版仅包含bulk，surface仍保留空框架。
+本页在p4vasp中提供参数界面，实际晶体构建调用ASE `ase.build.bulk`，超胞调用ASE重复晶胞功能。结构直接在p4vasp原生窗口预览，可保存POSCAR。bulk结果可在[Surface页](ase-surface-zh.md)点击Use bulk result作为切面来源；指数以实际生成晶胞为准。
 
 ## 1. 安装可选依赖
 
@@ -18,7 +18,7 @@ bulk页面最下方显示按当前项目实际路径生成的安装命令，可�
 
 GUI主进程不导入ASE或其NumPy；点击Build bulk才启动一个计算进程，任务结束即退出，没有常驻后台进程。支持取消，默认30秒超时，关闭页面时取消任务；默认单线程数值计算。
 
-本轮验证范围为Linux／WSL。Windows旧便携包未更新，尚未包含这一页和可选ASE计算环境；macOS与Windows本轮未实测。
+体相首版当时的验证范围为Linux／WSL；11月21日Windows便携包已包含Bulk与ASE并完成成品检查。Surface首版另见其指南，本轮未生成新的Windows包；macOS未在本轮核验。
 
 ## 2. 填写结构参数
 

@@ -504,7 +504,7 @@ Top/Side 等视图与缩放围绕模型中心进行。手动旋转后，普通�
 ### 模型库框架
 
 从左侧 **Models** 打开模型库。此页也隐藏 System／Selection，切回编辑面板恢复。顶部横向排列五个标签页，与 Resources 的标签页样式一致：
-**single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 支持本地分子库与SMILES，bulk使用ASE生成体相，surface暂时留空。
+**single atom**、**gas phase**、**bulk**、**surface**、**p4vasp data**。点击切换，默认打开 single atom；gas phase 支持本地分子库与SMILES，bulk使用ASE生成体相，surface使用ASE生成金属模板或按输入晶胞切面。
 Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料表从 Resources 移到 Models，Commit 快捷入口已移除。
 首次打开Models只创建默认单原子页；气相、bulk和元素资料表在首次点击对应标签时创建，之后复用，切换标签保留输入和未保存的元素编辑。气相页再次进入时仍刷新本地XYZ文件列表；首次进入不重复扫描。首次访问各页仍需完成该页自身加载，不代表全部计算在后台执行。
 
@@ -522,7 +522,7 @@ INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 
 
 在 **Models → bulk** 选择化学式和晶体原型，填写晶格参数、晶胞形式与超胞重复数，点击 **Build bulk**。完成后可查看原子数／晶胞／体积，使用 **Preview 3D** 预览，或 **Save POSCAR** 将结构写入新文件夹。保存后Open打开POSCAR可继续编辑；本页只生成POSCAR。
 
-首次使用在项目目录执行 `bash install/install-ase.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface仍为空框架。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
+首次使用在项目目录执行 `bash install/install-ase.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface首版现可切面、加真空、固定底层并保存。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
 
 ### 气相 XYZ 本地分子库
 
@@ -641,3 +641,11 @@ Show、振动预览及使用同一分子样式的气相预览中，H球半径在
 1像素晶胞细线、抗锯齿、柔和光照、原子大小、键、相机及结构操作保持。
 这是固定的实时显示默认值；重新打开窗口不会再次乘0.7。独立图片导出的Quality设置、
 分辨率及渲染预设不变；原生窗口截图会反映当前实时细节。源码版重启生效，旧Windows EXE需重建后才包含。
+
+
+### Surface表面建模（2026-11-22）
+
+Models → surface支持fcc/bcc常用金属面和hcp基面，也可从Bulk结果快照或POSCAR/CIF按(h k l)切面。
+设置层数、面内超胞、每侧真空和固定底层，Build后预览，Save POSCAR保存POSCAR与参数/层编号JSON。
+预览标记圈出固定原子；导出F/T按底部几何层生成。自定义指数以输入晶胞为准，不自动换成常规胞；
+复杂终止面、吸附物放置和独立重放脚本不在首版。参数含义、示例和限制见[ASE表面建模](ase-surface-zh.md)。

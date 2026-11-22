@@ -50,6 +50,7 @@ def show_model_preview(structure, title, molecular=False):
     window.setRadiusFactor(.5)
     window.structure_drawer.setBondFactor(1.2 if molecular else 1.0)
     window.setStructure(None)
+    window.removeSelectedAll()
     window.setStructure(structure)
     window.win.show()
     return window

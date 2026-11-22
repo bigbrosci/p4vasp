@@ -447,3 +447,36 @@ Native Show quality/state/reopen and actual Control XDATCAR navigation/playback
 checks pass on this Linux/WSL device, with reduced-detail screenshot inspected.
 Fourteen headless export tests pass. No native rebuild is necessary for the Python
 default change; no macOS/Windows acceptance or new EXE build was performed.
+
+
+### ASE Surface page (2026-11-22)
+
+Models toolbar / ModelsApplet / models.glade / GTK3 adapter retains its five
+notebook hosts; tab 3 is now a lazily created, scrolled SurfacePage. Neighboring
+Bulk/gas/data pages remain lazy and retain settings. The page uses existing
+compact file/folder dialogs, InstallHint and shared native model preview.
+Fixed atoms are marked using preview-only rings; shared preview selection is
+cleared before each new model to avoid leaking markers to Bulk/gas previews.
+
+ase_surface.py validates requests and invokes ASE metal presets or build.surface
+in a SurfaceTask, reusing BulkTask's isolated, bounded/cancellable transport.
+Only the worker imports ASE. Custom Miller indices refer to the input cell,
+with no conventional-cell conversion. Equivalent-layer count and geometric layer
+groups are distinct; vacuum is per side. Replace old constraints with bottom
+geometric-layer FixAtoms; stable species grouping keeps POSCAR flags/metadata
+aligned. Preserve original bulk/files. Save to a new folder as POSCAR and
+surface.json; metadata includes portable custom bulk input, not a standalone
+replay script or complete VASP inputs.
+
+Windows model_worker gains --surface, spec includes geometry/constraints and
+future frozen checks exercise surface build/preview/save. These are source/spec
+preparations, not a Windows acceptance or new EXE build. No new dependencies or
+library version changes; ASE catalog source references were updated.
+
+Focused verification: test/testAseSurface.py with the ASE interpreter checks all
+presets, physical Cu(111) plane spacing/vacuum, fixed masks, custom/negative Miller
+indices, CIF/species sorting, portable input and worker protocols. With GTK/display,
+test/testSurfaceGtk.py exercises actual worker responsiveness, source buttons,
+fixed-layer native preview, save/no-overwrite, invalidation and synthetic
+cancel/explicit page-destroy behavior. Tests use temporary inputs; full application
+shutdown cancellation and Windows/macOS runtime remain unverified.

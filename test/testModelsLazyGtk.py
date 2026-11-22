@@ -35,6 +35,7 @@ class ModelsLazyTest(unittest.TestCase):
                      patch.object(gas_module, 'scan_library', wraps=gas_module.scan_library) as scans, \
                      patch.object(module, 'GasPhasePage', wraps=module.GasPhasePage) as gas_factory, \
                      patch.object(module, 'BulkPage', wraps=module.BulkPage) as bulk_factory, \
+                     patch.object(module, 'SurfacePage', wraps=module.SurfacePage) as surface_factory, \
                      patch.object(module, 'ElementTable', wraps=module.ElementTable) as table_factory:
                     applet = module.ModelsApplet()
                     applet.store = ResourceStore(folder, folder / 'backups')
@@ -45,6 +46,7 @@ class ModelsLazyTest(unittest.TestCase):
                         window.show_all()
                         self.assertEqual([gas_factory.call_count, bulk_factory.call_count, table_factory.call_count], [0, 0, 0])
                         self.assertEqual(scans.call_count, 0)
+                        self.assertEqual(surface_factory.call_count, 0)
                         tabs = applet.notebook
                         tabs.set_current_page(1)
                         gas = applet.gas_phase_page
@@ -61,7 +63,10 @@ class ModelsLazyTest(unittest.TestCase):
                         table.edited(None, '0', '1.02', 2)
                         self.assertTrue(table.dirty)
                         tabs.set_current_page(3)
-                        self.assertFalse(tabs.get_nth_page(3).get_children())
+                        self.assertIsNone(applet.surface_page.result)
+                        surface=applet.surface_page
+                        surface.layers.set_text('5')
+                        self.assertFalse(applet.surface_page.save_button.get_sensitive())
                         (library / 'He.xyz').write_text('1\nHelium\nHe 0 0 0\n')
                         tabs.set_current_page(1)
                         self.assertIs(applet._page_contents[1], gas)
@@ -81,6 +86,10 @@ class ModelsLazyTest(unittest.TestCase):
                         self.assertTrue(table.dirty)
                         self.assertEqual(table.model[0][2], '1.02')
                         self.assertEqual([gas_factory.call_count, bulk_factory.call_count, table_factory.call_count], [1, 1, 1])
+                        tabs.set_current_page(3)
+                        self.assertIs(applet.surface_page,surface)
+                        self.assertEqual(surface.layers.get_text(),'5')
+                        self.assertEqual(surface_factory.call_count,1)
                         while Gtk.events_pending():
                             Gtk.main_iteration_do(False)
                         self.assertFalse(errors, errors)

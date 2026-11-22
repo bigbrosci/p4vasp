@@ -337,3 +337,6 @@ C++/ODP源码、生成包装文件位置和当前构建脚本保留原位。其�
 `data/glade2/`和GTK3适配器，无需安装libglade。外部插件若使用旧加载函数，
 需迁移到现行布局和`util.loadGlade`，不能直接假定旧布局兼容。历史文件可从Git查阅。
 现有Windows发行包需在后续重新构建才会反映本次资源清理。
+
+
+Surface与Bulk复用已有ASE环境和安装命令，不新增pymatgen依赖。表面切面、真空及底层固定操作见[ASE表面建模](doc/ase-surface-zh.md)。本次未更新Windows便携包。

@@ -1,9 +1,10 @@
-"""Model-library tabs with single-atom and local XYZ gas inputs."""
+"""Lazy single-atom, molecular, bulk, surface and element-data pages."""
 from p4vasp.applet.Applet import Applet
 from p4vasp.gtk3 import Gtk
 from p4vasp.gtk3.single_atom import SingleAtomPage
 from p4vasp.gtk3.gas_phase import GasPhasePage
 from p4vasp.gtk3.bulk import BulkPage
+from p4vasp.gtk3.surface import SurfacePage
 from p4vasp.gtk3.element_table import ElementTable
 from p4vasp.resource_data import ResourceStore
 from p4vasp.applet.ResourceHubApplet import message
@@ -29,7 +30,7 @@ class ModelsApplet(Applet):
                 page = SingleAtomPage()
                 self.single_atom_page = page
                 self._page_contents[index] = page
-            elif index == 2:
+            elif index in (2,3):
                 page = Gtk.ScrolledWindow()
                 page.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
             else:
@@ -53,13 +54,16 @@ class ModelsApplet(Applet):
         elif index == 2:
             content = BulkPage()
             self.bulk_page = content
+        elif index == 3:
+            content = SurfacePage(lambda: getattr(self._page_contents.get(2), 'result', None))
+            self.surface_page = content
         elif index == 4:
             content = ElementTable(self.store, self.parent_window, message)
             self.element_table = content
         else:
             return
         host = self._page_hosts[index]
-        if index == 2:
+        if index in (2,3):
             host.add(content)
         else:
             host.pack_start(content, True, True, 0)

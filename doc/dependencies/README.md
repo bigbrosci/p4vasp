@@ -108,3 +108,6 @@ checkpoint/2026-11-14-before-legacy-interface-fixes
 ## 11月21日Windows发布基线
 
 新增[GUI构建环境](snapshots/2026-11-21-windows-gui-f5de130e.json)和[独立模型构建环境](snapshots/2026-11-21-windows-model-f5de130e.json)实际元数据快照，分别由目标UCRT64与官方CPython解释器采集，保留旧快照不覆盖。来源为f5de130，工具/清单摘要已核对；12/22项元数据不是最小依赖或成品DLL清单，成品验收另见[Windows交付记录](../windows-update-workflow-zh.md)。
+
+
+Surface首版复用现有ASE环境及隔离worker，不新增库或改变版本。catalog中ASE用途/源码索引已同步，Windows worker/spec加入surface调度及geometry/constraints导入。只是使用现有依赖的新功能，未改变环境，故不重复采集快照；实际Windows冻结验收留后续打包。
