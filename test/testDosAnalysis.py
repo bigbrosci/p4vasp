@@ -117,6 +117,34 @@ class DosAnalysisTest(unittest.TestCase):
         poscar.write_text('One Fe\n1\n4 0 0\n0 4 0\n0 0 4\nFe\n1\nDirect\n0 0 0\n')
         with self.assertRaisesRegex(ValueError,'atom count differs'):self.run_analysis()
 
+    def test_rounded_vasp_grid_retains_hilbert_edge(self):
+        path=self.folder/'DOSCAR'
+        # VASP text precision can alternate the apparent interval on a uniform grid.
+        # Use only an artificial spectrum, never the user's local calculation.
+        lines=path.read_text().splitlines()
+        for start in (6,408,810):
+            for index in range(start,start+401):
+                fields=lines[index].split()
+                point=index-start
+                fields[0]='%.3f'%(-8.+point*.03737)
+                lines[index]=' '.join(fields)
+        for index in (5,407,809):
+            header=lines[index].split();header[0]='%.3f'%(-8.+400*.03737)
+            lines[index]=' '.join(header)
+        path.write_text('\n'.join(lines)+'\n')
+        result=self.run_analysis(atoms=[1],spin='up')
+        self.assertIsNotNone(result['rows'][3][1])
+        self.assertTrue(any('resampled' in note for note in result['notes']))
+        # Independent SciPy Hilbert transform on a uniformly interpolated grid.
+        import numpy as np
+        from scipy.signal import hilbert
+        data=read_doscar(path)
+        energy=np.array(data['energies'])-data['efermi']
+        rho=np.array([sum(row[4:]) for row in data['projected'][0][0]])
+        grid=np.linspace(energy[0],energy[-1],len(energy))
+        expected=float(grid[np.argmax(np.imag(hilbert(np.interp(grid,energy,rho))))])
+        self.assertAlmostEqual(result['rows'][3][1],expected,places=9)
+
     def test_worker_protocol_and_exclusive_metadata_export(self):
         env=dict(os.environ);env.pop('PYTHONPATH',None)
         process=subprocess.run([str(ROOT/'.venv-science/bin/python'),str(ROOT/'lib/p4vasp/dos_analysis.py')],

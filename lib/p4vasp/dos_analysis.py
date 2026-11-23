@@ -5,6 +5,9 @@ import math
 from pathlib import Path
 import sys
 
+# Bound numerical interpolation for rounded VASP energy columns.
+HILBERT_GRID_TOLERANCE = .05  # Fraction of the mean energy step.
+
 # Source execution must work without importing native p4vasp extensions.
 if __package__ in (None, ''):
     source = Path(__file__).resolve()
@@ -142,9 +145,15 @@ def analyze(request):
     filling = float(np.trapezoid(values[occupied],x=grid[occupied])/weight) if occupied.sum()>1 else 0.
     notes = []
     edge = None
-    if np.allclose(np.diff(energies),np.diff(energies)[0],rtol=1e-5,atol=1e-8):
-        edge = float(selected_dos(energies,density).get_upper_band_edge(erange=(lower,upper)))
-    else: notes.append('Upper edge unavailable: Hilbert transform requires a uniform original energy grid.')
+    uniform = np.linspace(energies[0],energies[-1],len(energies))
+    step = float(uniform[1]-uniform[0])
+    deviation = float(np.max(np.abs(energies-uniform)))
+    if deviation <= max(1e-8,step*HILBERT_GRID_TOLERANCE):
+        hilbert_density = np.interp(uniform,energies,density)
+        edge = float(selected_dos(uniform,hilbert_density).get_upper_band_edge(erange=(lower,upper)))
+        if deviation > max(1e-8,step*1e-5):
+            notes.append('Upper edge: slightly irregular/rounded source grid linearly resampled to %d uniform points (step %.8g eV; maximum adjustment %.8g eV).'%(len(uniform),step,deviation))
+    else: notes.append('Upper edge unavailable: source grid differs from a uniform grid by more than 5% of the mean energy step.')
     at_fermi = float(np.interp(0.,energies,density)) if energies[0]<=0<=energies[-1] else None
     if at_fermi is None: notes.append('D_d(EF) unavailable: EF is outside the original DOS grid.')
     rows = [['d-band center',center,'eV'],['d-band width (standard deviation)',width,'eV'],
@@ -156,7 +165,7 @@ def analyze(request):
                 energy_reference='E−EF', weight=weight,
                 fermi_dos_definition='Interpolated on the full original energy grid, independently of the analysis window.', pymatgen_version=version('pymatgen'), notes=notes,
                 filling_definition='Integral within selected window up to EF / integral over selected window; interpolated endpoints.',
-                upper_edge_definition='Peak of Hilbert transform of full selected d-DOS, searched inside the selected window.',
+                upper_edge_definition='Peak of Hilbert transform of full selected d-DOS, searched inside the selected window; source grid deviations <=5% of mean step are linearly resampled to uniform spacing.',
                 normalization='Sum over selected atoms and spin channels; not per atom.')
 
 

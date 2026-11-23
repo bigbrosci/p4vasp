@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 本地私有Cu3Ru1实际数据验证（2026-11-22）
+
+- 用户新放example/Cu3Ru1，明确禁止上传该目录。已在本机.git/info/exclude加入/example/Cu3Ru1/，git check-ignore确认DOSCAR/POTCAR排除、git ls-files确认无跟踪；以后不得stage/上传该目录，也不把其中结构/输入/结果数值/截图复制进公共测试或文档。该本地exclude不随仓库同步，其他设备仍需遵守用户限制。
+- 实际DOSCAR/vasprun.xml分别按Cu、Ru分析，解析一致性及独立NumPy中心/宽度积分核对通过；真实GUI从DOSCAR启动、File/Open XML、两个元素/五指标、旧Local DOS负向自旋投影、最大化True/改轨道/重建画布/恢复、图页/缓存/边缘像素、GUI不导入pymatgen通过。不是独立物理基准或其他参数/任务验收。临时脚本/日志/截图/结果仅在/tmp/cu3ru1*，不提交；5项源文件DOSCAR/XML/POSCAR/CONTCAR/INCAR前后SHA256一致，没有测试写入该目录，未读取或上传POTCAR内容。
+- 发现真实VASP文本舍入导致步距略有变化，原严格uniform判断将upper edge错误置Unavailable。现Hilbert单独把与同端点/点数等距网格偏差≤平均步长5%的谱线性插值，保留原始moment/filling，notes/CSV显式记录插值点数/步长/最大调整；超过判据仍Unavailable。5%为数值限制而非物理误差保证。新公开回归为独立生成的人工舍入谱，未使用私人数据。
+- 9项pymatgen回归通过（新增SciPy独立Hilbert参考，原显著非均匀仍拒该指标），4 DOSCAR读取回归通过；本机实际数据四组合和GUI通过，截图/tmp/cu3ru1-maximized.png已查看，哈希/ignore检查通过。日志/tmp/cu3ru1-{analysis,gui,synthetic-regression,reader-regression}.log；范围仅Linux/WSL、实际数据与合成回归，不重跑无关整套GUI、不新增依赖/重复快照/重编或EXE。仅通用修复/合成测试/说明和记录可按工作流推送，私有目录保持本地。
+
 ## DOS最大化后半图／重绘同步修复（2026-11-22）
 
 - 用户报告最大化后点右侧选项左图半幅、似卡住。本机最初简单最大化/改参未复现同样现象；进一步构造已realize的DrawingArea重建GraphCanvas且不产生新size-allocate，确认图页仍790x610而实际控件1000x700，新缓存默认500x400，新增GTK回归修复前失败。不是声称复现了用户桌面的全部触发条件。

@@ -570,3 +570,13 @@ right-panel parameter/result changes request it, and destroy cancels it. These
 redraws preserve curve data and zoom bounds and do not rerun DOS analysis.
 testDosAnalysisGtk covers actual maximize/restore, canvas recreation, right
 options and analysis, page/surface dimensions, edge pixels and preserved zoom.
+
+### Rounded VASP DOS energy grids (2026-11-22)
+
+Actual local calculation checks exposed rounded printed energy columns that
+fail a strict equal-step test. Only for Hilbert upper-edge calculation, grids
+within HILBERT_GRID_TOLERANCE (5% of mean step) of the corresponding uniform grid
+are linearly resampled. Report that choice in notes/CSV; materially irregular
+grids remain unavailable. Existing moment/filling calculations keep the source
+grid. testDosAnalysis adds an artificial rounded-grid case checked against a
+separate NumPy/SciPy transform. No user calculation files are included in tests.
