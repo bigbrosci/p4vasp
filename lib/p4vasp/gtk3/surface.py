@@ -63,7 +63,7 @@ class SurfacePage(Gtk.Box):
         for label in (self.summary,self.status):
             label.set_line_wrap(True);label.set_max_width_chars(65);label.set_selectable(True)
             self.pack_start(label,False,False,0)
-        self.status.set_text('Choose a source. Miller indices refer to the INPUT cell; use a conventional bulk cell for conventional indices. Bottom-layer rule replaces input constraints.')
+        self.status.set_text('')
         from p4vasp.gtk3.install_hint import InstallHint
         self.install_hint=InstallHint('ASE','install-science.sh');self.pack_end(self.install_hint,False,False,0)
         self.use_bulk.connect('clicked',self.from_bulk);self.open_button.connect('clicked',self.open)

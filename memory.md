@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Surface初始说明文字移除（2026-11-23）
+
+- 按用户要求移除Surface初始status中的Choose a source及Miller指数/固定规则说明，状态标签保留供构建、保存和错误反馈。规则仍见doc/ase-surface-zh.md，建模逻辑不变。
+- Linux/WSL实际显示页确认初始文字为空、Build可用、Center默认、Save未生成时禁用；实际Surface GTK预览/来源/保存等回归通过，日志/tmp/surface-remove-hint-gtk.log。语法/diff通过；未验收Mac/Windows，不改依赖或重建EXE。
+
 ## Surface保存自动导出重建脚本（2026-11-23）
 
 - Models → surface的Save POSCAR自动保存POSCAR、surface.json、rebuild_surface.py/.sh；最终切面/层数/超胞/真空/固定层/Center或Bottom及自定义体相快照一并记录，不记鼠标历史/相机，不生成完整VASP输入。surface_geometry.py抽取同一ASE数值核心，原ase_surface API继续可用；surface_replay.py嵌入核心和request，独立Python只需ASE，建议同版本。Bash使用p4v --surface-replay JSON 新目录，找不到p4v时回退导出机器p4v.sh；换机需有效p4v路径。已有目录拒绝覆盖。
