@@ -87,3 +87,5 @@ Hilbert变换使用完整所选谱，窗口只限制峰位置搜索。VASP文本
 多原子结果按投影态权重合并，不是各原子band center的算术平均。跨体系比较需要相同投影设置、窗口与自旋约定；局域轨道方向依赖计算坐标系，本程序不自动旋转到局部配位坐标。d-band指标本身不能直接证明吸附强弱或催化活性。
 
 API定义参考：[pymatgen CompleteDos](https://pymatgen.org/pymatgen.electronic_structure.html#pymatgen.electronic_structure.dos.CompleteDos)。
+
+结果表格及复制结果统一显示小数点后三位（例如0.123）；内部计算与CSV导出保留完整精度。

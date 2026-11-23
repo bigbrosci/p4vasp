@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS结果表格三位小数（2026-11-23）
+
+- gtk3/dos_analysis.py结果表格用%.3f，复制结果沿用表格，Unavailable保持文字；内部计算及CSV/脚本数值精度保持原样。操作说明同步。
+- 本机Linux/WSL真实DOS GTK计算/复制/导出/切源/最大化回归通过，日志/tmp/dos-three-decimals-gtk.log；语法/diff通过。未改科学算法或依赖，未构建Windows或验收Mac。
+
 ## d-band filling单位标签（2026-11-23）
 
 - 按用户要求dos_metrics将filling单位显示由dimensionless改为a.u.，共享结果同步GUI/复制/CSV及新导出Python脚本，填充度仍为原无量纲积分比值，数值算法不变。doc/dos-analysis-zh.md同步。

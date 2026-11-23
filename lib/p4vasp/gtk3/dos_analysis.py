@@ -259,7 +259,7 @@ class DosAnalysis(Gtk.Frame):
         else:
             self.result=result
             for name,value,unit in result['rows']:
-                self.model.append([name,'Unavailable' if value is None else '%.8g'%value,unit])
+                self.model.append([name,'Unavailable' if value is None else '%.3f'%value,unit])
             self.set_version(result['pymatgen_version'])
             self.status.set_text('atoms %s | %s | %s | E−EF: %.6g to %.6g eV.'%(
                 ','.join(map(str,result['atoms'])),result['orbital'],result['spin'],result['emin'],result['emax']))
