@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Surface Center／Bottom完成（2026-11-22）
+
+- 用户要求居中/靠底按钮，Bottom最低z=0.1Å。SurfacePage新增互斥按钮，生成前传placement参数，生成后用私有Structure副本即时平移，GUI不导入ASE、不重新切面/读取源。中心为ASE几何包围盒中心；Bottom保留晶胞高度/总真空，默认20Å空隙分配为底0.1/顶19.9，保留原子间距/排序/层号/F/T。真空输入Bottom标签改Half total vacuum，metadata记录placement/vacuum_bottom/top，vacuum_each_side为null。
+- ase_surface.position_offset共用于worker/本地结果，普通writer保留头/旗标，局部17位数值重写避免其10位Vector格式导致Direct坐标回读约7e-10Å漂移（初轮核心/UI严格检查失败后修复，未放松容差）。gap≤0.1拒绝Bottom，不擅自扩胞；0.1仅初始留边，不承诺优化后不跨界。
+- Surface原生预览默认侧视、显示晶胞并刷新；StructureWindow.fitToStructure新增可选include_cell，默认False保持Show/Control原拟合。共享模型预览按请求重置cell显示，避免影响后续gas/bulk。
+- 本机Linux/WSL：8 ASE核心通过，与独立Atoms.center(axis=2)对照、0.1/上下真空、晶胞/距离/标记/重复切换/源不变/坏真空；真实Surface GTK验证按钮/动态标签、原生预览、Bottom保存POSCAR+JSON及旧流程。1 Models惰性、9 GTK、58基础通过；原生Show像素初次[0,0]失败，未改绘图代码，git HEAD原实现及当前复查均[0,45]通过，记录捕获时序波动而非画质修复。日志/tmp/p4vasp-slab-position-{core,gtk,show,show-baseline,lazy,gtk-base,base}.log，Center/Bottom截图/tmp/p4vasp-surface-{center,bottom}.png已查看。
+- 用法/架构/双语同步，未来Windows模型诊断加入Bottom坐标验证；本轮仅源码/语法，不重编原生/构建EXE或跨平台验收。不引入依赖、不采重复快照；源码重启生效，现有Windows包不含Surface/本次定位功能。
+
 ## 当前完成：ASE Surface首版（2026-11-22）
 
 - 用户授权先做Surface。Models→surface由空框架改为惰性滚动SurfacePage，保持五标签/左右入口不变。ase_surface.py使用现有ASE构建fcc111/100/110、bcc110/100/111、hcp0001模板，或Bulk结果快照/用户POSCAR/CIF按(h k l)切面；使用SurfaceTask复用BulkTask独立进程/60秒/取消机制，GUI不导入ASE，不引入pymatgen。

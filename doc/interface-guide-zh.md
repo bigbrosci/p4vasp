@@ -649,3 +649,8 @@ Models → surface支持fcc/bcc常用金属面和hcp基面，也可从Bulk结果
 设置层数、面内超胞、每侧真空和固定底层，Build后预览，Save POSCAR保存POSCAR与参数/层编号JSON。
 预览标记圈出固定原子；导出F/T按底部几何层生成。自定义指数以输入晶胞为准，不自动换成常规胞；
 复杂终止面、吸附物放置和独立重放脚本不在首版。参数含义、示例和限制见[ASE表面建模](ase-surface-zh.md)。
+
+
+Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子笛卡尔z移到0.1 Å，
+保持晶胞及总真空不变。可在生成前选择或对已有结果立即切换，预览和POSCAR/JSON同步。
+侧视预览包含完整晶胞；底部0.1 Å是初始留边，不保证优化后绝不越界。参数细节见[表面建模说明](ase-surface-zh.md#5-center与bottom)。

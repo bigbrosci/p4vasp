@@ -11,7 +11,7 @@ import numpy as np
 from ase.build import bulk
 from ase.constraints import FixAtoms
 from ase.io import read, write
-from p4vasp.ase_surface import build_surface, parameters, PRESETS
+from p4vasp.ase_surface import build_surface, parameters, PRESETS, reposition_result
 
 
 class SurfaceTest(unittest.TestCase):
@@ -23,8 +23,8 @@ class SurfaceTest(unittest.TestCase):
         atoms=read(StringIO(result['poscar']),format='vasp')
         self.assertEqual(len(atoms),result['atoms'])
         z=atoms.positions[:,2]
-        self.assertAlmostEqual(z.min(),result['vacuum_each_side'],places=8)
-        self.assertAlmostEqual(atoms.cell[2,2]-z.max(),result['vacuum_each_side'],places=8)
+        self.assertAlmostEqual(z.min(),result['vacuum_bottom'],places=8)
+        self.assertAlmostEqual(atoms.cell[2,2]-z.max(),result['vacuum_top'],places=8)
         self.assertTrue(np.allclose(np.cross(atoms.cell[0],atoms.cell[1])[:2],0,atol=1e-9))
         fixed={int(i) for con in atoms.constraints for i in con.get_indices()}
         expected={i for i,layer in enumerate(result['layer_numbers']) if layer<=result['request']['fixed_layers']}
@@ -40,6 +40,33 @@ class SurfaceTest(unittest.TestCase):
         levels=np.unique(np.round(atoms.positions[:,2],8))
         self.assertTrue(np.allclose(np.diff(levels),3.615/math.sqrt(3),atol=1e-7))
         self.assertEqual(request,original)
+
+    def test_center_bottom_preserve_cell_distances_flags_and_source(self):
+        centered=build_surface(self.request());original=copy.deepcopy(centered)
+        atoms=self.check(centered)
+        bottom=reposition_result(centered,'bottom');shifted=self.check(bottom)
+        self.assertAlmostEqual(shifted.positions[:,2].min(),.1,places=12)
+        self.assertAlmostEqual(bottom['vacuum_top'],19.9,places=10)
+        self.assertIsNone(bottom['vacuum_each_side'])
+        self.assertTrue(np.allclose(shifted.cell.array,atoms.cell.array,atol=1e-12))
+        self.assertTrue(np.allclose(shifted.positions-atoms.positions,[0,0,-9.9],atol=1e-12))
+        self.assertEqual(bottom['layer_numbers'],centered['layer_numbers'])
+        self.assertEqual(centered,original)
+        again=reposition_result(bottom,'bottom');self.check(again)
+        self.assertTrue(np.allclose(read(StringIO(again['poscar']),format='vasp').positions,shifted.positions,atol=1e-12))
+        # Independent ASE centering of the shifted slab is the Center oracle.
+        shifted.center(axis=2)
+        restored=self.check(reposition_result(bottom,'center'))
+        self.assertTrue(np.allclose(restored.positions,shifted.positions,atol=1e-12))
+        self.assertTrue(np.allclose(restored.positions,atoms.positions,atol=1e-12))
+        generated=self.check(build_surface(self.request(placement='bottom')))
+        self.assertTrue(np.allclose(generated.positions,read(StringIO(bottom['poscar']),format='vasp').positions,atol=1e-12))
+
+    def test_bottom_rejects_insufficient_vacuum_without_modifying_result(self):
+        result=build_surface(self.request(vacuum=.04));original=copy.deepcopy(result)
+        with self.assertRaisesRegex(ValueError,'0.1'):reposition_result(result,'bottom')
+        self.assertEqual(result,original)
+        with self.assertRaises(ValueError):build_surface(self.request(placement='unknown'))
 
     def test_all_presets_and_zero_fixed_layers(self):
         for preset in PRESETS:

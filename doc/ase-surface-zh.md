@@ -10,7 +10,7 @@
 3. Atomic layers填4，In-plane repeat填2、2。
 4. Vacuum EACH side填10 Å，Fix bottom geometric layers填2，Layer tolerance保留0.3 Å。
 5. 点击 **Build surface**，得到16原子、4几何层，其中底部8原子固定。
-6. **Preview 3D** 打开原生预览，标记圈表示固定原子，可旋转观察；不是对源结构的编辑。
+6. 默认选中 **Center**。可点 **Bottom** 将最低原子移到z=0.1 Å，或点Center恢复居中。**Preview 3D**以完整晶胞侧视图显示真空，标记圈表示固定原子，可旋转观察。
 7. **Save POSCAR** 选择父目录及新文件夹名，保存POSCAR和surface.json；已有文件夹不覆盖。
 
 改变参数或输入来源后，旧结果和保存按钮失效，需重新Build。生成在独立进程运行，可Cancel，默认60秒超时。
@@ -34,7 +34,7 @@
 ## 3. 尺寸与固定原子
 
 - **In-plane repeat**：沿生成表面两个面内基矢重复，不是固定的屏幕X/Y方向。各1—100，总原子不超过10000。
-- **Vacuum EACH side**：几何表面上下各留该厚度。填10 Å表示两侧各10 Å；周期镜像之间的总空隙为20 Å。POSCAR本身不保存ASE的非周期方向标记，VASP仍按三维周期体系和真空处理。
+- **Vacuum EACH side**：几何表面上下各留该厚度。Center下填10 Å表示两侧各10 Å，总空隙20 Å。Bottom下标签显示Half total vacuum，同一数值仍表示总空隙的一半，最低原子留0.1 Å，上侧空隙为19.9 Å。POSCAR本身不保存ASE的非周期方向标记，VASP仍按三维周期体系和真空处理。
 - **Layer tolerance**：ASE沿表面法线识别几何层时的相邻距离容差。默认0.3 Å；复杂起伏层需要用户调整并检查，不按化学组成猜测层编号。
 - **Fix bottom geometric layers**：从最低层向上固定指定层，写FFF，其他原子写TTT。0表示全部自由且不输出Selective dynamics行；必须至少留一层自由。此规则替换输入中的固定约束，不与旧掩码叠加。
 
@@ -56,3 +56,17 @@ bash install/install-ase.sh
 页面底部也提供按当前安装位置生成的可复制命令。使用现有ASE环境可设置P4VASP_ASE_PYTHON，不把ASE强行装进GTK解释器。
 本轮Linux/WSL验证了实际ASE构建、原生预览与保存；macOS及Windows成品尚未验收。
 11月21日Windows便携包不含本次Surface功能；Windows worker/spec和诊断入口已接入，需后续重新构建验证。
+
+
+## 5. Center与Bottom
+
+两个互斥按钮既可在Build前选择，也可对已有结果立即切换，无需重新切面或重新读取源文件。
+Center按ASE center(axis=2)的几何包围盒居中，不是质量中心；保持晶胞高度不变。
+Bottom只沿z平移，使最低原子的**笛卡尔z坐标为0.1 Å**。晶胞尺寸、总真空量、原子间距、层号及F/T标记不变；
+例如Center上下各10 Å的模型切到Bottom后，下方留0.1 Å，上方19.9 Å。
+
+预览打开时自动刷新，保存的是当前摆放方式。surface.json中的placement、vacuum_bottom、vacuum_top记录实际状态；
+vacuum_each_side仅Center下有数值，Bottom下为null，request.vacuum仍为居中等效的每侧值。
+POSCAR若用Direct坐标，文件中的分数z不会直接等于0.1，换算到Å后才是0.1。
+总真空必须大于0.1 Å才能选择Bottom，不会为此自动拉长晶胞。
+0.1 Å是初始留边，不保证优化位移后绝不会跨越周期边界，仍应检查优化后的结构。

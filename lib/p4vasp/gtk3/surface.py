@@ -6,7 +6,7 @@ import re
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.file_dialogs import entry, CompactFileDialog
 from p4vasp.gtk3.single_atom import InputFolderDialog
-from p4vasp.ase_surface import PRESETS, SurfaceTask, parameters
+from p4vasp.ase_surface import PRESETS, SurfaceTask, parameters, reposition_result
 
 
 class SurfacePage(Gtk.Box):
@@ -15,7 +15,7 @@ class SurfacePage(Gtk.Box):
         self.set_border_width(8)
         self.bulk_result=bulk_result
         self.result=None;self.task=None;self.alive=True;self.directory=None;self.preview_window=None
-        self.source_poscar=None;self.source_path=None
+        self.source_poscar=None;self.source_path=None;self.placement='center';self._positioning=False
         grid=Gtk.Grid(column_spacing=8,row_spacing=8)
         self.source=Gtk.ComboBoxText()
         for name in ('Metal preset','Bulk result','Structure file'): self.source.append_text(name)
@@ -35,16 +35,25 @@ class SurfacePage(Gtk.Box):
         self.layers=entry('4');self.repeat=[entry('2'),entry('2')]
         self.vacuum=entry('10');self.fixed=entry('2');self.tolerance=entry('0.3')
         def row(index,label,widgets):
-            grid.attach(Gtk.Label(label=label,xalign=0),0,index,1,1)
+            title=Gtk.Label(label=label,xalign=0)
+            grid.attach(title,0,index,1,1)
             box=Gtk.Box(spacing=6)
             for widget in widgets:box.pack_start(widget,True,True,0)
             grid.attach(box,1,index,3,1)
+            return title
         row(3,'Metal surface',[self.preset]);row(4,'Element / a (Å) / c (Å)',[self.symbol,self.a,self.c])
         row(5,'Miller indices (h k l)',self.indices)
         self.layer_title=Gtk.Label(label='Atomic layers',xalign=0)
         grid.attach(self.layer_title,0,6,1,1);grid.attach(self.layers,1,6,3,1)
-        row(7,'In-plane repeat (nx ny)',self.repeat);row(8,'Vacuum EACH side (Å)',[self.vacuum])
+        row(7,'In-plane repeat (nx ny)',self.repeat)
+        self.vacuum_title=row(8,'Vacuum EACH side (Å)',[self.vacuum])
+        self.vacuum.set_tooltip_text('Total empty space is twice this value. Bottom keeps 0.1 Å below the slab and the remainder above.')
         row(9,'Fix bottom geometric layers',[self.fixed]);row(10,'Layer tolerance (Å)',[self.tolerance])
+        self.center_button=Gtk.RadioButton.new_with_label_from_widget(None,'Center')
+        self.bottom_button=Gtk.RadioButton.new_with_label_from_widget(self.center_button,'Bottom')
+        for button,placement in ((self.center_button,'center'),(self.bottom_button,'bottom')):
+            button.set_mode(False);button.connect('toggled',self.position_changed,placement)
+        row(11,'Slab position',[self.center_button,self.bottom_button])
         self.settings=grid;self.pack_start(grid,False,False,0)
         actions=Gtk.FlowBox();actions.set_selection_mode(Gtk.SelectionMode.NONE)
         self.build_button=Gtk.Button(label='Build surface');self.cancel_button=Gtk.Button(label='Cancel')
@@ -104,7 +113,7 @@ class SurfacePage(Gtk.Box):
 
     def request(self):
         source=('preset','poscar','file')[self.source.get_active()]
-        request=dict(source=source,preset=self.preset.get_active_text(),symbol=self.symbol.get_text(),
+        request=dict(source=source,placement=self.placement,preset=self.preset.get_active_text(),symbol=self.symbol.get_text(),
             a=self.a.get_text(),c=self.c.get_text(),indices=[w.get_text() for w in self.indices],
             layers=self.layers.get_text(),repeat=[w.get_text() for w in self.repeat],vacuum=self.vacuum.get_text(),
             fixed_layers=self.fixed.get_text(),layer_tolerance=self.tolerance.get_text(),
@@ -130,10 +139,32 @@ class SurfacePage(Gtk.Box):
         if error:self.result=None;self.status.set_text(error)
         else:
             self.result=result
-            self.summary.set_text('%s · %d atoms · ASE %s\n%d geometric layers; %d fixed atoms. Vacuum: %.6g Å EACH side.' %
-                (result['formula'],result['atoms'],result['ase_version'],result['geometric_layers'],result['fixed_atoms'],result['vacuum_each_side']))
+            self.update_summary()
             self.status.set_text('Preview or save POSCAR + surface.json. Generated slab is an initial model, not an optimized or stability-validated surface.')
         self.set_busy(False);return False
+
+    def update_summary(self):
+        result=self.result
+        self.summary.set_text('%s · %d atoms · ASE %s\n%d geometric layers; %d fixed atoms. %s: vacuum bottom %.6g Å / top %.6g Å.' %
+            (result['formula'],result['atoms'],result['ase_version'],result['geometric_layers'],
+             result['fixed_atoms'],result['placement'].title(),result['vacuum_bottom'],result['vacuum_top']))
+
+    def position_changed(self,button,placement):
+        if self._positioning or not button.get_active():return
+        previous=self.placement;preview_open=False
+        try:
+            if self.result is not None:
+                positioned=reposition_result(self.result,placement)
+                preview_open=self.preview_window is not None
+                self.result=positioned;self.update_summary()
+            self.placement=placement
+            self.vacuum_title.set_text('Vacuum EACH side (Å)' if placement=='center' else 'Half total vacuum (Å)')
+            self.status.set_text('Center: vacuum on both sides.' if placement=='center' else 'Bottom: lowest atom z = 0.1 Å; cell and total vacuum unchanged.')
+            if preview_open:self.preview()
+        except Exception as error:
+            self._positioning=True
+            (self.center_button if previous=='center' else self.bottom_button).set_active(True)
+            self._positioning=False;self.status.set_text(str(error))
 
     def cancel(self,*_):
         if self.task:self.task.cancel();self.cancel_button.set_sensitive(False);self.status.set_text('Cancelling surface generation…')
@@ -144,7 +175,10 @@ class SurfacePage(Gtk.Box):
             from p4vasp.Structure import Structure
             from p4vasp.gtk3.gas_phase import show_model_preview
             structure=Structure();structure.read(StringIO(self.result['poscar']))
-            self.preview_window=show_model_preview(structure,'Surface preview — '+self.result['formula'])
+            self.preview_window=show_model_preview(structure,'Surface preview — '+self.result['formula'],show_cell=True)
+            # View along -Y so +Z is upward; fit the cell to expose vacuum.
+            self.preview_window.navigator.setBottomView()
+            self.preview_window.fitToStructure(include_cell=True)
             for index,layer in enumerate(self.result['layer_numbers']):
                 if layer<=self.result['request']['fixed_layers']:self.preview_window.selectAtom(index)
             self.preview_window.redraw()

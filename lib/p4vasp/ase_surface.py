@@ -20,10 +20,50 @@ def integer(value, name, low, high):
     return number
 
 
+def position_offset(low,high,height,placement):
+    if placement not in ('center','bottom'):raise ValueError('Choose Center or Bottom.')
+    if not all(math.isfinite(v) for v in (low,high,height)) or high<low or height<=0:
+        raise ValueError('Invalid slab bounds or cell height.')
+    gap=height-(high-low)
+    if gap<=0 or (placement=='bottom' and gap<=.1):
+        raise ValueError('Bottom requires more than 0.1 angstrom of total vacuum; increase vacuum.')
+    return (gap/2 if placement=='center' else .1)-low
+
+
+def reposition_result(result,placement):
+    """Translate an existing generated slab without rebuilding or importing ASE."""
+    import copy
+    from p4vasp.Structure import Structure
+    atoms=Structure();atoms.read(StringIO(result['poscar']))
+    atoms.correctScaling();direct=atoms.isDirect();atoms.setCartesian()
+    if not len(atoms) or any(abs(atoms.basis[i][j])>1e-8 for i,j in ((0,2),(1,2),(2,0),(2,1))):
+        raise ValueError('Positioning requires a generated slab with its normal along z.')
+    height=atoms.basis[2][2];low=min(p[2] for p in atoms);high=max(p[2] for p in atoms)
+    shift=position_offset(low,high,height,placement)
+    for point in atoms:point[2]+=shift
+    new=copy.deepcopy(result);new['request']['placement']=placement
+    new.update(placement=placement,vacuum_bottom=low+shift,vacuum_top=height-high-shift,
+               vacuum_each_side=(height-high+low)/2 if placement=='center' else None)
+    if direct:atoms.setDirect()
+    stream=StringIO();atoms.write(stream)
+    # Keep the existing writer's species/counts/flags, but avoid its rounded
+    # Vector formatting moving z=0.1 during a Direct-coordinate round trip.
+    lines=stream.getvalue().splitlines()
+    for i,row in enumerate(atoms.basis):lines[2+i]=' '.join(format(v,'.17g') for v in row)
+    start=len(lines)-len(atoms)
+    for i,point in enumerate(atoms):
+        flags=lines[start+i].split()[3:]
+        lines[start+i]=' '.join([format(v,'.17g') for v in point]+flags)
+    new['poscar']='\n'.join(lines)+'\n'
+    return new
+
+
 def parameters(request):
     source = request.get('source', 'preset')
     if source not in ('preset', 'poscar', 'file'): raise ValueError('Choose a bulk source.')
-    result = {'source': source}
+    placement=request.get('placement','center')
+    if placement not in ('center','bottom'):raise ValueError('Choose Center or Bottom.')
+    result = {'source': source,'placement':placement}
     for key, default, low, high in (('layers',4,1,100), ('fixed_layers',2,0,100)):
         result[key] = integer(request.get(key,default),key,low,high)
     for key, default in (('vacuum',10.),('layer_tolerance',.3)):
@@ -104,6 +144,9 @@ def build_surface(request):
     if (not np.isfinite(slab.positions).all() or not np.isfinite(slab.cell.array).all()
             or not math.isfinite(slab.get_volume()) or slab.get_volume()<1e-8):
         raise ValueError('Generated surface cell or coordinates are invalid.')
+    shift=position_offset(float(slab.positions[:,2].min()),float(slab.positions[:,2].max()),
+                          float(slab.cell[2,2]),settings['placement'])
+    slab.positions[:,2]+=shift
     tags,levels=get_layers(slab,(0,0,1),tolerance=settings['layer_tolerance'])
     fixed=settings['fixed_layers']
     if fixed>=len(levels): raise ValueError('Fixed bottom layers must leave at least one free geometric layer.')
@@ -116,7 +159,10 @@ def build_surface(request):
     return {'poscar':stream.getvalue(),'atoms':len(slab),'formula':slab.get_chemical_formula(),
             'cell':slab.cell.array.tolist(),'ase_version':ase.__version__,'source_label':label,
             'request':portable,'geometric_layers':len(levels),'layer_numbers':layer_numbers,
-            'fixed_atoms':sum(v<=fixed for v in layer_numbers),'vacuum_each_side':settings['vacuum'],
+            'fixed_atoms':sum(v<=fixed for v in layer_numbers),
+            'placement':settings['placement'],'vacuum_bottom':float(slab.positions[:,2].min()),
+            'vacuum_top':float(slab.cell[2,2]-slab.positions[:,2].max()),
+            'vacuum_each_side':settings['vacuum'] if settings['placement']=='center' else None,
             'layer_convention':'bottom-up geometric layers along the surface normal; source constraints replaced'}
 
 

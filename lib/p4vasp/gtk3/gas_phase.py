@@ -37,7 +37,7 @@ def molecular_atomtypes():
     return covalent_atomtypes()
 
 
-def show_model_preview(structure, title, molecular=False):
+def show_model_preview(structure, title, molecular=False, show_cell=False):
     """Reuse the session-owned read-only model window and its event protection."""
     from p4vasp.StructureWindow import StructureWindow
     from p4vasp.util import getAtomtypes
@@ -49,6 +49,7 @@ def show_model_preview(structure, title, molecular=False):
     window.atomtypes = molecular_atomtypes() if molecular else getAtomtypes()
     window.setRadiusFactor(.5)
     window.structure_drawer.setBondFactor(1.2 if molecular else 1.0)
+    window.showCell(int(show_cell))
     window.setStructure(None)
     window.removeSelectedAll()
     window.setStructure(structure)

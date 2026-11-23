@@ -84,12 +84,15 @@ def main(args):
         surface.build_button.clicked();pump(lambda:surface.task is None,60)
         assert surface.result is not None,surface.status.get_text()
         assert surface.result['atoms']==16 and surface.result['fixed_atoms']==8
+        surface.bottom_button.set_active(True);pump()
+        assert abs(surface.result['vacuum_bottom']-.1)<1e-10
         surface.preview_button.clicked();pump()
         assert surface.preview_window.getSelectedCount()==8
         with patch.object(surface_module,'InputFolderDialog',side_effect=auto_dialog(surface_module.InputFolderDialog,'Cu_surface')):
             surface.save_button.clicked()
         saved=Structure(str(out/'Cu_surface/POSCAR'))
         assert len(saved)==16 and sum(not all(flag) for flag in saved.selective)==8
+        saved.setCartesian();assert abs(min(p[2] for p in saved)-.1)<1e-10
         assert (out/'Cu_surface/surface.json').is_file()
         screenshot('surface.png');surface.close_preview()
         report['checks'].append('actual surface GUI -> bundled ASE Cu(111) -> fixed bottom layers/preview -> POSCAR and metadata save')

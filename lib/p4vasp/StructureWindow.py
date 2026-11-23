@@ -167,8 +167,8 @@ class StructureWindow:
         self.redraw()
     def getMultiple(self):
         return self.multiple
-    def fitToStructure(self):
-        """Frame visible atom surfaces, ignoring empty cell/vacuum volume."""
+    def fitToStructure(self,include_cell=False):
+        """Frame atoms; optionally include the cell to compare slab/vacuum placement."""
         if self.structure is None or not len(self.structure): return False
         nav, drawer = self.navigator, self.structure_drawer
         if not hasattr(_cp4vasp,"VisNavDrawer_centerOn"):
@@ -185,6 +185,14 @@ class StructureWindow:
                 value = sum(rotation[row][j]*point[j] for j in range(3))
                 low[row] = min(low[row],value-radius)
                 high[row] = max(high[row],value+radius)
+        if include_cell:
+            for a in (0,1):
+                for b in (0,1):
+                    for c in (0,1):
+                        point=[a*structure.basis[0][j]+b*structure.basis[1][j]+c*structure.basis[2][j] for j in range(3)]
+                        for row in range(3):
+                            value=sum(rotation[row][j]*point[j] for j in range(3))
+                            low[row]=min(low[row],value);high[row]=max(high[row],value)
         if not all(math.isfinite(v) for v in low+high): return False
         counts = (drawer.getMultiple1(),drawer.getMultiple2(),drawer.getMultiple3())
         for axis, count in enumerate(counts):

@@ -54,6 +54,24 @@ def main():
         for _ in range(15):pump();time.sleep(.01)
         preview.win.saveScreenshot('/tmp/p4vasp-surface-preview.tga')
         assert page.result['poscar']==source
+        cell=page.result['cell']
+        page.bottom_button.set_active(True);pump()
+        assert page.result['request']['placement']=='bottom' and page.task is None
+        assert 'Half total' in page.vacuum_title.get_text()
+        assert page.result['cell']==cell and page.result['fixed_atoms']==8
+        shifted=Structure();shifted.read(StringIO(page.result['poscar']));shifted.setCartesian()
+        assert abs(min(p[2] for p in shifted)-.1)<1e-10
+        assert abs(page.result['vacuum_top']-19.9)<1e-10
+        assert page.preview_window is preview and preview.getSelectedCount()==8
+        for _ in range(15):pump();time.sleep(.01)
+        preview.win.saveScreenshot('/tmp/p4vasp-surface-bottom.tga')
+        page.center_button.set_active(True);pump()
+        assert abs(page.result['vacuum_bottom']-10)<1e-10
+        assert 'EACH side' in page.vacuum_title.get_text()
+        for _ in range(15):pump();time.sleep(.01)
+        preview.win.saveScreenshot('/tmp/p4vasp-surface-center.tga')
+        page.bottom_button.set_active(True);source=page.result['poscar']
+
         with tempfile.TemporaryDirectory(prefix='surface UI ') as temporary:
             parent=Path(temporary)
             def dialog(*args,**kwargs):
@@ -66,7 +84,8 @@ def main():
             atoms=Structure(str(out/'POSCAR'))
             assert len(atoms)==16 and sum(not all(flag) for flag in atoms.selective)==8
             meta=json.loads((out/'surface.json').read_text());assert meta['fixed_atoms']==8
-            assert len(meta['layer_numbers'])==16
+            assert len(meta['layer_numbers'])==16 and meta['placement']=='bottom'
+            atoms.setCartesian();assert abs(min(p[2] for p in atoms)-.1)<1e-10
             assert (out/'POSCAR').read_text()==source
             from p4vasp.single_atom_inputs import write_contents
             before=(out/'POSCAR').read_bytes()
@@ -111,7 +130,7 @@ def main():
             page.finished(fake,result,None)
             assert page.result is None and 'cancelled' in page.status.get_text().lower()
         # Screenshot is the actual scrolled Surface content after a clean preset build.
-        page.source.set_active(0);page.layers.set_text('4');page.fixed.set_text('2')
+        page.source.set_active(0);page.layers.set_text('4');page.fixed.set_text('2');page.center_button.set_active(True)
         for field in page.repeat:field.set_text('2')
         page.build_button.clicked();pump(lambda:page.task is None)
         assert page.result is not None,page.status.get_text()

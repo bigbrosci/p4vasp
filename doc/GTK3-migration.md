@@ -480,3 +480,30 @@ test/testSurfaceGtk.py exercises actual worker responsiveness, source buttons,
 fixed-layer native preview, save/no-overwrite, invalidation and synthetic
 cancel/explicit page-destroy behavior. Tests use temporary inputs; full application
 shutdown cancellation and Windows/macOS runtime remain unverified.
+
+
+### Slab Center / Bottom placement (2026-11-22)
+
+SurfacePage adds grouped, button-style radio controls within the existing grid.
+Center uses the ASE geometric-bounds convention along z. Bottom translates to
+min Cartesian z=0.1 Angstrom, keeping the cell and total vacuum fixed. Both
+worker generation and local repositioning use the same scalar offset helper;
+existing results are repositioned on private Structure copies without ASE in GTK,
+rebuilding a slab or rereading input files. Retain atom order/flags/layer metadata.
+Use the existing POSCAR writer's header/flags and 17-digit numeric rows locally
+to avoid Direct-coordinate round-trip drift at 0.1 Angstrom; no global writer change.
+
+Summary/JSON distinguish actual bottom/top gaps and placement. The input vacuum
+remains half the total empty space; its Bottom label says Half total vacuum.
+An insufficient gap is rejected instead of enlarging the cell. Live previews
+refresh and default to a side view with cell lines. StructureWindow.fitToStructure
+now has opt-in include_cell=True bounds; ordinary Show/Control defaults stay
+atom-focused. Shared previews explicitly reset cell visibility between models.
+
+ASE tests independently compare recentering with Atoms.center(axis=2), plus
+cell/distances/masks/idempotence and low-vacuum rejection. Real GUI tests verify
+buttons, labels, live preview and saved 0.1-Angstrom coordinates/metadata. Native
+Show's antialias pixel probe initially returned [0,0]; without altering rendering,
+baseline and current rechecks both returned [0,45]. Treat that as an observed
+capture-timing limitation, not a new antialias fix. No Windows/macOS build or
+full application shutdown acceptance was performed.
