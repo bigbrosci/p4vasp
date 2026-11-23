@@ -30,37 +30,41 @@ class DosAnalysis(Gtk.Frame):
         selected=Gtk.Button(label='Use selected atoms');selected.connect('clicked',self.use_selection)
         line=Gtk.Button(label='Use last DOS line');line.connect('clicked',self.use_line)
         grid.attach(selected,0,1,1,1);grid.attach(line,1,1,1,1)
-        self.orbital=Gtk.ComboBoxText()
-        for text in ('d','dxy','dyz','dz2','dxz','dx2'):self.orbital.append_text(text)
-        self.orbital.set_active(0)
+        self.orbital_box=Gtk.Box(spacing=2,homogeneous=True)
+        self.orbital_buttons={};self._orbital_sync=False
+        button_style=Gtk.CssProvider()
+        button_style.load_from_data(b"button { min-width: 0; padding: 4px 5px; }")
+        for name in ('d','dxy','dyz','dz2','dxz','dx2'):
+            button=Gtk.ToggleButton(label=name)
+            button.get_style_context().add_provider(button_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            self.orbital_buttons[name]=button;self.orbital_box.pack_start(button,True,True,0)
+        self.orbital_buttons['d'].set_active(True)
         self.spin_box=Gtk.Box(spacing=2,homogeneous=True)
         self.spin_buttons={};group=None
-        spin_style=Gtk.CssProvider()
-        spin_style.load_from_data(b"button { min-width: 0; padding: 4px 5px; }")
         for name,label in (('both','Both'),('up','Up'),('down','Down')):
             button=Gtk.RadioButton.new_with_label_from_widget(group,label)
             if group is None:group=button
             button.set_mode(False)
-            button.get_style_context().add_provider(spin_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            button.get_style_context().add_provider(button_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
             self.spin_buttons[name]=button;self.spin_box.pack_start(button,True,True,0)
         self.spin_buttons['both'].set_active(True)
         self.emin=Gtk.Entry();self.emax=Gtk.Entry()
         for entry in (self.emin,self.emax):
             entry.set_width_chars(4);entry.set_max_width_chars(4);entry.set_placeholder_text('Full')
             entry.set_tooltip_text('Relative to EF=0 eV. Blank uses the source grid limit.')
-        for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin_box))):
+        for index,(label,widget) in enumerate((('Orbital',self.orbital_box),('Spin',self.spin_box))):
             row=Gtk.Box(spacing=6)
             row.pack_start(Gtk.Label(label=label,xalign=0),False,False,0)
-            row.pack_start(widget,True,True,0);grid.attach(row,column,2,1,1)
+            row.pack_start(widget,True,True,0);grid.attach(row,0,2+index,2,1)
         limits=Gtk.Box(spacing=5)
         limits.pack_start(Gtk.Label(label='Energy Range (eV)',xalign=0),False,False,0)
         for label,widget in (('Emin',self.emin),('Emax',self.emax)):
             limits.pack_start(Gtk.Label(label=label),False,False,0)
             limits.pack_start(widget,False,False,0)
-        grid.attach(limits,0,3,2,1)
+        grid.attach(limits,0,4,2,1)
         actions=Gtk.Grid(column_spacing=6,row_spacing=5,column_homogeneous=True)
         self.calculate=Gtk.Button(label='Analyze d-DOS');self.calculate.connect('clicked',self.start)
-        self.script=Gtk.Button(label='Export Python script');self.script.connect('clicked',self.export_script)
+        self.script=Gtk.Button(label='Export scripts');self.script.connect('clicked',self.export_script)
         self.copy=Gtk.Button(label='Copy results');self.copy.connect('clicked',self.copy_results)
         self.export=Gtk.Button(label='Export CSV');self.export.connect('clicked',self.export_results)
         for index,widget in enumerate((self.calculate,self.script,self.copy,self.export)):
@@ -86,7 +90,8 @@ class DosAnalysis(Gtk.Frame):
         scroll.add(view);box.pack_start(scroll,True,True,0)
         self.hint=InstallHint('pymatgen','install-science.sh',bundled=False);self.hint.set_no_show_all(True)
         box.pack_start(self.hint,False,False,0)
-        for widget in (self.mode,self.orbital):widget.connect('changed',self.changed)
+        self.mode.connect('changed',self.changed)
+        for name,button in self.orbital_buttons.items():button.connect('toggled',self.orbital_toggled,name)
         for button in self.spin_buttons.values():button.connect('toggled',self.spin_toggled)
         for widget in (self.selection,self.emin,self.emax):widget.connect('changed',self.changed)
         self.set_system(applet.system)
@@ -139,6 +144,32 @@ class DosAnalysis(Gtk.Frame):
         self.set_spin_channels(channels)
         self.hint.hide();self.status.set_tooltip_text(None);self.sensitivity()
 
+    def orbital_name(self):
+        return ','.join(name for name,button in self.orbital_buttons.items() if button.get_active())
+
+    def set_orbitals(self,names):
+        from p4vasp.dos_selection import parse_orbitals
+        names=parse_orbitals(names)
+        self._orbital_sync=True
+        try:
+            for name,button in self.orbital_buttons.items():button.set_active(name in names)
+        finally:self._orbital_sync=False
+        self.changed()
+
+    def orbital_toggled(self,button,name):
+        if self._orbital_sync:return
+        self._orbital_sync=True
+        try:
+            if button.get_active():
+                if name=='d':
+                    for other,item in self.orbital_buttons.items():
+                        if other!='d':item.set_active(False)
+                else:self.orbital_buttons['d'].set_active(False)
+            if not any(item.get_active() for item in self.orbital_buttons.values()):
+                self.orbital_buttons['d'].set_active(True)
+        finally:self._orbital_sync=False
+        self.changed()
+
     def spin_name(self):
         return next(name for name,button in self.spin_buttons.items() if button.get_active())
 
@@ -184,15 +215,15 @@ class DosAnalysis(Gtk.Frame):
             if not atoms:raise ValueError('The last DOS line selects no atoms.')
             self.mode.set_active(2);self.selection.set_text(', '.join(str(i+1) for i in atoms))
             self.set_spin({1:'up',2:'down'}.get(line.spin,'both'))
-            self.orbital.set_active(0)
-            if len(line.orbital)==1 and line.orbital[0] in ('dxy','dyz','dz2','dxz','dx2'):
-                self.orbital.set_active(('d','dxy','dyz','dz2','dxz','dx2').index(line.orbital[0]))
+            from p4vasp.dos_selection import D_ORBITALS
+            selected=[name for name in D_ORBITALS if name in line.orbital]
+            self.set_orbitals(selected if 0<len(selected)<5 else ['d'])
             self.status.set_text('Copied atoms/spin from the last DOS line. Analyze uses the selected d orbital, without line scale or sign.')
         except Exception as error:self.status.set_text(str(error))
 
     def request(self):
         text=self.selection.get_text().strip();mode=self.mode.get_active()
-        request=dict(path=str(self.path()),orbital=self.orbital.get_active_text(),spin=self.spin_name())
+        request=dict(path=str(self.path()),orbital=self.orbital_name(),spin=self.spin_name())
         if mode==1:
             request['elements']=list(dict.fromkeys(re.split(r'[\s,]+',text))) if text else []
             if not request['elements']:raise ValueError('Enter at least one element symbol.')
@@ -263,9 +294,11 @@ class DosAnalysis(Gtk.Frame):
     def export_script(self,*_):
         if not self.result:return
         from p4vasp.gtk3.file_dialogs import CompactFileDialog
-        from p4vasp.dos_replay import save_script
-        dialog=CompactFileDialog(self.parent(),Path(self.result['path']).parent,'Export Python analysis script',save_name='d-band-analysis.py')
+        from p4vasp.dos_replay import save_scripts
+        dialog=CompactFileDialog(self.parent(),Path(self.result['path']).parent,'Export Python and Bash analysis scripts',save_name='d-band-analysis.py')
         path=dialog.run()
         if path:
-            try:save_script(path,self.result);self.status.set_tooltip_text((self.status.get_tooltip_text() or '')+'\nSaved '+str(path))
+            try:
+                paths=save_scripts(path,self.result)
+                self.status.set_tooltip_text((self.status.get_tooltip_text() or '')+'\n'+'\n'.join('Saved '+str(item) for item in paths))
             except Exception as error:self.status.set_text('Script export failed: '+str(error))

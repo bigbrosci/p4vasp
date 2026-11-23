@@ -659,4 +659,6 @@ Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子�
 
 原DOS+bands和Local DOS绘图保留。DOS图在左，右侧d-band analysis默认直接显示，可拖动分隔线调整宽度、小窗口滚动；可按元素/原子及d轨道、自旋、相对EF窗口计算中心、标准差宽度、窗口填充度及Hilbert upper edge，复制/独占CSV导出。支持DOSCAR投影或vasprun.xml，缺投影/SOC等明确拒绝；缺pymatgen不影响旧绘图。计算通过统一科学环境独立进程，可取消，换源清理旧结果；详见[分析操作与科学定义](dos-analysis-zh.md)。
 
-DOS分析顶部显示实际pymatgen版本；摘要只保留原子、轨道、自旋和范围，细节见悬浮提示/CSV。Energy Range (eV)下用Emin/Emax手填相对EF范围；Use last DOS line继续保留。Export Python script替代Cancel，可导出独立重算当前选择的脚本；参数变化仍自动取消计算。脚本用法见[分析说明](dos-analysis-zh.md#导出python分析脚本)。
+DOS分析顶部显示实际pymatgen版本；摘要只保留原子、轨道、自旋和范围，细节见悬浮提示/CSV。Energy Range (eV)下用Emin/Emax手填相对EF范围；Use last DOS line继续保留。Export scripts可同时导出独立Python快照脚本和重新读源文件的Bash命令行脚本；参数变化仍自动取消计算。脚本用法见[分析说明](dos-analysis-zh.md#导出python和bash脚本)。
+
+Orbital为独立一排按钮，d与分量互斥，dxy/dyz等分量可同时选中并求和；Spin置于下一排。新增无界面命令：`p4v DOSCAR 1-3 dxy,dyz both -6 0 result.csv`，完整参数说明见[常用命令](../usage_commands.md)。

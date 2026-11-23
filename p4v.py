@@ -8,6 +8,9 @@
 import sys
 if __name__ == "__main__":
     cli_args = sys.argv[1:]
+    if cli_args and cli_args[0]=='--dos-analysis':
+        from p4vasp.dos_cli import main as dos_main
+        raise SystemExit(dos_main(cli_args[1:]))
     if cli_args and cli_args[0] == '--check-runtime':
         from p4vasp.windows_check import main as check_runtime
         check_runtime(cli_args[1:])
@@ -22,6 +25,11 @@ if __name__ == "__main__":
            for a in cli_args):
         from p4vasp.render_cli import main as render_main
         raise SystemExit(render_main(cli_args))
+
+    from p4vasp.dos_cli import is_dos_command
+    if is_dos_command(cli_args):
+        from p4vasp.dos_cli import main as dos_main
+        raise SystemExit(dos_main(cli_args))
 
 # GTK3 is the only supported GUI runtime.
 try:

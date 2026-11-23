@@ -53,6 +53,14 @@ def main():
         assert panel.translate_coordinates(electronic.dos_split,0,0)[0]>left.translate_coordinates(electronic.dos_split,0,0)[0]
         assert panel.calculate.get_mapped() and panel.export.get_mapped() and panel.script.get_mapped()
         assert not panel.hint.get_visible()
+        panel.orbital_buttons['dxy'].clicked();panel.orbital_buttons['dyz'].clicked()
+        assert panel.request()['orbital']=='dxy,dyz'
+        assert not panel.orbital_buttons['d'].get_active()
+        panel.orbital_buttons['d'].clicked()
+        assert panel.request()['orbital']=='d'
+        assert sum(button.get_active() for button in panel.orbital_buttons.values())==1
+        panel.orbital_buttons['d'].clicked();assert panel.request()['orbital']=='d'
+
         assert [button.get_label() for button in panel.spin_buttons.values()]==['Both','Up','Down']
         assert panel.spin_buttons['up'].get_sensitive() and panel.spin_buttons['down'].get_sensitive()
         spin(10,lambda:panel.version_job is None)
@@ -68,6 +76,7 @@ def main():
         finally:selection().data=old_selection
 
         panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up')
+        panel.orbital_buttons['dxy'].clicked();panel.orbital_buttons['dyz'].clicked()
         ticks=[];timer=GLib.timeout_add(10,lambda:(ticks.append(1),True)[1])
         panel.calculate.clicked();assert panel.job is not None
         spin(30,lambda:panel.job is None);GLib.source_remove(timer)
@@ -77,7 +86,8 @@ def main():
         assert len(panel.model)==4 and panel.export.get_sensitive() and panel.script.get_sensitive()
         expected_title='d-band analysis (pymatgen-'+panel.result['pymatgen_version'].replace('.','-')+')'
         assert panel.get_label()==expected_title
-        assert panel.status.get_text()=='atoms 1 | d | up | E−EF: -10 to 10 eV.'
+        assert panel.status.get_text()=='atoms 1 | dxy,dyz | up | E−EF: -10 to 10 eV.'
+        assert panel.result['orbitals']==['dxy','dyz']
         assert electronic.total_dos==original,'Analysis changed original plotting densities'
         assert not any(name=='pymatgen' or name.startswith('pymatgen.') for name in sys.modules)
         panel.copy.clicked();assert 'd-band center' in Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()
@@ -98,6 +108,8 @@ def main():
         with patch('p4vasp.gtk3.file_dialogs.CompactFileDialog',side_effect=actual_export_dialog):
             panel.script.clicked()
         assert (folder/'d-band-analysis.py').exists(),panel.status.get_text()
+        assert (folder/'d-band-analysis.sh').exists(),panel.status.get_text()
+        assert panel.script.get_label()=='Export scripts'
 
         def check_plot_surface(stage):
             canvas=electronic.canvas
@@ -125,9 +137,9 @@ def main():
 
         for i in range(3):
             panel.mode.set_active(1);panel.selection.set_text('Fe')
-            panel.orbital.set_active(i);panel.set_spin(('both','up','down')[i])
+            panel.set_orbitals(('d','dxy','dyz')[i]);panel.set_spin(('both','up','down')[i])
             spin(.35);check_plot_surface('options-'+str(i))
-        panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up');panel.orbital.set_active(0)
+        panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up');panel.set_orbitals('d')
         panel.calculate.clicked();spin(30,lambda:panel.job is None)
         assert panel.result is not None,panel.status.get_text()
         check_plot_surface('maximized-analysis')

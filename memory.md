@@ -1,6 +1,14 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 多轨道按钮／双脚本／无界面DOS命令完成（2026-11-23）
+
+- 用户要求Orbital单独一行d及5分量，多分量可组合、d与分量互斥；Spin移下一行。DosAnalysis用ToggleButton组及同步guard，最后一项取消回d；set_orbitals/orbital_name替代旧下拉，Use last DOS line可复制多个d分量，全部5项时用d。dos_selection.py统一原子/轨道解析，逗号或列表标准化/去重；d+分量拒绝，LM各分量原始密度先求和，指标算法不变。仅有汇总d的源仍需选d。
+- p4v.py在GTK/native导入前分流位置参数：p4v DOSCAR atoms orbitals spin Emin Emax output.csv，也支持XML、显式--dos-analysis和帮助。dos_cli.py用既有科学worker/120秒/独占CSV，不开GUI；原子1起范围或all，轨道逗号、spin both/up/down，能量相对EF或full。少参数但明显原子选择意图也走CLI报usage，单文件GUI/图片导出路由保持原有逻辑。
+- Export scripts一次生成同名.py/.sh，检查两者存在并用独占创建，异常清理本轮文件；原save_script单Python接口保留。Python为所选谱快照，不依赖原数据/p4vasp，仍可改范围；Bash重新读原数据，写出可编辑的p4v位置命令，非交互无alias时用导出机器p4v.sh函数回退，不source用户bashrc。默认输出分别_results.csv/_cli.csv，已有CSV拒覆盖，Bash支持第1参数另指定输出。换机需源文件及有效p4v路径，不将快照当VASP输入。
+- Linux/WSL：10科学回归含组合/去重/冲突、2Python隔离重放、2实际CLI/双脚本测试通过（无DISPLAY/Wayland、禁止gi导入、DOSCAR/XML、含空格路径、少参数usage、已存文件保护、Bash真正运行并匹配数值）。真实GTK多选/d互斥/空选回d、组合计算、两导出对话框产生.py/.sh、非自旋灰显、最大化/复制/取消等通过，截图/tmp/p4vasp-dos-maximized-redraw.png已查看。10 GTK、33面板、58基础、3依赖工具/清单及语法/diff通过，日志/tmp/dos-multi-{core,replay,cli,gtk,gtk-base,smoke,base}.log。
+- 本地私有Cu3Ru1额外无界面多轨道命令与相同后端结果一致，5项源哈希不变，输出仅/tmp/cu3ru1-cli-*；公开测试全为人工谱，不提交example/私有输出。命令指南/分析说明/架构/依赖源码索引及当日中英同步；无新依赖/环境，不重采快照/重编或Windows包，Mac/Windows未验收。任务完成，用户可重启GUI或直接用新命令。
 
 ## Spin三按钮与无自旋灰显（2026-11-22）
 

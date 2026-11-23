@@ -1,9 +1,10 @@
 """Export the selected d-DOS snapshot and the shared calculation as plain Python."""
 import json
+import shlex
 from pathlib import Path
 
 
-def save_script(path, result):
+def script_text(result):
     if not result or 'replay' not in result:
         raise ValueError('Analyze the current selection before exporting its Python script.')
     snapshot=json.dumps(result['replay'],ensure_ascii=False,allow_nan=False)
@@ -54,6 +55,47 @@ def main():
 if __name__=='__main__':main()
 '''%repr(snapshot)
     text=header+'\n'+core+'\n'+main
-    compile(text,str(path),'exec')
+    compile(text,'<d-band replay>','exec')
+    return text
+
+
+def save_script(path,result):
+    text=script_text(result)
     with Path(path).open('x',encoding='utf-8',newline='') as stream:stream.write(text)
     return Path(path)
+
+
+def bash_text(path,result):
+    import p4vasp
+    launcher=Path(p4vasp.p4vasp_home).resolve()/'p4v.sh'
+    if not launcher.is_file():raise ValueError('Bash export requires a source checkout with p4v.sh.')
+    command=['p4v',result['path'],','.join(map(str,result['atoms'])),result['orbital'],result['spin'],
+             '%.17g'%result['emin'],'%.17g'%result['emax']]
+    output=Path(path).with_name(Path(path).stem+'_cli.csv').absolute()
+    return ('#!/usr/bin/env bash\nset -euo pipefail\n'
+            '# Re-read the original VASP source using the headless p4v command.\n'
+            '# Run: bash THIS_SCRIPT.sh [NEW_OUTPUT.csv]\n'
+            '# p4v must support positional DOS analysis. Bash does not load interactive aliases.\n'
+            'if ! command -v p4v >/dev/null 2>&1; then\n'
+            '  p4v() { bash '+shlex.quote(str(launcher))+' "$@"; }\n'
+            'fi\n'
+            'default_output='+shlex.quote(str(output))+'\n'
+            'output="${1:-$default_output}"\n'+shlex.join(command)+' "$output"\n')
+
+
+def save_scripts(path,result):
+    """Create matching .py/.sh files exclusively; roll back on pair failure."""
+    path=Path(path)
+    if path.suffix.lower()!='.py':raise ValueError('Choose a .py filename; the matching .sh is exported alongside it.')
+    shell=path.with_suffix('.sh')
+    if path.exists() or shell.exists():raise FileExistsError('A script already exists; choose a new basename.')
+    texts=((path,script_text(result)),(shell,bash_text(path,result)))
+    created=[]
+    try:
+        for destination,text in texts:
+            with destination.open('x',encoding='utf-8',newline='') as stream:
+                created.append(destination);stream.write(text)
+    except Exception:
+        for destination in reversed(created):destination.unlink(missing_ok=True)
+        raise
+    return path,shell

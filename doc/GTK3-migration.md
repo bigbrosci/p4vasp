@@ -615,3 +615,17 @@ Use-last-line respects that availability. Keep lowercase worker spin values and
 source-change invalidation; the numerical backend is unchanged. GTK regression
 switches both DOSCAR and XML to scalar data, calculates with Both and returns to
 a polarized source, checking exclusivity, restored buttons and regular-width fit.
+
+### Orbital combinations and headless DOS entry (2026-11-23)
+
+Orbital uses six toggle buttons on its own row: d excludes component choices,
+components combine, and clearing the last choice restores d. Spin moves to the
+next row. dos_selection.py supplies shared orbital/atom validation; the worker
+sums each selected component once before running unchanged metrics.
+
+p4v.py dispatches the seven positional DOS arguments (or --dos-analysis) before
+GTK/native imports. dos_cli.py invokes the existing science worker and writes
+exclusive CSV; single-file GUI and render flags keep their existing routes.
+Export scripts creates .py/.sh together: Python embeds the selected snapshot,
+Bash re-reads the source through p4v and includes an alias-free launcher fallback.
+New paired files are exclusive and cleaned up on failure. No shared Glade change.

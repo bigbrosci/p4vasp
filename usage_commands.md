@@ -39,3 +39,17 @@ p4v POSCAR -o side.png --view side
 下拉菜单的Initial positions和Final positions分别显示XDATCAR首帧和末帧；即使停留在这两个单帧选项，点击播放或步进也会自动回到完整轨迹。File/Open选择XDATCAR同样适用，不需要ASE。文件必须保留在原位置以便按索引读取，播放中不要替换或追加文件；新增帧请重新打开。
 
 读取支持Direct／Cartesian坐标、VASP4／5头及重复完整头的变晶胞轨迹；不完整帧会报错，不会伪造缺失原子。轨迹只反映文件实际保存的帧，不推断是优化还是分子动力学，也不插值未保存过程或补充能量／力。此改动需新源码，旧Windows EXE须另行打包。
+
+## 无界面DOS分析
+
+需先安装统一科学环境：`bash install/install-science.sh`。下面命令不打开GUI，直接输出CSV：
+
+```bash
+p4v DOSCAR 1-3 dxy,dyz both -6 0 result.csv
+p4v vasprun.xml all d both full full all-d.csv
+p4v --dos-analysis --help
+```
+
+参数顺序为：文件、原子编号/范围、轨道、自旋、Emin、Emax、输出CSV。
+多个原子或轨道用逗号，轨道d与单个分量不能混用；能量相对EF=0，已有CSV不覆盖。
+单参数`p4v DOSCAR`仍打开界面。Export scripts生成Python快照脚本和调用该入口的Bash脚本，详见[分析与脚本说明](doc/dos-analysis-zh.md)。

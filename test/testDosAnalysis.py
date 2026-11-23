@@ -46,6 +46,17 @@ class DosAnalysisTest(unittest.TestCase):
         whole=self.run_analysis(atoms=[1],spin='down')
         self.assertAlmostEqual(whole['weight'],a['weight']*3,places=8)
 
+    def test_multiple_orbitals_sum_once_and_reject_d_conflict(self):
+        first=self.run_analysis(atoms=[1],spin='up',orbital='dxy')
+        second=self.run_analysis(atoms=[1],spin='up',orbital='dyz')
+        combined=self.run_analysis(atoms=[1],spin='up',orbital='dyz,dxy,dxy')
+        self.assertEqual(combined['orbital'],'dxy,dyz')
+        self.assertEqual(combined['orbitals'],['dxy','dyz'])
+        self.assertAlmostEqual(combined['weight'],first['weight']+second['weight'],places=9)
+        self.assertAlmostEqual(combined['rows'][0][1],-1.,places=9)
+        for value in ('d,dxy','s',''):
+            with self.assertRaises(ValueError):self.run_analysis(orbital=value)
+
     def test_window_interpolation_filling_and_invariance(self):
         before=(self.folder/'DOSCAR').read_bytes()
         result=self.run_analysis(atoms=[1],spin='up',emin=-2.013,emax=.117)

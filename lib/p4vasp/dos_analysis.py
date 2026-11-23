@@ -86,9 +86,10 @@ def analyze(request):
         if unknown: raise ValueError('Elements not present: '+', '.join(sorted(unknown)))
         indices = [i for i,site in enumerate(complete.structure) if site.specie.symbol in elements]
     else: indices = list(range(len(complete.structure)))
-    orbital = request.get('orbital','d')
-    if orbital not in ('d','dxy','dyz','dz2','dxz','dx2'): raise ValueError('Unsupported d orbital.')
-    if aggregated and orbital != 'd': raise ValueError('This DOSCAR contains summed d only, not separate d orbitals.')
+    from p4vasp.dos_selection import parse_orbitals
+    orbitals=parse_orbitals(request.get('orbital','d'))
+    orbital=','.join(orbitals)
+    if aggregated and orbitals != ['d']: raise ValueError('This DOSCAR contains summed d only, not separate d orbitals.')
     spin_name = request.get('spin','both')
     if spin_name not in ('both','up','down'): raise ValueError('Invalid spin selection.')
     spins = list(complete.densities) if spin_name == 'both' else [Spin.up if spin_name == 'up' else Spin.down]
@@ -102,7 +103,7 @@ def analyze(request):
     for i in indices:
         for key,channels in complete.pdos.get(complete.structure[i],{}).items():
             kind = key if isinstance(key, OrbitalType) else key.orbital_type
-            if kind == OrbitalType.d and (orbital=='d' or key.name.replace('dx2_y2','dx2')==orbital):
+            if kind == OrbitalType.d and (orbitals==['d'] or key.name.replace('dx2_y2','dx2') in orbitals):
                 found = True
                 for spin in spins:
                     if spin not in channels: raise ValueError('Projected spin channel is missing.')
@@ -120,7 +121,7 @@ def analyze(request):
     result=calculate_metrics(energies,density,representative,request.get('emin'),request.get('emax'))
     result.update(path=str(Path(request['path']).resolve()), structure_source=structure_source,
                   atoms=[i+1 for i in indices], elements=sorted({complete.structure[i].specie.symbol for i in indices}),
-                  orbital=orbital, spin=spin_name, efermi=float(complete.efermi))
+                  orbital=orbital, orbitals=orbitals, spin=spin_name, efermi=float(complete.efermi))
     result['replay']=dict(energies=energies.tolist(),density=density.tolist(),structure=representative.as_dict(),
                           metadata={key:value for key,value in result.items() if key!='rows'})
     return result
