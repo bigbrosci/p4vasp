@@ -25,7 +25,7 @@ p4v OUTCAR
 源码版需要 ASE 环境；若缺失，在仓库目录运行：
 
 ```bash
-bash install/install-ase.sh
+bash install/install-science.sh
 ```
 
 读取／计算复用独立 ASE worker，有取消与 90 秒超时，界面保持响应。2026-11-07 的 Windows 便携包已包含频率面板与科学 worker；本次新增的气相参数弹窗和重跑脚本导出还需要重新打包，已生成的 EXE 不会自动更新。

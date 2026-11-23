@@ -50,7 +50,7 @@
 如果未安装ASE，在项目目录运行：
 
 ```bash
-bash install/install-ase.sh
+bash install/install-science.sh
 ```
 
 页面底部也提供按当前安装位置生成的可复制命令。使用现有ASE环境可设置P4VASP_ASE_PYTHON，不把ASE强行装进GTK解释器。

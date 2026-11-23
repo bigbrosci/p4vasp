@@ -66,7 +66,7 @@ class SurfacePage(Gtk.Box):
             self.pack_start(label,False,False,0)
         self.status.set_text('Choose a source. Miller indices refer to the INPUT cell; use a conventional bulk cell for conventional indices. Bottom-layer rule replaces input constraints.')
         from p4vasp.gtk3.install_hint import InstallHint
-        self.install_hint=InstallHint('ASE','install-ase.sh');self.pack_end(self.install_hint,False,False,0)
+        self.install_hint=InstallHint('ASE','install-science.sh');self.pack_end(self.install_hint,False,False,0)
         self.use_bulk.connect('clicked',self.from_bulk);self.open_button.connect('clicked',self.open)
         for widget in (self.source,self.preset,self.symbol,self.a,self.c,*self.indices,self.layers,*self.repeat,self.vacuum,self.fixed,self.tolerance):
             widget.connect('changed',self.changed)

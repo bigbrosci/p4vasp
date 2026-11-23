@@ -226,7 +226,7 @@ class VibrationsPage(Gtk.Box):
         self.status=Gtk.Label(label='Load a VASP frequency OUTCAR. Animation is schematic; Scale is dimensionless.',xalign=0)
         self.status.set_line_wrap(True);self.status.set_max_width_chars(90);self.status.set_selectable(True)
         self.pack_start(self.status,False,False,0)
-        self.install_hint=InstallHint('ASE','install-ase.sh');self.install_hint.set_no_show_all(True)
+        self.install_hint=InstallHint('ASE','install-science.sh');self.install_hint.set_no_show_all(True)
         self.pack_start(self.install_hint,False,False,0)
         self.open_button.connect('clicked',self.open)
         self.cancel_button.connect('clicked',lambda *_:self.cancel())

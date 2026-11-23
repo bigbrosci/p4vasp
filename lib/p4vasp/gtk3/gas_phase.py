@@ -106,7 +106,7 @@ class GasPhasePage(Gtk.Box):
         self.status.set_max_width_chars(80)
         self.pack_start(self.status,False,False,0)
         from p4vasp.gtk3.install_hint import InstallHint
-        self.install_hint = InstallHint('RDKit (SMILES)', 'install-rdkit.sh')
+        self.install_hint = InstallHint('RDKit (SMILES)', 'install-science.sh')
         self.pack_end(self.install_hint, False, False, 0)
         self.connect('destroy',self.destroyed)
         self.refresh()

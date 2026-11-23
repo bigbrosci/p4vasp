@@ -15,7 +15,7 @@ class BundledWorkerTest(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='model worker ') as folder:
             root=Path(folder);exe=root/'p4vasp.exe';exe.touch()
             worker=root/'model-worker/p4vasp-model-worker.exe';worker.parent.mkdir();worker.touch()
-            with patch.object(sys,'frozen',True,create=True),patch.object(sys,'executable',str(exe)),patch.dict(os.environ,{'P4VASP_ASE_PYTHON':'','P4VASP_SMILES_PYTHON':''}):
+            with patch.object(sys,'frozen',True,create=True),patch.object(sys,'executable',str(exe)),patch.dict(os.environ,{'P4VASP_ASE_PYTHON':'','P4VASP_SMILES_PYTHON':'','P4VASP_SCIENCE_PYTHON':''}):
                 self.assertEqual(bundled_worker(),worker)
                 self.assertEqual(bulk_command(),[str(worker),'--bulk'])
                 self.assertEqual(smiles_command(),[str(worker),'--smiles'])
@@ -33,6 +33,30 @@ class BundledWorkerTest(unittest.TestCase):
                 self.assertEqual(options['env']['PYINSTALLER_RESET_ENVIRONMENT'],'1')
                 self.assertEqual(options['env']['OMP_NUM_THREADS'],'1')
                 worker.unlink();self.assertIsNone(bundled_worker())
+
+    def test_shared_environment_priority_and_legacy_fallback(self):
+        import p4vasp
+        from p4vasp.model_worker import scientific_python
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            legacy = root/'.venv-ase/bin/python'
+            legacy.parent.mkdir(parents=True); legacy.touch()
+            shared = root/'.venv-science/bin/python'
+            with patch.object(p4vasp, 'p4vasp_home', folder), patch.dict(os.environ,
+                    {'P4VASP_ASE_PYTHON':'', 'P4VASP_SMILES_PYTHON':'',
+                     'P4VASP_PYMATGEN_PYTHON':'', 'P4VASP_SCIENCE_PYTHON':''}):
+                self.assertEqual(scientific_python('ase'), str(legacy))
+                shared.parent.mkdir(parents=True); shared.touch()
+                for feature in ('ase', 'smiles', 'pymatgen'):
+                    self.assertEqual(scientific_python(feature), str(shared))
+                self.assertEqual(bulk_command()[0], str(shared))
+                self.assertEqual(smiles_command()[0], str(shared))
+                with patch.dict(os.environ, {'P4VASP_SCIENCE_PYTHON':'common-python'}):
+                    self.assertEqual(bulk_command()[0], 'common-python')
+                    self.assertEqual(smiles_command()[0], 'common-python')
+                    with patch.dict(os.environ, {'P4VASP_ASE_PYTHON':'ase-python'}):
+                        self.assertEqual(bulk_command()[0], 'ase-python')
+                        self.assertEqual(smiles_command()[0], 'common-python')
 
     def test_source_environment_not_sanitized(self):
         with patch.object(sys,'frozen',False,create=True),patch.dict(os.environ,{'PYTHONPATH':'source-path'}):

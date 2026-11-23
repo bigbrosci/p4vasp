@@ -69,7 +69,7 @@ class BulkPage(Gtk.Box):
         for widget in (self.name, self.crystal, self.mode, *self.fields.values(), *self.repeat):
             widget.connect('changed', self.changed)
         from p4vasp.gtk3.install_hint import InstallHint
-        self.install_hint = InstallHint('ASE', 'install-ase.sh')
+        self.install_hint = InstallHint('ASE', 'install-science.sh')
         self.pack_end(self.install_hint, False, False, 0)
         self.connect('destroy', self.destroyed)
         self.update_fields()

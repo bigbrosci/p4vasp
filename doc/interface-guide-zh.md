@@ -57,7 +57,7 @@ p4v crystal.cif
 Linux／macOS 源码版需要可用的 ASE 环境；若缺失，在仓库目录运行下面的命令，再启动 p4vasp：
 
 ```bash
-bash install/install-ase.sh
+bash install/install-science.sh
 ```
 
 也可通过 `P4VASP_ASE_PYTHON` 指定已有 ASE 解释器。读取在独立进程中进行，60 秒超时；File／Open 失败时保留原系统。新版 Windows 构建脚本已接入随包 ASE 读取器及格式模块，但本次未生成／核验新 Windows 包，11 月 6 日旧 EXE 尚不包含此功能。
@@ -522,7 +522,7 @@ INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 
 
 在 **Models → bulk** 选择化学式和晶体原型，填写晶格参数、晶胞形式与超胞重复数，点击 **Build bulk**。完成后可查看原子数／晶胞／体积，使用 **Preview 3D** 预览，或 **Save POSCAR** 将结构写入新文件夹。保存后Open打开POSCAR可继续编辑；本页只生成POSCAR。
 
-首次使用在项目目录执行 `bash install/install-ase.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface首版现可切面、加真空、固定底层并保存。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
+首次使用在项目目录执行 `bash install/install-science.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface首版现可切面、加真空、固定底层并保存。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
 
 ### 气相 XYZ 本地分子库
 
@@ -554,7 +554,7 @@ INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGM
 
 Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构只是力场初始几何，不是 DFT 结果；盐、多片段及金属等继续导入 XYZ。生成结构只暂存当前页面，离开 Models 前需导出 POSCAR；不会自动写入原 XYZ 库。
 
-本机可选依赖已装入独立 `.venv-smiles`；其他设备需执行 `bash install/install-rdkit.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
+本机可选依赖已装入独立 `.venv-science`；其他设备需执行 `bash install/install-science.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
 
 ### Useful tools and links
 

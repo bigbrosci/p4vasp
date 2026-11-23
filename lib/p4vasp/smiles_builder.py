@@ -20,7 +20,7 @@ def build_geometry(smiles):
         from rdkit import Chem
         from rdkit.Chem import AllChem
     except ImportError as error:
-        raise RuntimeError('RDKit is unavailable. Run bash install/install-rdkit.sh in the p4vasp checkout, or set P4VASP_SMILES_PYTHON.') from error
+        raise RuntimeError('RDKit is unavailable. Run bash install/install-science.sh in the p4vasp checkout, or set P4VASP_SMILES_PYTHON.') from error
     mol=Chem.MolFromSmiles(smiles.strip())
     if mol is None:raise ValueError('Invalid SMILES. Check atom symbols, brackets and ring closures.')
     if len(Chem.GetMolFrags(mol))!=1:
@@ -78,15 +78,14 @@ def molecule_from_result(result):
 
 
 def worker_command():
-    configured=os.environ.get('P4VASP_SMILES_PYTHON')
+    configured=os.environ.get('P4VASP_SMILES_PYTHON') or os.environ.get('P4VASP_SCIENCE_PYTHON')
     if configured:return [configured,'-m','p4vasp.smiles_builder']
     from p4vasp.model_worker import bundled_worker
     bundled=bundled_worker()
     if bundled is not None:return [str(bundled),'--smiles']
-    root=Path(p4vasp.p4vasp_home)
-    for relative in ('.venv-smiles/bin/python','.venv-smiles/Scripts/python.exe'):
-        python=root/relative
-        if python.is_file():return [str(python),'-m','p4vasp.smiles_builder']
+    from p4vasp.model_worker import scientific_python
+    python=scientific_python('smiles')
+    if python:return [python,'-m','p4vasp.smiles_builder']
     if getattr(sys,'frozen',False):
         raise RuntimeError('Set P4VASP_SMILES_PYTHON to a Python interpreter with RDKit installed.')
     return [sys.executable,'-m','p4vasp.smiles_builder']

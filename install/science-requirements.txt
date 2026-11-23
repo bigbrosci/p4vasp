@@ -1,0 +1,4 @@
+# Shared Linux/WSL/macOS scientific worker environment; GUI remains separate.
+ase==3.29.0
+rdkit==2026.9.2
+pymatgen==2026.10.24

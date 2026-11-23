@@ -38,3 +38,5 @@ odpdom/cODP_wrap.cpp
 /build/checkpoints/
 
 .venv-pymatgen/
+
+.venv-science/

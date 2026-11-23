@@ -520,3 +520,14 @@ without changing covalent bond thresholds. `incar_generator.load_presets` uses
 the same effective resource reader. Restart applies cached defaults.
 Focused checks: `test/testPersonalData.py`, `test/testPersonalDataGtk.py`,
 `test/testElementData.py`, `test/testResourceData.py`, `test/testResourceHubGtk.py`.
+
+### Shared scientific worker environment (2026-11-22)
+
+`install/install-science.sh` installs ASE/RDKit/pymatgen into `.venv-science`,
+independently of GTK. Bulk, Surface, SMILES and vibration dependency hints copy
+this same installer command; their widget layout is unchanged. Existing
+feature installers forward to it. `model_worker.scientific_python` centralizes
+source interpreter selection while retaining legacy variables/environments;
+packaged Windows worker selection remains unchanged. Projected DOS analysis
+controls are not yet implemented. See `doc/dependencies/README.md` for precedence
+and baseline recording.

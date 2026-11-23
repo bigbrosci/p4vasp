@@ -61,7 +61,7 @@ def build_bulk(request):
         from ase.formula import Formula
         from ase.data import atomic_numbers
     except ImportError as error:
-        raise RuntimeError('ASE is unavailable. Run bash install/install-ase.sh in the p4vasp checkout.') from error
+        raise RuntimeError('ASE is unavailable. Run bash install/install-science.sh in the p4vasp checkout.') from error
     composition = Formula(name).count()
     if not composition or any(symbol not in atomic_numbers or symbol == 'X' for symbol in composition):
         raise ValueError('Use valid element symbols in the chemical formula.')
@@ -86,10 +86,9 @@ def build_bulk(request):
 
 def worker_command():
     import p4vasp
-    root = Path(p4vasp.p4vasp_home)
-    configured = os.environ.get('P4VASP_ASE_PYTHON')
-    candidates = [root/'.venv-ase/bin/python', root/'.venv-ase/Scripts/python.exe']
-    python = configured or next((str(path) for path in candidates if path.is_file()), None)
+    from p4vasp.model_worker import scientific_python
+    configured = os.environ.get('P4VASP_ASE_PYTHON') or os.environ.get('P4VASP_SCIENCE_PYTHON')
+    python = scientific_python('ase')
     if not configured:
         from p4vasp.model_worker import bundled_worker
         bundled=bundled_worker()
@@ -140,7 +139,7 @@ class BulkTask:
                 raise RuntimeError(self.label+' timed out.')
             if self.cancelled.is_set(): raise RuntimeError(self.label+' cancelled.')
             try: response = json.loads(output)
-            except ValueError: raise RuntimeError('ASE worker could not start. Run bash install/install-ase.sh, or check P4VASP_ASE_PYTHON. '+stderr[-400:])
+            except ValueError: raise RuntimeError('ASE worker could not start. Run bash install/install-science.sh, or check P4VASP_ASE_PYTHON. '+stderr[-400:])
             if self.process.returncode or not response.get('ok'):
                 raise RuntimeError(response.get('error', 'ASE generation failed.'))
             result = response['result']

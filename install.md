@@ -293,16 +293,16 @@ With the alias configured, use `p4v POSCAR -o top.png`. No GUI or display server
 XYZ 本地分子库及其他原有功能不依赖 RDKit。需要在 gas phase 中通过 SMILES 生成并初步优化结构时，可在源码仓库执行：
 
 ```bash
-bash install/install-rdkit.sh
+bash install/install-science.sh
 ```
 
-依赖安装在独立 `.venv-smiles`，不替换 GTK 应用的 Python；运行时按需启动隔离计算进程。也可设置 `P4VASP_SMILES_PYTHON` 指向已有 RDKit 的 Python。当前仅本机 Linux 验证，完整操作及平台限制见 [SMILES 气相建模](doc/smiles-gas-phase-zh.md)。
+依赖安装在独立 `.venv-science`，不替换 GTK 应用的 Python；运行时按需启动隔离计算进程。也可设置 `P4VASP_SMILES_PYTHON` 指向已有 RDKit 的 Python。当前仅本机 Linux 验证，完整操作及平台限制见 [SMILES 气相建模](doc/smiles-gas-phase-zh.md)。
 
 ## Optional ASE bulk builder / 可选ASE体相建模
 
-For Models → bulk, run `bash install/install-ase.sh` from the checkout. This installs tested ASE 3.29.0 into `.venv-ase` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Current validation is Linux/WSL only; the existing Windows portable build was not rebuilt with ASE. See [bulk usage](doc/ase-bulk-zh.md).
+For Models → bulk, run `bash install/install-science.sh` from the checkout. This installs ASE, RDKit and pymatgen into `.venv-science` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Current validation is Linux/WSL only; the existing Windows portable build was not rebuilt with ASE. See [bulk usage](doc/ase-bulk-zh.md).
 
-Models → bulk使用前，在项目目录运行 `bash install/install-ase.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，当前Windows旧便携包不包含本轮新增功能。
+Models → bulk使用前，在项目目录运行 `bash install/install-science.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，当前Windows旧便携包不包含本轮新增功能。
 
 ## Windows bundled ASE and RDKit / Windows随包建模依赖
 
@@ -346,19 +346,19 @@ Surface与Bulk复用已有ASE环境和安装命令，不新增pymatgen依赖。�
 From the checkout root, run:
 
 ```bash
-bash install/install-pymatgen.sh
+bash install/install-science.sh
 ```
 
-This creates `.venv-pymatgen` separately from GTK, ASE and RDKit, installs the
-version specified in the script and checks the DOS-analysis and VASP-reader
+This creates `.venv-science` for ASE, RDKit and pymatgen, separately from GTK, installs the
+versions specified in `install/science-requirements.txt` and checks the DOS-analysis and VASP-reader
 imports. Python 3.11 or newer with venv/pip is required; select another Python
-with `PYTHON=/path/to/python3 bash install/install-pymatgen.sh`. Internet access
+with `PYTHON=/path/to/python3 bash install/install-science.sh`. Internet access
 is needed. This Bash installer targets Linux/WSL and macOS; it does not modify
 or rebuild Windows EXE packages. DOS analysis GUI integration is still pending.
 After an actual installation, record its dependency baseline using:
 
 ```bash
-.venv-pymatgen/bin/python tools/dependency_snapshot.py --profile pymatgen --output /tmp/p4vasp-pymatgen-baseline.json
+.venv-science/bin/python tools/dependency_snapshot.py --profile science --output /tmp/p4vasp-pymatgen-baseline.json
 ```
 
 Choose a new output filename if it already exists. The snapshot is metadata,

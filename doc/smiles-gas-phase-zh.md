@@ -28,13 +28,13 @@
 XYZ、单原子和其他功能不需要 RDKit。Linux 源码版可在仓库根目录执行：
 
 ```bash
-bash install/install-rdkit.sh
+bash install/install-science.sh
 ```
 
-脚本用 `python3` 创建仓库内 `.venv-smiles`，只在该环境安装 RDKit 及其依赖，不改 GTK 应用所用 Python。需要 Python 的 venv／pip 支持和首次安装的网络。也可指定创建环境的解释器：
+脚本用 `python3` 创建仓库内 `.venv-science`，在该环境统一安装 ASE、RDKit、pymatgen 及其依赖，不改 GTK 应用所用 Python。需要 Python 的 venv／pip 支持和首次安装的网络。也可指定创建环境的解释器：
 
 ```bash
-PYTHON=/path/to/python3 bash install/install-rdkit.sh
+PYTHON=/path/to/python3 bash install/install-science.sh
 ```
 
 界面自动找到该环境；也可使用已经装好 RDKit 的外部 Python：
@@ -52,7 +52,7 @@ P4VASP_SMILES_PYTHON=/path/to/python bash p4v.sh
 安装可选环境后，从仓库根目录运行：
 
 ```bash
-PYTHONPATH=lib P4VASP_HOME="$PWD" .venv-smiles/bin/python test/testSmilesChemistry.py
+PYTHONPATH=lib P4VASP_HOME="$PWD" .venv-science/bin/python test/testSmilesChemistry.py
 PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/testSmilesTask.py
 GDK_BACKEND=x11 PYTHONPATH=lib:src P4VASP_HOME="$PWD" /usr/bin/python3 test/testSmilesGtk.py
 ```

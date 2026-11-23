@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 统一科学环境完成（2026-11-22）
+
+- 用户明确要求ASE/RDKit/pymatgen同环境。install/install-science.sh创建.venv-science，install/science-requirements.txt唯一维护三项直接依赖版本，安装后pip check及install/check-science.py实际计算检查；原install-ase/rdkit/pymatgen三个入口转发，不再新建各自环境；Bulk/Surface/SMILES/振动可复制提示统一为install-science，实际Bulk复制/剪贴板断言通过。GUI仍独立，旧目录未删除。
+- model_worker.scientific_python统一查找：显式功能变量优先、其次P4VASP_SCIENCE_PYTHON、.venv-science、旧功能环境；ASE/RDKit worker共用，结构导入/Surface/热化学跟随ASE入口；默认冻结Windows仍使用随包worker。pymatgen仅安装/解析器接口准备，DOS分析GUI尚未实现；Windows构建源仍原独立模型worker体系，不自动加入pymatgen或重建EXE。
+- 本机Linux/WSL实际安装成功，/usr/bin/python3首次venv因缺ensurepip失败，默认python3重建后安装成功；最终目标解释器报告Python3.14.4、ASE3.29.0/RDKit2026.9.2/pymatgen2026.10.24，目标元数据快照doc/dependencies/snapshots/2026-11-22-linux-science.json。快照source_revision为安装时HEAD5f303bd，带本轮未提交清单，非最终提交/锁文件；无覆盖旧快照。分发包元数据不等于完整原生依赖验收。
+- 实际检查：ASE Cu构造、RDKit嵌入/UFF、pymatgen CompleteDos解析矩形谱中心/宽度独立解析值、Vasprun导入通过；pip check无冲突。6 Bulk、8 Surface、5 RDKit、10振动热化学、3worker路由/隔离、3BulkTask、4SmilesTask、58基础、3依赖工具及清单/语法/diff通过。真实Smiles GTK生成/预览/导出/取消通过；真实Bulk GTK先完成生成/32原子原生预览/保存，再在既有480x320窗口尺寸断言失败，不写整套通过，已知cmatrix/VisSync退出告警保留。日志/tmp/p4vasp-science-install.log及/tmp/science-{bulk,surface,smiles,vibrations,tasks,smiles-task,base,bulk-gtk,smiles-gtk}.log。
+- 当前安装/操作指南及双语历史同步，Mac/另一设备/Windows未验收；用户本机源码重启即可用科学环境。下一步是DOSCAR投影与pymatgen分析接入，不把本轮环境统一说成d-band界面实现。
+
 ## pymatgen安装入口准备（2026-11-22）
 
 - 用户确认d-band分析方向并要求类似ASE/RDKit的安装脚本。新增install/install-pymatgen.sh，独立.venv-pymatgen（gitignore），检查Python≥3.11，精确版本仅脚本维护；安装后检查CompleteDos四种指标接口及Vasprun导入，不导入GTK/改ASE或RDKit。发行来源https://pypi.org/project/pymatgen/及官方releases核对。

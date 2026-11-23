@@ -31,7 +31,7 @@ def spin(seconds=.1,until=None):
 
 assert page.result is None and not page.save_button.get_sensitive()
 import shlex
-assert shlex.split(page.install_hint.command.get_text()) == ['bash', str(Path(__file__).resolve().parents[1]/'install/install-ase.sh')]
+assert shlex.split(page.install_hint.command.get_text()) == ['bash', str(Path(__file__).resolve().parents[1]/'install/install-science.sh')]
 assert not page.install_hint.command.get_editable()
 page.install_hint.copy_button.clicked()
 assert Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text() == page.install_hint.command.get_text()
