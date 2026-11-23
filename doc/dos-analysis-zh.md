@@ -15,7 +15,7 @@ ASE、RDKit、pymatgen共用科学环境；GUI仍用原解释器。也支持File
 
 ## 操作
 
-1. 点击 **DOS+bands**，展开绘图下方 **d-band analysis (pymatgen)**。
+1. 点击 **DOS+bands**，左侧显示原DOS绘图与工具栏，右侧直接显示 **d-band analysis (pymatgen)**，无需展开。拖动中间分隔线可调整两侧宽度；小窗口可在右侧区域滚动。
 2. 选择 **All atoms**、**Elements**（如`Fe, Ni`）或 **Atom numbers**（从1开始，如`1-4, 8`）。元素与原子编号二选一。**Use selected atoms**复用结构选择；**Use last DOS line**复用Local DOS控制中最后一条投影线的原子和自旋。后者不使用曲线的倍率或正负号，默认分析全部d，若该线只选了一个d轨道则复用它。
 3. 选择全部 **d** 或单独的 **dxy/dyz/dz2/dxz/dx2**（dx2表示dx²−y²），以及 **both/up/down**。非自旋计算不提供down；both表示相加，不是平均。
 4. 输入相对费米能级的上下限，单位eV。留空使用原文件完整能量网格。分析范围与绘图缩放独立，超出数据范围会报错，不静默外推。

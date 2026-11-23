@@ -346,8 +346,27 @@ class ElectronicApplet(GraphWindowApplet):
         GraphWindowApplet.initUI(self)
         from p4vasp.gtk3.dos_analysis import DosAnalysis
         self.dos_analysis=DosAnalysis(self)
-        self.xml.get_widget("applet_frame").pack_end(self.dos_analysis,False,False,0)
-        self.dos_analysis.show_all()
+        from p4vasp.gtk3 import Gtk
+        root=self.xml.get_widget("applet_frame")
+        plot=self.xml.get_widget("vbox2")
+        plot.get_parent().remove(plot)
+        self.dos_split=Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
+        self.dos_split.set_wide_handle(True)
+        self.dos_plot_scroll=Gtk.ScrolledWindow()
+        self.dos_plot_scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
+        self.dos_plot_scroll.set_min_content_width(320)
+        self.dos_plot_scroll.set_min_content_height(200)
+        plot.set_hexpand(True);plot.set_vexpand(True)
+        self.dos_plot_scroll.add(plot)
+        self.dos_split.pack1(self.dos_plot_scroll,resize=True,shrink=True)
+        self.dos_split.pack2(self.dos_analysis,resize=True,shrink=True)
+        root.pack_start(self.dos_split,True,True,0)
+        def initial_split(widget,allocation):
+            if allocation.width>1 and not getattr(widget,'initial_position_set',False):
+                widget.initial_position_set=True
+                widget.set_position(round(allocation.width*.58))
+        self.dos_split.connect('size-allocate',initial_split)
+        self.dos_split.show_all()
 
         mitem=gtk.MenuItem("Show")
         menu=gtk.Menu()

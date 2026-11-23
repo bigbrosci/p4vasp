@@ -657,4 +657,4 @@ Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子�
 
 ### DOS的pymatgen分析（2026-11-22）
 
-原DOS+bands和Local DOS绘图保留。展开图下方d-band analysis，可按元素/原子及d轨道、自旋、相对EF窗口计算中心、标准差宽度、窗口填充度、Hilbert upper edge及D_d(EF)，复制/独占CSV导出。支持DOSCAR投影或vasprun.xml，缺投影/SOC等明确拒绝；缺pymatgen不影响旧绘图。计算通过统一科学环境独立进程，可取消，换源清理旧结果；详见[分析操作与科学定义](dos-analysis-zh.md)。
+原DOS+bands和Local DOS绘图保留。DOS图在左，右侧d-band analysis默认直接显示，可拖动分隔线调整宽度、小窗口滚动；可按元素/原子及d轨道、自旋、相对EF窗口计算中心、标准差宽度、窗口填充度、Hilbert upper edge及D_d(EF)，复制/独占CSV导出。支持DOSCAR投影或vasprun.xml，缺投影/SOC等明确拒绝；缺pymatgen不影响旧绘图。计算通过统一科学环境独立进程，可取消，换源清理旧结果；详见[分析操作与科学定义](dos-analysis-zh.md)。

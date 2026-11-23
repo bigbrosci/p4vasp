@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS左右分栏布局完成（2026-11-22）
+
+- 用户要求左DOS/右pymatgen且直接显示。ElectronicApplet将自身graphwindowapplet.glade的vbox2（原工具栏+graph_box）移入横向Gtk.Paned左侧滚动容器，右侧DosAnalysis由Expander改Frame。菜单保持顶部，共享Glade/其他GraphWindowApplet不改；右侧两列参数/两行按钮、属性文字换行，表格占剩余高度，均可滚动。
+- 分隔线首次实际分配按58%/42%初始化，之后不重置用户拖动；左plot显式hexpand/vexpand，避免新增Viewport时仅显示默认400像素高度。小窗口左侧也可横向滚动访问原工具栏/整图，右侧控件和缺库提示滚动访问，不宣称任意尺寸无裁切。新测试900x650请求在本机实际分配952x739，不能记成900x650通过。
+- 本机Linux/WSL实际GTK分析流程通过Frame初始直接可见/左右位置、异步DOSCAR/XML/选中原子和最后线/CSV对话框/剪贴板/取消换源/缺库提示、分隔线保留和小窗口。常规/小窗截图/tmp/p4vasp-dos-analysis-side{,-compact}.png已查看；常规窗图与5项结果同时可见，小窗使用滚动。初轮Pango错误导入从adapter改gi.repository，位置断言改translate_coordinates（有独立Gdk窗口时allocation.x是子窗口本地坐标），不是左右实际反置。
+- 布局迭代中4旧DOS启动/Open/切面板/自旋/能带/resize、最终GTK9/面板33通过；最终源码另复查DOSCAR旧流程，证据见/tmp/dos-side-{gtk,legacy,final-legacy,gtk-base,smoke}.log。无科学计算/解析/依赖改动，不重复科学数值测试或快照；Mac/Windows未测、无原生重编或EXE。本轮仅布局，操作/架构与中英更新同步。
+
 ## DOS+pymatgen首版集成完成（2026-11-22）
 
 - 用户要求保留原DOS绘图并增加分析。DOS+bands仍由ElectronicApplet/GraphWindowApplet→graphwindowapplet.glade/GTK3 adapter绘制；新增折叠、限高可滚动的gtk3/dos_analysis.DosAnalysis，不改共享Glade或旧菜单/图线操作。按元素或1起原子、全部/单个d轨道、both/up/down及相对EF窗口计算五项，复用结构选择/最后DOS线的原子自旋，明确不复用线倍率/符号。可复制整表/文字单值，真实CompactFileDialog独占CSV导出附完整定义/对象/版本/来源/范围，不覆盖。

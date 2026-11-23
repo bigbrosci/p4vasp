@@ -535,9 +535,9 @@ and baseline recording.
 ### Optional d-band analysis (2026-11-22)
 
 Toolbar/menu → ElectronicApplet → existing graphwindowapplet.glade/GTK3 adapter
-remains the plot route. A Python-created collapsed `DosAnalysis` expander is
-packed below the graph; bounded scrolling keeps its controls accessible without
-editing shared Graph resources. Existing ElectronicControlApplet uses new
+remains the plot route. The Python-created `DosAnalysis` panel is always visible
+on the right as described below. Bounded scrolling keeps controls accessible
+without editing shared Graph resources. Existing ElectronicControlApplet uses new
 DoscarSystemPM PARTIAL_DOS(_L) arrays from the strict stdlib dos_data reader.
 Analysis uses dos_analysis.py in the shared science interpreter via bounded
 BulkTask; no pymatgen import in GTK. Parameter/source changes, leaving the graph
@@ -545,3 +545,15 @@ and destruction cancel stale jobs. Import failure exposes a copyable installer;
 InstallHint's optional bundled flag avoids claiming pymatgen is already in the
 older Windows worker. CSV includes scientific definitions and source metadata.
 See doc/dos-analysis-zh.md and test/testDosAnalysis{,Gtk}.py.
+
+### Side-by-side DOS and analysis (2026-11-22)
+
+ElectronicApplet reparents only its `vbox2` (existing toolbar/graph) into a
+scrollable left child of a horizontal Gtk.Paned, preserving access to toolbar
+buttons and labels when the pane is narrow. The right child is DosAnalysis as an always
+visible Gtk.Frame, with two-column controls, wrapping property labels and a
+scrollable body. Initialize the divider once at 58% plot / 42% analysis, then
+leave dragging to the user. Graph menus stay above both panes; graph_box and
+GraphCanvas references remain unchanged. Other GraphWindowApplet users and
+shared Glade resources are unchanged. testDosAnalysisGtk checks initial widget
+state and placement as well as existing calculations and export flows.

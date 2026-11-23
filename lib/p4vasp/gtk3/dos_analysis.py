@@ -3,18 +3,20 @@ from pathlib import Path
 import re
 from urllib.parse import unquote, urlparse
 from p4vasp.gtk3 import Gtk, GLib, Gdk
+from gi.repository import Pango
 from p4vasp.gtk3.install_hint import InstallHint
 
 
-class DosAnalysis(Gtk.Expander):
+class DosAnalysis(Gtk.Frame):
     def __init__(self, applet):
         super().__init__(label='d-band analysis (pymatgen)')
         self.applet=applet;self.job=None;self.result=None;self.alive=True;self.system=None
         self.connect('destroy',self.closed)
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5);box.set_border_width(6)
         bounds=Gtk.ScrolledWindow();bounds.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        bounds.set_min_content_height(180);bounds.set_max_content_height(340)
-        bounds.set_propagate_natural_height(True);bounds.add(box);self.add(bounds)
+        bounds.set_min_content_height(180);bounds.set_min_content_width(280)
+        bounds.set_max_content_width(420);bounds.set_propagate_natural_width(True)
+        bounds.add(box);self.add(bounds)
         grid=Gtk.Grid(column_spacing=6,row_spacing=5);box.pack_start(grid,False,False,0)
         self.mode=Gtk.ComboBoxText()
         for text in ('All atoms','Elements','Atom numbers'):self.mode.append_text(text)
@@ -25,8 +27,7 @@ class DosAnalysis(Gtk.Expander):
         grid.attach(self.mode,0,0,1,1);grid.attach(self.selection,1,0,1,1)
         selected=Gtk.Button(label='Use selected atoms');selected.connect('clicked',self.use_selection)
         line=Gtk.Button(label='Use last DOS line');line.connect('clicked',self.use_line)
-        grid.attach(selected,2,0,1,1);grid.attach(line,3,0,1,1)
-        options=Gtk.Box(spacing=6)
+        grid.attach(selected,0,1,1,1);grid.attach(line,1,1,1,1)
         self.orbital=Gtk.ComboBoxText()
         for text in ('d','dxy','dyz','dz2','dxz','dx2'):self.orbital.append_text(text)
         self.orbital.set_active(0)
@@ -35,18 +36,27 @@ class DosAnalysis(Gtk.Expander):
         self.spin.set_active(0)
         self.emin=Gtk.Entry();self.emax=Gtk.Entry()
         for entry in (self.emin,self.emax):entry.set_width_chars(7);entry.set_placeholder_text('Full grid')
-        for widget in (Gtk.Label(label='Orbital'),self.orbital,Gtk.Label(label='Spin'),self.spin,
-                       Gtk.Label(label='E−EF min/max (eV)'),self.emin,self.emax):
-            options.pack_start(widget,False,False,0)
-        grid.attach(options,0,1,4,1)
-        actions=Gtk.Box(spacing=6)
+        for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin))):
+            row=Gtk.Box(spacing=6)
+            row.pack_start(Gtk.Label(label=label,xalign=0),False,False,0)
+            row.pack_start(widget,True,True,0);grid.attach(row,column,2,1,1)
+        limits=Gtk.Label(label='Analysis range E−EF (eV)',xalign=0)
+        grid.attach(limits,0,3,2,1)
+        for column,(label,widget) in enumerate((('Min',self.emin),('Max',self.emax))):
+            row=Gtk.Box(spacing=6)
+            row.pack_start(Gtk.Label(label=label),False,False,0)
+            widget.set_hexpand(True);row.pack_start(widget,True,True,0)
+            grid.attach(row,column,4,1,1)
+        actions=Gtk.Grid(column_spacing=6,row_spacing=5,column_homogeneous=True)
         self.calculate=Gtk.Button(label='Analyze d-DOS');self.calculate.connect('clicked',self.start)
         self.cancel=Gtk.Button(label='Cancel');self.cancel.connect('clicked',self.cancel_job)
         self.copy=Gtk.Button(label='Copy results');self.copy.connect('clicked',self.copy_results)
         self.export=Gtk.Button(label='Export CSV');self.export.connect('clicked',self.export_results)
-        for widget in (self.calculate,self.cancel,self.copy,self.export):actions.pack_start(widget,False,False,0)
+        for index,widget in enumerate((self.calculate,self.cancel,self.copy,self.export)):
+            widget.set_hexpand(True);actions.attach(widget,index%2,index//2,1,1)
         box.pack_start(actions,False,False,0)
-        self.status=Gtk.Label(xalign=0);self.status.set_line_wrap(True);self.status.set_max_width_chars(100)
+        self.status=Gtk.Label(xalign=0);self.status.set_line_wrap(True);self.status.set_max_width_chars(42);self.status.set_width_chars(1)
+        self.status.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
         self.status.set_selectable(True);box.pack_start(self.status,False,False,0)
         self.model=Gtk.ListStore(str,str,str)
         view=Gtk.TreeView(model=self.model);view.set_grid_lines(Gtk.TreeViewGridLines.BOTH)
@@ -55,11 +65,14 @@ class DosAnalysis(Gtk.Expander):
             renderer=Gtk.CellRendererText();renderer.set_property('editable',True)
             # Editable renderer permits copying an individual value; edits are discarded.
             renderer.connect('edited',lambda *_:None)
-            column=Gtk.TreeViewColumn(title,renderer,text=i);column.set_resizable(True);column.set_expand(True)
+            if i==0:
+                renderer.set_property('wrap-width',170)
+                renderer.set_property('wrap-mode',Pango.WrapMode.WORD_CHAR)
+            column=Gtk.TreeViewColumn(title,renderer,text=i);column.set_resizable(True);column.set_expand(i==0)
             view.append_column(column)
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        scroll.set_min_content_height(165);scroll.set_max_content_height(185);scroll.set_propagate_natural_height(True)
-        scroll.add(view);box.pack_start(scroll,False,False,0)
+        scroll.set_min_content_height(180)
+        scroll.add(view);box.pack_start(scroll,True,True,0)
         self.hint=InstallHint('pymatgen','install-science.sh',bundled=False);self.hint.set_no_show_all(True)
         box.pack_start(self.hint,False,False,0)
         for widget in (self.mode,self.orbital,self.spin):widget.connect('changed',self.changed)

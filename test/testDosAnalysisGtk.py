@@ -35,7 +35,11 @@ def main():
         frame=getAppletFrame();frame.root_window.resize(1100,850)
         ns['startApplet'](None,'p4vasp.applet.ElectronicApplet.ElectronicApplet',frame);spin(.8)
         electronic=frame.embedded_applet;panel=electronic.dos_analysis
-        assert not panel.get_expanded()
+        assert isinstance(panel,Gtk.Frame)
+        assert electronic.dos_split.get_orientation()==Gtk.Orientation.HORIZONTAL
+        assert electronic.dos_split.get_child1() is electronic.dos_plot_scroll
+        assert electronic.dos_plot_scroll.get_child().get_child() is electronic.xml.get_widget('vbox2')
+        assert electronic.dos_split.get_child2() is panel
         assert electronic.total_dos is not None
         original=[channel[:] for channel in electronic.total_dos]
         from p4vasp.applet.ElectronicApplet import Line
@@ -44,7 +48,9 @@ def main():
         list(line.updateDosGen(SimpleNamespace(system=electronic.system,struct=electronic.system.INITIAL_STRUCTURE,e_fermi=2.)))
         assert len(line.dos)==401 and abs(line.dos[200][1]+15)<1e-8
 
-        panel.set_expanded(True);spin()
+        spin()
+        left=electronic.dos_split.get_child1()
+        assert panel.translate_coordinates(electronic.dos_split,0,0)[0]>left.translate_coordinates(electronic.dos_split,0,0)[0]
         assert panel.calculate.get_mapped() and panel.export.get_mapped()
         assert not panel.hint.get_visible()
         electronic.lines.append(line);panel.use_line()
@@ -101,13 +107,25 @@ def main():
         # Draw GTK widgets to Cairo instead of capturing WSL compositor pixels.
         import cairo
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
-        window.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-dos-analysis.png')
+        window.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-dos-analysis-side.png')
         # Missing environment fails gracefully and does not remove the old DOS plot.
         from unittest.mock import patch
         with patch('p4vasp.dos_analysis.worker_command',side_effect=RuntimeError('pymatgen is unavailable. Run bash install/install-science.sh.')):
             panel.calculate.clicked();spin(10,lambda:panel.job is None)
         assert panel.result is None and electronic.total_dos is not None
         assert panel.hint.get_visible(),panel.status.get_text()
+        split=electronic.dos_split
+        position=split.get_position()-35
+        split.set_position(position);spin(.3)
+        assert split.get_position()==position,'Divider reset after a user adjustment'
+        window.resize(900,650);spin(.8);window.check_resize();spin(.3)
+        assert panel.get_mapped() and electronic.area.get_mapped()
+        assert split.get_child1().get_allocated_width()>100 and panel.get_allocated_width()>100
+        assert panel.calculate.get_mapped() and panel.export.get_mapped()
+        print('Compact allocation:',window.get_allocated_width(),window.get_allocated_height(),flush=True)
+        compact=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+        window.draw(cairo.Context(compact));compact.write_to_png('/tmp/p4vasp-dos-analysis-side-compact.png')
+
         print('PASS: actual DOSCAR/XML analysis, responsive GTK, raw plot preserved, copy/export, cancellation/source invalidation and missing-library hint',flush=True)
 
 if __name__=='__main__':
