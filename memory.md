@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## d-band filling单位标签（2026-11-23）
+
+- 按用户要求dos_metrics将filling单位显示由dimensionless改为a.u.，共享结果同步GUI/复制/CSV及新导出Python脚本，填充度仍为原无量纲积分比值，数值算法不变。doc/dos-analysis-zh.md同步。
+- Linux/WSL 10 DOS科学、2独立脚本及真实DOS分析GTK回归通过，日志/tmp/dos-filling-unit-{core,replay,gtk}.log；语法/diff通过。不改依赖/环境或构建EXE，Mac/Windows未验收。
+
 ## Surface初始说明文字移除（2026-11-23）
 
 - 按用户要求移除Surface初始status中的Choose a source及Miller指数/固定规则说明，状态标签保留供构建、保存和错误反馈。规则仍见doc/ase-surface-zh.md，建模逻辑不变。

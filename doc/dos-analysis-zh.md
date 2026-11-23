@@ -77,7 +77,7 @@ p4v --dos-analysis --help
 |---|---|---|
 | d-band center | ∫ερdε / ∫ρdε | eV |
 | d-band width | √[∫(ε−center)²ρdε / ∫ρdε]，标准差，不是半峰宽 | eV |
-| d-band filling | 窗口内费米能级以下积分 / 窗口内全部积分 | 无量纲 |
+| d-band filling | 窗口内费米能级以下积分 / 窗口内全部积分 | a.u.（无量纲比值） |
 | d-band upper edge | 完整所选d-DOS的Hilbert变换最大值，在所选窗口内的峰位置 | eV |
 
 中心、宽度和upper edge使用pymatgen CompleteDos。中心/宽度的窗口端点线性插值后积分。填充度在窗口与EF处插值并使用梯形积分，明确包含EF端点；这是本程序的窗口填充度定义，不直接套用pymatgen没有能量范围参数、使用严格ε<0网格掩码的get_band_filling。它不是投影d电子数，也不是以10个d态归一化的占据率。

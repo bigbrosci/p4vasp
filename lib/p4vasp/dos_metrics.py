@@ -51,7 +51,7 @@ def calculate_metrics(energies, density, structure, emin=None, emax=None):
             notes.append('Upper edge: slightly irregular/rounded source grid linearly resampled to %d uniform points (step %.8g eV; maximum adjustment %.8g eV).'%(len(uniform),step,deviation))
     else: notes.append('Upper edge unavailable: source grid differs from a uniform grid by more than 5% of the mean energy step.')
     rows = [['d-band center',center,'eV'],['d-band width (standard deviation)',width,'eV'],
-            ['d-band filling (selected window)',filling,'dimensionless'],
+            ['d-band filling (selected window)',filling,'a.u.'],
             ['d-band upper edge (Hilbert)',edge,'eV']]
     return dict(rows=rows, emin=lower, emax=upper, energy_reference='E−EF', weight=weight,
                 pymatgen_version=version('pymatgen'), notes=notes,
