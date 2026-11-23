@@ -308,7 +308,7 @@ Models → bulk使用前，在项目目录运行 `bash install/install-science.s
 
 The Windows packaging pipeline now builds a private official-CPython model-worker with ASE, RDKit and pymatgen, separate from the UCRT64 GTK runtime. Exact package pins are maintained in `install/windows/prepare_model_env.py`. First build prepares an isolated cache from Python.org/PyPI; users need no external Python or PATH configuration. Keep the full folder including model-worker. Frozen --check-models validates GUI generation/preview/export/cancellation, Surface replay and s/p/d/f DOSCAR/XML analysis; successful delivery evidence is recorded in the dated update.
 
-Windows打包流程已加入独立ASE／RDKit计算程序，首次构建下载专用缓存，不改系统Python。运行时自动调用，用户无需配置解释器路径；保留整个目录及model-worker。整包构建／交付以当日更新记录实际结果为准，11月1日旧包不因此自动获得依赖。
+Windows打包流程已加入独立ASE／RDKit／pymatgen科学计算程序，首次构建下载专用缓存，不改系统Python。运行时自动调用，用户无需配置解释器路径；保留整个目录及model-worker。整包构建／交付以当日更新记录实际结果为准，11月1日旧包不因此自动获得依赖。
 
 
 Current native build / 当前原生构建入口
