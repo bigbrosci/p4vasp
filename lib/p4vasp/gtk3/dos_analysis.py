@@ -109,6 +109,7 @@ class DosAnalysis(Gtk.Frame):
     def changed(self,*_):
         self.cancel_job();self.result=None;self.model.clear();self.sensitivity()
         self.status.set_text('Parameters changed. Click Analyze d-DOS to calculate.')
+        self.applet.queue_plot_redraw()
 
     def use_selection(self,*_):
         from p4vasp.Selection import selection
@@ -172,7 +173,7 @@ class DosAnalysis(Gtk.Frame):
             self.status.set_text('pymatgen %s | %s | atoms %s | %s | %s | E−EF: %.6g to %.6g eV. Values are summed over selected atoms. %s'%(
                 result['pymatgen_version'],Path(result['path']).name,','.join(map(str,result['atoms'])),
                 result['orbital'],result['spin'],result['emin'],result['emax'],' '.join(result['notes'])))
-        self.sensitivity();return False
+        self.sensitivity();self.applet.queue_plot_redraw();return False
 
     def cancel_job(self,*_):
         if self.job is not None:

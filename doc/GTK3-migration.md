@@ -557,3 +557,16 @@ leave dragging to the user. Graph menus stay above both panes; graph_box and
 GraphCanvas references remain unchanged. Other GraphWindowApplet users and
 shared Glade resources are unchanged. testDosAnalysisGtk checks initial widget
 state and placement as well as existing calculations and export flows.
+
+### DOS maximization / partial repaint (2026-11-22)
+
+GraphCanvas.render now synchronizes the live DrawingArea allocation, graph page
+size and Cairo backing surface before rendering. A newly recreated canvas on an
+already-realized widget may receive no new size-allocate signal; it must not
+keep the default 500x400 buffer or an earlier graph page size. The regression
+in testGtk3 reproduces that boundary without relying on a window resize.
+ElectronicApplet coalesces settled-pane redraws through one GLib idle callback;
+right-panel parameter/result changes request it, and destroy cancels it. These
+redraws preserve curve data and zoom bounds and do not rerun DOS analysis.
+testDosAnalysisGtk covers actual maximize/restore, canvas recreation, right
+options and analysis, page/surface dimensions, edge pixels and preserved zoom.

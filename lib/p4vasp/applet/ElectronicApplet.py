@@ -341,6 +341,7 @@ class ElectronicApplet(GraphWindowApplet):
         self.show_DOS=True
         self.view_all=True
         self.dos_analysis=None
+        self._dos_redraw_source=None
 
     def initUI(self):
         GraphWindowApplet.initUI(self)
@@ -366,6 +367,7 @@ class ElectronicApplet(GraphWindowApplet):
                 widget.initial_position_set=True
                 widget.set_position(round(allocation.width*.58))
         self.dos_split.connect('size-allocate',initial_split)
+        self.dos_split.connect('size-allocate',self.queue_plot_redraw)
         self.dos_split.show_all()
 
         mitem=gtk.MenuItem("Show")
@@ -420,7 +422,22 @@ class ElectronicApplet(GraphWindowApplet):
                     w=createGraph(x)
                 self.worlds.append(w)
 
+    def queue_plot_redraw(self,*_):
+        from p4vasp.gtk3 import GLib
+        if self._dos_redraw_source is None:
+            self._dos_redraw_source=GLib.idle_add(self._redraw_plot)
+
+    def _redraw_plot(self):
+        self._dos_redraw_source=None
+        if self.canvas is not None and self.area is not None and self.area.get_mapped():
+            # Wait for Paned/Viewport allocation to settle; preserve data/zoom.
+            self.canvas.updateSize()
+        return False
+
     def destroy(self):
+        if self._dos_redraw_source is not None:
+            from p4vasp.gtk3 import GLib
+            GLib.source_remove(self._dos_redraw_source);self._dos_redraw_source=None
         if self.dos_analysis is not None:self.dos_analysis.cancel_job()
         GraphWindowApplet.destroy(self)
 

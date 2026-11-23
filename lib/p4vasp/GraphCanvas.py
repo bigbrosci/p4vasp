@@ -274,6 +274,16 @@ class GraphCanvas(piddleGTK3.InteractiveCanvas):
         self.render()
 
     def render(self,data=None):
+        # A new canvas may reuse a realized DrawingArea without another
+        # size-allocate event. Never paint a large graph into the default
+        # 500x400 backing surface, or keep a page size from an earlier layout.
+        width=self.area.get_allocated_width()
+        height=self.area.get_allocated_height()
+        if self.area.get_realized() and width>1 and height>1:
+            self.ensure_size(width,height)
+            if self.world is not None:
+                self.world.page_size_x=width
+                self.world.page_size_y=height
         if self.world is None:
             self.clear()
             self.flush()

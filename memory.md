@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS最大化后半图／重绘同步修复（2026-11-22）
+
+- 用户报告最大化后点右侧选项左图半幅、似卡住。本机最初简单最大化/改参未复现同样现象；进一步构造已realize的DrawingArea重建GraphCanvas且不产生新size-allocate，确认图页仍790x610而实际控件1000x700，新缓存默认500x400，新增GTK回归修复前失败。不是声称复现了用户桌面的全部触发条件。
+- GraphCanvas.render每次绘制前按已realize控件同步world.page_size和Cairo缓存，覆盖重建/错过分配事件边界。ElectronicApplet对分栏size-allocate、右侧改参/结果变化合并单个GLib idle重绘，布局稳定后updateSize；销毁取消排队，保留数据和world缩放范围，不重算科学结果。
+- 本机Linux/WSL：新增重用已realize控件测试后GTK10通过（含默认缓存/当前页/背景缓存尺寸及zoom不变）。真实分析GTK最大化状态True，最大化后重建canvas/3轮轨道自旋切换/计算/恢复均通过area/world/surface尺寸及边缘背景像素检查，原曲线/zoom、两来源、取消/复制/真实CSV对话框仍通过；截图/tmp/p4vasp-dos-maximized-redraw.png已查看。CSV夹具初轮目标变为x导致期望文件失败，改响应时显式设置目标后通过，未改导出实现、未归因具体桌面输入来源。
+- 当前旧DOSCAR真实启动/切面板/FileOpen/XML刷新/能带/resize通过；33面板、58基础、7PS/PDF及5其他图形导出通过，语法/diff通过。日志/tmp/dos-redraw-{buffer-before,buffer-after,gtk,legacy,smoke,base,vector,other-exports}.log，最初简单场景日志/tmp/dos-redraw-repro.log保留。GTK/GI既有弃用告警保留。
+- 仅GUI绘图同步，无科学算法/依赖/环境变化，无新快照、原生重编/Windows包/Mac或另一台设备验收；用户实际桌面需重启后复核。操作/架构和中英记录同步，当前已确认边界修复完成。
+
 ## DOS左右分栏布局完成（2026-11-22）
 
 - 用户要求左DOS/右pymatgen且直接显示。ElectronicApplet将自身graphwindowapplet.glade的vbox2（原工具栏+graph_box）移入横向Gtk.Paned左侧滚动容器，右侧DosAnalysis由Expander改Frame。菜单保持顶部，共享Glade/其他GraphWindowApplet不改；右侧两列参数/两行按钮、属性文字换行，表格占剩余高度，均可滚动。

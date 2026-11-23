@@ -107,6 +107,32 @@ class TestGtk3(unittest.TestCase):
         canvas.close()
         window.destroy()
 
+    def test_recreated_plot_buffer_matches_realized_area(self):
+        from p4vasp.GraphCanvas import GraphCanvas
+        from p4vasp.GraphPM import createGraph
+        window=gtk.OffscreenWindow()
+        window.set_default_size(1000,700)
+        area=gtk.DrawingArea();window.add(area);window.show_all()
+        while gtk.events_pending():gtk.main_iteration()
+        world=createGraph('dos')
+        bounds=(world[0].world_xmin,world[0].world_xmax,world[0].world_ymin,world[0].world_ymax)
+        try:
+            for _ in range(2):
+                canvas=GraphCanvas(drawing_area=area,top=window,world=world)
+                try:
+                    # No allocation change is required when the same widget is reused.
+                    canvas.updateGraph()
+                    width=area.get_allocated_width();height=area.get_allocated_height()
+                    self.assertGreater(width,500);self.assertGreater(height,400)
+                    self.assertEqual((world.page_size_x,world.page_size_y),(width,height))
+                    self.assertGreaterEqual(canvas.drawable.get_width(),width)
+                    self.assertGreaterEqual(canvas.drawable.get_height(),height)
+                    self.assertGreaterEqual(canvas.background_buffer.get_width(),width)
+                    self.assertGreaterEqual(canvas.background_buffer.get_height(),height)
+                    self.assertEqual(bounds,(world[0].world_xmin,world[0].world_xmax,world[0].world_ymin,world[0].world_ymax))
+                finally:canvas.close()
+        finally:window.destroy()
+
     def test_phonon_model_notifications(self):
         from p4vasp.applet.PhononApplet import KPathTreeModel
         from p4vasp.Dyna import Dyna

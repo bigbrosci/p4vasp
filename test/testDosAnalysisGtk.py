@@ -80,12 +80,53 @@ def main():
         from p4vasp.gtk3.file_dialogs import CompactFileDialog
         def actual_export_dialog(*args,**kwargs):
             dialog=CompactFileDialog(*args,**kwargs)
-            GLib.timeout_add(100,lambda:(dialog.dialog.response(Gtk.ResponseType.OK),False)[1])
+            def accept_export():
+                dialog.location.set_text(str(folder));dialog.filename.set_text('d-band-analysis.csv')
+                dialog.dialog.response(Gtk.ResponseType.OK);return False
+            GLib.timeout_add(100,accept_export)
             return dialog
         with patch('p4vasp.gtk3.file_dialogs.CompactFileDialog',side_effect=actual_export_dialog):
             panel.export.clicked()
         assert (folder/'d-band-analysis.csv').exists(),panel.status.get_text()
 
+        def check_plot_surface(stage):
+            canvas=electronic.canvas
+            width=electronic.area.get_allocated_width();height=electronic.area.get_allocated_height()
+            surface=canvas.drawable
+            print('PLOT',stage,'area',width,height,'world',canvas.world.page_size_x,canvas.world.page_size_y,
+                  'surface',surface.get_width(),surface.get_height(),flush=True)
+            assert canvas.world.page_size_x==width and canvas.world.page_size_y==height,stage
+            assert surface.get_width()>=width and surface.get_height()>=height,stage
+            color=canvas.world.resolveColor(canvas.world.background_color)
+            expected=[round(value*255) for value in (color.blue,color.green,color.red)]
+            surface.flush();data=memoryview(surface.get_data());stride=surface.get_stride()
+            for y in (2,height//2,height-3):
+                offset=y*stride+(width-3)*4
+                actual=list(data[offset:offset+3])
+                assert all(abs(a-b)<=2 for a,b in zip(actual,expected)),(stage,y,actual,expected)
+        window=frame.root_window
+        window.maximize();spin(1.2)
+        print('Maximized state:',bool(window.get_window().get_state()&Gdk.WindowState.MAXIMIZED),flush=True)
+        check_plot_surface('maximize')
+        old_bounds=[(g.world_xmin,g.world_xmax,g.world_ymin,g.world_ymax) for g in electronic.world]
+        electronic.show()
+        check_plot_surface('recreate-maximized-canvas')
+        assert old_bounds==[(g.world_xmin,g.world_xmax,g.world_ymin,g.world_ymax) for g in electronic.world]
+
+        for i in range(3):
+            panel.mode.set_active(1);panel.selection.set_text('Fe')
+            panel.orbital.set_active(i);panel.spin.set_active(i)
+            spin(.35);check_plot_surface('options-'+str(i))
+        panel.mode.set_active(2);panel.selection.set_text('1');panel.spin.set_active(1);panel.orbital.set_active(0)
+        panel.calculate.clicked();spin(30,lambda:panel.job is None)
+        assert panel.result is not None,panel.status.get_text()
+        check_plot_surface('maximized-analysis')
+        import cairo
+        window.check_resize();spin(.3)
+        maximum=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+        window.draw(cairo.Context(maximum));maximum.write_to_png('/tmp/p4vasp-dos-maximized-redraw.png')
+
+        window.unmaximize();window.resize(1100,850);spin(.8);check_plot_surface('restore')
         panel.emin.set_text('-2');assert panel.result is None and not panel.export.get_sensitive()
         panel.emax.set_text('1');panel.calculate.clicked()
         panel.cancel.clicked();assert panel.job is None
