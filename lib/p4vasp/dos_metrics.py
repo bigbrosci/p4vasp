@@ -50,13 +50,10 @@ def calculate_metrics(energies, density, structure, emin=None, emax=None):
         if deviation > max(1e-8,step*1e-5):
             notes.append('Upper edge: slightly irregular/rounded source grid linearly resampled to %d uniform points (step %.8g eV; maximum adjustment %.8g eV).'%(len(uniform),step,deviation))
     else: notes.append('Upper edge unavailable: source grid differs from a uniform grid by more than 5% of the mean energy step.')
-    at_fermi = float(np.interp(0.,energies,density)) if energies[0]<=0<=energies[-1] else None
-    if at_fermi is None: notes.append('D_d(EF) unavailable: EF is outside the original DOS grid.')
     rows = [['d-band center',center,'eV'],['d-band width (standard deviation)',width,'eV'],
             ['d-band filling (selected window)',filling,'dimensionless'],
-            ['d-band upper edge (Hilbert)',edge,'eV'],['D_d(EF)',at_fermi,'states/eV']]
+            ['d-band upper edge (Hilbert)',edge,'eV']]
     return dict(rows=rows, emin=lower, emax=upper, energy_reference='E−EF', weight=weight,
-                fermi_dos_definition='Interpolated on the full original energy grid, independently of the analysis window.',
                 pymatgen_version=version('pymatgen'), notes=notes,
                 filling_definition='Integral within selected window up to EF / integral over selected window; interpolated endpoints.',
                 upper_edge_definition='Peak of Hilbert transform of full selected d-DOS, searched inside the selected window; source grid deviations <=5% of mean step are linearly resampled to uniform spacing.',

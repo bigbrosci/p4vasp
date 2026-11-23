@@ -32,7 +32,8 @@ class DosAnalysisTest(unittest.TestCase):
         # Independent Gaussian CDF and value at EF; finite-grid trapezoid tolerance.
         expected=.5*(1+math.erf(1/(.6*math.sqrt(2))))
         self.assertAlmostEqual(result['rows'][2][1],expected,delta=2e-4)
-        self.assertAlmostEqual(result['rows'][4][1],15*math.exp(-.5*(1/.6)**2),places=8)
+        self.assertEqual(len(result['rows']),4)
+        self.assertNotIn('fermi_dos_definition',result)
         # Gaussian Hilbert peak is approximately center + 1.307*sigma.
         self.assertAlmostEqual(result['rows'][3][1],-1.+1.307*.6,delta=.05)
         self.assertEqual(result['atoms'],[1]);self.assertEqual(result['energy_reference'],'E−EF')
@@ -43,7 +44,7 @@ class DosAnalysisTest(unittest.TestCase):
         for row1,row2 in zip(a['rows'],b['rows']):self.assertAlmostEqual(row1[1],row2[1],places=9)
         self.assertAlmostEqual(a['rows'][0][1],0.,places=9)
         whole=self.run_analysis(atoms=[1],spin='down')
-        self.assertAlmostEqual(whole['rows'][4][1],a['rows'][4][1]*3,places=8)
+        self.assertAlmostEqual(whole['weight'],a['weight']*3,places=8)
 
     def test_window_interpolation_filling_and_invariance(self):
         before=(self.folder/'DOSCAR').read_bytes()

@@ -597,3 +597,10 @@ standalone script. Its representative one-site structure is an API container,
 not VASP calculation input. Scripts require pymatgen but not p4vasp/source files;
 optional CLI limits change the window, not the fixed atom/orbital/spin selection.
 CSV excludes the embedded replay spectrum. Exports/results refuse overwriting.
+
+### Four d-band results (2026-11-22)
+
+Remove D_d(EF) and its definition metadata from the shared dos_metrics output.
+The GUI, CSV and newly exported standalone scripts retain center, width,
+window filling and Hilbert upper edge. Selection/energy limits and the other
+algorithms stay the same; testDosAnalysisGtk checks four displayed rows.

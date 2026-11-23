@@ -72,7 +72,7 @@ def main():
         assert panel.result is not None,panel.status.get_text()
         assert len(ticks)>2
         assert abs(panel.result['rows'][0][1]+1)<1e-8
-        assert len(panel.model)==5 and panel.export.get_sensitive() and panel.script.get_sensitive()
+        assert len(panel.model)==4 and panel.export.get_sensitive() and panel.script.get_sensitive()
         expected_title='d-band analysis (pymatgen-'+panel.result['pymatgen_version'].replace('.','-')+')'
         assert panel.get_label()==expected_title
         assert panel.status.get_text()=='atoms 1 | d | up | E−EF: -10 to 10 eV.'
