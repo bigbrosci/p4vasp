@@ -4,6 +4,7 @@
   "profiles": {
     "gui": "Main GTK/native-viewer Python",
     "ase": "Isolated ASE scientific Python",
+    "pymatgen": "Isolated optional DOS analysis Python (installer prepared; GUI integration pending)",
     "smiles": "Isolated RDKit scientific Python",
     "windows-model": "Official CPython used to freeze the Windows scientific worker",
     "build": "Python used for GUI packaging and development"
@@ -11,14 +12,15 @@
   "python": [
     {"id":"pygobject","distribution":"PyGObject","profiles":["gui"],"kind":"runtime","purpose":"GTK3 widgets and GI bindings","sources":["lib/p4vasp/gtk3/__init__.py","install/ubuntu-bootstrap.sh","install/macos-bootstrap.sh"]},
     {"id":"pycairo","distribution":"pycairo","profiles":["gui"],"kind":"runtime","purpose":"Cairo rendering; platform GI-Cairo bridge is also required","sources":["lib/p4vasp/piddle/piddleGTK3/core.py","install/ubuntu-bootstrap.sh"]},
-    {"id":"numpy","distribution":"numpy","profiles":["gui","ase","smiles","windows-model"],"kind":"runtime","purpose":"Arrays and numerical geometry, directly and transitively","sources":["lib/p4vasp/Array.py","lib/p4vasp/PhononsCalculation.py","install/windows/model_worker.spec"]},
+    {"id":"numpy","distribution":"numpy","profiles":["gui","ase","smiles","pymatgen","windows-model"],"kind":"runtime","purpose":"Arrays and numerical geometry, directly and transitively","sources":["lib/p4vasp/Array.py","lib/p4vasp/PhononsCalculation.py","install/windows/model_worker.spec"]},
     {"id":"pyopengl","distribution":"PyOpenGL","profiles":["gui"],"kind":"feature","purpose":"Independent K-point viewer; requires native GLUT/GLU","sources":["lib/p4vasp/applet/KpointsViewerApplet.py","lib/p4vasp/paint3d/OpenGLPaint3D.py"]},
     {"id":"ase","distribution":"ase","profiles":["ase","windows-model"],"kind":"feature","purpose":"Bulk/surface generation, structure formats and thermochemistry","sources":["lib/p4vasp/ase_bulk.py","lib/p4vasp/ase_surface.py","install/windows/model_worker.py","lib/p4vasp/ase_import.py","lib/p4vasp/vibrations.py","install/install-ase.sh","install/windows/prepare_model_env.py"]},
+    {"id":"pymatgen","distribution":"pymatgen","profiles":["pymatgen"],"kind":"feature","purpose":"Optional projected DOS descriptors; installer prepared, application integration pending","sources":["install/install-pymatgen.sh"]},
     {"id":"rdkit","distribution":"rdkit","profiles":["smiles","windows-model"],"kind":"feature","purpose":"SMILES embedding and initial force-field optimization","sources":["lib/p4vasp/smiles_builder.py","install/install-rdkit.sh","install/windows/prepare_model_env.py"]},
-    {"id":"scipy","distribution":"scipy","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE numerical dependency; not removable solely from application import counts","sources":["install/windows/model_worker.spec"]},
-    {"id":"matplotlib","distribution":"matplotlib","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE installation requirement; explicitly excluded from current frozen workers","sources":["install/install-ase.sh","install/windows/model_worker.spec"]},
+    {"id":"scipy","distribution":"scipy","profiles":["ase","pymatgen","windows-model"],"kind":"transitive","purpose":"ASE numerical dependency; not removable solely from application import counts","sources":["install/windows/model_worker.spec"]},
+    {"id":"matplotlib","distribution":"matplotlib","profiles":["ase","pymatgen","windows-model"],"kind":"transitive","purpose":"ASE installation requirement; explicitly excluded from current frozen workers","sources":["install/install-ase.sh","install/windows/model_worker.spec"]},
     {"id":"pillow","distribution":"Pillow","profiles":["smiles","windows-model"],"kind":"transitive","purpose":"RDKit dependency; unrelated to obsolete top-level Image imports","sources":["install/install-rdkit.sh","install/windows/model_worker.spec"]},
-    {"id":"typing-extensions","distribution":"typing_extensions","profiles":["ase","windows-model"],"kind":"transitive","purpose":"ASE installation metadata requirement","sources":["install/install-ase.sh"]},
+    {"id":"typing-extensions","distribution":"typing_extensions","profiles":["ase","pymatgen","windows-model"],"kind":"transitive","purpose":"ASE installation metadata requirement","sources":["install/install-ase.sh"]},
     {"id":"pyinstaller","distribution":"PyInstaller","profiles":["build","windows-model"],"kind":"build","purpose":"Freeze executables; not a portable-user prerequisite","sources":["install/package-windows.sh","install/windows/prepare_model_env.py"]}
   ],
   "native": [

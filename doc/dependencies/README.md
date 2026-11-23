@@ -12,12 +12,13 @@
 | [安装指南](../../install.md) | 用户如何安装和启动 | 不再另维护一套精确版本表 |
 | [全层盘点报告](../dependency-inventory-2026-11-14-zh.md) | 当时的人工调查证据与待办 | 历史结论不会自动成为新设备的实测结果 |
 
-平台脚本仍是执行层的依据：Ubuntu/Debian看`install/ubuntu-bootstrap.sh`，macOS看`install/macos-bootstrap.sh`，可选科学环境看`install/install-ase.sh`和`install/install-rdkit.sh`，Windows看spec、`prepare_model_env.py`及相关构建入口。清单的sources指向这些位置，避免版本号在两处手工同步。
+平台脚本仍是执行层的依据：Ubuntu/Debian看`install/ubuntu-bootstrap.sh`，macOS看`install/macos-bootstrap.sh`，可选科学环境看`install/install-ase.sh`、`install/install-rdkit.sh`和`install/install-pymatgen.sh`，Windows看spec、`prepare_model_env.py`及相关构建入口。清单的sources指向这些位置，避免版本号在两处手工同步。
 
 ## 环境边界
 
 - `gui`：主GUI和原生模块所用Python。当前Linux示例是`/usr/bin/python3`，不是激活的base或ASE环境；macOS应使用实际GUI解释器。
 - `ase`：隔离ASE环境；不要求把ASE装进主GUI解释器。
+- `pymatgen`：独立可选DOS分析环境；目前提供安装脚本，GUI分析接入尚未实现。
 - `smiles`：隔离RDKit环境；不要求将其合并进ASE或GTK环境。
 - `windows-model`：构建Windows科学worker的官方CPython环境；**不是已冻结的worker.exe**。
 - `build`：用于GUI打包/开发的Python，可与实际GUI解释器对应。

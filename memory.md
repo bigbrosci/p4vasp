@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## pymatgen安装入口准备（2026-11-22）
+
+- 用户确认d-band分析方向并要求类似ASE/RDKit的安装脚本。新增install/install-pymatgen.sh，独立.venv-pymatgen（gitignore），检查Python≥3.11，精确版本仅脚本维护；安装后检查CompleteDos四种指标接口及Vasprun导入，不导入GTK/改ASE或RDKit。发行来源https://pypi.org/project/pymatgen/及官方releases核对。
+- 清单新增pymatgen角色/安装来源，安装指南含复制命令和实际安装后快照命令。bash -n、依赖清单检查、3项DependencySnapshot测试、diff通过；本轮未执行网络安装、未创建环境，因此不采虚假新快照，不声称科学接口实测或Mac/Windows通过。Windows包不变。
+- 待办：DOSCAR投影解析、pymatgen独立worker与GUI选择/分析/导出仍未实现；用户已表达方向，下一步围绕该功能继续，不能把安装脚本视为DOS分析交付。
+
 ## p4vasp data个人覆盖完成（2026-11-22）
 
 - 用户报告git pull后自定义值被重置及重启不生效。源码确认原表直接写跟踪文件、viewer强制共价显示半径、INCAR单独读取程序JSON；改ResourceStore默认periodic/incar为个人字段差异覆盖，位于~/.p4vasp/resources/{periodic,incar}.json。默认数据不改，未编辑字段跟随上游；显式root工具/旧测试保持原直写，user_root可用于隔离测试。

@@ -340,3 +340,27 @@ C++/ODP源码、生成包装文件位置和当前构建脚本保留原位。其�
 
 
 Surface与Bulk复用已有ASE环境和安装命令，不新增pymatgen依赖。表面切面、真空及底层固定操作见[ASE表面建模](doc/ase-surface-zh.md)。本次未更新Windows便携包。
+
+## Optional pymatgen DOS analysis environment
+
+From the checkout root, run:
+
+```bash
+bash install/install-pymatgen.sh
+```
+
+This creates `.venv-pymatgen` separately from GTK, ASE and RDKit, installs the
+version specified in the script and checks the DOS-analysis and VASP-reader
+imports. Python 3.11 or newer with venv/pip is required; select another Python
+with `PYTHON=/path/to/python3 bash install/install-pymatgen.sh`. Internet access
+is needed. This Bash installer targets Linux/WSL and macOS; it does not modify
+or rebuild Windows EXE packages. DOS analysis GUI integration is still pending.
+After an actual installation, record its dependency baseline using:
+
+```bash
+.venv-pymatgen/bin/python tools/dependency_snapshot.py --profile pymatgen --output /tmp/p4vasp-pymatgen-baseline.json
+```
+
+Choose a new output filename if it already exists. The snapshot is metadata,
+not a functional DOS-analysis test. Official package information:
+https://pypi.org/project/pymatgen/
