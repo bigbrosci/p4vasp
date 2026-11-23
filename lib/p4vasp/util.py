@@ -514,4 +514,6 @@ def getAtomtypes():
         if index == 0:
             from p4vasp.element_data import apply_catalog
             apply_catalog(atomtypes_)
+    from p4vasp.element_data import apply_personal_fields
+    apply_personal_fields(atomtypes_)
     return atomtypes_

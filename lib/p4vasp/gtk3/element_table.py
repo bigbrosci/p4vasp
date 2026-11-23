@@ -38,7 +38,7 @@ class ElementTable(Gtk.Box):
             for row in data.rows: self.model.append(row)
             self.data = data; self.dirty = False
             self.save_button.set_sensitive(True)
-            self.status.set_text('118 elements. Blank = unknown / unset. radii = display radius; RGB: 0–255.\nDouble-click a value to edit; press Enter, then Save. Restart p4vasp after saving.')
+            self.status.set_text('118 elements. Blank = unknown / unset. radii = display radius; RGB: 0–255.\nDouble-click a value to edit; press Enter, then Save. Restart p4vasp after saving. Personal settings survive Git updates.')
         except Exception as error:
             self.save_button.set_sensitive(False)
             self.status.set_text('Cannot load element data: '+str(error))
@@ -48,14 +48,14 @@ class ElementTable(Gtk.Box):
             value = check_value(column, value)
             if self.model[path][column] != value:
                 self.model[path][column] = value; self.dirty = True
-                self.status.set_text('Unsaved changes. Press Save to write the program files.')
+                self.status.set_text('Unsaved changes. Press Save to write your personal settings.')
         except Exception as error: self.show_error(self.parent_window(), str(error))
 
     def save(self, *args):
         try:
             backups = self.data.save([list(row) for row in self.model])
             self.load()
-            self.status.set_text('Saved. Restart p4vasp to apply defaults.\n'+ '\n'.join(str(path) for path in backups) if backups else 'No changes to save.')
+            self.status.set_text('Saved personal settings to ' + str(self.store.user_root or self.store.root) + '. Restart p4vasp to apply defaults.\n'+ '\n'.join(str(path) for path in backups) if backups else 'No changes to save.')
         except Exception as error: self.show_error(self.parent_window(), str(error))
 
     def reload_clicked(self, *args):

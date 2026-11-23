@@ -1,16 +1,12 @@
 """Compose INCAR presets from the user's Q-robot generator, without GUI dependencies."""
 
-import json
-import os
 import re
 
-import p4vasp
 
 
 def load_presets():
-    path = os.path.join(p4vasp.p4vasp_home, "data", "incar", "presets.json")
-    with open(path, encoding="utf-8") as stream:
-        return json.load(stream)
+    from p4vasp.resource_data import ResourceStore, validate
+    return validate('incar', ResourceStore().read('incar')[0])
 
 
 def parse_custom(text):

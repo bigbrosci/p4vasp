@@ -507,3 +507,16 @@ Show's antialias pixel probe initially returned [0,0]; without altering renderin
 baseline and current rechecks both returned [0,45]. Treat that as an observed
 capture-timing limitation, not a new antialias fix. No Windows/macOS build or
 full application shutdown acceptance was performed.
+
+### Personal element data (2026-11-22)
+
+Models' `models.glade` hosts the lazy Python `ElementTable` (no XML layout
+change). `ResourceStore` overlays personal field patches in
+`~/.p4vasp/resources/{periodic,incar}.json` onto bundled defaults; explicit
+root-only stores retain direct editing for isolated tools/tests. Table saves
+never touch bundled files. `getAtomtypes` reapplies explicitly saved fields
+after legacy XML; shared native/Cairo viewer styles honor edited display radii
+without changing covalent bond thresholds. `incar_generator.load_presets` uses
+the same effective resource reader. Restart applies cached defaults.
+Focused checks: `test/testPersonalData.py`, `test/testPersonalDataGtk.py`,
+`test/testElementData.py`, `test/testResourceData.py`, `test/testResourceHubGtk.py`.

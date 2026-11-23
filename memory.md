@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## p4vasp data个人覆盖完成（2026-11-22）
+
+- 用户报告git pull后自定义值被重置及重启不生效。源码确认原表直接写跟踪文件、viewer强制共价显示半径、INCAR单独读取程序JSON；改ResourceStore默认periodic/incar为个人字段差异覆盖，位于~/.p4vasp/resources/{periodic,incar}.json。默认数据不改，未编辑字段跟随上游；显式root工具/旧测试保持原直写，user_root可用于隔离测试。
+- util.getAtomtypes在旧home/CWD XML后仅重放明确保存字段，保留无个人覆盖时旧优先级；viewer_style原生/振动共享读取显式显示半径，默认紧凑共价外观、H已有1.5显示倍率和共价成键阈值保留。INCAR generator统一ResourceStore读取；不表示每个建模任务自动启用Magmom/U/J（单原子等原有策略不变）。Save/Reload状态说明个人路径，重启使缓存生效。
+- 本机Linux/WSL：新独立进程测试验证默认文件字节不改、模拟上游变化后覆盖保留且未改字段更新、过期编辑冲突、legacy XML优先级、mass/RGB/radius及INCAR三项消费者、双文件失败回滚/清空；真实GTK个人表编辑Save/重新构造读取及状态通过。9元素、5资源、58基础和原有Resources GTK集成通过；语法/diff通过。日志/tmp/personal-{core,elements,resources,base,gtk,gtk-profile}.log。原Resources GTK退出仍有已知cmatrix析构None告警，不算新修复。
+- 文档/双语同步，无依赖或环境变化、原生重编/EXE/Mac/Windows验收。新旧本机设置不被代码主动清理，已经被旧更新丢失的内容只能从既有备份找回；不把历史自定义仓库数据自动认作个人覆盖。当前任务完成，下一步由用户指定。
+
 ## Surface Center／Bottom完成（2026-11-22）
 
 - 用户要求居中/靠底按钮，Bottom最低z=0.1Å。SurfacePage新增互斥按钮，生成前传placement参数，生成后用私有Structure副本即时平移，GUI不导入ASE、不重新切面/读取源。中心为ASE几何包围盒中心；Bottom保留晶胞高度/总真空，默认20Å空隙分配为底0.1/顶19.9，保留原子间距/排序/层号/F/T。真空输入Bottom标签改Half total vacuum，metadata记录placement/vacuum_bottom/top，vacuum_each_side为null。

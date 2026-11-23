@@ -1,4 +1,4 @@
-"""Bundled resource catalog, validation and direct atomic editing with backups."""
+"""Resource defaults and personal field overrides, with atomic saves and backups."""
 from datetime import datetime
 import json
 import math
@@ -129,21 +129,61 @@ def validate(key, text):
 
 
 class ResourceStore:
-    def __init__(self, root=None, backups=None):
+    def __init__(self, root=None, backups=None, user_root=None):
         self.root = Path(root or p4vasp.p4vasp_home)/'data'
+        self.user_root = (Path(user_root) if user_root is not None else
+                          Path.home()/'.p4vasp/resources' if root is None else None)
         self.backups = Path(backups) if backups is not None else Path.home()/'.p4vasp/backups'
 
     def path(self, key):
+        if self.user_root is not None and key in ('periodic', 'incar'):
+            return self.user_root/(key+'.json')
         return self.root/FILES[key]
 
+    def _effective(self, key):
+        data = json.loads((self.root/FILES[key]).read_text(encoding='utf-8'))
+        path = self.path(key)
+        if path.exists():
+            overlay = json.loads(path.read_text(encoding='utf-8'))
+            if overlay.get('version') != 1:
+                raise ValueError('Unsupported personal data version: '+str(path))
+            for change in overlay['changes']:
+                target = data
+                for part in change['path'][:-1]: target = target[part]
+                last = change['path'][-1]
+                if change.get('delete'): target.pop(last, None)
+                else: target[last] = change['value']
+        text = json.dumps(data, ensure_ascii=False, indent=2)+'\n'
+        validate(key, text)
+        return text.encode('utf-8')
+
+    def _personal(self, key):
+        return self.user_root is not None and key in ('periodic', 'incar')
+
     def read(self, key):
-        content = self.path(key).read_bytes()
+        content = self._effective(key) if self._personal(key) else self.path(key).read_bytes()
         return content.decode('utf-8'), content
 
     def save(self, key, text, expected):
         validate(key, text)
         path = self.path(key)
-        original = path.read_bytes()
+        original = self.read(key)[1]
+        payload = text
+        if self._personal(key):
+            base = json.loads((self.root/FILES[key]).read_text(encoding='utf-8'))
+            changes = []
+            def diff(old, new, parts):
+                if isinstance(old, dict) and isinstance(new, dict):
+                    for name in old.keys() | new.keys():
+                        if name not in new: changes.append(dict(path=parts+[name], delete=True))
+                        elif name not in old: changes.append(dict(path=parts+[name], value=new[name]))
+                        else: diff(old[name], new[name], parts+[name])
+                elif isinstance(old, list) and isinstance(new, list) and len(old) == len(new):
+                    for index, (a, b) in enumerate(zip(old, new)): diff(a, b, parts+[index])
+                elif old != new: changes.append(dict(path=parts, value=new))
+            diff(base, json.loads(text), [])
+            payload = json.dumps(dict(version=1, changes=changes), ensure_ascii=False, indent=2)+'\n'
+            path.parent.mkdir(parents=True, exist_ok=True)
         if original != expected:
             raise ValueError('File changed outside this editor. Reload and review before saving.')
         folder = self.backups/key
@@ -155,9 +195,9 @@ class ResourceStore:
         descriptor, temporary = tempfile.mkstemp(prefix='.p4vasp-resource-', dir=path.parent)
         try:
             with os.fdopen(descriptor, 'w', encoding='utf-8', newline='') as stream:
-                stream.write(text)
-            shutil.copymode(path, temporary)
-            if path.read_bytes() != original:
+                stream.write(payload)
+            if path.exists(): shutil.copymode(path, temporary)
+            if self.read(key)[1] != original:
                 raise ValueError('File changed during save. Reload and review.')
             os.replace(temporary, path)
         finally:

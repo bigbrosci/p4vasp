@@ -16,24 +16,32 @@ def ball_radius(symbol, radius):
     return radius * (1.5 if str(symbol).strip() == 'H' else 1.)
 
 
+def display_radius(record):
+    return record.covalent if math.isfinite(record.covalent) and record.covalent > 0 else .7
+
+
 def covalent_atomtypes():
     from p4vasp.Structure import AtomInfo
     from p4vasp.util import getAtomtypes
     table=AtomInfo(getAtomtypes())
+    from p4vasp.element_data import personal_radii
+    overrides = personal_radii()
     for index in range(len(table)):
         record=table.getRecord(index)
-        record.radius=record.covalent if math.isfinite(record.covalent) and record.covalent>0 else .7
+        record.radius=overrides.get(str(record.element).strip(), display_radius(record))
         record.radius=ball_radius(record.element,record.radius)
     return table
 
 
 def display_values(symbols,radii,colors):
     from p4vasp.util import getAtomtypes
+    from p4vasp.element_data import personal_radii
+    overrides = personal_radii()
     table=getAtomtypes();out_radii=[];out_colors=[]
     for symbol,radius,color in zip(symbols,radii,colors):
         record=table.getRecordForElement(symbol)
         if record is not None:
-            radius=record.covalent if math.isfinite(record.covalent) and record.covalent>0 else .7
+            radius=overrides.get(str(symbol).strip(), display_radius(record))
             color=[record.red,record.green,record.blue]
         out_radii.append(radius);out_colors.append(tuple(color))
     return out_radii,out_colors

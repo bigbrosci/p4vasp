@@ -117,3 +117,33 @@ def apply_catalog(atominfo, store=None):
             target.element = record['symbol']
         for field, value in runtime_values(record).items(): setattr(target, field, value)
     return atominfo
+
+
+def personal_radii():
+    """Explicit visual overrides only; keep default compact balls and bond radii."""
+    from p4vasp.resource_data import ResourceStore
+    store = ResourceStore()
+    path = store.path('periodic')
+    if not store._personal('periodic') or not path.exists(): return {}
+    overrides = {}
+    for change in json.loads(path.read_text(encoding='utf-8'))['changes']:
+        parts = change['path']
+        if len(parts) == 3 and parts[0] == 'elements' and parts[2] == 'radius':
+            value = change.get('value')
+            if value is not None: overrides[SYMBOLS[parts[1]]] = value
+    return overrides
+
+
+def apply_personal_fields(atominfo):
+    """Saved table edits take precedence over legacy home/CWD atomtypes.xml."""
+    from p4vasp.resource_data import ResourceStore
+    store = ResourceStore()
+    path = store.path('periodic')
+    if not store._personal('periodic') or not path.exists(): return
+    catalog = validate('periodic', store.read('periodic')[0])
+    for change in json.loads(path.read_text(encoding='utf-8'))['changes']:
+        parts = change['path']
+        if len(parts) == 3 and parts[0] == 'elements' and parts[2] in XML_FIELDS:
+            record = catalog['elements'][parts[1]]
+            target = atominfo.getRecordForElement(record['symbol'])
+            setattr(target, parts[2], runtime_values(record)[parts[2]])
