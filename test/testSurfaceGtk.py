@@ -80,7 +80,7 @@ def main():
                 GLib.timeout_add(50,lambda:(d.dialog.response(Gtk.ResponseType.OK),False)[1]);return d
             with patch('p4vasp.gtk3.surface.InputFolderDialog',side_effect=dialog):page.save_button.clicked()
             out=parent/'Cu_111'
-            assert {f.name for f in out.iterdir()}=={'POSCAR','surface.json'}
+            assert {f.name for f in out.iterdir()}=={'POSCAR','surface.json','rebuild_surface.py','rebuild_surface.sh'}
             atoms=Structure(str(out/'POSCAR'))
             assert len(atoms)==16 and sum(not all(flag) for flag in atoms.selective)==8
             meta=json.loads((out/'surface.json').read_text());assert meta['fixed_atoms']==8

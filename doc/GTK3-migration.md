@@ -458,15 +458,20 @@ compact file/folder dialogs, InstallHint and shared native model preview.
 Fixed atoms are marked using preview-only rings; shared preview selection is
 cleared before each new model to avoid leaking markers to Bulk/gas previews.
 
-ase_surface.py validates requests and invokes ASE metal presets or build.surface
+surface_geometry.py validates requests and invokes ASE metal presets or build.surface
 in a SurfaceTask, reusing BulkTask's isolated, bounded/cancellable transport.
 Only the worker imports ASE. Custom Miller indices refer to the input cell,
 with no conventional-cell conversion. Equivalent-layer count and geometric layer
 groups are distinct; vacuum is per side. Replace old constraints with bottom
 geometric-layer FixAtoms; stable species grouping keeps POSCAR flags/metadata
 aligned. Preserve original bulk/files. Save to a new folder as POSCAR and
-surface.json; metadata includes portable custom bulk input, not a standalone
-replay script or complete VASP inputs.
+surface.json plus rebuild_surface.py/.sh. surface_replay.py embeds the same geometry
+core and portable custom bulk input in standalone Python (ASE only). Bash invokes
+p4v --surface-replay through surface_cli.py before GTK/native imports, reusing
+the bounded scientific worker. Both create new folders and preserve constraints;
+these are final construction recipes, not camera history or complete VASP inputs.
+Frozen GUI specs include raw geometry/metrics helpers for source embedding;
+Windows artifacts still require a target-machine build and verification.
 
 Windows model_worker gains --surface, spec includes geometry/constraints and
 future frozen checks exercise surface build/preview/save. These are source/spec

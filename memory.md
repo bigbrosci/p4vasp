@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Surface保存自动导出重建脚本（2026-11-23）
+
+- Models → surface的Save POSCAR自动保存POSCAR、surface.json、rebuild_surface.py/.sh；最终切面/层数/超胞/真空/固定层/Center或Bottom及自定义体相快照一并记录，不记鼠标历史/相机，不生成完整VASP输入。surface_geometry.py抽取同一ASE数值核心，原ase_surface API继续可用；surface_replay.py嵌入核心和request，独立Python只需ASE，建议同版本。Bash使用p4v --surface-replay JSON 新目录，找不到p4v时回退导出机器p4v.sh；换机需有效p4v路径。已有目录拒绝覆盖。
+- surface_cli.py在GTK/native导入前分流，复用现有60秒科学worker；默认脚本输出surface_rebuilt，可另指定目录。重建比较科学结构等价，不承诺原生/ASE写出字节格式完全相同。GUI打包spec补收集原始surface_geometry.py/dos_metrics.py供脚本嵌入，Windows诊断增加两脚本存在断言，未构建EXE或验收Windows/Mac。
+- 本机Linux/WSL：8既有Surface科学回归、3新增重放测试通过，人工Cu预设及自定义CIF删除后，隔离Python、无DISPLAY/Wayland的真实Bash/CLI重建保持元素顺序/晶胞/坐标/固定标记/层号/request；检查原生Bottom重定位、空格路径、坏JSON与防覆盖。实际Surface GTK保存四文件、预览/Center/Bottom/来源/失效/取消及10 GTK回归通过。3依赖工具、清单、语法/diff通过；日志/tmp/surface-replay-{core,tests,gtk,gtk-base}.log。未访问私有example/改依赖环境或重采快照；操作指南、架构、依赖源码索引和当日双语记录同步。当前完成，下一次启动生效。
+
 ## 多轨道按钮／双脚本／无界面DOS命令完成（2026-11-23）
 
 - 用户要求Orbital单独一行d及5分量，多分量可组合、d与分量互斥；Spin移下一行。DosAnalysis用ToggleButton组及同步guard，最后一项取消回d；set_orbitals/orbital_name替代旧下拉，Use last DOS line可复制多个d分量，全部5项时用d。dos_selection.py统一原子/轨道解析，逗号或列表标准化/去重；d+分量拒绝，LM各分量原始密度先求和，指标算法不变。仅有汇总d的源仍需选d。

@@ -8,6 +8,9 @@
 import sys
 if __name__ == "__main__":
     cli_args = sys.argv[1:]
+    if cli_args and cli_args[0]=='--surface-replay':
+        from p4vasp.surface_cli import main as surface_main
+        raise SystemExit(surface_main(cli_args[1:]))
     if cli_args and cli_args[0]=='--dos-analysis':
         from p4vasp.dos_cli import main as dos_main
         raise SystemExit(dos_main(cli_args[1:]))

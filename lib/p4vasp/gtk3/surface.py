@@ -1,7 +1,6 @@
 """Lazy ASE surface builder using the existing model worker/preview/save flows."""
 from io import StringIO
 from pathlib import Path
-import json
 import re
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.gtk3.file_dialogs import entry, CompactFileDialog
@@ -191,14 +190,13 @@ class SurfacePage(Gtk.Box):
     def save(self,*_):
         if self.result is None:return
         from p4vasp.single_atom_inputs import write_contents
-        result=self.result;metadata={key:value for key,value in result.items() if key!='poscar'}
-        metadata['index_convention']='zero-based POSCAR atom order; layer_numbers are bottom-up starting at 1'
-        files={'POSCAR':result['poscar'],'surface.json':json.dumps(metadata,indent=2)+'\n'}
+        from p4vasp.surface_replay import surface_contents
+        result=self.result;files=surface_contents(result)
         output=InputFolderDialog(self.parent_window(),result['formula'],self.directory,title='Save surface POSCAR',
             folder_name=re.sub('[^A-Za-z0-9_-]','_',result['formula'])+'_surface',
-            summary='Creates POSCAR and surface.json (parameters/layers). Existing folders are not overwritten.',
+            summary='Creates POSCAR, surface.json and replay scripts:\nrebuild_surface.py / rebuild_surface.sh\nExisting folders are not overwritten.',
             writer=lambda parent,name:write_contents(files,parent,name),action_label='Save POSCAR').run()
-        if output:self.directory=output.parent;self.status.set_text('Saved '+str(output/'POSCAR'))
+        if output:self.directory=output.parent;self.status.set_text('Saved structure and replay scripts to '+str(output))
 
     def close_preview(self):
         if self.preview_window is not None:

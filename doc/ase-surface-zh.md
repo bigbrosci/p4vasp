@@ -11,7 +11,7 @@
 4. Vacuum EACH side填10 Å，Fix bottom geometric layers填2，Layer tolerance保留0.3 Å。
 5. 点击 **Build surface**，得到16原子、4几何层，其中底部8原子固定。
 6. 默认选中 **Center**。可点 **Bottom** 将最低原子移到z=0.1 Å，或点Center恢复居中。**Preview 3D**以完整晶胞侧视图显示真空，标记圈表示固定原子，可旋转观察。
-7. **Save POSCAR** 选择父目录及新文件夹名，保存POSCAR和surface.json；已有文件夹不覆盖。
+7. **Save POSCAR** 选择父目录及新文件夹名，自动保存POSCAR、surface.json、rebuild_surface.py和rebuild_surface.sh；已有文件夹不覆盖。
 
 改变参数或输入来源后，旧结果和保存按钮失效，需重新Build。生成在独立进程运行，可Cancel，默认60秒超时。
 这不是DFT优化或稳定性筛选；没有生成INCAR、KPOINTS或POTCAR。
@@ -45,7 +45,22 @@
 
 `POSCAR`用于后续结构计算。`surface.json`记录ASE版本、建模参数、晶胞、几何层数、固定原子数以及与POSCAR行序一致的layer_numbers。
 层编号从底部1开始，原子索引按POSCAR从0开始。自定义体相来源在参数中嵌入POSCAR，文件导入不依赖原文件的绝对路径。
-这份JSON用于追溯，首版尚未生成独立重放Python脚本，也不包含全部VASP计算设置。
+保存时同时导出两个重建脚本，记录最终建模参数、体相快照和Center/Bottom位置；不是逐次鼠标操作或相机记录，也不包含全部VASP计算设置。
+
+在保存目录运行以下任一方式，输出到新的文件夹：
+
+```bash
+python rebuild_surface.py --output rebuilt_python
+bash rebuild_surface.sh rebuilt_bash
+```
+
+Python脚本内嵌生成代码与输入，只需ASE，不依赖p4vasp或原始POSCAR/CIF；建议使用脚本顶部注明的ASE版本。
+Bash脚本调用`p4v --surface-replay surface.json rebuilt_bash`，需要已安装p4vasp及ASE环境。
+未找到p4v命令时会回退到导出时的启动器位置；换机后应配置p4v命令或修改脚本中的路径。
+两个脚本都重建POSCAR、参数JSON和脚本，不覆盖已有目录；重复运行请另选输出目录。
+相同ASE版本下验证晶胞、坐标、元素顺序和固定标记一致；POSCAR数字格式可能不同。
+直接编辑Python中的REQUEST可以修改建模参数，Bash则读取旁边JSON中的request。
+这不会运行VASP，也不会生成INCAR、KPOINTS或POTCAR。
 
 如果未安装ASE，在项目目录运行：
 

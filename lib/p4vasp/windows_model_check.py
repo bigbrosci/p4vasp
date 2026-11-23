@@ -94,6 +94,8 @@ def main(args):
         assert len(saved)==16 and sum(not all(flag) for flag in saved.selective)==8
         saved.setCartesian();assert abs(min(p[2] for p in saved)-.1)<1e-10
         assert (out/'Cu_surface/surface.json').is_file()
+        assert (out/'Cu_surface/rebuild_surface.py').is_file()
+        assert (out/'Cu_surface/rebuild_surface.sh').is_file()
         screenshot('surface.png');surface.close_preview()
         report['checks'].append('actual surface GUI -> bundled ASE Cu(111) -> fixed bottom layers/preview -> POSCAR and metadata save')
         models.notebook.set_current_page(1);gas=models.gas_phase_page

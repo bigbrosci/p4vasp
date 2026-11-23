@@ -646,9 +646,9 @@ Show、振动预览及使用同一分子样式的气相预览中，H球半径在
 ### Surface表面建模（2026-11-22）
 
 Models → surface支持fcc/bcc常用金属面和hcp基面，也可从Bulk结果快照或POSCAR/CIF按(h k l)切面。
-设置层数、面内超胞、每侧真空和固定底层，Build后预览，Save POSCAR保存POSCAR与参数/层编号JSON。
+设置层数、面内超胞、每侧真空和固定底层，Build后预览，Save POSCAR保存POSCAR、参数/层编号JSON及Python/Bash重建脚本。
 预览标记圈出固定原子；导出F/T按底部几何层生成。自定义指数以输入晶胞为准，不自动换成常规胞；
-复杂终止面、吸附物放置和独立重放脚本不在首版。参数含义、示例和限制见[ASE表面建模](ase-surface-zh.md)。
+复杂终止面和吸附物放置不在本版。参数含义、示例和限制见[ASE表面建模](ase-surface-zh.md)。
 
 
 Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子笛卡尔z移到0.1 Å，

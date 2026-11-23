@@ -53,3 +53,18 @@ p4v --dos-analysis --help
 参数顺序为：文件、原子编号/范围、轨道、自旋、Emin、Emax、输出CSV。
 多个原子或轨道用逗号，轨道d与单个分量不能混用；能量相对EF=0，已有CSV不覆盖。
 单参数`p4v DOSCAR`仍打开界面。Export scripts生成Python快照脚本和调用该入口的Bash脚本，详见[分析与脚本说明](doc/dos-analysis-zh.md)。
+
+
+## 重建已保存的Surface
+
+Surface保存时自动生成两个脚本和surface.json；以下命令不打开GUI，输出目录必须不存在：
+
+```bash
+python rebuild_surface.py --output rebuilt_python
+bash rebuild_surface.sh rebuilt_bash
+p4v --surface-replay surface.json rebuilt_cli
+```
+
+Python需要ASE，可脱离p4vasp及原始体相文件；Bash/CLI需要p4vasp的ASE环境。
+记录最终切面、超胞、真空、固定层和摆放参数，不包含完整VASP计算输入。
+详见[Surface保存与重建](doc/ase-surface-zh.md#4-文件与依赖)。
