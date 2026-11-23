@@ -580,3 +580,20 @@ are linearly resampled. Report that choice in notes/CSV; materially irregular
 grids remain unavailable. Existing moment/filling calculations keep the source
 grid. testDosAnalysis adds an artificial rounded-grid case checked against a
 separate NumPy/SciPy transform. No user calculation files are included in tests.
+
+### Compact DOS controls and standalone analysis script (2026-11-22)
+
+Keep Use last DOS line. DosAnalysis displays only atoms/orbital/spin/E−EF limits
+in its completed summary; source/normalization/resampling notes remain in the
+tooltip and CSV. Show the actual pymatgen distribution version in the frame
+label, queried once per scientific interpreter through a short metadata-only
+worker action and cached; the GUI does not import pymatgen. Energy Range (eV)
+uses Emin/Emax entries with EF-relative tooltips and no range presets.
+
+Export Python script replaces the Cancel button. Parameter/source changes and
+leaving still cancel jobs. dos_metrics.py contains the shared numerical method;
+dos_replay.py embeds that code and the selected summed full-grid spectrum in a
+standalone script. Its representative one-site structure is an API container,
+not VASP calculation input. Scripts require pymatgen but not p4vasp/source files;
+optional CLI limits change the window, not the fixed atom/orbital/spin selection.
+CSV excludes the embedded replay spectrum. Exports/results refuse overwriting.

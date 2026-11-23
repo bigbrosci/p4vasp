@@ -51,8 +51,10 @@ def main():
         spin()
         left=electronic.dos_split.get_child1()
         assert panel.translate_coordinates(electronic.dos_split,0,0)[0]>left.translate_coordinates(electronic.dos_split,0,0)[0]
-        assert panel.calculate.get_mapped() and panel.export.get_mapped()
+        assert panel.calculate.get_mapped() and panel.export.get_mapped() and panel.script.get_mapped()
         assert not panel.hint.get_visible()
+        spin(10,lambda:panel.version_job is None)
+        assert panel.get_label().startswith('d-band analysis (pymatgen-')
         electronic.lines.append(line);panel.use_line()
         assert panel.request()['atoms']==[1] and panel.request()['spin']=='down'
         electronic.lines.remove(line)
@@ -70,7 +72,10 @@ def main():
         assert panel.result is not None,panel.status.get_text()
         assert len(ticks)>2
         assert abs(panel.result['rows'][0][1]+1)<1e-8
-        assert len(panel.model)==5 and panel.export.get_sensitive()
+        assert len(panel.model)==5 and panel.export.get_sensitive() and panel.script.get_sensitive()
+        expected_title='d-band analysis (pymatgen-'+panel.result['pymatgen_version'].replace('.','-')+')'
+        assert panel.get_label()==expected_title
+        assert panel.status.get_text()=='atoms 1 | d | up | E−EF: -10 to 10 eV.'
         assert electronic.total_dos==original,'Analysis changed original plotting densities'
         assert not any(name=='pymatgen' or name.startswith('pymatgen.') for name in sys.modules)
         panel.copy.clicked();assert 'd-band center' in Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD).wait_for_text()
@@ -81,13 +86,16 @@ def main():
         def actual_export_dialog(*args,**kwargs):
             dialog=CompactFileDialog(*args,**kwargs)
             def accept_export():
-                dialog.location.set_text(str(folder));dialog.filename.set_text('d-band-analysis.csv')
+                dialog.location.set_text(str(folder));dialog.filename.set_text(kwargs.get('save_name','d-band-analysis.csv'))
                 dialog.dialog.response(Gtk.ResponseType.OK);return False
             GLib.timeout_add(100,accept_export)
             return dialog
         with patch('p4vasp.gtk3.file_dialogs.CompactFileDialog',side_effect=actual_export_dialog):
             panel.export.clicked()
         assert (folder/'d-band-analysis.csv').exists(),panel.status.get_text()
+        with patch('p4vasp.gtk3.file_dialogs.CompactFileDialog',side_effect=actual_export_dialog):
+            panel.script.clicked()
+        assert (folder/'d-band-analysis.py').exists(),panel.status.get_text()
 
         def check_plot_surface(stage):
             canvas=electronic.canvas
@@ -129,7 +137,7 @@ def main():
         window.unmaximize();window.resize(1100,850);spin(.8);check_plot_surface('restore')
         panel.emin.set_text('-2');assert panel.result is None and not panel.export.get_sensitive()
         panel.emax.set_text('1');panel.calculate.clicked()
-        panel.cancel.clicked();assert panel.job is None
+        panel.emax.set_text('1.5');assert panel.job is None
         spin(.5);assert panel.result is None,'Cancelled callback restored stale result'
         # Existing real File/Open refresh must invalidate result and analyze XML source.
         frame.show_load_system_fileselection();chooser=frame.load_system_fileselection

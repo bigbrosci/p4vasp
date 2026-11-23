@@ -1,12 +1,8 @@
 """Optional pymatgen d-DOS analysis in a short-lived scientific worker."""
 import csv
 import json
-import math
 from pathlib import Path
 import sys
-
-# Bound numerical interpolation for rounded VASP energy columns.
-HILBERT_GRID_TOLERANCE = .05  # Fraction of the mean energy step.
 
 # Source execution must work without importing native p4vasp extensions.
 if __package__ in (None, ''):
@@ -74,9 +70,7 @@ def load_complete(path, structure_path=None):
 def analyze(request):
     try:
         import numpy as np
-        from importlib.metadata import version
-        from pymatgen.electronic_structure.core import Spin, Orbital, OrbitalType
-        from pymatgen.electronic_structure.dos import CompleteDos, Dos
+        from pymatgen.electronic_structure.core import Spin, OrbitalType
     except ImportError as error:
         raise RuntimeError('pymatgen is unavailable. Run bash install/install-science.sh. '+str(error)) from error
     complete, aggregated, structure_source = load_complete(request['path'], request.get('structure_path'))
@@ -120,53 +114,17 @@ def analyze(request):
     if not np.all(np.isfinite(density)) or np.any(density < -1e-8):
         raise ValueError('Expected finite, nonnegative raw d-DOS densities.')
     density = np.maximum(density,0.)
-    lower = float(request.get('emin') if request.get('emin') is not None else energies[0])
-    upper = float(request.get('emax') if request.get('emax') is not None else energies[-1])
-    if not math.isfinite(lower) or not math.isfinite(upper) or lower>=upper:
-        raise ValueError('Energy limits must be finite with minimum < maximum.')
-    if lower < energies[0]-1e-7 or upper > energies[-1]+1e-7:
-        raise ValueError('Analysis range lies outside the available E−EF grid: %.6g to %.6g eV.'%(energies[0],energies[-1]))
-    lower=max(lower,float(energies[0]));upper=min(upper,float(energies[-1]))
-    grid = np.unique(np.r_[lower, energies[(energies>lower)&(energies<upper)], upper,
-                           [0.] if lower<0<upper else []])
-    values = np.interp(grid, energies, density)
-    weight = float(np.trapezoid(values,x=grid))
-    if weight <= 1e-12: raise ValueError('Selected d-DOS has zero weight in this range.')
-    # A summed selected d projection is sufficient for the moment methods.
-    def selected_dos(grid, values):
-        channels = {Spin.up:values}
-        return CompleteDos(complete.structure, Dos(0.,grid,channels),
-                           {complete.structure[indices[0]]:{Orbital.dxy:channels}})
-    clipped = selected_dos(grid, values)
-    center = float(clipped.get_band_center())
-    width = float(clipped.get_band_width())
-    # Include interpolated EF exactly; pymatgen's < EF mask omits that endpoint.
-    occupied = grid<=0
-    filling = float(np.trapezoid(values[occupied],x=grid[occupied])/weight) if occupied.sum()>1 else 0.
-    notes = []
-    edge = None
-    uniform = np.linspace(energies[0],energies[-1],len(energies))
-    step = float(uniform[1]-uniform[0])
-    deviation = float(np.max(np.abs(energies-uniform)))
-    if deviation <= max(1e-8,step*HILBERT_GRID_TOLERANCE):
-        hilbert_density = np.interp(uniform,energies,density)
-        edge = float(selected_dos(uniform,hilbert_density).get_upper_band_edge(erange=(lower,upper)))
-        if deviation > max(1e-8,step*1e-5):
-            notes.append('Upper edge: slightly irregular/rounded source grid linearly resampled to %d uniform points (step %.8g eV; maximum adjustment %.8g eV).'%(len(uniform),step,deviation))
-    else: notes.append('Upper edge unavailable: source grid differs from a uniform grid by more than 5% of the mean energy step.')
-    at_fermi = float(np.interp(0.,energies,density)) if energies[0]<=0<=energies[-1] else None
-    if at_fermi is None: notes.append('D_d(EF) unavailable: EF is outside the original DOS grid.')
-    rows = [['d-band center',center,'eV'],['d-band width (standard deviation)',width,'eV'],
-            ['d-band filling (selected window)',filling,'dimensionless'],
-            ['d-band upper edge (Hilbert)',edge,'eV'],['D_d(EF)',at_fermi,'states/eV']]
-    return dict(rows=rows, path=str(Path(request['path']).resolve()), structure_source=structure_source,
-                atoms=[i+1 for i in indices], elements=sorted({complete.structure[i].specie.symbol for i in indices}),
-                orbital=orbital, spin=spin_name, emin=lower, emax=upper, efermi=float(complete.efermi),
-                energy_reference='E−EF', weight=weight,
-                fermi_dos_definition='Interpolated on the full original energy grid, independently of the analysis window.', pymatgen_version=version('pymatgen'), notes=notes,
-                filling_definition='Integral within selected window up to EF / integral over selected window; interpolated endpoints.',
-                upper_edge_definition='Peak of Hilbert transform of full selected d-DOS, searched inside the selected window; source grid deviations <=5% of mean step are linearly resampled to uniform spacing.',
-                normalization='Sum over selected atoms and spin channels; not per atom.')
+    from pymatgen.core import Structure
+    from p4vasp.dos_metrics import calculate_metrics
+    representative=Structure.from_sites([complete.structure[indices[0]]])
+    result=calculate_metrics(energies,density,representative,request.get('emin'),request.get('emax'))
+    result.update(path=str(Path(request['path']).resolve()), structure_source=structure_source,
+                  atoms=[i+1 for i in indices], elements=sorted({complete.structure[i].specie.symbol for i in indices}),
+                  orbital=orbital, spin=spin_name, efermi=float(complete.efermi))
+    result['replay']=dict(energies=energies.tolist(),density=density.tolist(),structure=representative.as_dict(),
+                          metadata={key:value for key,value in result.items() if key!='rows'})
+    return result
+
 
 
 def save_result(path,result):
@@ -175,14 +133,18 @@ def save_result(path,result):
         writer=csv.writer(stream)
         writer.writerow(['Metadata','Value'])
         for key,value in result.items():
-            if key!='rows': writer.writerow([key,json.dumps(value,ensure_ascii=False)])
+            if key not in ('rows','replay'): writer.writerow([key,json.dumps(value,ensure_ascii=False)])
         writer.writerow([]);writer.writerow(['Property','Value','Unit'])
         writer.writerows(result['rows'])
 
 
 if __name__ == '__main__':
     try:
-        result=analyze(json.load(sys.stdin))
+        request=json.load(sys.stdin)
+        if request.get('action')=='version':
+            from importlib.metadata import version
+            result=dict(pymatgen_version=version('pymatgen'))
+        else:result=analyze(request)
         print(json.dumps(dict(ok=True,result=result),allow_nan=False))
     except Exception as error:
         print(json.dumps(dict(ok=False,error=str(error))))

@@ -8,9 +8,11 @@ from p4vasp.gtk3.install_hint import InstallHint
 
 
 class DosAnalysis(Gtk.Frame):
+    _versions = {}
+
     def __init__(self, applet):
         super().__init__(label='d-band analysis (pymatgen)')
-        self.applet=applet;self.job=None;self.result=None;self.alive=True;self.system=None
+        self.applet=applet;self.job=None;self.result=None;self.alive=True;self.system=None;self.version_job=None
         self.connect('destroy',self.closed)
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=5);box.set_border_width(6)
         bounds=Gtk.ScrolledWindow();bounds.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
@@ -35,24 +37,26 @@ class DosAnalysis(Gtk.Frame):
         for text in ('both','up','down'):self.spin.append_text(text)
         self.spin.set_active(0)
         self.emin=Gtk.Entry();self.emax=Gtk.Entry()
-        for entry in (self.emin,self.emax):entry.set_width_chars(7);entry.set_placeholder_text('Full grid')
+        for entry in (self.emin,self.emax):
+            entry.set_width_chars(7);entry.set_placeholder_text('Full grid')
+            entry.set_tooltip_text('Relative to EF=0 eV. Blank uses the source grid limit.')
         for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin))):
             row=Gtk.Box(spacing=6)
             row.pack_start(Gtk.Label(label=label,xalign=0),False,False,0)
             row.pack_start(widget,True,True,0);grid.attach(row,column,2,1,1)
-        limits=Gtk.Label(label='Analysis range E−EF (eV)',xalign=0)
+        limits=Gtk.Label(label='Energy Range (eV)',xalign=0)
         grid.attach(limits,0,3,2,1)
-        for column,(label,widget) in enumerate((('Min',self.emin),('Max',self.emax))):
+        for column,(label,widget) in enumerate((('Emin',self.emin),('Emax',self.emax))):
             row=Gtk.Box(spacing=6)
             row.pack_start(Gtk.Label(label=label),False,False,0)
             widget.set_hexpand(True);row.pack_start(widget,True,True,0)
             grid.attach(row,column,4,1,1)
         actions=Gtk.Grid(column_spacing=6,row_spacing=5,column_homogeneous=True)
         self.calculate=Gtk.Button(label='Analyze d-DOS');self.calculate.connect('clicked',self.start)
-        self.cancel=Gtk.Button(label='Cancel');self.cancel.connect('clicked',self.cancel_job)
+        self.script=Gtk.Button(label='Export Python script');self.script.connect('clicked',self.export_script)
         self.copy=Gtk.Button(label='Copy results');self.copy.connect('clicked',self.copy_results)
         self.export=Gtk.Button(label='Export CSV');self.export.connect('clicked',self.export_results)
-        for index,widget in enumerate((self.calculate,self.cancel,self.copy,self.export)):
+        for index,widget in enumerate((self.calculate,self.script,self.copy,self.export)):
             widget.set_hexpand(True);actions.attach(widget,index%2,index//2,1,1)
         box.pack_start(actions,False,False,0)
         self.status=Gtk.Label(xalign=0);self.status.set_line_wrap(True);self.status.set_max_width_chars(42);self.status.set_width_chars(1)
@@ -78,6 +82,28 @@ class DosAnalysis(Gtk.Frame):
         for widget in (self.mode,self.orbital,self.spin):widget.connect('changed',self.changed)
         for widget in (self.selection,self.emin,self.emax):widget.connect('changed',self.changed)
         self.set_system(applet.system)
+        self.load_version()
+
+    def set_version(self,version):
+        self.set_label('d-band analysis (pymatgen-'+str(version).replace('.','-')+')')
+
+    def load_version(self):
+        from p4vasp.ase_bulk import BulkTask
+        from p4vasp.dos_analysis import worker_command
+        try:key=tuple(worker_command())
+        except Exception:return
+        if key in self._versions:
+            self.set_version(self._versions[key]);return
+        task=BulkTask({'action':'version'},lambda result,error:GLib.idle_add(self.version_ready,task,key,result,error),
+                      timeout=10,command_factory=worker_command,label='pymatgen version')
+        self.version_job=task;task.start()
+
+    def version_ready(self,task,key,result,error):
+        if not self.alive or self.version_job is not task:return False
+        self.version_job=None
+        if result and not error:
+            self._versions[key]=result['pymatgen_version'];self.set_version(result['pymatgen_version'])
+        return False
 
     def parent(self):
         window=self.get_toplevel()
@@ -98,17 +124,18 @@ class DosAnalysis(Gtk.Frame):
     def set_system(self, system):
         self.cancel_job();self.system=system;self.result=None;self.model.clear()
         self.status.set_text('Select atoms/elements and an analysis range. Blank limits use the full DOS grid; plot zoom does not change analysis.')
-        self.hint.hide();self.sensitivity()
+        self.hint.hide();self.status.set_tooltip_text(None);self.sensitivity()
 
     def sensitivity(self):
         busy=self.job is not None
-        self.calculate.set_sensitive(not busy);self.cancel.set_sensitive(busy)
+        self.calculate.set_sensitive(not busy);self.script.set_sensitive(self.result is not None and not busy)
         self.copy.set_sensitive(self.result is not None and not busy)
         self.export.set_sensitive(self.result is not None and not busy)
 
     def changed(self,*_):
         self.cancel_job();self.result=None;self.model.clear();self.sensitivity()
         self.status.set_text('Parameters changed. Click Analyze d-DOS to calculate.')
+        self.status.set_tooltip_text(None)
         self.applet.queue_plot_redraw()
 
     def use_selection(self,*_):
@@ -170,9 +197,10 @@ class DosAnalysis(Gtk.Frame):
             self.result=result
             for name,value,unit in result['rows']:
                 self.model.append([name,'Unavailable' if value is None else '%.8g'%value,unit])
-            self.status.set_text('pymatgen %s | %s | atoms %s | %s | %s | E−EF: %.6g to %.6g eV. Values are summed over selected atoms. %s'%(
-                result['pymatgen_version'],Path(result['path']).name,','.join(map(str,result['atoms'])),
-                result['orbital'],result['spin'],result['emin'],result['emax'],' '.join(result['notes'])))
+            self.set_version(result['pymatgen_version'])
+            self.status.set_text('atoms %s | %s | %s | E−EF: %.6g to %.6g eV.'%(
+                ','.join(map(str,result['atoms'])),result['orbital'],result['spin'],result['emin'],result['emax']))
+            self.status.set_tooltip_text('\n'.join([str(result['path']),result['normalization']]+result['notes']))
         self.sensitivity();self.applet.queue_plot_redraw();return False
 
     def cancel_job(self,*_):
@@ -183,6 +211,7 @@ class DosAnalysis(Gtk.Frame):
 
     def closed(self,*_):
         self.alive=False;self.cancel_job()
+        if self.version_job is not None:self.version_job.cancel();self.version_job=None
 
     def copy_results(self,*_):
         if not self.result:return
@@ -196,5 +225,15 @@ class DosAnalysis(Gtk.Frame):
         dialog=CompactFileDialog(self.parent(),Path(self.result['path']).parent,'Export d-band analysis',save_name='d-band-analysis.csv')
         path=dialog.run()
         if path:
-            try:save_result(path,self.result);self.status.set_text('Saved '+str(path))
+            try:save_result(path,self.result);self.status.set_tooltip_text((self.status.get_tooltip_text() or '')+'\nSaved '+str(path))
             except Exception as error:self.status.set_text('Export failed: '+str(error))
+
+    def export_script(self,*_):
+        if not self.result:return
+        from p4vasp.gtk3.file_dialogs import CompactFileDialog
+        from p4vasp.dos_replay import save_script
+        dialog=CompactFileDialog(self.parent(),Path(self.result['path']).parent,'Export Python analysis script',save_name='d-band-analysis.py')
+        path=dialog.run()
+        if path:
+            try:save_script(path,self.result);self.status.set_tooltip_text((self.status.get_tooltip_text() or '')+'\nSaved '+str(path))
+            except Exception as error:self.status.set_text('Script export failed: '+str(error))

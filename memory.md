@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS精简界面与独立脚本导出完成（2026-11-22）
+
+- 用户撤销删除Use last DOS line的要求，前一轮未提交的删除已撤回，按钮/逻辑/测试继续保留。用户明确range仍手填，不加预设；Energy Range (eV)下Emin/Emax，EF=0说明放输入提示。完成摘要仅atoms/轨道/自旋/E−EF上下限；来源/求和/重采样详情留tooltip/CSV。顶部d-band analysis (pymatgen-实际版本，点改横线)，通过独立worker的metadata-only action查询并按解释器缓存，不在GUI导入科学库/写死版本。
+- Cancel按钮改Export Python script，结果有效且未计算时可用；参数/换源/离开仍自动取消。dos_metrics.py抽取原数值方法，analyze保留选择与读取，结果附隐藏replay快照（选中投影之和的完整相对能量谱、单代表site API容器、元数据），CSV不塞谱。dos_replay.py导出同一核心代码+快照，独立Python/pymatgen即可重算，不依赖p4vasp/原DOSCAR/XML；可CLI改积分限，不能直接换原子/轨道/自旋，代表site不等于完整计算结构。脚本和输出CSV独占写入，不覆盖。
+- D_d(EF)继续保留：当前原子/轨道/自旋在EF处的投影态密度之和，states/eV，非电子数，也非每原子平均；算法不变。当前数值重构在本地真实两来源×两元素五指标与原结果一致（只记定性，不公开私有数值）。
+- Linux/WSL：9原科学回归、2独立脚本测试通过（删除合成源文件、-I清环境运行、结果一致、改窗口/拒绝覆盖）；真实GTK包含初始版本/精简摘要/保留最后线/选中原子、实际CSV及脚本对话框、改参取消、最大化与复制/缺库提示通过；10 GTK、33面板、58基础、3依赖工具/清单、编译/diff通过。日志/tmp/dos-export-{core,replay,gtk,gtk-base,smoke,base}.log；实际私有Cu数据的两个来源精确界面文本和本地独立脚本匹配通过，截图/tmp/cu3ru1-controls.png已查看，5源文件哈希不变，私有生成脚本/结果仍仅/tmp/cu3ru1-script-*，example不跟踪/上传。
+- 文档/依赖用途源码索引/中英同步；无新依赖/环境变化，不重复采快照/原生重编或Windows包/Mac验收。当前任务完成，重启GUI载入控件改动。
+
 ## 本地私有Cu3Ru1实际数据验证（2026-11-22）
 
 - 用户新放example/Cu3Ru1，明确禁止上传该目录。已在本机.git/info/exclude加入/example/Cu3Ru1/，git check-ignore确认DOSCAR/POTCAR排除、git ls-files确认无跟踪；以后不得stage/上传该目录，也不把其中结构/输入/结果数值/截图复制进公共测试或文档。该本地exclude不随仓库同步，其他设备仍需遵守用户限制。
