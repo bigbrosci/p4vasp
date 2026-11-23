@@ -1207,6 +1207,8 @@ class DoscarSystemPM(SystemPM):
                  if os.path.isfile(os.path.join(self.PATH,"INCAR")) else Incar())
         self.add("INITIAL_STRUCTURE",read=self.getInitialStructure)
         self.add("TOTAL_DOS",read=lambda x:readDOSCAR(self.doscarpath))
+        self.add("PARTIAL_DOS",read=self.getPartialDOS)
+        self.add("PARTIAL_DOS_L",read=self.getPartialDOS)
         self.add("E_FERMI",read=self.getEFermi)
 
     def getInitialStructure(self,x):
@@ -1214,6 +1216,19 @@ class DoscarSystemPM(SystemPM):
             path=os.path.join(self.PATH,name)
             if os.path.isfile(path):return Structure(path)
         return Structure()
+
+    def getPartialDOS(self,x):
+        from p4vasp.dos_data import read_doscar
+        data = read_doscar(self.doscarpath)
+        if not data['projected']: return None
+        result = Array()
+        result.dimension = ['gridpoints', 'spin', 'ion']
+        fields = ['energy']+data['orbitals']
+        result.setupFields(fields, [FLOAT_TYPE]*len(fields), ['%+14.10f']*len(fields))
+        for atom in data['projected']:
+            result.append([[[energy]+row for energy,row in zip(data['energies'],channel)]
+                           for channel in atom])
+        return result
 
     def getEFermi(self,x):
         with open(self.doscarpath) as stream:

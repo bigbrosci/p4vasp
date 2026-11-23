@@ -7,7 +7,7 @@ from p4vasp.gtk3 import Gtk, Gdk
 
 
 class InstallHint(Gtk.Box):
-    def __init__(self, dependency, script):
+    def __init__(self, dependency, script, bundled=True):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         self.caption = Gtk.Label(label=dependency+' missing? Copy this command and run it in your Linux/macOS terminal:', xalign=0)
         self.caption.set_line_wrap(True)
@@ -20,7 +20,7 @@ class InstallHint(Gtk.Box):
         self.command.set_hexpand(True)
         self.copy_button = Gtk.Button(label='Copy command')
         from p4vasp.model_worker import bundled_worker
-        if bundled_worker() is not None:
+        if bundled and bundled_worker() is not None:
             self.caption.set_text(dependency+' is included. No installation or PATH setup is required.')
             self.command.set_no_show_all(True)
             self.copy_button.set_no_show_all(True)

@@ -2,6 +2,16 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS+pymatgen首版集成完成（2026-11-22）
+
+- 用户要求保留原DOS绘图并增加分析。DOS+bands仍由ElectronicApplet/GraphWindowApplet→graphwindowapplet.glade/GTK3 adapter绘制；新增折叠、限高可滚动的gtk3/dos_analysis.DosAnalysis，不改共享Glade或旧菜单/图线操作。按元素或1起原子、全部/单个d轨道、both/up/down及相对EF窗口计算五项，复用结构选择/最后DOS线的原子自旋，明确不复用线倍率/符号。可复制整表/文字单值，真实CompactFileDialog独占CSV导出附完整定义/对象/版本/来源/范围，不覆盖。
+- dos_data.py为纯标准库共线DOSCAR投影读取，DoscarSystemPM提供PARTIAL_DOS(_L)给原Local DOS控制；支持spd/spdf和9/16lm、1/2spin。检查截断/块数/网格/负值/非有限数及SOC标记。无投影总DOS旧读法不变。DOSCAR分析需匹配显式元素符号VASP5 POSCAR优先/CONTCAR次选，不读取POTCAR；核对原子数但不能验证同数异顺序。SOC/非共线拒绝，17列单spin缺INCAR布局歧义拒绝。XML由科学worker内Vasprun读取，不读取POTCAR/本征值。
+- dos_analysis.py在共享science解释器短进程，通过BulkTask120s/取消/回调；主GUI不导入pymatgen。改参数/换源/离开/销毁取消并拒过期回调。独立脚本初测发现项目uuid.py遮蔽标准库，移除脚本目录、保留lib入口后清PYTHONPATH协议通过；XML汇总OrbitalType与lm Orbital均处理。InstallHint新增可选bundled参数，pymatgen不误报旧Windows已包含；真实GUI初测发现no-show-all令错误提示不可见，显式show修复。
+- 科学定义：center与标准差width通过pymatgen，窗口端点插值；filling为窗口内≤EF积分/窗口总积分（自行梯形/EF插值，非pymatgen严格<0且无窗口的原方法，非投影电子数）；upper edge为完整所选d谱Hilbert变换在窗口内的峰位置，非均匀原网格返回Unavailable；D_d(EF)在完整网格插值且不除原子数，EF不在网格返回Unavailable。原始正spin密度求和，不取图中负号、不用abs掩盖坏值。详见doc/dos-analysis-zh.md。
+- 2026-11-22本机Linux/WSL现有science环境：8实际pymatgen数值/读取/清PYTHONPATH新进程/CSV测试通过，含高斯解析中心/标准差/CDF/EF值/Hilbert峰近似、DOSCAR/XML等价、轨道/自旋/选择/范围、聚合、零/负权重/非均匀/错结构/截断等；4旧DOSCAR测试含原投影数组通过。真实GTK通过异步tick、旧曲线不变/GUI未import科学库、两个文件源、结构选择/最后线复用、原Line下自旋负向绘制、剪贴板、真实导出对话框、改参/取消/换源拒过期及模拟缺库提示；截图/tmp/p4vasp-dos-analysis.png已查看，分析区域通过滚动访问完整结果。
+- 4旧真实启动/File/Open/反复切面板/XML/DOSCAR-only/自旋/带图/resize通过；9 GTK、33面板、58基础、3既有通用进程取消/超时、3依赖工具/清单、语法/diff通过。首次sandbox GTK9全skip不算通过，授权显示后9实际通过；新reader测试曾误import GUI导致无display中止，已把Line检查移到GUI测试，reader恢复独立。新GUI首次startup等待不足夹具改等待实际frame，不算应用修复。日志/tmp/dos-analysis-{core,old-reader,gtk,legacy-gtk,gtk-base,smoke,base,transport}.log。
+- 用法/架构/安装/目录及双语同步；通用进程测试初轮发现前轮统一环境后缺库文案断言仍指向旧install-ase，现同步新入口后3项通过；无新依赖/环境变化、不重复采快照、不重编原生/打包Windows，不声称Mac/Windows或用户真实DOS文件验收。当前任务完成，后续用户实际文件检验；偏度/峰度、批量每原子报告等未自动扩展。
+
 ## 统一科学环境完成（2026-11-22）
 
 - 用户明确要求ASE/RDKit/pymatgen同环境。install/install-science.sh创建.venv-science，install/science-requirements.txt唯一维护三项直接依赖版本，安装后pip check及install/check-science.py实际计算检查；原install-ase/rdkit/pymatgen三个入口转发，不再新建各自环境；Bulk/Surface/SMILES/振动可复制提示统一为install-science，实际Bulk复制/剪贴板断言通过。GUI仍独立，旧目录未删除。

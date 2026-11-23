@@ -354,7 +354,8 @@ versions specified in `install/science-requirements.txt` and checks the DOS-anal
 imports. Python 3.11 or newer with venv/pip is required; select another Python
 with `PYTHON=/path/to/python3 bash install/install-science.sh`. Internet access
 is needed. This Bash installer targets Linux/WSL and macOS; it does not modify
-or rebuild Windows EXE packages. DOS analysis GUI integration is still pending.
+or rebuild Windows EXE packages. For the integrated analysis controls and scientific definitions, see
+[the DOS analysis guide](doc/dos-analysis-zh.md).
 After an actual installation, record its dependency baseline using:
 
 ```bash

@@ -41,7 +41,7 @@ class BulkTaskTest(unittest.TestCase):
         result=subprocess.run(['/usr/bin/python3',str(ROOT/'lib/p4vasp/ase_bulk.py'),'--worker'],
             input=json.dumps(REQUEST),env=env,text=True,capture_output=True)
         self.assertNotEqual(result.returncode,0)
-        self.assertIn('install/install-ase.sh',json.loads(result.stdout)['error'])
+        self.assertIn('install/install-science.sh',json.loads(result.stdout)['error'])
 
     def test_cancel_and_timeout_reap(self):
         command=[sys.executable,'-c','import time; time.sleep(30)']

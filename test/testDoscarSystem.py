@@ -40,6 +40,18 @@ class DoscarSystemTest(unittest.TestCase):
         self.assertEqual(list(data[1][1]),[0.,5.,7.])
         readDOSCAR(StringIO(doscar()),closeflag=1)
 
+    def test_projected_blocks_feed_existing_local_dos_lines(self):
+        from dos_projected_fixtures import projected_calculation
+        with tempfile.TemporaryDirectory() as folder:
+            path=projected_calculation(folder)/'DOSCAR'
+            system=getSystem(path)
+            data=system.PARTIAL_DOS_L
+            self.assertEqual(len(data),2)
+            self.assertEqual(len(data[0]),2)
+            self.assertIn('dx2',data.field)
+            self.assertEqual(len(data[0][0]),401)
+            self.assertAlmostEqual(data[0][1][200][data.fieldIndex('dxy')],1.)
+
     def test_reject_incomplete_inconsistent_or_invalid_rows(self):
         for text in ['', 'header\n',doscar().replace('1 -1 3 0.5','1 -1 0 0.5'),
                      doscar().rsplit('\n',2)[0]+'\n',doscar().replace('0 4 1','0 4 5 6 7')]:

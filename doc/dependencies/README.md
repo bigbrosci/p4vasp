@@ -24,14 +24,14 @@ bash install/install-science.sh
 程序优先读取显式功能变量（P4VASP_ASE_PYTHON／P4VASP_SMILES_PYTHON），
 其次统一变量`P4VASP_SCIENCE_PYTHON`，然后`.venv-science`，最后旧功能环境；
 已冻结Windows默认仍优先随包worker。旧目录不删除，迁移后可自行备份清理。
-GUI不导入这三套科学库；pymatgen尚未接入DOS分析界面。
+GUI不导入这三套科学库；DOS分析界面通过独立进程调用pymatgen，详见[分析指南](../dos-analysis-zh.md)。
 
 ## 环境边界
 
 - `science`：当前共享ASE/RDKit/pymatgen环境。
 - `gui`：主GUI和原生模块所用Python。当前Linux示例是`/usr/bin/python3`，不是激活的base或ASE环境；macOS应使用实际GUI解释器。
 - `ase`：隔离ASE环境；不要求把ASE装进主GUI解释器。
-- `pymatgen`：独立可选DOS分析环境；旧独立环境兼容角色；GUI分析接入尚未实现。
+- `pymatgen`：独立可选DOS分析环境；旧独立环境兼容角色；当前推荐science。
 - `smiles`：隔离RDKit环境；不要求将其合并进ASE或GTK环境。
 - `windows-model`：构建Windows科学worker的官方CPython环境；**不是已冻结的worker.exe**。
 - `build`：用于GUI打包/开发的Python，可与实际GUI解释器对应。

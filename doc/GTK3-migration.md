@@ -529,5 +529,19 @@ this same installer command; their widget layout is unchanged. Existing
 feature installers forward to it. `model_worker.scientific_python` centralizes
 source interpreter selection while retaining legacy variables/environments;
 packaged Windows worker selection remains unchanged. Projected DOS analysis
-controls are not yet implemented. See `doc/dependencies/README.md` for precedence
+controls are described in the next section. See `doc/dependencies/README.md` for precedence
 and baseline recording.
+
+### Optional d-band analysis (2026-11-22)
+
+Toolbar/menu → ElectronicApplet → existing graphwindowapplet.glade/GTK3 adapter
+remains the plot route. A Python-created collapsed `DosAnalysis` expander is
+packed below the graph; bounded scrolling keeps its controls accessible without
+editing shared Graph resources. Existing ElectronicControlApplet uses new
+DoscarSystemPM PARTIAL_DOS(_L) arrays from the strict stdlib dos_data reader.
+Analysis uses dos_analysis.py in the shared science interpreter via bounded
+BulkTask; no pymatgen import in GTK. Parameter/source changes, leaving the graph
+and destruction cancel stale jobs. Import failure exposes a copyable installer;
+InstallHint's optional bundled flag avoids claiming pymatgen is already in the
+older Windows worker. CSV includes scientific definitions and source metadata.
+See doc/dos-analysis-zh.md and test/testDosAnalysis{,Gtk}.py.

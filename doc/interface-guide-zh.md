@@ -654,3 +654,7 @@ Models → surface支持fcc/bcc常用金属面和hcp基面，也可从Bulk结果
 Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子笛卡尔z移到0.1 Å，
 保持晶胞及总真空不变。可在生成前选择或对已有结果立即切换，预览和POSCAR/JSON同步。
 侧视预览包含完整晶胞；底部0.1 Å是初始留边，不保证优化后绝不越界。参数细节见[表面建模说明](ase-surface-zh.md#5-center与bottom)。
+
+### DOS的pymatgen分析（2026-11-22）
+
+原DOS+bands和Local DOS绘图保留。展开图下方d-band analysis，可按元素/原子及d轨道、自旋、相对EF窗口计算中心、标准差宽度、窗口填充度、Hilbert upper edge及D_d(EF)，复制/独占CSV导出。支持DOSCAR投影或vasprun.xml，缺投影/SOC等明确拒绝；缺pymatgen不影响旧绘图。计算通过统一科学环境独立进程，可取消，换源清理旧结果；详见[分析操作与科学定义](dos-analysis-zh.md)。

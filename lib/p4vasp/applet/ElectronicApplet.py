@@ -340,9 +340,15 @@ class ElectronicApplet(GraphWindowApplet):
         self.klines=[]
         self.show_DOS=True
         self.view_all=True
+        self.dos_analysis=None
 
     def initUI(self):
         GraphWindowApplet.initUI(self)
+        from p4vasp.gtk3.dos_analysis import DosAnalysis
+        self.dos_analysis=DosAnalysis(self)
+        self.xml.get_widget("applet_frame").pack_end(self.dos_analysis,False,False,0)
+        self.dos_analysis.show_all()
+
         mitem=gtk.MenuItem("Show")
         menu=gtk.Menu()
         mitem.set_submenu(menu)
@@ -394,6 +400,10 @@ class ElectronicApplet(GraphWindowApplet):
                 else:
                     w=createGraph(x)
                 self.worlds.append(w)
+
+    def destroy(self):
+        if self.dos_analysis is not None:self.dos_analysis.cancel_job()
+        GraphWindowApplet.destroy(self)
 
     def setshowtype_handler_(self,w,t):
         self.setShowType(t)
@@ -577,6 +587,7 @@ class ElectronicApplet(GraphWindowApplet):
 
     def updateSystem(self,x=None):
         system=self.system
+        if self.dos_analysis is not None:self.dos_analysis.set_system(system)
         self.total_dos=None
         self.eigenval=None
         self.kpoints=None
