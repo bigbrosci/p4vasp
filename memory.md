@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows新版打包接手点（2026-11-23，构建待完成）
+
+- 用户授权生成最新Windows EXE、整理更新并推送。现有Windows checkout只读确认干净、p4vasp-py3/origin正确；旧11月21日包保留。新增冻结worker --dos-analysis/version路由及pymatgen依赖/metadata/data收集，沿用官方CPython3.13独立运行时，不升级ASE/RDKit。DOS及Surface Bash导出共用model_worker.bash_launcher，冻结版回退同目录console.exe，源码仍p4v.sh。
+- 新windows_dos_check.py用随包公开人工fixture实测双来源s/p/d/f GUI、f列序/双脚本/无界面DOS及Surface重放；诊断已接入--check-models，尚待真实Windows打包验收。Linux源协议/模拟冻结路由通过，既有2 CLI与3Surface重放、3依赖工具及清单/语法/diff通过，日志/tmp/windows-dos-prep-{cli,surface}.log。下步推送构建源码，运行既有Windows updater，检查实际报告/ZIP/快照，回填结果。未将源协议测试冒充Windows成品通过。
+
 ## DOS分析扩展s/p/d/f及三排轨道（2026-11-23）
 
 - gtk3/dos_analysis.py Orbital三排：s/p及py,pz,px；d及5分量；f及7分量。总壳层与自身分量互斥，分量和不同壳层可组合，空选回d；Spin在其下，Analyze DOS按钮。标题及结果按单壳层显示s/p/d/f-band，跨壳层为selected-band，三位小数/a.u.保留。Use last DOS line同步所有轨道，旧plot f1…f7按VASP列序转换分析f_3…f3，负m按钮显示f−3等，CLI用f_3等规范名。

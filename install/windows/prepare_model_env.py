@@ -10,7 +10,7 @@ import urllib.request
 import zipfile
 
 PYTHON_VERSION='3.13.17'
-PACKAGES=['ase==3.29.0','rdkit==2026.9.1','pyinstaller==6.22.3']
+PACKAGES=['ase==3.29.0','rdkit==2026.9.1','pymatgen==2026.10.24','pyinstaller==6.22.3']
 
 
 def environment_path():

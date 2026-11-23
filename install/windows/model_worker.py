@@ -8,10 +8,15 @@ def main():
     try:
         if kind=='--versions':
             import ase,rdkit
-            print(json.dumps({'ase':ase.__version__,'rdkit':rdkit.__version__,'python':sys.version}))
+            from importlib.metadata import version
+            print(json.dumps({'ase':ase.__version__,'rdkit':rdkit.__version__,
+                              'pymatgen':version('pymatgen'),'python':sys.version}))
             return 0
         request=json.load(sys.stdin)
-        if kind=='--bulk':
+        if kind=='--dos-analysis':
+            from p4vasp.dos_analysis import run_request
+            result={'ok':True,'result':run_request(request)}
+        elif kind=='--bulk':
             from p4vasp.ase_bulk import build_bulk
             result={'ok':True,'result':build_bulk(request)}
         elif kind=='--surface':

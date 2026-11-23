@@ -67,9 +67,7 @@ def save_script(path,result):
 
 
 def bash_text(path,result):
-    import p4vasp
-    launcher=Path(p4vasp.p4vasp_home).resolve()/'p4v.sh'
-    if not launcher.is_file():raise ValueError('Bash export requires a source checkout with p4v.sh.')
+    from p4vasp.model_worker import bash_launcher
     command=['p4v',result['path'],','.join(map(str,result['atoms'])),result['orbital'],result['spin'],
              '%.17g'%result['emin'],'%.17g'%result['emax']]
     output=Path(path).with_name(Path(path).stem+'_cli.csv').absolute()
@@ -78,7 +76,7 @@ def bash_text(path,result):
             '# Run: bash THIS_SCRIPT.sh [NEW_OUTPUT.csv]\n'
             '# p4v must support positional DOS analysis. Bash does not load interactive aliases.\n'
             'if ! command -v p4v >/dev/null 2>&1; then\n'
-            '  p4v() { bash '+shlex.quote(str(launcher))+' "$@"; }\n'
+            +bash_launcher()+
             'fi\n'
             'default_output='+shlex.quote(str(output))+'\n'
             'output="${1:-$default_output}"\n'+shlex.join(command)+' "$output"\n')

@@ -98,6 +98,8 @@ def main(args):
         assert (out/'Cu_surface/rebuild_surface.sh').is_file()
         screenshot('surface.png');surface.close_preview()
         report['checks'].append('actual surface GUI -> bundled ASE Cu(111) -> fixed bottom layers/preview -> POSCAR and metadata save')
+        from p4vasp.windows_dos_check import check_dos
+        check_dos(out,pump,report)
         models.notebook.set_current_page(1);gas=models.gas_phase_page
         assert 'included' in gas.install_hint.caption.get_text()
         gas.smiles_entry.set_text('CCO');gas.build_button.clicked();pump(lambda:gas.task is None,90)

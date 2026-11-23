@@ -8,9 +8,10 @@ An independent clean-machine acceptance check is still required.
 For errors or command-line PNG export, use p4vasp-console.exe.
   p4vasp-console.exe POSCAR -o image.png
 
-Bundled modeling: ASE bulk and RDKit SMILES generation/initial optimization
+Bundled science: ASE bulk/surface and RDKit SMILES generation/initial optimization
 work through the included model-worker executable. No PATH or Python setup is
-required. Keep model-worker with the main application; its private runtime is
+required. pymatgen supports s/p/d/f projected DOS analysis from VASP DOSCAR/XML.
+Keep model-worker with the main application; its private runtime is
 separate from GTK. These are initial structures, not DFT-optimized results.
 
 Structure import (new builds): launch p4vasp.exe test.xyz, or use File/Open,
@@ -41,3 +42,9 @@ Source and project license:
 https://github.com/bigbrosci/p4vasp/tree/p4vasp-py3
 See LICENSE and _internal/dependency-licenses for bundled dependency notices.
 This development package is not yet an installer or a signed public release.
+
+Headless projected DOS example (no GUI):
+  p4vasp-console.exe DOSCAR 1-3 d both -6 0 result.csv
+Surface Save POSCAR includes surface.json and Python/Bash rebuild scripts.
+Bash companions require Bash (e.g. MSYS2); standalone Python needs ASE/pymatgen.
+The exported Bash fallback calls this installation's p4vasp-console.exe.

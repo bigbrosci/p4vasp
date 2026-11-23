@@ -1,7 +1,6 @@
 """Portable surface recipes plus standalone Python and headless Bash replay."""
 import json
 from pathlib import Path
-import shlex
 
 INDEX_CONVENTION='zero-based POSCAR atom order; layer_numbers are bottom-up starting at 1'
 
@@ -13,14 +12,13 @@ def metadata(result):
 
 
 def bash_script():
-    import p4vasp
-    launcher=Path(p4vasp.p4vasp_home).resolve()/'p4v.sh'
+    from p4vasp.model_worker import bash_launcher
     return ('#!/usr/bin/env bash\nset -euo pipefail\n'
             '# Rebuild from the adjacent portable surface.json, without a GUI.\n'
             '# Run: bash rebuild_surface.sh [NEW_OUTPUT_FOLDER]\n'
             'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"\n'
-            'if ! command -v p4v >/dev/null 2>&1; then\n'
-            '  p4v() { bash '+shlex.quote(str(launcher))+' "$@"; }\n'
+            'if ! command -v p4v >/dev/null 2>&1; then\n'+
+            bash_launcher()+
             'fi\n'
             'p4v --surface-replay "$script_dir/surface.json" "${1:-$script_dir/surface_rebuilt}"\n')
 

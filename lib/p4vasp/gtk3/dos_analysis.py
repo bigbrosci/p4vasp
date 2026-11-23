@@ -94,7 +94,7 @@ class DosAnalysis(Gtk.Frame):
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.set_min_content_height(180)
         scroll.add(view);box.pack_start(scroll,True,True,0)
-        self.hint=InstallHint('pymatgen','install-science.sh',bundled=False);self.hint.set_no_show_all(True)
+        self.hint=InstallHint('pymatgen','install-science.sh');self.hint.set_no_show_all(True)
         box.pack_start(self.hint,False,False,0)
         self.mode.connect('changed',self.changed)
         for name,button in self.orbital_buttons.items():button.connect('toggled',self.orbital_toggled,name)

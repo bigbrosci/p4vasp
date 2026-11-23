@@ -5,6 +5,20 @@ import subprocess
 import sys
 
 
+def bash_launcher():
+    """Alias-free replay fallback for source checkouts and portable Windows apps."""
+    import shlex
+    if getattr(sys,'frozen',False):
+        launcher=Path(sys.executable).resolve().with_name('p4vasp-console.exe')
+        command=shlex.quote(launcher.as_posix())
+    else:
+        import p4vasp
+        launcher=Path(p4vasp.p4vasp_home).resolve()/'p4v.sh'
+        command='bash '+shlex.quote(str(launcher))
+    if not launcher.is_file():raise ValueError('Replay launcher is missing: '+str(launcher))
+    return '  p4v() { '+command+' "$@"; }\n'
+
+
 def bundled_worker():
     if not getattr(sys,'frozen',False):return None
     path=Path(sys.executable).resolve().parent/'model-worker/p4vasp-model-worker.exe'

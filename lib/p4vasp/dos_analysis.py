@@ -1,6 +1,7 @@
 """Optional pymatgen projected DOS analysis in a short-lived scientific worker."""
 import csv
 import json
+import os
 from pathlib import Path
 import sys
 
@@ -12,6 +13,10 @@ if __package__ in (None, ''):
 
 
 def worker_command():
+    from p4vasp.model_worker import bundled_worker
+    if not (os.environ.get('P4VASP_PYMATGEN_PYTHON') or os.environ.get('P4VASP_SCIENCE_PYTHON')):
+        bundled=bundled_worker()
+        if bundled is not None:return [str(bundled),'--dos-analysis']
     from p4vasp.model_worker import scientific_python
     python = scientific_python('pymatgen')
     if python is None:
@@ -19,6 +24,13 @@ def worker_command():
     script=Path(__file__).resolve()
     if not script.is_file():raise RuntimeError('This build lacks the pymatgen analysis worker source; use an updated source checkout.')
     return [python, str(script)]
+
+
+def run_request(request):
+    if request.get('action')=='version':
+        from importlib.metadata import version
+        return dict(pymatgen_version=version('pymatgen'))
+    return analyze(request)
 
 
 def load_complete(path, structure_path=None):
@@ -146,10 +158,7 @@ def save_result(path,result):
 if __name__ == '__main__':
     try:
         request=json.load(sys.stdin)
-        if request.get('action')=='version':
-            from importlib.metadata import version
-            result=dict(pymatgen_version=version('pymatgen'))
-        else:result=analyze(request)
+        result=run_request(request)
         print(json.dumps(dict(ok=True,result=result),allow_nan=False))
     except Exception as error:
         print(json.dumps(dict(ok=False,error=str(error))))

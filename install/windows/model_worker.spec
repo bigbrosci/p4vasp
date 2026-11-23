@@ -2,10 +2,10 @@ from pathlib import Path
 from PyInstaller.utils.hooks import collect_data_files, collect_dynamic_libs, copy_metadata, collect_delvewheel_libs_directory
 
 root=Path(SPECPATH).parents[1]
-datas=collect_data_files('ase')+collect_data_files('rdkit')
+datas=collect_data_files('ase')+collect_data_files('rdkit')+collect_data_files('pymatgen')
 binaries=collect_dynamic_libs('rdkit')
 datas,binaries=collect_delvewheel_libs_directory('rdkit',datas=datas,binaries=binaries)
-for package in ('ase','rdkit','numpy','scipy'):
+for package in ('ase','rdkit','numpy','scipy','pymatgen','pymatgen-core'):
     datas+=copy_metadata(package)
 datas += [(str(root/'LICENSE'),'.')]
 python_license=Path(__import__('sys').base_prefix)/'LICENSE.txt'
