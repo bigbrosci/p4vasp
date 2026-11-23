@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Energy Range单行紧凑输入（2026-11-22）
+
+- 用户要求Energy Range/Emin/Emax一行。gtk3/dos_analysis.py改同一横向Box，两个Entry约4字符视觉宽度且不拉伸，空值占位Full；未设置输入长度限制，负数/小数仍完整读取，留空全网格及EF相对定义不变。
+- 本机Linux/WSL真实DOS分析GTK通过计算/手动改参/导出/最大化重绘/紧凑窗口；截图/tmp/p4vasp-dos-maximized-redraw.png已查看，标题和两框同排。日志/tmp/dos-range-one-row-gtk.log，编译/diff/用法检查通过；不额外重跑未改科学算法，不触及私有example/环境/EXE，Mac/Windows未验收。当前用法与中英记录同步。
+
 ## 删除D_d(EF)结果项（2026-11-22）
 
 - 用户要求删除EF处d投影态密度，dos_metrics去掉对应数值/定义元数据；GUI、CSV和新导出独立脚本共同只输出center/标准差width/window filling/Hilbert upper edge四项。积分范围/其余数值方法、Use last DOS line及脚本导出入口保留。

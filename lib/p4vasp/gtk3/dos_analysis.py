@@ -38,19 +38,18 @@ class DosAnalysis(Gtk.Frame):
         self.spin.set_active(0)
         self.emin=Gtk.Entry();self.emax=Gtk.Entry()
         for entry in (self.emin,self.emax):
-            entry.set_width_chars(7);entry.set_placeholder_text('Full grid')
+            entry.set_width_chars(4);entry.set_max_width_chars(4);entry.set_placeholder_text('Full')
             entry.set_tooltip_text('Relative to EF=0 eV. Blank uses the source grid limit.')
         for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin))):
             row=Gtk.Box(spacing=6)
             row.pack_start(Gtk.Label(label=label,xalign=0),False,False,0)
             row.pack_start(widget,True,True,0);grid.attach(row,column,2,1,1)
-        limits=Gtk.Label(label='Energy Range (eV)',xalign=0)
+        limits=Gtk.Box(spacing=5)
+        limits.pack_start(Gtk.Label(label='Energy Range (eV)',xalign=0),False,False,0)
+        for label,widget in (('Emin',self.emin),('Emax',self.emax)):
+            limits.pack_start(Gtk.Label(label=label),False,False,0)
+            limits.pack_start(widget,False,False,0)
         grid.attach(limits,0,3,2,1)
-        for column,(label,widget) in enumerate((('Emin',self.emin),('Emax',self.emax))):
-            row=Gtk.Box(spacing=6)
-            row.pack_start(Gtk.Label(label=label),False,False,0)
-            widget.set_hexpand(True);row.pack_start(widget,True,True,0)
-            grid.attach(row,column,4,1,1)
         actions=Gtk.Grid(column_spacing=6,row_spacing=5,column_homogeneous=True)
         self.calculate=Gtk.Button(label='Analyze d-DOS');self.calculate.connect('clicked',self.start)
         self.script=Gtk.Button(label='Export Python script');self.script.connect('clicked',self.export_script)
