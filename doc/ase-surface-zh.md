@@ -69,8 +69,8 @@ bash install/install-science.sh
 ```
 
 页面底部也提供按当前安装位置生成的可复制命令。使用现有ASE环境可设置P4VASP_ASE_PYTHON，不把ASE强行装进GTK解释器。
-本轮Linux/WSL验证了实际ASE构建、原生预览与保存；macOS及Windows成品尚未验收。
-11月21日Windows便携包不含本次Surface功能；Windows worker/spec和诊断入口已接入，需后续重新构建验证。
+Linux/WSL验证了实际ASE构建、原生预览与保存；2026-11-23 Windows冻结包亦通过构建/预览/保存及无界面重放检查，macOS和另一台干净Windows未验收。
+11月21日Windows便携包不含本次Surface功能；新包路径及范围见[Windows交付记录](windows-update-workflow-zh.md)。
 
 
 ## 5. Center与Bottom

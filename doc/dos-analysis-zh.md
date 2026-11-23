@@ -11,7 +11,7 @@ p4v DOSCAR
 p4v vasprun.xml
 ```
 
-ASE、RDKit、pymatgen共用科学环境；GUI仍用原解释器。也支持File/Open；缺少pymatgen时，原绘图继续可用，分析区域提供可复制安装命令。此功能目前在Linux/WSL源码版验证，尚未更新Windows EXE或验收macOS。
+ASE、RDKit、pymatgen共用科学环境；GUI仍用原解释器。也支持File/Open；缺少pymatgen时，原绘图继续可用，分析区域提供可复制安装命令。Linux/WSL源码及2026-11-23 Windows冻结包已通过公开人工投影数据检查，macOS和另一台干净Windows未验收；[Windows包及验证范围](windows-update-workflow-zh.md)。
 
 ## 操作
 

@@ -300,13 +300,13 @@ bash install/install-science.sh
 
 ## Optional ASE bulk builder / 可选ASE体相建模
 
-For Models → bulk, run `bash install/install-science.sh` from the checkout. This installs ASE, RDKit and pymatgen into `.venv-science` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Current validation is Linux/WSL only; the existing Windows portable build was not rebuilt with ASE. See [bulk usage](doc/ase-bulk-zh.md).
+For Models → bulk, run `bash install/install-science.sh` from the checkout. This installs ASE, RDKit and pymatgen into `.venv-science` without changing the GTK interpreter. The GUI starts one bounded worker only when building; `P4VASP_ASE_PYTHON` can select an existing compatible interpreter. Windows packages use a separately frozen scientific worker; see the dated release evidence below. See [bulk usage](doc/ase-bulk-zh.md).
 
-Models → bulk使用前，在项目目录运行 `bash install/install-science.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，当前Windows旧便携包不包含本轮新增功能。
+Models → bulk使用前，在项目目录运行 `bash install/install-science.sh`，安装独立ASE环境，不替换GTK解释器。当前维护设备已安装；其他设备需自行安装并核验。详见[体相建模说明](doc/ase-bulk-zh.md)，Windows新版包含独立科学worker，具体版本与验证范围见[交付记录](doc/windows-update-workflow-zh.md)。
 
-## Windows bundled ASE and RDKit / Windows随包建模依赖
+## Windows bundled scientific libraries / Windows随包科学依赖
 
-The Windows packaging pipeline now builds a private official-CPython model-worker with ASE 3.29.0 and RDKit 2026.09.1, separate from the UCRT64 GTK runtime. First build prepares an isolated cache from Python.org/PyPI; users need no external Python or PATH configuration. Keep the full folder including model-worker. Frozen --check-models validates real GUI generation/preview/export/cancellation; successful delivery evidence is recorded in the dated update.
+The Windows packaging pipeline now builds a private official-CPython model-worker with ASE, RDKit and pymatgen, separate from the UCRT64 GTK runtime. Exact package pins are maintained in `install/windows/prepare_model_env.py`. First build prepares an isolated cache from Python.org/PyPI; users need no external Python or PATH configuration. Keep the full folder including model-worker. Frozen --check-models validates GUI generation/preview/export/cancellation, Surface replay and s/p/d/f DOSCAR/XML analysis; successful delivery evidence is recorded in the dated update.
 
 Windows打包流程已加入独立ASE／RDKit计算程序，首次构建下载专用缓存，不改系统Python。运行时自动调用，用户无需配置解释器路径；保留整个目录及model-worker。整包构建／交付以当日更新记录实际结果为准，11月1日旧包不因此自动获得依赖。
 
@@ -365,3 +365,5 @@ After an actual installation, record its dependency baseline using:
 Choose a new output filename if it already exists. The snapshot is metadata,
 not a functional DOS-analysis test. Official package information:
 https://pypi.org/project/pymatgen/
+
+2026-11-23 Windows新版含Surface及pymatgen s/p/d/f DOS分析，当前设备的冻结成品检查通过；安装目录、ZIP及验证范围见[Windows更新流程](doc/windows-update-workflow-zh.md)。

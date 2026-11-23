@@ -1,10 +1,40 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-21。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-23。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
 
-## 当前交付（2026-11-21）
+## 当前交付（2026-11-23）
+
+冻结源码`5ca60f29fb9f552dfacbf6ef86f273a4d8ceb9d3`。完整EXE路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261123-013128-5ca60f29-r5cg71v2\p4vasp.exe
+```
+
+同级ZIP：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261123-013128-5ca60f29-r5cg71v2.zip
+```
+
+ZIP为198095378字节，SHA256：`76a023a937326818b43596c69961becf4eba2ccbcb4683ddb02f81d4ff7be64d`，另有同名`.zip.sha256`。
+完整解压后双击p4vasp.exe，保留整个`_internal`和`model-worker`；不需要另安装Python或设置科学库PATH。
+旧发行包保留，本次未另复制到桌面或发布GitHub Release附件。
+
+本版包含Surface切面、固定层、Center/Bottom及保存时Python/Bash重建脚本；个人元素数据覆盖；
+DOS左右分栏分析、s/p/d/f三排轨道、自旋按钮、多轨道、三位小数及a.u.填充度、独立Python/Bash脚本和无界面命令。
+ASE/RDKit/pymatgen随包科学worker与UCRT64 GTK运行时隔离，实际版本见MODEL-VERSIONS.json，精确构建安装源见prepare_model_env.py。
+
+当前Windows设备成品runtime/gui/models报告均ok/frozen，新增双来源s/p/d/f、f分量、导出脚本及无界面DOS/Surface重放通过；
+另在MSYS2实际执行导出的两种Bash脚本，在Windows科学Python实际执行两种独立Python脚本，数值及Surface坐标/晶胞/固定标记核对通过。
+独立检查SOURCE-COMMIT、raw helper、ZIP CRC/SHA256通过；预览/建模及公开人工谱回归不等于全部科学任务或另一台干净Windows验收。
+Bash脚本仍需Bash（如MSYS2），独立Python脚本仍需其相应科学库；双击GUI不需要这些外部环境。
+
+构建日志：`build/windows-update/5ca60f29-z_n6ok88`；报告：`dist/windows-releases/p4vasp-20261123-013128-5ca60f29-r5cg71v2-checks`。
+依赖快照见[依赖维护记录](dependencies/README.md)。后续纯交付文档提交不改变本包SOURCE-COMMIT，无需为文档重复打包。
+
+## 历史交付（2026-11-21）
 
 冻结源码`f5de130ec89e55a76431d0edf8280a609abdd88e`，EXE完整路径：
 

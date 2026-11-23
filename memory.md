@@ -2,10 +2,13 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
-## Windows新版打包接手点（2026-11-23，构建待完成）
+## Windows新版交付完成（2026-11-23）
 
-- 用户授权生成最新Windows EXE、整理更新并推送。现有Windows checkout只读确认干净、p4vasp-py3/origin正确；旧11月21日包保留。新增冻结worker --dos-analysis/version路由及pymatgen依赖/metadata/data收集，沿用官方CPython3.13独立运行时，不升级ASE/RDKit。DOS及Surface Bash导出共用model_worker.bash_launcher，冻结版回退同目录console.exe，源码仍p4v.sh。
-- 新windows_dos_check.py用随包公开人工fixture实测双来源s/p/d/f GUI、f列序/双脚本/无界面DOS及Surface重放；诊断已接入--check-models，尚待真实Windows打包验收。Linux源协议/模拟冻结路由通过，既有2 CLI与3Surface重放、3依赖工具及清单/语法/diff通过，日志/tmp/windows-dos-prep-{cli,surface}.log。下步推送构建源码，运行既有Windows updater，检查实际报告/ZIP/快照，回填结果。未将源协议测试冒充Windows成品通过。
+- 用户要求更新历史、生成Windows及推送，已完成冻结源码5ca60f29fb9f552dfacbf6ef86f273a4d8ceb9d3的包，包含近期Surface/个人数据/DOS+s/p/d/f和重放等；pymatgen加入官方CPython科学worker，与UCRT64 GUI隔离，ASE/RDKit pin保持。DOS/Surface Bash共用冻结console回退，源码仍p4v.sh；新增Windows科学诊断及公开人工fixture，不含私有example。
+- EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261123-013128-5ca60f29-r5cg71v2\p4vasp.exe；同级.zip及.zip.sha256，198095378字节，SHA256=76a023a937326818b43596c69961becf4eba2ccbcb4683ddb02f81d4ff7be64d。保留完整_internal/model-worker，不单拎EXE；旧包保留，未另复制桌面或上传Release附件。包SOURCE-COMMIT不随后续文档提交改变。
+- 当前Windows实际原生编译/GUI与worker冻结成功，runtime/gui/models报告均ok=True/frozen=True，含Surface Bottom保存、双来源s/p/d/f、f列序/双脚本、无界面DOS/Surface重放及既有ASE/RDKit/取消。另在MSYS2运行导出DOS/Surface Bash、官方科学Python运行两独立脚本，结果及晶胞/顺序/坐标/固定标记一致。Windows Surface截图已查看。独立核对SOURCE/helper/ZIP CRC/SHA256通过；不是另一台干净Windows/所有科学场景全面验收。
+- 发布实际依赖快照doc/dependencies/snapshots/2026-11-23-windows-{gui,model}-5ca60f29.json，GUI Python3.14.9/UCRT与worker3.13.17/MSVC分开，12/48项元数据，pymatgen2026.10.24/core2026.10.31、ASE3.29.0、RDKit2026.9.1；源码与工具/清单hash核对通过。元数据非DLL清单/锁文件，原始无Git PATH临时捕获留Windows Temp，公共快照含来源提交；旧记录不覆盖。
+- 日志Windows build/windows-update/5ca60f29-z_n6ok88，报告dist/windows-releases/p4vasp-20261123-013128-5ca60f29-r5cg71v2-checks；Linux启动/tmp/p4vasp-windows-20261123.log及/tmp/windows-exported-replays-20261123.log。WSL启动wrapper最终返回143，但updater日志SUCCESS、成品三个报告及独立ZIP/脚本检查完整通过，不以wrapper退出码0作为证据。源协议/模拟冻结路由、2 CLI、3Surface、2Python、3bundled routing、58基础及3依赖工具/清单/语法/diff通过。指南/当日双语同步；本任务完成，无待自动开发或重建任务。
 
 ## DOS分析扩展s/p/d/f及三排轨道（2026-11-23）
 

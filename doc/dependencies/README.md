@@ -12,7 +12,7 @@
 | [安装指南](../../install.md) | 用户如何安装和启动 | 不再另维护一套精确版本表 |
 | [全层盘点报告](../dependency-inventory-2026-11-14-zh.md) | 当时的人工调查证据与待办 | 历史结论不会自动成为新设备的实测结果 |
 
-平台脚本仍是执行层依据：Ubuntu/Debian看`install/ubuntu-bootstrap.sh`，macOS看`install/macos-bootstrap.sh`；统一科学环境看`install/install-science.sh`和`install/science-requirements.txt`，旧install-ase/rdkit/pymatgen脚本转发到同一入口。Windows仍使用原`prepare_model_env.py`及spec，本轮不加入pymatgen冻结依赖。精确版本只在执行源维护。
+平台脚本仍是执行层依据：Ubuntu/Debian看`install/ubuntu-bootstrap.sh`，macOS看`install/macos-bootstrap.sh`；统一科学环境看`install/install-science.sh`和`install/science-requirements.txt`，旧install-ase/rdkit/pymatgen脚本转发到同一入口。Windows使用`prepare_model_env.py`及spec，将ASE/RDKit/pymatgen放入独立官方CPython科学worker，不与UCRT64 GTK运行时混装。精确版本只在执行源维护。
 
 ## 统一科学环境
 
@@ -125,3 +125,8 @@ checkpoint/2026-11-14-before-legacy-interface-fixes
 
 
 Surface首版复用现有ASE环境及隔离worker，不新增库或改变版本。catalog中ASE用途/源码索引已同步，Windows worker/spec加入surface调度及geometry/constraints导入。只是使用现有依赖的新功能，未改变环境，故不重复采集快照；实际Windows冻结验收留后续打包。
+
+
+## 2026-11-23 Windows发布基线
+
+新增[GUI环境](snapshots/2026-11-23-windows-gui-5ca60f29.json)和[科学worker构建环境](snapshots/2026-11-23-windows-model-5ca60f29.json)的目标解释器实际快照，来源提交5ca60f29，12/48项分发元数据。GUI为UCRT64 Python3.14.9，worker为官方CPython3.13.17；新增pymatgen及其间接依赖，ASE/RDKit构建pin沿用。源码、工具/清单摘要核对通过；原始首次无Git PATH的临时捕获留Windows Temp，仓库保留带来源提交的完整捕获。此为元数据基线，不是冻结DLL清单或锁文件；成品验收见[Windows交付](../windows-update-workflow-zh.md)。旧快照保留。
