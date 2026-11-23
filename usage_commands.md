@@ -51,7 +51,7 @@ p4v --dos-analysis --help
 ```
 
 参数顺序为：文件、原子编号/范围、轨道、自旋、Emin、Emax、输出CSV。
-多个原子或轨道用逗号，轨道d与单个分量不能混用；能量相对EF=0，已有CSV不覆盖。
+多个原子或轨道用逗号，各轨道总壳层与自身分量不能混用；能量相对EF=0，已有CSV不覆盖。
 单参数`p4v DOSCAR`仍打开界面。Export scripts生成Python快照脚本和调用该入口的Bash脚本，详见[分析与脚本说明](doc/dos-analysis-zh.md)。
 
 
@@ -68,3 +68,7 @@ p4v --surface-replay surface.json rebuilt_cli
 Python需要ASE，可脱离p4vasp及原始体相文件；Bash/CLI需要p4vasp的ASE环境。
 记录最终切面、超胞、真空、固定层和摆放参数，不包含完整VASP计算输入。
 详见[Surface保存与重建](doc/ase-surface-zh.md#4-文件与依赖)。
+
+DOS分析还支持s/p/d/f：`p4v DOSCAR all p both -6 0 p.csv`。
+多个壳层可用`s,p`；f分量负编号写`f_3,f_2,f_1`，正编号写`f0,f1,f2,f3`。
+源文件缺少所选投影时报错，详见[轨道分析说明](doc/dos-analysis-zh.md#spdf投影分析)。

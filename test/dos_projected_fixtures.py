@@ -3,11 +3,12 @@ import math
 from pathlib import Path
 
 
-def projected_calculation(folder, spin=True, aggregate=False, xml=False):
+def projected_calculation(folder, spin=True, aggregate=False, xml=False, with_f=False):
     folder=Path(folder);folder.mkdir(parents=True,exist_ok=True)
     n=401; ef=2.
     energies=[-10.+i*.05 for i in range(n)]
     fields=['s','p','d'] if aggregate else ['s','py','pz','px','dxy','dyz','dz2','dxz','dx2']
+    if with_f:fields+=(['f'] if aggregate else ['f_3','f_2','f_1','f0','f1','f2','f3'])
     channels=[]
     for atom in range(2):
         atom_channels=[]
@@ -16,7 +17,11 @@ def projected_calculation(folder, spin=True, aggregate=False, xml=False):
             rows=[]
             for energy in energies:
                 d=math.exp(-.5*((energy-center)/.6)**2)
-                rows.append([.1,.2,d*15] if aggregate else [.1,.2,.3,.4]+[d*(i+1) for i in range(5)])
+                row=[.1,.2,d*15] if aggregate else [.1,.2,.3,.4]+[d*(i+1) for i in range(5)]
+                if with_f:
+                    f=math.exp(-.5*((energy-center-2)/.7)**2)
+                    row+=([f*28] if aggregate else [f*(i+1) for i in range(7)])
+                rows.append(row)
             atom_channels.append(rows)
         channels.append(atom_channels)
     header='12 -8 %d %g 1\n'%(n,ef)

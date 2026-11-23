@@ -16,7 +16,7 @@ class DosReplayTest(unittest.TestCase):
     def test_isolated_script_reproduces_and_adjusts_window(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);source=projected_calculation(root/'source')
-            result=analyze(dict(path=str(source/'DOSCAR'),atoms=[1],spin='up',emin=-6,emax=0))
+            result=analyze(dict(path=str(source/'DOSCAR'),atoms=[1],spin='up',orbital='p',emin=-6,emax=0))
             script=save_script(root/'analysis.py',result)
             shutil.rmtree(source)
             env=dict(os.environ);env.pop('PYTHONPATH',None);env.pop('P4VASP_HOME',None)

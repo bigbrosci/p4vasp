@@ -30,14 +30,20 @@ class DosAnalysis(Gtk.Frame):
         selected=Gtk.Button(label='Use selected atoms');selected.connect('clicked',self.use_selection)
         line=Gtk.Button(label='Use last DOS line');line.connect('clicked',self.use_line)
         grid.attach(selected,0,1,1,1);grid.attach(line,1,1,1,1)
-        self.orbital_box=Gtk.Box(spacing=2,homogeneous=True)
-        self.orbital_buttons={};self._orbital_sync=False
+        from p4vasp.dos_selection import P_ORBITALS,D_ORBITALS,F_ORBITALS
+        self.orbital_box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=3)
+        self.orbital_rows=[];self.orbital_buttons={};self._orbital_sync=False
         button_style=Gtk.CssProvider()
         button_style.load_from_data(b"button { min-width: 0; padding: 4px 5px; }")
-        for name in ('d','dxy','dyz','dz2','dxz','dx2'):
-            button=Gtk.ToggleButton(label=name)
-            button.get_style_context().add_provider(button_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-            self.orbital_buttons[name]=button;self.orbital_box.pack_start(button,True,True,0)
+        for names in (('s','p',*P_ORBITALS),('d',*D_ORBITALS),('f',*F_ORBITALS)):
+            row=Gtk.Box(spacing=2,homogeneous=True);self.orbital_rows.append(row)
+            self.orbital_box.pack_start(row,False,False,0)
+            for name in names:
+                label=name.replace('f_','f−')
+                button=Gtk.ToggleButton(label=label)
+                button.set_tooltip_text(name)
+                button.get_style_context().add_provider(button_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+                self.orbital_buttons[name]=button;row.pack_start(button,True,True,0)
         self.orbital_buttons['d'].set_active(True)
         self.spin_box=Gtk.Box(spacing=2,homogeneous=True)
         self.spin_buttons={};group=None
@@ -63,7 +69,7 @@ class DosAnalysis(Gtk.Frame):
             limits.pack_start(widget,False,False,0)
         grid.attach(limits,0,4,2,1)
         actions=Gtk.Grid(column_spacing=6,row_spacing=5,column_homogeneous=True)
-        self.calculate=Gtk.Button(label='Analyze d-DOS');self.calculate.connect('clicked',self.start)
+        self.calculate=Gtk.Button(label='Analyze DOS');self.calculate.connect('clicked',self.start)
         self.script=Gtk.Button(label='Export scripts');self.script.connect('clicked',self.export_script)
         self.copy=Gtk.Button(label='Copy results');self.copy.connect('clicked',self.copy_results)
         self.export=Gtk.Button(label='Export CSV');self.export.connect('clicked',self.export_results)
@@ -98,7 +104,10 @@ class DosAnalysis(Gtk.Frame):
         self.load_version()
 
     def set_version(self,version):
-        self.set_label('d-band analysis (pymatgen-'+str(version).replace('.','-')+')')
+        from p4vasp.dos_selection import band_label,parse_orbitals
+        self.analysis_version=version
+        label=band_label(parse_orbitals(self.orbital_name()))
+        self.set_label(label+'-band analysis (pymatgen-'+str(version).replace('.','-')+')')
 
     def load_version(self):
         from p4vasp.ase_bulk import BulkTask
@@ -161,10 +170,11 @@ class DosAnalysis(Gtk.Frame):
         self._orbital_sync=True
         try:
             if button.get_active():
-                if name=='d':
-                    for other,item in self.orbital_buttons.items():
-                        if other!='d':item.set_active(False)
-                else:self.orbital_buttons['d'].set_active(False)
+                from p4vasp.dos_selection import SHELLS,orbital_shell
+                shell=orbital_shell(name)
+                if name==shell:
+                    for other in SHELLS[shell]:self.orbital_buttons[other].set_active(False)
+                else:self.orbital_buttons[shell].set_active(False)
             if not any(item.get_active() for item in self.orbital_buttons.values()):
                 self.orbital_buttons['d'].set_active(True)
         finally:self._orbital_sync=False
@@ -196,8 +206,9 @@ class DosAnalysis(Gtk.Frame):
         self.export.set_sensitive(self.result is not None and not busy)
 
     def changed(self,*_):
+        if hasattr(self,'analysis_version'):self.set_version(self.analysis_version)
         self.cancel_job();self.result=None;self.model.clear();self.sensitivity()
-        self.status.set_text('Parameters changed. Click Analyze d-DOS to calculate.')
+        self.status.set_text('Parameters changed. Click Analyze DOS to calculate.')
         self.status.set_tooltip_text(None)
         self.applet.queue_plot_redraw()
 
@@ -215,10 +226,15 @@ class DosAnalysis(Gtk.Frame):
             if not atoms:raise ValueError('The last DOS line selects no atoms.')
             self.mode.set_active(2);self.selection.set_text(', '.join(str(i+1) for i in atoms))
             self.set_spin({1:'up',2:'down'}.get(line.spin,'both'))
-            from p4vasp.dos_selection import D_ORBITALS
-            selected=[name for name in D_ORBITALS if name in line.orbital]
-            self.set_orbitals(selected if 0<len(selected)<5 else ['d'])
-            self.status.set_text('Copied atoms/spin from the last DOS line. Analyze uses the selected d orbital, without line scale or sign.')
+            from p4vasp.dos_selection import SHELLS,F_ORBITALS
+            # Legacy plot f1..f7 denote ordered VASP columns, not magnetic m labels.
+            mapped=[F_ORBITALS[int(name[1:])-1] if name.startswith('f') and name[1:].isdigit()
+                    and 1<=int(name[1:])<=7 else name for name in line.orbital]
+            selected=[]
+            for shell,components in SHELLS.items():
+                choices=[name for name in components if name in mapped]
+                selected.extend([shell] if shell in mapped or (components and len(choices)==len(components)) else choices)
+            self.set_orbitals(selected or ['d'])
         except Exception as error:self.status.set_text(str(error))
 
     def request(self):

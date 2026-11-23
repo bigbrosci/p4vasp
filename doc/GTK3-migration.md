@@ -623,9 +623,10 @@ a polarized source, checking exclusivity, restored buttons and regular-width fit
 
 ### Orbital combinations and headless DOS entry (2026-11-23)
 
-Orbital uses six toggle buttons on its own row: d excludes component choices,
-components combine, and clearing the last choice restores d. Spin moves to the
-next row. dos_selection.py supplies shared orbital/atom validation; the worker
+Orbital uses three toggle-button rows: s/p and p components, d and its components,
+f and its seven components. Each shell excludes its own components; components
+and different shells combine. Clearing the last choice restores d. Spin follows
+these rows. dos_selection.py supplies shared orbital/atom validation; the worker
 sums each selected component once before running unchanged metrics.
 
 p4v.py dispatches the seven positional DOS arguments (or --dos-analysis) before
@@ -634,3 +635,11 @@ exclusive CSV; single-file GUI and render flags keep their existing routes.
 Export scripts creates .py/.sh together: Python embeds the selected snapshot,
 Bash re-reads the source through p4v and includes an alias-free launcher fallback.
 New paired files are exclusive and cleaned up on failure. No shared Glade change.
+
+The projected analysis worker supports s/p/d/f shell totals and components in both
+DOSCAR and XML. dos_selection.py provides canonical ordering and per-shell conflict
+validation shared by GTK/CLI. Missing selected projections on any selected atom
+are errors. Aggregated sources permit shell totals only. f columns follow VASP's
+ordered real harmonics; old plotting f1..f7 map to pymatgen f_3..f3 for Use last DOS
+line. Metrics use the selected summed spectrum, labels identify its shell or
+selected-band for mixed shells, and standalone replay preserves the label.

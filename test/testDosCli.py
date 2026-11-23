@@ -52,8 +52,8 @@ runpy.run_path(P4V,run_name='__main__')
 
     def test_bash_pair_runs_cli_and_preserves_existing_pair(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);source=projected_calculation(root/'source space')
-            result=analyze(dict(path=str(source/'DOSCAR'),atoms=[1],orbital='dxy,dyz',spin='up',emin=-6,emax=0))
+            root=Path(tmp);source=projected_calculation(root/'source space',with_f=True)
+            result=analyze(dict(path=str(source/'DOSCAR'),atoms=[1],orbital='f_3,f3',spin='up',emin=-6,emax=0))
             py,sh=save_scripts(root/'analysis space.py',result)
             check=subprocess.run(['bash','-n',str(sh)],capture_output=True,text=True)
             self.assertEqual(check.returncode,0,check.stderr)

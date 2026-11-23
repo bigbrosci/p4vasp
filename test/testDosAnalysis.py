@@ -54,8 +54,42 @@ class DosAnalysisTest(unittest.TestCase):
         self.assertEqual(combined['orbitals'],['dxy','dyz'])
         self.assertAlmostEqual(combined['weight'],first['weight']+second['weight'],places=9)
         self.assertAlmostEqual(combined['rows'][0][1],-1.,places=9)
-        for value in ('d,dxy','s',''):
+        for value in ('d,dxy','g',''):
             with self.assertRaises(ValueError):self.run_analysis(orbital=value)
+
+    def test_spdf_sources_components_and_missing_projections(self):
+        for aggregate in (False,True):
+            with tempfile.TemporaryDirectory() as tmp:
+                folder=projected_calculation(tmp,aggregate=aggregate,xml=True,with_f=True)
+                for orbital in ('s','p','d','f','s,p'):
+                    request=dict(atoms=[1],spin='up',orbital=orbital)
+                    first=analyze(dict(path=str(folder/'DOSCAR'),**request))
+                    second=analyze(dict(path=str(folder/'vasprun.xml'),**request))
+                    self.assertEqual(first['orbitals'],orbital.split(','))
+                    for a,b in zip(first['rows'],second['rows']):
+                        self.assertEqual(a[0],b[0]);self.assertAlmostEqual(a[1],b[1],places=8)
+                    label='selected' if ',' in orbital else orbital
+                    self.assertEqual(first['rows'][0][0],label+'-band center')
+                    if orbital=='f':self.assertAlmostEqual(first['rows'][0][1],1.,places=8)
+                if not aggregate:
+                    for total,parts in (('p','py,pz,px'),('f','f_3,f_2,f_1,f0,f1,f2,f3')):
+                        a=analyze(dict(path=str(folder/'DOSCAR'),orbital=total,atoms=[1]))
+                        b=analyze(dict(path=str(folder/'DOSCAR'),orbital=parts,atoms=[1]))
+                        self.assertAlmostEqual(a['weight'],b['weight'],places=8)
+                    for name,scale in [('f_3',1),('f3',7)]:
+                        a=analyze(dict(path=str(folder/'DOSCAR'),orbital=name,atoms=[1],spin='up'))
+                        self.assertAlmostEqual(a['rows'][0][1],1.,places=8)
+                        self.assertAlmostEqual(a['weight'],scale*.7*math.sqrt(2*math.pi),places=8)
+                else:
+                    for name in ('px','f_3'):
+                        with self.assertRaisesRegex(ValueError,'summed'):
+                            analyze(dict(path=str(folder/'DOSCAR'),orbital=name))
+        for name in ('f','f_3'):
+            with self.assertRaisesRegex(ValueError,'Missing orbital'):
+                self.run_analysis(orbital=name)
+        for name in ('p,px','f,f0'):
+            with self.assertRaisesRegex(ValueError,'cannot be combined'):
+                self.run_analysis(orbital=name)
 
     def test_window_interpolation_filling_and_invariance(self):
         before=(self.folder/'DOSCAR').read_bytes()

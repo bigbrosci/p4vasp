@@ -28,7 +28,7 @@ def main(args=None):
         usage='p4v DOSCAR selected_atoms orbital(s) both/up/down Emin Emax output.csv')
     parser.add_argument('source',help='DOSCAR or vasprun.xml')
     parser.add_argument('atoms',help='1-based numbers/ranges, e.g. 1-3,8; or all')
-    parser.add_argument('orbitals',help='d or comma-separated individual orbitals, e.g. dxy,dyz')
+    parser.add_argument('orbitals',help='s/p/d/f shells or comma-separated components, e.g. px,py or dxy,dyz; f_3 through f3')
     parser.add_argument('spin',type=str.lower,choices=('both','up','down'))
     parser.add_argument('emin',help='Energy relative to EF, or full')
     parser.add_argument('emax',help='Energy relative to EF, or full')

@@ -53,6 +53,18 @@ def main():
         assert panel.translate_coordinates(electronic.dos_split,0,0)[0]>left.translate_coordinates(electronic.dos_split,0,0)[0]
         assert panel.calculate.get_mapped() and panel.export.get_mapped() and panel.script.get_mapped()
         assert not panel.hint.get_visible()
+        assert len(panel.orbital_rows)==3
+        assert [len(row.get_children()) for row in panel.orbital_rows]==[5,6,8]
+        panel.set_orbitals(['p'])
+        panel.orbital_buttons['px'].clicked()
+        assert panel.request()['orbital']=='px' and not panel.orbital_buttons['p'].get_active()
+        panel.orbital_buttons['py'].clicked();assert panel.request()['orbital']=='py,px'
+        panel.set_orbitals(['f'])
+        panel.orbital_buttons['f_3'].clicked();panel.orbital_buttons['f3'].clicked()
+        assert panel.request()['orbital']=='f_3,f3'
+        panel.orbital_buttons['f'].clicked();assert panel.request()['orbital']=='f'
+        panel.set_orbitals(['s','p']);assert panel.request()['orbital']=='s,p'
+        panel.set_orbitals(['d'])
         panel.orbital_buttons['dxy'].clicked();panel.orbital_buttons['dyz'].clicked()
         assert panel.request()['orbital']=='dxy,dyz'
         assert not panel.orbital_buttons['d'].get_active()
@@ -197,6 +209,24 @@ def main():
             panel.spin_buttons[name].clicked()
             assert panel.request()['spin']==name
             assert sum(button.get_active() for button in panel.spin_buttons.values())==1
+        # Run each added shell through real GUI workers on an artificial f-bearing source.
+        spdf=projected_calculation(folder/'spdf',with_f=True,xml=True)
+        frame.show_load_system_fileselection();chooser=frame.load_system_fileselection
+        chooser.set_filename(str(spdf/'DOSCAR'));spin();chooser.ok_button.clicked();spin(.8)
+        for shell in ('s','p','f'):
+            panel.set_orbitals([shell]);panel.calculate.clicked();spin(30,lambda:panel.job is None)
+            assert panel.result is not None,panel.status.get_text()
+            assert panel.model[0][0]==shell+'-band center'
+            assert panel.get_label().startswith(shell+'-band analysis')
+            assert all(row[1]=='Unavailable' or __import__('re').fullmatch(r'-?\d+\.\d{3}',row[1]) for row in panel.model)
+        window.check_resize();spin(.3)
+        for row in panel.orbital_rows:
+            last=row.get_children()[-1]
+            assert last.get_mapped()
+            assert last.translate_coordinates(panel,0,0)[0]+last.get_allocated_width()<=panel.get_allocated_width()
+        spdf_image=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+        window.draw(cairo.Context(spdf_image));spdf_image.write_to_png('/tmp/p4vasp-dos-spdf.png')
+        panel.set_orbitals(['d'])
         # Missing environment fails gracefully and does not remove the old DOS plot.
         from unittest.mock import patch
         with patch('p4vasp.dos_analysis.worker_command',side_effect=RuntimeError('pymatgen is unavailable. Run bash install/install-science.sh.')):

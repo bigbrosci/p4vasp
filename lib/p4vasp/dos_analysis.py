@@ -1,4 +1,4 @@
-"""Optional pymatgen d-DOS analysis in a short-lived scientific worker."""
+"""Optional pymatgen projected DOS analysis in a short-lived scientific worker."""
 import csv
 import json
 from pathlib import Path
@@ -38,7 +38,7 @@ def load_complete(path, structure_path=None):
     from p4vasp.dos_data import read_doscar, LM
     data = read_doscar(path)
     if not data['projected']:
-        raise ValueError('DOSCAR has total DOS only. Orbital-projected d-DOS is required.')
+        raise ValueError('DOSCAR has total DOS only. Orbital-projected DOS is required.')
     if structure_path:
         source = Path(structure_path).resolve()
     else:
@@ -59,7 +59,7 @@ def load_complete(path, structure_path=None):
     for site, atom in zip(structure, data['projected']):
         pdos[site] = {}
         for column, name in enumerate(data['orbitals']):
-            # Aggregated l data are represented once, solely for summed-d analysis.
+            # Aggregated l data are represented once, solely for shell-summed analysis.
             orbital = {'s':Orbital.s, 'p':Orbital.py, 'd':Orbital.dxy, 'f':Orbital.f_3}.get(name)
             if orbital is None: orbital = Orbital(LM.index(name))
             pdos[site][orbital] = {spin:np.array([row[column] for row in channel])
@@ -86,10 +86,11 @@ def analyze(request):
         if unknown: raise ValueError('Elements not present: '+', '.join(sorted(unknown)))
         indices = [i for i,site in enumerate(complete.structure) if site.specie.symbol in elements]
     else: indices = list(range(len(complete.structure)))
-    from p4vasp.dos_selection import parse_orbitals
+    from p4vasp.dos_selection import parse_orbitals, SHELLS, orbital_shell, band_label
     orbitals=parse_orbitals(request.get('orbital','d'))
     orbital=','.join(orbitals)
-    if aggregated and orbitals != ['d']: raise ValueError('This DOSCAR contains summed d only, not separate d orbitals.')
+    if aggregated and any(name not in SHELLS for name in orbitals):
+        raise ValueError('This source contains summed d/p/f shells only, not separate orbital components.')
     spin_name = request.get('spin','both')
     if spin_name not in ('both','up','down'): raise ValueError('Invalid spin selection.')
     spins = list(complete.densities) if spin_name == 'both' else [Spin.up if spin_name == 'up' else Spin.down]
@@ -99,26 +100,29 @@ def analyze(request):
     if not np.all(np.isfinite(energies)) or np.any(np.diff(energies)<=0):
         raise ValueError('DOS energy grid must be finite and strictly increasing.')
     density = np.zeros_like(energies)
-    found = False
     for i in indices:
+        found = set()
         for key,channels in complete.pdos.get(complete.structure[i],{}).items():
             kind = key if isinstance(key, OrbitalType) else key.orbital_type
-            if kind == OrbitalType.d and (orbitals==['d'] or key.name.replace('dx2_y2','dx2') in orbitals):
-                found = True
+            matched={name for name in orbitals if kind.name==orbital_shell(name) and
+                     (name in SHELLS or key.name.replace('dx2_y2','dx2')==name)}
+            if matched:
+                found.update(matched)
                 for spin in spins:
                     if spin not in channels: raise ValueError('Projected spin channel is missing.')
                     values=np.asarray(channels[spin],dtype=float)
                     if values.shape!=energies.shape or not np.all(np.isfinite(values)) or np.any(values < -1e-8):
                         raise ValueError('Expected finite nonnegative raw projected spin densities on the DOS grid.')
                     density += np.maximum(values,0.)
-    if not found: raise ValueError('No selected d-orbital projection; total DOS cannot substitute for d-DOS.')
+        missing=set(orbitals)-found
+        if missing:raise ValueError('Missing orbital projection for atom %d: %s. Total DOS cannot substitute.'%(i+1,', '.join(sorted(missing))))
     if not np.all(np.isfinite(density)) or np.any(density < -1e-8):
-        raise ValueError('Expected finite, nonnegative raw d-DOS densities.')
+        raise ValueError('Expected finite, nonnegative raw projected DOS densities.')
     density = np.maximum(density,0.)
     from pymatgen.core import Structure
     from p4vasp.dos_metrics import calculate_metrics
     representative=Structure.from_sites([complete.structure[indices[0]]])
-    result=calculate_metrics(energies,density,representative,request.get('emin'),request.get('emax'))
+    result=calculate_metrics(energies,density,representative,request.get('emin'),request.get('emax'),band_label(orbitals))
     result.update(path=str(Path(request['path']).resolve()), structure_source=structure_source,
                   atoms=[i+1 for i in indices], elements=sorted({complete.structure[i].specie.symbol for i in indices}),
                   orbital=orbital, orbitals=orbitals, spin=spin_name, efermi=float(complete.efermi))

@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS分析扩展s/p/d/f及三排轨道（2026-11-23）
+
+- gtk3/dos_analysis.py Orbital三排：s/p及py,pz,px；d及5分量；f及7分量。总壳层与自身分量互斥，分量和不同壳层可组合，空选回d；Spin在其下，Analyze DOS按钮。标题及结果按单壳层显示s/p/d/f-band，跨壳层为selected-band，三位小数/a.u.保留。Use last DOS line同步所有轨道，旧plot f1…f7按VASP列序转换分析f_3…f3，负m按钮显示f−3等，CLI用f_3等规范名。
+- dos_selection共享校验/排序/去重/壳层冲突；dos_analysis读取DOSCAR/XML s/p/d/f总量及LM分量，每个选中原子缺任一投影即报错，不补零/借总DOS。汇总源只允许总壳层，SOC限制不变。dos_metrics用对应壳层API容器算同一谱矩/填充/Hilbert算法；跨壳层为求和谱的数值描述，不声称是d带。独立Python保留band_label，Bash/CLI复用相同选择。
+- Linux/WSL 11科学（公开人工spd/spdf、9/16轨道、双来源、非自旋、缺f/汇总拒分量、f列顺序/权重等）、2隔离Python（p谱）、2实际CLI/双脚本（含f分量）通过；真实GTK三排/互斥/组合/边界、s/p/f实际计算与三位小数/标题、原DOS/复制/导出/切源/最大化通过，/tmp/p4vasp-dos-spdf.png及最大化图已查看。10 GTK、33面板、58基础、3依赖工具/清单及语法/diff通过；日志/tmp/dos-spdf-{core,replay,cli,gtk,gtk-base,smoke,base}.log。未访问私有example，未改环境/重采快照/重编或Windows包，Mac/Windows未验收。用法/架构/依赖用途及当日中英同步，任务完成。
+
 ## DOS结果表格三位小数（2026-11-23）
 
 - gtk3/dos_analysis.py结果表格用%.3f，复制结果沿用表格，Unavailable保持文字；内部计算及CSV/脚本数值精度保持原样。操作说明同步。
