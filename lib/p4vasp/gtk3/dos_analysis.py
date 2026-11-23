@@ -33,14 +33,22 @@ class DosAnalysis(Gtk.Frame):
         self.orbital=Gtk.ComboBoxText()
         for text in ('d','dxy','dyz','dz2','dxz','dx2'):self.orbital.append_text(text)
         self.orbital.set_active(0)
-        self.spin=Gtk.ComboBoxText()
-        for text in ('both','up','down'):self.spin.append_text(text)
-        self.spin.set_active(0)
+        self.spin_box=Gtk.Box(spacing=2,homogeneous=True)
+        self.spin_buttons={};group=None
+        spin_style=Gtk.CssProvider()
+        spin_style.load_from_data(b"button { min-width: 0; padding: 4px 5px; }")
+        for name,label in (('both','Both'),('up','Up'),('down','Down')):
+            button=Gtk.RadioButton.new_with_label_from_widget(group,label)
+            if group is None:group=button
+            button.set_mode(False)
+            button.get_style_context().add_provider(spin_style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            self.spin_buttons[name]=button;self.spin_box.pack_start(button,True,True,0)
+        self.spin_buttons['both'].set_active(True)
         self.emin=Gtk.Entry();self.emax=Gtk.Entry()
         for entry in (self.emin,self.emax):
             entry.set_width_chars(4);entry.set_max_width_chars(4);entry.set_placeholder_text('Full')
             entry.set_tooltip_text('Relative to EF=0 eV. Blank uses the source grid limit.')
-        for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin))):
+        for column,(label,widget) in enumerate((('Orbital',self.orbital),('Spin',self.spin_box))):
             row=Gtk.Box(spacing=6)
             row.pack_start(Gtk.Label(label=label,xalign=0),False,False,0)
             row.pack_start(widget,True,True,0);grid.attach(row,column,2,1,1)
@@ -78,7 +86,8 @@ class DosAnalysis(Gtk.Frame):
         scroll.add(view);box.pack_start(scroll,True,True,0)
         self.hint=InstallHint('pymatgen','install-science.sh',bundled=False);self.hint.set_no_show_all(True)
         box.pack_start(self.hint,False,False,0)
-        for widget in (self.mode,self.orbital,self.spin):widget.connect('changed',self.changed)
+        for widget in (self.mode,self.orbital):widget.connect('changed',self.changed)
+        for button in self.spin_buttons.values():button.connect('toggled',self.spin_toggled)
         for widget in (self.selection,self.emin,self.emax):widget.connect('changed',self.changed)
         self.set_system(applet.system)
         self.load_version()
@@ -123,7 +132,31 @@ class DosAnalysis(Gtk.Frame):
     def set_system(self, system):
         self.cancel_job();self.system=system;self.result=None;self.model.clear()
         self.status.set_text('Select atoms/elements and an analysis range. Blank limits use the full DOS grid; plot zoom does not change analysis.')
+        channels=None
+        if system is not None and 'TOTAL_DOS' in system:
+            prop=system['TOTAL_DOS']
+            if prop.status==prop.READY and prop.value is not None:channels=len(prop.value)
+        self.set_spin_channels(channels)
         self.hint.hide();self.status.set_tooltip_text(None);self.sensitivity()
+
+    def spin_name(self):
+        return next(name for name,button in self.spin_buttons.items() if button.get_active())
+
+    def set_spin(self,name):
+        button=self.spin_buttons[name]
+        if not button.get_sensitive():button=self.spin_buttons['both']
+        button.set_active(True)
+
+    def spin_toggled(self,button):
+        if button.get_active():self.changed()
+
+    def set_spin_channels(self,channels):
+        polarized=channels==2
+        for name in ('up','down'):
+            button=self.spin_buttons[name];button.set_sensitive(polarized)
+            button.set_tooltip_text(None if polarized else
+                'No separate spin channel in this DOS.' if channels==1 else 'Separate spin channels are not available yet.')
+        if not polarized:self.spin_buttons['both'].set_active(True)
 
     def sensitivity(self):
         busy=self.job is not None
@@ -150,7 +183,7 @@ class DosAnalysis(Gtk.Frame):
             atoms=sorted(set(line.getSelection(self.system.INITIAL_STRUCTURE)))
             if not atoms:raise ValueError('The last DOS line selects no atoms.')
             self.mode.set_active(2);self.selection.set_text(', '.join(str(i+1) for i in atoms))
-            self.spin.set_active({1:1,2:2}.get(line.spin,0))
+            self.set_spin({1:'up',2:'down'}.get(line.spin,'both'))
             self.orbital.set_active(0)
             if len(line.orbital)==1 and line.orbital[0] in ('dxy','dyz','dz2','dxz','dx2'):
                 self.orbital.set_active(('d','dxy','dyz','dz2','dxz','dx2').index(line.orbital[0]))
@@ -159,7 +192,7 @@ class DosAnalysis(Gtk.Frame):
 
     def request(self):
         text=self.selection.get_text().strip();mode=self.mode.get_active()
-        request=dict(path=str(self.path()),orbital=self.orbital.get_active_text(),spin=self.spin.get_active_text())
+        request=dict(path=str(self.path()),orbital=self.orbital.get_active_text(),spin=self.spin_name())
         if mode==1:
             request['elements']=list(dict.fromkeys(re.split(r'[\s,]+',text))) if text else []
             if not request['elements']:raise ValueError('Enter at least one element symbol.')

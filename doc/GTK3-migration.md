@@ -604,3 +604,14 @@ Remove D_d(EF) and its definition metadata from the shared dos_metrics output.
 The GUI, CSV and newly exported standalone scripts retain center, width,
 window filling and Hilbert upper edge. Selection/energy limits and the other
 algorithms stay the same; testDosAnalysisGtk checks four displayed rows.
+
+### Direct spin buttons (2026-11-22)
+
+DosAnalysis uses grouped Both/Up/Down radio buttons styled as compact buttons.
+Cached TOTAL_DOS and ElectronicApplet's existing DOS-read completion update
+availability without a second file read or worker. Only two-channel data enable
+Up/Down; scalar/unknown data select Both and disable the separate channels.
+Use-last-line respects that availability. Keep lowercase worker spin values and
+source-change invalidation; the numerical backend is unchanged. GTK regression
+switches both DOSCAR and XML to scalar data, calculates with Both and returns to
+a polarized source, checking exclusivity, restored buttons and regular-width fit.

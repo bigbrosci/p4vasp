@@ -556,6 +556,8 @@ class ElectronicApplet(GraphWindowApplet):
                         msg().status("Update DOS data")
                         yield 1
                         tdos=system.TOTAL_DOS
+                        if self.dos_analysis is not None:
+                            self.dos_analysis.set_spin_channels(len(tdos) if tdos is not None else None)
                         e=self.e_fermi
                         if tdos is not None:
                             if len(tdos)==2:

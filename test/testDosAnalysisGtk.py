@@ -53,6 +53,8 @@ def main():
         assert panel.translate_coordinates(electronic.dos_split,0,0)[0]>left.translate_coordinates(electronic.dos_split,0,0)[0]
         assert panel.calculate.get_mapped() and panel.export.get_mapped() and panel.script.get_mapped()
         assert not panel.hint.get_visible()
+        assert [button.get_label() for button in panel.spin_buttons.values()]==['Both','Up','Down']
+        assert panel.spin_buttons['up'].get_sensitive() and panel.spin_buttons['down'].get_sensitive()
         spin(10,lambda:panel.version_job is None)
         assert panel.get_label().startswith('d-band analysis (pymatgen-')
         electronic.lines.append(line);panel.use_line()
@@ -65,7 +67,7 @@ def main():
             assert panel.request()['atoms']==[2]
         finally:selection().data=old_selection
 
-        panel.mode.set_active(2);panel.selection.set_text('1');panel.spin.set_active(1)
+        panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up')
         ticks=[];timer=GLib.timeout_add(10,lambda:(ticks.append(1),True)[1])
         panel.calculate.clicked();assert panel.job is not None
         spin(30,lambda:panel.job is None);GLib.source_remove(timer)
@@ -123,9 +125,9 @@ def main():
 
         for i in range(3):
             panel.mode.set_active(1);panel.selection.set_text('Fe')
-            panel.orbital.set_active(i);panel.spin.set_active(i)
+            panel.orbital.set_active(i);panel.set_spin(('both','up','down')[i])
             spin(.35);check_plot_surface('options-'+str(i))
-        panel.mode.set_active(2);panel.selection.set_text('1');panel.spin.set_active(1);panel.orbital.set_active(0)
+        panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up');panel.orbital.set_active(0)
         panel.calculate.clicked();spin(30,lambda:panel.job is None)
         assert panel.result is not None,panel.status.get_text()
         check_plot_surface('maximized-analysis')
@@ -144,7 +146,7 @@ def main():
         chooser.set_filename(str(folder/'vasprun.xml'));spin();chooser.ok_button.clicked();spin(.8)
         panel=electronic.dos_analysis
         assert panel.result is None
-        panel.mode.set_active(2);panel.selection.set_text('1');panel.spin.set_active(1)
+        panel.mode.set_active(2);panel.selection.set_text('1');panel.set_spin('up')
         panel.emin.set_text('');panel.emax.set_text('')
         panel.calculate.clicked();spin(30,lambda:panel.job is None)
         assert panel.result is not None,panel.status.get_text()
@@ -157,6 +159,32 @@ def main():
         import cairo
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
         window.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-dos-analysis-side.png')
+        # Both file formats must disable separate channels for ISPIN=1,
+        # then restore them when a polarized source is opened again.
+        nonspin=projected_calculation(folder/'nonspin',spin=False,xml=True)
+        for filename in ('DOSCAR','vasprun.xml'):
+            frame.show_load_system_fileselection();chooser=frame.load_system_fileselection
+            chooser.set_filename(str(nonspin/filename));spin();chooser.ok_button.clicked();spin(.8)
+            assert panel.spin_name()=='both'
+            assert not panel.spin_buttons['up'].get_sensitive()
+            assert not panel.spin_buttons['down'].get_sensitive()
+            panel.set_spin('down');assert panel.request()['spin']=='both'
+            panel.calculate.clicked();spin(30,lambda:panel.job is None)
+            assert panel.result is not None,panel.status.get_text()
+            assert panel.result['spin']=='both' and len(panel.model)==4
+        window.check_resize();spin(.3)
+        down=panel.spin_buttons['down']
+        right=down.translate_coordinates(panel,0,0)[0]+down.get_allocated_width()
+        assert right<=panel.get_allocated_width(),('Spin buttons clipped',right,panel.get_allocated_width())
+        nonspin_image=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+        window.draw(cairo.Context(nonspin_image));nonspin_image.write_to_png('/tmp/p4vasp-dos-spin-nonspin.png')
+        frame.show_load_system_fileselection();chooser=frame.load_system_fileselection
+        chooser.set_filename(str(folder/'DOSCAR'));spin();chooser.ok_button.clicked();spin(.8)
+        assert panel.spin_buttons['up'].get_sensitive() and panel.spin_buttons['down'].get_sensitive()
+        for name in ('both','up','down'):
+            panel.spin_buttons[name].clicked()
+            assert panel.request()['spin']==name
+            assert sum(button.get_active() for button in panel.spin_buttons.values())==1
         # Missing environment fails gracefully and does not remove the old DOS plot.
         from unittest.mock import patch
         with patch('p4vasp.dos_analysis.worker_command',side_effect=RuntimeError('pymatgen is unavailable. Run bash install/install-science.sh.')):

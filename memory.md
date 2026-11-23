@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-22. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Spin三按钮与无自旋灰显（2026-11-22）
+
+- 用户要求Spin下拉改Both/Up/Down按钮。DosAnalysis用互斥RadioButton隐藏圆点、三按钮局部紧凑CSS；对接set_spin/spin_name，Use last DOS line复用同一选择方法。只有实际TOTAL_DOS恰两通道才启用Up/Down；单通道或未知时Both并灰显另外两项。set_system仅读已READY缓存，ElectronicApplet原DOS读取后通知，不额外读文件或启动探测进程。结果/worker保持lowercase spin及原算法，不把非自旋Both乘2。
+- Linux/WSL真实GTK通过3按钮逐一点击/互斥/请求映射，DOSCAR和XML切到单通道后两按钮灰显、Both实际分析，再切回双通道恢复；既有选择/脚本导出/最大化重绘通过。初轮普通宽度下按钮拥挤，局部减padding后检查Down右边界在面板内，截图/tmp/p4vasp-dos-{maximized-redraw,spin-nonspin}.png已查看。10 GTK、33面板、编译/diff通过；日志/tmp/dos-spin-buttons-{gtk,gtk-base,smoke}.log。
+- 用法/架构/双语同步，未改科学函数或依赖/环境，不重复科学回归/快照，不触及私有example或打包Windows，Mac/Windows未验收。
+
 ## Energy Range单行紧凑输入（2026-11-22）
 
 - 用户要求Energy Range/Emin/Emax一行。gtk3/dos_analysis.py改同一横向Box，两个Entry约4字符视觉宽度且不拉伸，空值占位Full；未设置输入长度限制，负数/小数仍完整读取，留空全网格及EF相对定义不变。
