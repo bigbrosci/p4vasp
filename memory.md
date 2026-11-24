@@ -1,6 +1,11 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-23. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Surface来源合并三按钮（2026-11-24）
+
+- 用户确认删除Source下拉框，与原读取按钮合并为Metal preset／Use bulk result／Open POSCAR / CIF等宽一排ToggleButton，高亮当前来源。surface.py用source_mode，选预设直接切换，成功读取Bulk快照/文件后再切换并使旧结果失效；同类来源重读也失效，取消文件或无Bulk结果则恢复按钮并保留原来源/结果。GTK set_active可能触发clicked，_source_sync防重入；不改ASE算法、输出recipe、models.glade/ModelsApplet/工具栏入口。
+- 本机Linux/WSL真实Surface GTK通过三按钮初始/缺Bulk/取消/实际Bulk与文件读取/回预设、原生预览、Center/Bottom、四文件保存、失效/取消/销毁；实际截图/tmp/p4vasp-surface-page.png已查看，控制项无裁切。1 Models惰性加载及10 GTK适配器通过，日志/tmp/surface-source-buttons-{gtk,lazy,adapter}.log，语法/diff通过；既有native Vector析构提示仍见lazy测试退出。操作/架构/双语同步。无依赖/环境/快照、原生重编或Windows重打包，11月23日EXE仍为旧来源布局，Mac/Windows本改动未验收。当前任务完成，源码版重启生效。
 
 ## Windows新版交付完成（2026-11-23）
 

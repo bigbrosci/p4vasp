@@ -16,16 +16,18 @@ class SurfacePage(Gtk.Box):
         self.result=None;self.task=None;self.alive=True;self.directory=None;self.preview_window=None
         self.source_poscar=None;self.source_path=None;self.placement='center';self._positioning=False
         grid=Gtk.Grid(column_spacing=8,row_spacing=8)
-        self.source=Gtk.ComboBoxText()
-        for name in ('Metal preset','Bulk result','Structure file'): self.source.append_text(name)
-        self.source.set_active(0)
-        self.use_bulk=Gtk.Button(label='Use bulk result');self.open_button=Gtk.Button(label='Open POSCAR / CIF')
-        sources=Gtk.Box(spacing=8);sources.pack_start(self.use_bulk,False,False,0);sources.pack_start(self.open_button,False,False,0)
-        grid.attach(Gtk.Label(label='Source',xalign=0),0,0,1,1);grid.attach(self.source,1,0,3,1)
-        grid.attach(sources,0,1,4,1)
+        self.source_mode=0
+        self.preset_button=Gtk.ToggleButton(label='Metal preset')
+        self.use_bulk=Gtk.ToggleButton(label='Use bulk result')
+        self.open_button=Gtk.ToggleButton(label='Open POSCAR / CIF')
+        self.source_buttons=(self.preset_button,self.use_bulk,self.open_button)
+        sources=Gtk.Box(spacing=8,homogeneous=True)
+        for button in self.source_buttons:sources.pack_start(button,True,True,0)
+        self.sync_source_buttons()
+        grid.attach(sources,0,0,4,1)
         self.source_label=Gtk.Label(label='Metal preset uses standard ASE surface cells.',xalign=0)
         self.source_label.set_line_wrap(True);self.source_label.set_max_width_chars(60)
-        grid.attach(self.source_label,0,2,4,1)
+        grid.attach(self.source_label,0,1,4,1)
         self.preset=Gtk.ComboBoxText()
         for name in PRESETS:self.preset.append_text(name)
         self.preset.set_active(0)
@@ -40,19 +42,19 @@ class SurfacePage(Gtk.Box):
             for widget in widgets:box.pack_start(widget,True,True,0)
             grid.attach(box,1,index,3,1)
             return title
-        row(3,'Metal surface',[self.preset]);row(4,'Element / a (Å) / c (Å)',[self.symbol,self.a,self.c])
-        row(5,'Miller indices (h k l)',self.indices)
+        row(2,'Metal surface',[self.preset]);row(3,'Element / a (Å) / c (Å)',[self.symbol,self.a,self.c])
+        row(4,'Miller indices (h k l)',self.indices)
         self.layer_title=Gtk.Label(label='Atomic layers',xalign=0)
-        grid.attach(self.layer_title,0,6,1,1);grid.attach(self.layers,1,6,3,1)
-        row(7,'In-plane repeat (nx ny)',self.repeat)
-        self.vacuum_title=row(8,'Vacuum EACH side (Å)',[self.vacuum])
+        grid.attach(self.layer_title,0,5,1,1);grid.attach(self.layers,1,5,3,1)
+        row(6,'In-plane repeat (nx ny)',self.repeat)
+        self.vacuum_title=row(7,'Vacuum EACH side (Å)',[self.vacuum])
         self.vacuum.set_tooltip_text('Total empty space is twice this value. Bottom keeps 0.1 Å below the slab and the remainder above.')
-        row(9,'Fix bottom geometric layers',[self.fixed]);row(10,'Layer tolerance (Å)',[self.tolerance])
+        row(8,'Fix bottom geometric layers',[self.fixed]);row(9,'Layer tolerance (Å)',[self.tolerance])
         self.center_button=Gtk.RadioButton.new_with_label_from_widget(None,'Center')
         self.bottom_button=Gtk.RadioButton.new_with_label_from_widget(self.center_button,'Bottom')
         for button,placement in ((self.center_button,'center'),(self.bottom_button,'bottom')):
             button.set_mode(False);button.connect('toggled',self.position_changed,placement)
-        row(11,'Slab position',[self.center_button,self.bottom_button])
+        row(10,'Slab position',[self.center_button,self.bottom_button])
         self.settings=grid;self.pack_start(grid,False,False,0)
         actions=Gtk.FlowBox();actions.set_selection_mode(Gtk.SelectionMode.NONE)
         self.build_button=Gtk.Button(label='Build surface');self.cancel_button=Gtk.Button(label='Cancel')
@@ -66,16 +68,27 @@ class SurfacePage(Gtk.Box):
         self.status.set_text('')
         from p4vasp.gtk3.install_hint import InstallHint
         self.install_hint=InstallHint('ASE','install-science.sh');self.pack_end(self.install_hint,False,False,0)
+        self.preset_button.connect('clicked',lambda *_:None if self._source_sync else self.set_source(0))
         self.use_bulk.connect('clicked',self.from_bulk);self.open_button.connect('clicked',self.open)
-        for widget in (self.source,self.preset,self.symbol,self.a,self.c,*self.indices,self.layers,*self.repeat,self.vacuum,self.fixed,self.tolerance):
+        for widget in (self.preset,self.symbol,self.a,self.c,*self.indices,self.layers,*self.repeat,self.vacuum,self.fixed,self.tolerance):
             widget.connect('changed',self.changed)
         self.build_button.connect('clicked',self.build);self.cancel_button.connect('clicked',self.cancel)
         self.preview_button.connect('clicked',self.preview);self.save_button.connect('clicked',self.save)
         self.connect('destroy',self.destroyed)
         self.update_fields();self.set_busy(False)
 
+    def sync_source_buttons(self):
+        self._source_sync=True
+        try:
+            for index,button in enumerate(self.source_buttons):button.set_active(index==self.source_mode)
+        finally:self._source_sync=False
+
+    def set_source(self,index,refresh=False):
+        previous=self.source_mode;self.source_mode=index;self.sync_source_buttons()
+        if previous!=index or refresh:self.changed()
+
     def update_fields(self):
-        preset=self.source.get_active()==0
+        preset=self.source_mode==0
         for widget in (self.preset,self.symbol,self.a):widget.set_sensitive(preset)
         self.c.set_sensitive(preset and self.preset.get_active_text()=='hcp0001')
         self._updating_fields=True
@@ -86,7 +99,7 @@ class SurfacePage(Gtk.Box):
         finally:self._updating_fields=False
         self.layer_title.set_text('Atomic layers' if preset else 'ASE equivalent layers')
         if preset:self.source_label.set_text('Metal preset uses standard ASE surface cells.')
-        elif self.source.get_active()==1:
+        elif self.source_mode==1:
             self.source_label.set_text('Bulk snapshot loaded; indices refer to its cell, not an automatically standardized cell.' if self.source_poscar else 'Click Use bulk result after building a crystal.')
         else:self.source_label.set_text(self.source_path or 'Choose a periodic bulk POSCAR / CIF.')
 
@@ -97,21 +110,25 @@ class SurfacePage(Gtk.Box):
         self.status.set_text('Settings changed. Build again; Miller indices refer to the chosen input cell.')
 
     def from_bulk(self,*_):
+        if self._source_sync:return
         result=self.bulk_result()
         if not result:
+            self.sync_source_buttons()
             self.status.set_text('Build a bulk structure in the Bulk tab first, then click Use bulk result.');return
-        self.source_poscar=result['poscar'];self.source.set_active(1);self.changed()
+        self.source_poscar=result['poscar'];self.set_source(1,refresh=True)
         self.source_label.set_text('Snapshot of bulk result: '+result['formula']+'; indices refer to this cell, with no automatic conventional-cell conversion.')
 
     def open(self,*_):
+        if self._source_sync:return
         self.file_dialog=CompactFileDialog(self.parent_window(),self.directory or '.', 'Open bulk POSCAR / CIF')
         path=self.file_dialog.run()
         if path:
-            self.source_path=str(path);self.directory=Path(path).parent;self.source.set_active(2);self.changed()
+            self.source_path=str(path);self.directory=Path(path).parent;self.set_source(2,refresh=True)
             self.source_label.set_text(str(path))
+        else:self.sync_source_buttons()
 
     def request(self):
-        source=('preset','poscar','file')[self.source.get_active()]
+        source=('preset','poscar','file')[self.source_mode]
         request=dict(source=source,placement=self.placement,preset=self.preset.get_active_text(),symbol=self.symbol.get_text(),
             a=self.a.get_text(),c=self.c.get_text(),indices=[w.get_text() for w in self.indices],
             layers=self.layers.get_text(),repeat=[w.get_text() for w in self.repeat],vacuum=self.vacuum.get_text(),

@@ -5,7 +5,7 @@
 
 ## 1. 快速生成Cu(111)
 
-1. Source选择 **Metal preset**，Metal surface选择 **fcc111**。
+1. 点击顶部 **Metal preset**，Metal surface选择 **fcc111**。
 2. Element填Cu，a填3.615 Å；这是可修改的演示输入，不是自动优化的晶格常数。
 3. Atomic layers填4，In-plane repeat填2、2。
 4. Vacuum EACH side填10 Å，Fix bottom geometric layers填2，Layer tolerance保留0.3 Å。
@@ -18,11 +18,16 @@
 
 ## 2. 来源与晶面约定
 
+顶部只有一排三个来源按钮：**Metal preset｜Use bulk result｜Open POSCAR / CIF**，高亮项表示当前来源。
+Use bulk result直接读取bulk结果快照，Open POSCAR / CIF直接打开选择窗口，无需先选下拉框。
+取消文件选择或bulk尚无结果时，保留之前的来源和已生成结构；成功载入新快照/文件后需重新Build。
+
+
 | 来源 | 操作与含义 |
 |---|---|
 | Metal preset | fcc111、fcc100、fcc110、bcc110、bcc100、bcc111、hcp0001；必须输入元素和晶格长度，hcp还需c。使用ASE对应标准表面构建器，层数为其原子层数。hcp0001的三指数显示为(0 0 1)。 |
-| Bulk result | 先在bulk页Build，再点击Use bulk result，取得该结果的POSCAR快照；不是实时追踪bulk之后的修改。 |
-| Structure file | Open POSCAR / CIF明确选择周期体相结构；CIF多数据块读取最后一份，POSCAR按单结构读取；不自动给分子添加晶胞。 |
+| Use bulk result | 先在bulk页Build，再点击Use bulk result，取得该结果的POSCAR快照；不是实时追踪bulk之后的修改。 |
+| Open POSCAR / CIF | Open POSCAR / CIF明确选择周期体相结构；CIF多数据块读取最后一份，POSCAR按单结构读取；不自动给分子添加晶胞。 |
 
 后两种来源调用ASE通用surface。**(h k l)相对于输入晶胞，不自动转换成常规胞**。
 如果希望使用通常文献中的常规胞指数，应先提供相应常规胞；例如在Bulk页对支持的晶型选择cubic。

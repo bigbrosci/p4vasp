@@ -643,3 +643,15 @@ are errors. Aggregated sources permit shell totals only. f columns follow VASP's
 ordered real harmonics; old plotting f1..f7 map to pymatgen f_3..f3 for Use last DOS
 line. Metrics use the selected summed spectrum, labels identify its shell or
 selected-band for mixed shells, and standalone replay preserves the label.
+
+
+### Surface source actions (2026-11-24)
+
+SurfacePage replaces the Source combo plus separate loaders with one row of
+three toggle actions: Metal preset, Use bulk result, Open POSCAR / CIF.
+source_mode changes only after a successful load (or explicit preset choice);
+a synchronization guard prevents GTK's programmatic toggle/click callbacks from
+re-entering source actions. Cancellation/unavailable Bulk restores button state
+without invalidating the previous result. Successful snapshot/file reloads invalidate
+results even when the source kind stays the same. ModelsApplet/models.glade host
+and toolbar wiring are unchanged; the page is built by the GTK3 adapter code.

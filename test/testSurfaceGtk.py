@@ -24,6 +24,9 @@ def main():
     assert not hasattr(models,'surface_page')
     models.notebook.set_current_page(3);page=models.surface_page
     assert page.result is None and not page.save_button.get_sensitive()
+    assert not hasattr(page,'source')
+    assert [button.get_label() for button in page.source_buttons]==['Metal preset','Use bulk result','Open POSCAR / CIF']
+    assert page.preset_button.get_active() and page.source_mode==0
     page.preset.set_active(1)
     assert [w.get_text() for w in page.indices]==['1','0','0']
     page.preset.set_active(0)
@@ -39,6 +42,13 @@ def main():
             time.sleep(.01)
         raise AssertionError('Timed out waiting for Surface UI')
     try:
+        # Unavailable bulk and cancelled file selection preserve current source/result.
+        page.use_bulk.clicked()
+        assert page.source_mode==0 and page.preset_button.get_active()
+        with patch('p4vasp.gtk3.surface.CompactFileDialog') as chooser:
+            chooser.return_value.run.return_value=None
+            page.open_button.clicked()
+        assert page.source_mode==0 and page.preset_button.get_active()
         ticks=[];timer=GLib.timeout_add(10,lambda:(ticks.append(1),True)[1])
         page.build_button.clicked();assert page.task is not None
         assert not page.settings.get_sensitive() and page.cancel_button.get_sensitive()
@@ -112,10 +122,16 @@ def main():
                     browser.select_file(path);browser.dialog.response(Gtk.ResponseType.OK);return False
                 return True
             GLib.timeout_add(30,answer);page.open_button.clicked()
-            assert page.source_path==str(path) and page.source.get_active()==2
+            assert page.source_path==str(path) and page.source_mode==2
             page.build_button.clicked();pump(lambda:page.task is None)
             assert page.result is not None,page.status.get_text()
             assert 'path' not in page.result['request']
+            old_result=page.result
+            with patch('p4vasp.gtk3.surface.CompactFileDialog') as chooser:
+                chooser.return_value.run.return_value=None
+                page.open_button.clicked()
+            assert page.result is old_result and page.source_mode==2
+            assert page.open_button.get_active() and sum(b.get_active() for b in page.source_buttons)==1
             # Changing input invalidates saves and hides the old surface preview.
             page.fixed.set_text('0')
             assert page.result is None and not page.save_button.get_sensitive() and page.preview_window is None
@@ -130,7 +146,7 @@ def main():
             page.finished(fake,result,None)
             assert page.result is None and 'cancelled' in page.status.get_text().lower()
         # Screenshot is the actual scrolled Surface content after a clean preset build.
-        page.source.set_active(0);page.layers.set_text('4');page.fixed.set_text('2');page.center_button.set_active(True)
+        page.preset_button.clicked();page.layers.set_text('4');page.fixed.set_text('2');page.center_button.set_active(True)
         for field in page.repeat:field.set_text('2')
         page.build_button.clicked();pump(lambda:page.task is None)
         assert page.result is not None,page.status.get_text()
