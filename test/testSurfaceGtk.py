@@ -104,11 +104,18 @@ def main():
             assert (out/'POSCAR').read_bytes()==before
             # Bulk -> Surface takes an explicit snapshot and retains bulk output.
             models.notebook.set_current_page(2);bulk=models.bulk_page
-            bulk.mode.set_active(2);bulk.build_button.clicked();pump(lambda:bulk.task is None)
+            bulk.mode.set_active(2);bulk.fields['a'].set_text('3.6345');bulk.build_button.clicked();pump(lambda:bulk.task is None)
             assert bulk.result is not None,bulk.status.get_text()
             original=bulk.result['poscar']
             models.notebook.set_current_page(3);page.use_bulk.clicked()
             assert page.source_poscar==original and page.result is None
+            assert page.a.get_text()=='3.6345' and page.symbol.get_text()=='Cu'
+            assert not page.a.get_sensitive()
+            assert 'a' not in page.request() and page.request()['poscar']==original
+            import cairo
+            window.check_resize();pump()
+            shot=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+            window.draw(cairo.Context(shot));shot.write_to_png('/tmp/p4vasp-surface-bulk-lattice.png')
             page.repeat[0].set_text('1');page.repeat[1].set_text('1')
             page.build_button.clicked();pump(lambda:page.task is None)
             assert page.result is not None,page.status.get_text()
@@ -146,7 +153,8 @@ def main():
             page.finished(fake,result,None)
             assert page.result is None and 'cancelled' in page.status.get_text().lower()
         # Screenshot is the actual scrolled Surface content after a clean preset build.
-        page.preset_button.clicked();page.layers.set_text('4');page.fixed.set_text('2');page.center_button.set_active(True)
+        page.preset_button.clicked();assert page.a.get_text()=='3.615' and page.a.get_sensitive()
+        page.layers.set_text('4');page.fixed.set_text('2');page.center_button.set_active(True)
         for field in page.repeat:field.set_text('2')
         page.build_button.clicked();pump(lambda:page.task is None)
         assert page.result is not None,page.status.get_text()

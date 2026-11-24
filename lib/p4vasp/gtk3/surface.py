@@ -15,6 +15,7 @@ class SurfacePage(Gtk.Box):
         self.bulk_result=bulk_result
         self.result=None;self.task=None;self.alive=True;self.directory=None;self.preview_window=None
         self.source_poscar=None;self.source_path=None;self.placement='center';self._positioning=False
+        self.bulk_parameters={};self._showing_preset=True
         grid=Gtk.Grid(column_spacing=8,row_spacing=8)
         self.source_mode=0
         self.preset_button=Gtk.ToggleButton(label='Metal preset')
@@ -93,6 +94,14 @@ class SurfacePage(Gtk.Box):
         self.c.set_sensitive(preset and self.preset.get_active_text()=='hcp0001')
         self._updating_fields=True
         try:
+            fields=(self.symbol,self.a,self.c)
+            if not preset:
+                if self._showing_preset:self._preset_values=[widget.get_text() for widget in fields]
+                values=[self.bulk_parameters.get(key,'') for key in ('name','a','c')] if self.source_mode==1 else ['','','']
+                for widget,value in zip(fields,values):widget.set_text(str(value))
+            elif not self._showing_preset:
+                for widget,value in zip(fields,self._preset_values):widget.set_text(value)
+            self._showing_preset=preset
             for widget,value in zip(self.indices,PRESETS[self.preset.get_active_text()]):
                 widget.set_sensitive(not preset)
                 if preset and widget.get_text()!=str(value):widget.set_text(str(value))
@@ -100,7 +109,7 @@ class SurfacePage(Gtk.Box):
         self.layer_title.set_text('Atomic layers' if preset else 'ASE equivalent layers')
         if preset:self.source_label.set_text('Metal preset uses standard ASE surface cells.')
         elif self.source_mode==1:
-            self.source_label.set_text('Bulk snapshot loaded; indices refer to its cell, not an automatically standardized cell.' if self.source_poscar else 'Click Use bulk result after building a crystal.')
+            self.source_label.set_text('Bulk snapshot loaded. Lattice fields show its build inputs (read only); cutting uses the full cell, including repeats.' if self.source_poscar else 'Click Use bulk result after building a crystal.')
         else:self.source_label.set_text(self.source_path or 'Choose a periodic bulk POSCAR / CIF.')
 
     def changed(self,*_):
@@ -115,8 +124,8 @@ class SurfacePage(Gtk.Box):
         if not result:
             self.sync_source_buttons()
             self.status.set_text('Build a bulk structure in the Bulk tab first, then click Use bulk result.');return
-        self.source_poscar=result['poscar'];self.set_source(1,refresh=True)
-        self.source_label.set_text('Snapshot of bulk result: '+result['formula']+'; indices refer to this cell, with no automatic conventional-cell conversion.')
+        self.source_poscar=result['poscar'];self.bulk_parameters=dict(result.get('request',{}));self.set_source(1,refresh=True)
+        self.source_label.set_text('Snapshot of bulk result: '+result['formula']+'; lattice fields are read only. Cutting uses this full input cell.')
 
     def open(self,*_):
         if self._source_sync:return

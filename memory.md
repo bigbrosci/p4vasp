@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Surface Bulk晶格显示修正（2026-11-24）
+
+- 用户报告Bulk用Cu a=3.6345而Surface灰框仍3.615。源码确认切面已使用完整POSCAR快照，旧灰框为未刷新的Metal preset默认值，未覆盖科学输入。现from_bulk保存其原始request，update_fields只读显示name/a/c；导入文件清空这些预设框，回Metal preset恢复之前缓存，guard避免字段同步触发失效回调。不把输入a等同于原胞/超胞基矢长度。
+- Linux/WSL实际GTK用3.6345生成Cu bulk、快照切面/显示值/只读检查、request不含预设a且完整POSCAR不变通过；原Surface来源/预览/Center/Bottom/保存/取消回归通过，/tmp/surface-bulk-lattice-gtk.log，实际截图/tmp/p4vasp-surface-bulk-lattice.png已查看。语法/diff及操作/架构/双语同步；科学算法/依赖/环境不变，Windows未重包，Mac/Windows本改动未验收。
+
 ## Surface来源合并三按钮（2026-11-24）
 
 - 用户确认删除Source下拉框，与原读取按钮合并为Metal preset／Use bulk result／Open POSCAR / CIF等宽一排ToggleButton，高亮当前来源。surface.py用source_mode，选预设直接切换，成功读取Bulk快照/文件后再切换并使旧结果失效；同类来源重读也失效，取消文件或无Bulk结果则恢复按钮并保留原来源/结果。GTK set_active可能触发clicked，_source_sync防重入；不改ASE算法、输出recipe、models.glade/ModelsApplet/工具栏入口。

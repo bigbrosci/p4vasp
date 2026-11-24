@@ -655,3 +655,8 @@ re-entering source actions. Cancellation/unavailable Bulk restores button state
 without invalidating the previous result. Successful snapshot/file reloads invalidate
 results even when the source kind stays the same. ModelsApplet/models.glade host
 and toolbar wiring are unchanged; the page is built by the GTK3 adapter code.
+
+Surface Bulk import also copies its build request into read-only Element/a/c
+fields, rather than leaving stale preset defaults. Those fields do not override
+the full POSCAR snapshot used for cutting. File sources clear the preset fields;
+returning to Metal preset restores the user's cached preset entries.

@@ -21,6 +21,7 @@
 顶部只有一排三个来源按钮：**Metal preset｜Use bulk result｜Open POSCAR / CIF**，高亮项表示当前来源。
 Use bulk result直接读取bulk结果快照，Open POSCAR / CIF直接打开选择窗口，无需先选下拉框。
 取消文件选择或bulk尚无结果时，保留之前的来源和已生成结构；成功载入新快照/文件后需重新Build。
+Use bulk result后，灰色Element/a/c显示Bulk生成时的输入参数，仅供核对；实际切面采用完整结构快照，包括超胞。需要改晶格时回bulk修改并重新生成，再点Use bulk result。导入文件时这些预设参数框留空，使用文件晶胞；切回Metal preset会恢复原先预设输入。
 
 
 | 来源 | 操作与含义 |
