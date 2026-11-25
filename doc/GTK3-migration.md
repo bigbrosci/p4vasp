@@ -72,6 +72,14 @@ was exercised on Linux; macOS execution has not been verified in this session.
 
 ## Verification
 
+The main frame footer (`frame.glade` → `FrameMessageDriver` →
+`gtk3/daily_status.py`) uses the local date to look up the read-only bundled
+SQLite schedule. Dates outside the schedule use the JSON rotation. The footer
+refreshes once a minute while idle and preserves task and error messages. Its
+tooltip shows the scheduled date, source details, and reflection question.
+Run `test/testDailyStatusGtk.py` with the same environment and display as the
+GTK checks below to check calendar lookup, footer layout, and status priority.
+
 The Vibrations toolbar entry (2026-11-07) loads `vibrations.glade` and
 `VibrationsApplet`, whose page uses a GTK/Cairo 3D projection, independently of
 the native FLTK Show window. ASE parsing/thermochemistry runs in a short-lived

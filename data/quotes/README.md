@@ -1,6 +1,24 @@
 # 每日一句
 
-`daily.json`保存离线经典语句、篇名和参考网址。当前16条（12条中文、4条英文），按本机日历日期顺序轮换；同一天重复启动不随机更换，16天后循环。程序每分钟检查日期，仅空闲时更新，不覆盖任务或错误。
+`daily.sqlite3` 的 `daily_quotes` 表按 `publish_date`（本机日历的 YYYY-MM-DD）安排每日一句。首批从 2026-11-25 至 2029-08-20，共 1000 条，含 16 条原创与 984 条节选。底部显示语句和作者，悬停可查看日期、出处和思考问题。程序启动时只读载入，每分钟检查日期，仅空闲时更新。
+
+英文节选来自以下公版译本。每条记录有作者、作品、译者、章节或条目编号及来源网址。多数节选由程序筛选，思考问题按主题共用；开头几条经过人工挑选并配有专属问题。
+
+- [La Rochefoucauld, Reflections; or Sentences and Moral Maxims](https://www.gutenberg.org/ebooks/9105)
+- [Nietzsche, Human, All Too Human, Part I](https://www.gutenberg.org/ebooks/51935) 与 [Part II](https://www.gutenberg.org/ebooks/37841)
+- [Pascal, Pensées](https://www.gutenberg.org/ebooks/18269)
+- [Marcus Aurelius, Thoughts of Marcus Aurelius](https://www.gutenberg.org/ebooks/6920)
+- [Epictetus, The Golden Sayings of Epictetus](https://www.gutenberg.org/ebooks/871)
+
+维护者可检查或延长日期表，修改后重启生效。
+
+```sql
+SELECT publish_date, quote, author FROM daily_quotes ORDER BY publish_date;
+```
+
+### 未排期日期的后备词库
+
+数据库不可读或当天没有排期时，按本机日期轮换使用 `daily.json` 中的 16 条语句（12 条中文、4 条英文）。
 
 语句取自公版古籍《论语·为政》《荀子·劝学》《老子》第六十四章，文字按简体与现代标点整理，部分为原文节选。参考网页为Chinese Text Project：
 

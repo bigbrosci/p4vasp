@@ -2,7 +2,7 @@
 import sys
 from p4vasp.gtk3 import GLib
 from gi.repository import Pango
-from p4vasp.daily_quotes import load_quotes, quote_for_day
+from p4vasp.daily_quotes import load_quotes, load_schedule, quote_for_day
 
 
 class DailyStatus:
@@ -13,6 +13,7 @@ class DailyStatus:
             load_chinese_font()
         self.label = label
         self.records = load_quotes()
+        self.schedule = load_schedule()
         self.idle = True
         label.set_line_wrap(True)
         label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
@@ -27,13 +28,21 @@ class DailyStatus:
 
     def refresh(self, today=None):
         if self.idle:
-            quote = quote_for_day(self.records, today)
+            quote = quote_for_day(self.records, today, schedule=self.schedule)
             if quote.get('language') == 'en':
                 text = quote['text']+' — '+quote['source']
             else:
                 text = quote['text']+' ——《'+quote['source']+'》'
             self.label.set_text(text)
-            self.label.set_tooltip_text(text+'\n'+quote['url'])
+            details = [text]
+            if quote.get('publish_date'):
+                details.append(quote['publish_date'])
+                if quote['work']:
+                    details.append(f"{quote['work']}, {quote['locator']} (tr. {quote['translator']})")
+                details.append(quote['reflection_question'])
+            if quote['url']:
+                details.append(quote['url'])
+            self.label.set_tooltip_text('\n'.join(details))
         return True
 
     def status(self, text):

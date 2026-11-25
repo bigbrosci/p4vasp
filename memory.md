@@ -1,6 +1,11 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 每日一句日期词库（2026-11-25）
+
+- 主窗口空闲底栏从 `data/quotes/daily.sqlite3` 只读加载 1000 条排期，按本机日期选择（2026-11-25 至 2029-08-20）；悬停查看日期、出处和思考问题。无当日排期或数据库不可用时使用原中英文词库，任务/错误优先。
+- 本机 macOS arm64 PyGObject/GTK3 实际窗口验证了排期切换、同栏对齐、状态优先及定时器销毁，已查看 /tmp/p4vasp-daily-quote.png。10 GTK、58 基础、SQLite 完整性及缺失/损坏后备通过。当前源码版重启生效。Windows 规格已收录整个 data 目录，未重建或验证 Windows 包，也未运行 Linux GUI。详细记录见 [11 月 25 日更新](update_history/update_2026_11_25.md)。
 
 ## Windows新版交付完成（2026-11-24）
 
