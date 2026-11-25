@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 单原子磁矩来源说明（2026-11-25）
+
+- 用户指出Fe原子参考4与p4vasp data预设3不一致。AtomInputDialog把Use reference改名Use atomic 2S，在设置区明确显示NIST中性自由原子LS的2S估计及当前个人/默认Magmom预设，说明均非最终DFT磁矩；Fe S=2/多重度5→4 μB，预设3是独立可编辑初始化，不宣称实验体相值。按钮逻辑/全局数据/默认空MAGMOM不变，原Models资源/入口不变。
+- 本机Linux/WSL实际弹窗回归验证Fe来源/2S=4/当前预设/按钮填4及原电荷/约束/预览=导出/取消流程；日志/tmp/atomic-moment-source-gtk.log。语法/diff通过，指南及双语同步；无新依赖或Windows包，Mac/Windows未验收。
+
 ## 单原子固相结构参考（2026-11-25）
 
 - 用户要求补充常温稳定晶型、气体低温固相。AtomInputDialog增加Phase (~298 K, ~1 bar)、Solid structure、Structure conditions只读行及独立晶体来源链接；现有滚动设置/底部Generate保留，ModelsApplet/models.glade/工具栏无改动。atomic_reference.crystal_reference独立缓存data/resources/crystal_states.json，83元素条目逐项保存相态/结构/条件/注释/URL，未审阅元素Unknown，不猜超重元素。默认单原子/自旋及输入生成不受晶型驱动。

@@ -24,7 +24,8 @@ class AtomInputDialog(Gtk.Dialog):
         box=Gtk.Box(orientation=Gtk.Orientation.VERTICAL,spacing=8);box.set_border_width(12);scroll.add(box)
         notebook.append_page(scroll,Gtk.Label(label='Atom & settings'))
         info=Gtk.Grid(column_spacing=12,row_spacing=5)
-        mass=ElementData(ResourceStore()).rows[NUMBERS[self.symbol]-1][2]
+        element_row=ElementData(ResourceStore()).rows[NUMBERS[self.symbol]-1]
+        mass=element_row[2]
         ref=self.reference;mult=ref.get('multiplicity');spin=ref.get('spin')
         crystal=crystal_reference(self.symbol)
         self.reference_labels={}
@@ -66,8 +67,13 @@ class AtomInputDialog(Gtk.Dialog):
         self.magmom=entry(saved.get('magmom') if saved.get('magmom') is not None else '')
         self.magmom.set_placeholder_text('Optional initial moment')
         magbox=Gtk.Box(spacing=5);magbox.pack_start(self.magmom,True,True,0)
-        self.use_reference=Gtk.Button(label='Use reference');self.use_reference.connect('clicked',self.apply_reference)
+        self.use_reference=Gtk.Button(label='Use atomic 2S');self.use_reference.connect('clicked',self.apply_reference)
         magbox.pack_start(self.use_reference,False,False,0);row(2,'MAGMOM (μB)',magbox)
+        atomic_moment='Unknown' if spin is None else '%g μB'%(2*spin)
+        saved_moment=(element_row[7]+' μB') if element_row[7] else 'Not set'
+        self.moment_source=Gtk.Label(label='Use atomic 2S: NIST neutral free-atom LS spin, 2S = '+atomic_moment+'.\np4vasp data Magmom: '+saved_moment+' (editable initial-moment preset; separate source).\nNeither value guarantees the converged DFT magnetic moment.',xalign=0)
+        self.moment_source.set_line_wrap(True);self.moment_source.set_max_width_chars(60)
+        grid.attach(self.moment_source,0,7,2,1)
         self.constrain=Gtk.CheckButton(label='Constrain spin (NUPDOWN)')
         self.constrain.set_active(saved.get('nupdown') is not None);grid.attach(self.constrain,0,3,2,1)
         self.nupdown=entry(saved.get('nupdown') if saved.get('nupdown') is not None else '')
@@ -124,7 +130,7 @@ class AtomInputDialog(Gtk.Dialog):
             self.nupdown.set_sensitive(spin and self.constrain.get_active())
             suggestion=self.suggestion()
             self.use_reference.set_sensitive(spin and suggestion is not None)
-            self.use_reference.set_tooltip_text(('Neutral LS estimate: 2S = %g μB; check POTCAR valence and the DFT state.'%suggestion) if suggestion is not None else 'Enter spin manually for charged, unknown or heavy-atom states.')
+            self.use_reference.set_tooltip_text(('NIST neutral free-atom LS spin: 2S = %g μB. Independent of the p4vasp data Magmom preset; check POTCAR valence and the DFT state.'%suggestion) if suggestion is not None else 'Enter spin manually for charged, unknown or heavy-atom states.')
             files=input_contents(self.symbol,self.config,self.request())
             self.preview.get_buffer().set_text(files['INCAR']);self.generate.set_sensitive(True)
             self.status.set_text('Charged template: complete NELECT using POTCAR before running.' if 'SET_AFTER_POTCAR' in files['INCAR'] else '')

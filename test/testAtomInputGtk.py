@@ -63,6 +63,22 @@ with tempfile.TemporaryDirectory() as name:
     dialog.constrain.set_active(True);assert dialog.nupdown.get_text()=='2'
     assert parse_custom(preview(dialog))['MAGMOM']=='2'
     dialog.response(Gtk.ResponseType.CANCEL)
+    page.buttons['Fe'].clicked();dialog=page.atom_dialog;pump()
+    assert dialog.reference['spin']==2 and dialog.reference['multiplicity']==5
+    assert 'NIST' in dialog.moment_source.get_text() and '2S = 4 μB' in dialog.moment_source.get_text()
+    from p4vasp.element_data import ElementData, NUMBERS
+    from p4vasp.resource_data import ResourceStore
+    preset=ElementData(ResourceStore()).rows[NUMBERS['Fe']-1][7]
+    assert 'p4vasp data Magmom: '+preset+' μB' in dialog.moment_source.get_text()
+    dialog.use_reference.clicked();assert dialog.magmom.get_text()=='4'
+    assert dialog.use_reference.get_label()=='Use atomic 2S'
+    container=dialog.moment_source.get_parent()
+    while not isinstance(container,Gtk.ScrolledWindow):container=container.get_parent()
+    adjustment=container.get_vadjustment();adjustment.set_value(adjustment.get_upper()-adjustment.get_page_size());pump()
+    import cairo
+    surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,dialog.get_allocated_width(),dialog.get_allocated_height())
+    dialog.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-fe-moment-source.png')
+    dialog.response(Gtk.ResponseType.CANCEL)
     page.buttons['He'].clicked();dialog=page.atom_dialog;pump()
     assert '25 bar' in dialog.reference_labels['Structure conditions'].get_text()
     assert 'No ambient-pressure solid' in dialog.reference_labels['Solid structure'].get_text()
