@@ -45,6 +45,16 @@ with tempfile.TemporaryDirectory() as root:
 for _ in range(20):
     while Gtk.events_pending():Gtk.main_iteration()
     time.sleep(.01)
+window.set_size_request(420,320)
+for _ in range(20):
+    while Gtk.events_pending():Gtk.main_iteration()
+    time.sleep(.01)
+for button in page.buttons.values():
+    x,y=button.translate_coordinates(page.grid,0,0)
+    assert x>=0 and y>=0
+    assert x+button.get_allocated_width()<=page.grid.get_allocated_width()
+    assert y+button.get_allocated_height()<=page.grid.get_allocated_height()
+assert page.symbol=='Fe' and page.generate.get_sensitive()
 window.get_pixbuf().savev('/tmp/p4vasp-single-atom-page.png','png',[],[])
 window.destroy()
 print('PASS: periodic selection, compact folder dialog, create/cancel, Generate inputs wiring')

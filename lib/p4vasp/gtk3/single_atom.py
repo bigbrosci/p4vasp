@@ -1,6 +1,8 @@
 """Periodic selection and a compact new-folder dialog for isolated atoms."""
 from pathlib import Path
 from p4vasp.gtk3 import Gtk
+from gi.repository import Pango
+from p4vasp.gtk3.periodic_grid import FittedPeriodicGrid
 from p4vasp.gtk3.file_dialogs import FolderDialog, fit_dialog, entry, error_label
 from p4vasp.element_data import SYMBOLS, PERIODS
 from p4vasp.single_atom_inputs import write_inputs
@@ -58,23 +60,23 @@ class SingleAtomPage(Gtk.Box):
         self.generate.connect('clicked',self.generate_inputs)
         actions.pack_start(self.selection,True,True,0);actions.pack_start(self.generate,False,False,0)
         self.pack_start(actions,False,False,0)
-        grid=Gtk.Grid(column_spacing=3,row_spacing=4,column_homogeneous=True)
-        style=Gtk.CssProvider()
-        style.load_from_data(b'.single-atom-element { padding: 2px 4px; min-width: 26px; }')
+        self.grid=grid=FittedPeriodicGrid(columns=18,rows=9)
         for row,period in enumerate(PERIODS):
             for symbol,column in period:
                 number=SYMBOLS.index(symbol)+1
                 button=Gtk.Button(label=str(number)+'\n'+symbol)
                 button.get_style_context().add_class('single-atom-element')
-                button.get_style_context().add_provider(style,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+                button.get_style_context().add_class('element-tile')
+                grid.track(button);grid.track(button.get_child())
                 button.set_tooltip_text(symbol+' — atomic number '+str(number))
                 button.connect('clicked',self.choose,symbol)
                 grid.attach(button,column,row,1,1);self.buttons[symbol]=button
-        scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        scroll.add(grid);self.pack_start(scroll,True,True,0)
+        self.pack_start(grid,True,True,0)
         self.status=Gtk.Label(xalign=0)
         self.status.set_no_show_all(True)
-        self.status.set_line_wrap(True);self.pack_start(self.status,False,False,0)
+        self.status.set_line_wrap(True);self.status.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
+        self.status.set_width_chars(1);self.status.set_max_width_chars(70)
+        self.pack_start(self.status,False,False,0)
 
     def choose(self,button,symbol):
         if self.symbol:self.buttons[self.symbol].get_style_context().remove_class('suggested-action')

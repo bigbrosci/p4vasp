@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Single atom周期表同步自适应（2026-11-25）
+
+- 用户要求single atom同样完整显示。将FittedPeriodicGrid抽到gtk3/periodic_grid.py，参数化行/列，ElementTable沿用默认19×11；SingleAtom用原18×9元素布局，移除固定最小宽度及ScrolledWindow，共用按可用宽高调整字号/格子逻辑。保留原灰色按钮/选中高亮、Generate inputs及保存目录流程；输出路径改按字符换行，避免长路径撑宽面板。
+- Linux/WSL实际完整p4v双标签首次/多次缩放/最大化/还原，全部118格及网格在面板内，SingleAtom可选Og/H并启用生成；实际SingleAtom生成/取消/目录按钮连线及小面板含输出路径的边界检查通过。/tmp/p4vasp-single-atom-fit-{compact,maximized}.png截图已查看。个人元素编辑回归、1 Models惰性、10 GTK和33面板通过，日志/tmp/single-atom-fit-{frame,inputs,editor,lazy,adapter,smoke}.log，语法/diff通过。已知还原GTK自然分配警告及原生析构/弃用提示未修复，未当作新增通过项。
+- 操作/架构及当日双语同步，无科学输入算法/依赖/环境变化、快照或Windows重打包，Mac/Windows未验收；当前任务完成，源码重启生效。
+
 ## 周期表自动适配面板（2026-11-25）
 
 - 用户报告初次打开p4vasp data不完整，最大化才全。ElementTable移除40×44固定格子及表格ScrolledWindow，FittedPeriodicGrid提供较小最小请求、按可用宽高计算共用字号/零最小padding，调用原生Gtk.Grid分配；保留118按钮、族/周期/f区、焦点/悬停/属性及个人Save。窗体越小字号越小，无需周期表横纵滚动；主窗其他控件仍有自己的最小尺寸。

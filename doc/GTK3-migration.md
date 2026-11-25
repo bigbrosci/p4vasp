@@ -697,3 +697,14 @@ There is no horizontal/vertical table scrollbar. testPeriodicFitGtk exercises th
 actual application frame at initial size, multiple resizes, maximize and restore,
 checking every tile's mapped bounds and opening Og. Other app controls retain
 their own minimum window size; tiny panels trade text size for a complete table.
+
+
+### Single atom shares periodic fitting (2026-11-25)
+
+FittedPeriodicGrid now lives in gtk3/periodic_grid.py, reused by ElementTable
+(default 19 columns/11 rows including headers) and SingleAtomPage (its original
+18 columns/9 rows). Single atom removes its fixed tile CSS and scroll viewport,
+but keeps native buttons, selection highlighting, Generate inputs and folder
+workflow. Output paths use character wrapping so they cannot widen the page.
+The full-frame fit test covers both tabs and selection across resize/maximize;
+testSingleAtomGtk also checks small-panel tile bounds after actual input export.

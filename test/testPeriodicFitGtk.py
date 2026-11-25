@@ -67,8 +67,22 @@ def main():
         assert window.get_window().get_state() & Gdk.WindowState.MAXIMIZED
         capture('/tmp/p4vasp-periodic-fit-maximized.png')
         window.unmaximize();window.resize(640,480);pump(.8);check()
+        # Single atom uses the same fitter with its original 18-column/9-row layout.
+        models.notebook.set_current_page(0);pump()
+        page=models._page_contents[0]
+        assert page.symbol is None and not page.generate.get_sensitive()
+        for width,height in ((640,480),(1100,740),(600,400)):
+            window.resize(width,height);pump(.6);check()
+            page.buttons['Og'].clicked()
+            assert page.symbol=='Og' and page.generate.get_sensitive()
+        capture('/tmp/p4vasp-single-atom-fit-compact.png')
+        window.maximize();pump(.8);check()
+        capture('/tmp/p4vasp-single-atom-fit-maximized.png')
+        window.unmaximize();window.resize(640,480);pump(.8);check()
+        page.buttons['H'].clicked();assert page.symbol=='H'
+        models.notebook.set_current_page(4);pump();page=models.element_table;check()
         assert not (folder/'profile').exists(),'Layout checks must not save user settings'
-        print('PASS full-frame initial/resize/maximize/restore: all 118 tiles visible and last element editable',flush=True)
+        print('PASS full-frame initial/resize/maximize/restore: both periodic pages fit all 118 tiles; editing/selection preserved',flush=True)
 
 if __name__=='__main__':
     main();os._exit(0)
