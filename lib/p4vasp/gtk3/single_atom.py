@@ -53,7 +53,7 @@ class SingleAtomPage(Gtk.Box):
     def __init__(self):
         super().__init__(orientation=Gtk.Orientation.VERTICAL,spacing=8)
         self.set_border_width(8)
-        self.symbol=None;self.directory=None;self.buttons={}
+        self.symbol=None;self.directory=None;self.buttons={};self.atom_dialog=None;self.input_settings={}
         actions=Gtk.Box(spacing=12)
         self.selection=Gtk.Label(label='Choose an element.',xalign=0)
         self.generate=Gtk.Button(label='Generate inputs');self.generate.set_sensitive(False)
@@ -77,17 +77,23 @@ class SingleAtomPage(Gtk.Box):
         self.status.set_line_wrap(True);self.status.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
         self.status.set_width_chars(1);self.status.set_max_width_chars(70)
         self.pack_start(self.status,False,False,0)
+        self.connect('destroy',lambda *_:self.atom_dialog.destroy() if self.atom_dialog is not None else None)
 
     def choose(self,button,symbol):
         if self.symbol:self.buttons[self.symbol].get_style_context().remove_class('suggested-action')
         self.symbol=symbol;button.get_style_context().add_class('suggested-action')
         self.selection.set_text('Selected: '+symbol);self.generate.set_sensitive(True)
+        if self.atom_dialog is not None:self.atom_dialog.destroy()
+        self.generate_inputs()
 
     def generate_inputs(self,*args):
         if self.symbol is None:return
-        parent=self.get_toplevel();parent=parent if isinstance(parent,Gtk.Window) else None
-        output=InputFolderDialog(parent,self.symbol,self.directory).run()
-        if output is not None:
-            self.directory=output.parent
-            self.status.set_text('Created INCAR, KPOINTS and POSCAR in: '+str(output))
-            self.status.show()
+        if self.atom_dialog is not None:self.atom_dialog.present();return
+        from p4vasp.gtk3.atom_input import AtomInputDialog
+        try:self.atom_dialog=AtomInputDialog(self)
+        except Exception as error:
+            self.status.set_text('Cannot prepare single-atom inputs: '+str(error));self.status.show();return
+        self.atom_dialog.connect('destroy',self.atom_dialog_closed)
+        self.atom_dialog.show_all()
+
+    def atom_dialog_closed(self,*_):self.atom_dialog=None

@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 单原子参考与计算设置弹窗（2026-11-25）
+
+- 用户批准选择元素后弹出基本资料/电子组态及自旋设置。SingleAtomPage.choose自动打开gtk3/atom_input.py的AtomInputDialog，主Generate可重开；只读名称/Z/当前质量/NIST中性组态/能级/LS对应S和多重度，设置Charge、ISPIN、可选MAGMOM、默认关闭NUPDOWN约束、可选POTCAR ZVAL及盒子。INCAR preview与导出同一快照，成功后记住该元素本会话设置，Cancel不写全局元素资料/文件；内容可滚动，底部操作始终可见。
+- atomic_reference.py只读缓存data/resources/atomic_states.json；官方NIST ASD5.12(2024)中性H–Hs108项，工具抓取的表格行atomic_states_source.txt及tools/import_atomic_reference.py可重建，来源/DOI/2026-11-25日期/SHA在JSON。LS自旋从已指认项前缀提取，jj/仅J或快照外均Unknown，不由J或全电子配置猜POTCAR。可用中性Z≤86时Use reference明确填2S初始矩；带电/未知/重原子需手动，参考不强加占据或保证DFT基态。
+- single_atom_inputs新增settings_values和可选settings参数，旧API默认仍三文件/13×14×15中心单原子/Gamma1³、ISPIN2/ALGOALL/NELM500且无显式MAGMOM。清理通用标准的MAGMOM/NELECT/NUPDOWN/SOC标记后应用显式设置；约束时空MAGMOM与NUPDOWN一致，验证有限值/正盒长/整数Charge/NUPDOWN、已知ZVAL时电子数及奇偶。中性NELECT省略，带电且ZVAL已知按ZVAL−Charge；未知则明确NELECT=SET_AFTER_POTCAR模板，弹窗/目录/主状态提示运行前补全，不读/生成POTCAR。
+- Linux/WSL：8输入/来源重建回归通过（全部118默认、正负电荷/自旋/盒子/奇偶/防覆盖/失败清理、108组态电子总数/LS奇偶及NIST代表条目），实际新弹窗参考/格式/按键/约束/缺资料/精确INCAR预览=写出/重开/取消通过，截图/tmp/p4vasp-atomic-reference-settings.png已查看。原SingleAtom文件/文件夹流程、完整双周期表缩放、1 Models惰性、10 GTK、33面板、58基础及语法/diff通过；日志/tmp/atom-popup-{inputs,gtk,single,fit,lazy,adapter,editor,smoke,base}.log。旧offscreen单原子测试因Wayland窗口/模态阻塞已停止，改真实Window后通过；主窗旧restore警告及析构/弃用提示不宣称修复。
+- 操作专用doc/single-atom-zh.md、资源README、架构及双语同步。无新依赖/环境/快照/原生重编或Windows包，Mac/Windows未验收；源码版重启后使用，未访问私有example，任务完成。
+
 ## Single atom周期表同步自适应（2026-11-25）
 
 - 用户要求single atom同样完整显示。将FittedPeriodicGrid抽到gtk3/periodic_grid.py，参数化行/列，ElementTable沿用默认19×11；SingleAtom用原18×9元素布局，移除固定最小宽度及ScrolledWindow，共用按可用宽高调整字号/格子逻辑。保留原灰色按钮/选中高亮、Generate inputs及保存目录流程；输出路径改按字符换行，避免长路径撑宽面板。

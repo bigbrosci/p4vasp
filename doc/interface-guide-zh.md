@@ -510,13 +510,15 @@ Models 独立为左侧按钮，Database 菜单只保留 Resources；元素资料
 
 ### 单原子输入生成
 
-1. 打开 **Models → single atom**。周期表包含 118 个元素，格子与字号自动适应面板大小，无需最大化或滚动即可完整显示；点击选择，高亮后可点 **Generate inputs**。
-2. 弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。页面底部不再显示默认 INCAR 参数提示，生成成功后仍显示输出路径。
+1. 打开 **Models → single atom**。周期表包含 118 个元素，格子与字号自动适应面板大小，无需最大化或滚动即可完整显示；点击后高亮并弹出中性原子参考与计算设置窗口，显示电子组态/基态能级/S和多重度；可设Charge、ISPIN、MAGMOM、可选NUPDOWN、POTCAR ZVAL及盒子，查看INCAR preview后点击弹窗Generate inputs。
+2. 接着在目录弹窗中填写 **Folder name**（新文件夹名称）及 **Save in**（保存的父目录，可 Browse 选择），再点 **Generate inputs**。默认名称为 `Fe_single_atom` 等；可以改名。页面底部不再显示默认 INCAR 参数提示，生成成功后仍显示输出路径。
 3. 新目录中生成 `INCAR`、`KPOINTS`、`POSCAR`。同名目录已存在时不会覆盖，需另选名称；取消不生成文件。状态栏显示实际输出路径。
 
 POSCAR 为 13×14×15 Å 正交晶胞，只有所选的一个原子，Direct 坐标 `(0.5, 0.5, 0.5)`，对应笛卡尔 `(6.5, 7, 7.5)` Å。KPOINTS 为 Γ 中心的 `1 1 1` 网格、零偏移。
 
 INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 `ISPIN=2`、`ALGO=ALL`、`NELM=500`，不输出 `MAGMOM`，不自动套用元素磁矩或 U/J。SYSTEM 标注所选元素；其他参数按当前基础预设保留，不自动启用额外 Task。生成时读取程序预设及上述个人覆盖值，不依赖外部 in.py。界面选择不会修改当前加载的结构、元素资料或 INCAR 预设；这里只生成上述三个文件。
+
+详细参考来源、自旋含义、带电模板及导出流程见[单原子设置说明](single-atom-zh.md)。
 
 ### ASE体相建模
 

@@ -35,3 +35,12 @@ GTK 原生结构显示和图片导出均读取新资料。为让未知资料的�
 第 17 个入口为 [NIST-JANAF](https://janaf.nist.gov/)，提供 NIST-JANAF 热化学表（SRD 13）。
 
 第 18 个入口为 [The Cambridge Cluster Database](http://www-wales.ch.cam.ac.uk/CCD.html)（剑桥团簇数据库），官网现标题为 Cambridge Energy Landscape Database，提供团簇全局优化与结构数据。
+
+
+## 单原子电子态参考（只读）
+
+`atomic_states.json`为NIST ASD 5.12（2024）中性原子H–Hs的108条电子组态/基态能级快照，供Single atom输入弹窗使用。
+捕获行在`atomic_states_source.txt`，来源/DOI/2026-11-25检索日及摘要记在JSON；配置和项符号为事实数据，保留NIST引用。
+工具`tools/import_atomic_reference.py`从捕获文本重建，LS多重度按已指认项符号提取；仅J指认、jj耦合及快照外条目不猜S。
+这不是完整离子态数据库，重元素LS指认/部分配置有近似或估计，不能直接当作POTCAR价电子配置或DFT固定占据。
+详见[单原子使用说明](../../doc/single-atom-zh.md)和[NIST数据说明](https://www.nist.gov/pml/ground-levels-and-ionization-energies-neutral-atoms)。

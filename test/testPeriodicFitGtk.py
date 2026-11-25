@@ -75,11 +75,13 @@ def main():
             window.resize(width,height);pump(.6);check()
             page.buttons['Og'].clicked()
             assert page.symbol=='Og' and page.generate.get_sensitive()
+            page.atom_dialog.response(Gtk.ResponseType.CANCEL)
         capture('/tmp/p4vasp-single-atom-fit-compact.png')
         window.maximize();pump(.8);check()
         capture('/tmp/p4vasp-single-atom-fit-maximized.png')
         window.unmaximize();window.resize(640,480);pump(.8);check()
         page.buttons['H'].clicked();assert page.symbol=='H'
+        page.atom_dialog.response(Gtk.ResponseType.CANCEL)
         models.notebook.set_current_page(4);pump();page=models.element_table;check()
         assert not (folder/'profile').exists(),'Layout checks must not save user settings'
         print('PASS full-frame initial/resize/maximize/restore: both periodic pages fit all 118 tiles; editing/selection preserved',flush=True)

@@ -708,3 +708,23 @@ but keeps native buttons, selection highlighting, Generate inputs and folder
 workflow. Output paths use character wrapping so they cannot widen the page.
 The full-frame fit test covers both tabs and selection across resize/maximize;
 testSingleAtomGtk also checks small-panel tile bounds after actual input export.
+
+
+### Atomic reference/settings popup (2026-11-25)
+
+SingleAtomPage opens the nonblocking modal AtomInputDialog on element selection;
+the page's Generate inputs action reopens it. gtk3/atom_input.py separates read-only
+neutral references from explicit charge/ISPIN/MAGMOM/optional NUPDOWN/ZVAL/cell
+settings and a synchronized INCAR-preview tab. Scrollable content keeps dialog
+actions visible. Export snapshots the exact preview inputs through the existing
+new-folder writer; only successful exports retain per-element session settings.
+single_atom_inputs.settings_values validates spin, electron counts/parity when
+ZVAL is supplied and cell dimensions; default calls still produce the original
+three neutral-atom files. Charged exports without ZVAL are clearly marked
+NELECT=SET_AFTER_POTCAR templates. Spin/SOC/electron tags inherited from generic
+standards are removed before explicit collinear settings are applied.
+atomic_reference.py reads bundled offline NIST state data (108 neutral entries);
+missing assignments remain Unknown and LS labels are not orbital constraints.
+No scientific dependency is imported in GTK, no global element data is edited,
+and ModelsApplet/models.glade wiring stays unchanged. The reference importer,
+source capture and usage guide document provenance and known limitations.

@@ -9,7 +9,7 @@ from p4vasp.element_data import SYMBOLS
 
 assert Gtk.init_check()[0]
 assert sorted(symbol for period in PERIODS for symbol,_ in period)==sorted(SYMBOLS)
-window=Gtk.OffscreenWindow();window.set_size_request(1100,600)
+window=Gtk.Window();window.set_default_size(1100,600)
 page=SingleAtomPage();window.add(page);window.show_all()
 assert page.symbol is None and not page.generate.get_sensitive()
 assert not page.status.get_visible()
@@ -17,6 +17,7 @@ page.buttons['Fe'].clicked()
 assert page.symbol=='Fe' and page.generate.get_sensitive()
 page.buttons['Og'].clicked();assert page.symbol=='Og'
 page.buttons['Fe'].clicked()
+page.atom_dialog.response(Gtk.ResponseType.CANCEL)
 with tempfile.TemporaryDirectory() as root:
     root=Path(root)
     dialog=InputFolderDialog(None,'Fe',root)
@@ -39,13 +40,13 @@ with tempfile.TemporaryDirectory() as root:
     assert not (root/'H_single_atom').exists()
     with patch('p4vasp.gtk3.single_atom.InputFolderDialog') as factory:
         factory.return_value.run.return_value=output
-        page.generate.clicked()
+        page.generate.clicked();page.atom_dialog.generate.clicked()
         assert factory.call_args.args[1]=='Fe'
         assert 'iron atom' in page.status.get_text()
 for _ in range(20):
     while Gtk.events_pending():Gtk.main_iteration()
     time.sleep(.01)
-window.set_size_request(420,320)
+window.resize(420,320)
 for _ in range(20):
     while Gtk.events_pending():Gtk.main_iteration()
     time.sleep(.01)
@@ -55,6 +56,8 @@ for button in page.buttons.values():
     assert x+button.get_allocated_width()<=page.grid.get_allocated_width()
     assert y+button.get_allocated_height()<=page.grid.get_allocated_height()
 assert page.symbol=='Fe' and page.generate.get_sensitive()
-window.get_pixbuf().savev('/tmp/p4vasp-single-atom-page.png','png',[],[])
+import cairo
+shot=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+window.draw(cairo.Context(shot));shot.write_to_png('/tmp/p4vasp-single-atom-page.png')
 window.destroy()
 print('PASS: periodic selection, compact folder dialog, create/cancel, Generate inputs wiring')
