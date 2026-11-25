@@ -1,10 +1,38 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-23。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-24。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
 
-## 当前交付（2026-11-23）
+## 当前交付（2026-11-24）
+
+冻结源码`42b9802aa894d8d3068e8684b92d9d95f58f6f54`，包含Surface三个来源按钮及Bulk晶格参数只读显示修复。
+
+完整EXE路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261124-190354-42b9802a-9_742f0r\p4vasp.exe
+```
+
+同级ZIP：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261124-190354-42b9802a-9_742f0r.zip
+```
+
+ZIP 198097752字节，SHA256：`f42c2974c7d8d7c680b2c15ae78240b45badbfe9eef3e3d9760f68f8e6df8d7e`，另有同名`.zip.sha256`。
+完整解压并保留`_internal`与`model-worker`，双击p4vasp.exe。继续随包ASE、RDKit、pymatgen，依赖版本与11月23日包一致，无需另配Python/PATH。
+旧包保留，未另复制桌面或上传GitHub Release附件。
+
+本机Windows完整原生/冻结构建及runtime/gui/models检查通过，含Surface预览/固定层/保存/重放、DOSCAR/XML s/p/d/f、CLI及ASE/RDKit等既有流程。
+另外以Windows源GTK及实际ASE生成Cu a=3.6345，确认来源按钮/只读值/完整快照/回预设；源GTK和冻结Surface截图已查看。
+独立SOURCE、ZIP CRC/SHA256及两环境发布快照核对通过；不是另一台干净Windows或所有科学任务验收。
+本轮不把11月23日的额外独立Python/Bash脚本运行重复记为本次实测。
+
+日志：`build/windows-update/42b9802a-n3t5a1cv`；成品报告：`dist/windows-releases/p4vasp-20261124-190354-42b9802a-9_742f0r-checks`。
+快照见[依赖记录](dependencies/README.md)。后续交付文档提交不改变包的SOURCE-COMMIT，无需仅为文档重复打包。
+
+## 历史交付（2026-11-23）
 
 冻结源码`5ca60f29fb9f552dfacbf6ef86f273a4d8ceb9d3`。完整EXE路径：
 

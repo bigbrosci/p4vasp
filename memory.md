@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-24. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows新版交付完成（2026-11-24）
+
+- 用户要求将Surface来源三按钮与Bulk晶格显示修复打包。冻结源码42b9802aa894d8d3068e8684b92d9d95f58f6f54，EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261124-190354-42b9802a-9_742f0r\p4vasp.exe；同级.zip/.zip.sha256，198097752字节，SHA256=f42c2974c7d8d7c680b2c15ae78240b45badbfe9eef3e3d9760f68f8e6df8d7e。完整_internal/model-worker需保留，旧包保留，未复制桌面/上传Release附件；后续纯文档提交不改变SOURCE-COMMIT。
+- 本机Windows原生及GUI/worker冻结成功，updater SUCCESS且wrapper零退出；runtime/gui/models均ok/frozen，含Surface预览/固定层/四文件保存/CLI重放、双来源s/p/d/f及既有ASE/RDKit/取消。另Windows源GTK用实际ASE Cu a=3.6345确认三按钮/只读值/完整快照及回预设，日志/tmp/windows-surface-lattice-20261124.log，Windows Temp的p4vasp-surface-lattice-20261124.png及冻结Surface截图已查看；该3.6345专项是源GTK测试，未冒充冻结专项或全部科研场景/干净Windows验收。
+- 独立SOURCE/ZIP CRC/SHA256通过，不含私有Cu3Ru1。目标GUI/worker快照doc/dependencies/snapshots/2026-11-24-windows-{gui,model}-42b9802a.json，12/48项版本与11月23日一致、源码/工具/清单摘要核对通过；3依赖工具/清单/diff通过。未额外重复11月23日独立脚本重放测试，不记作本次实测。
+- 构建日志build/windows-update/42b9802a-n3t5a1cv；报告dist/windows-releases/p4vasp-20261124-190354-42b9802a-9_742f0r-checks；Linux启动/tmp/p4vasp-windows-20261124.log。交付指南/当日双语同步，当前完成，无待自动构建任务。
+
 ## Surface Bulk晶格显示修正（2026-11-24）
 
 - 用户报告Bulk用Cu a=3.6345而Surface灰框仍3.615。源码确认切面已使用完整POSCAR快照，旧灰框为未刷新的Metal preset默认值，未覆盖科学输入。现from_bulk保存其原始request，update_fields只读显示name/a/c；导入文件清空这些预设框，回Metal preset恢复之前缓存，guard避免字段同步触发失效回调。不把输入a等同于原胞/超胞基矢长度。

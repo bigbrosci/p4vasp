@@ -130,3 +130,8 @@ Surface首版复用现有ASE环境及隔离worker，不新增库或改变版本�
 ## 2026-11-23 Windows发布基线
 
 新增[GUI环境](snapshots/2026-11-23-windows-gui-5ca60f29.json)和[科学worker构建环境](snapshots/2026-11-23-windows-model-5ca60f29.json)的目标解释器实际快照，来源提交5ca60f29，12/48项分发元数据。GUI为UCRT64 Python3.14.9，worker为官方CPython3.13.17；新增pymatgen及其间接依赖，ASE/RDKit构建pin沿用。源码、工具/清单摘要核对通过；原始首次无Git PATH的临时捕获留Windows Temp，仓库保留带来源提交的完整捕获。此为元数据基线，不是冻结DLL清单或锁文件；成品验收见[Windows交付](../windows-update-workflow-zh.md)。旧快照保留。
+
+
+## 2026-11-24 Windows发布基线
+
+[GUI快照](snapshots/2026-11-24-windows-gui-42b9802a.json)与[科学worker快照](snapshots/2026-11-24-windows-model-42b9802a.json)由实际Windows目标解释器采集，来源42b9802a；12/48项分发版本与11月23日相同，工具/清单摘要及来源核对通过，旧快照保留。成品验证与完整路径见[Windows交付](../windows-update-workflow-zh.md)，元数据不等于冻结DLL清单或锁文件。
