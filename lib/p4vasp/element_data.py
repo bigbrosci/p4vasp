@@ -11,6 +11,20 @@ XML_FIELDS = ('mass', 'radius', 'red', 'green', 'blue')
 DEFAULT_FIELDS = ('mag_value', 'u_value', 'j_value')
 
 
+# Main-table gaps follow groups 1–18; lanthanides and actinides have detached rows.
+PERIODS = [
+    [('H',0),('He',17)],
+    list(zip('Li Be B C N O F Ne'.split(),[0,1,12,13,14,15,16,17])),
+    list(zip('Na Mg Al Si P S Cl Ar'.split(),[0,1,12,13,14,15,16,17])),
+    list(zip(SYMBOLS[18:36],range(18))),
+    list(zip(SYMBOLS[36:54],range(18))),
+    list(zip(['Cs','Ba','La']+SYMBOLS[71:86],range(18))),
+    list(zip(['Fr','Ra','Ac']+SYMBOLS[103:118],range(18))),
+    list(zip(SYMBOLS[57:71],range(3,17))),
+    list(zip(SYMBOLS[89:103],range(3,17))),
+]
+
+
 def check_value(column, value):
     value = value.strip()
     if not value:

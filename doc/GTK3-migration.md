@@ -668,3 +668,19 @@ Surface Bulk import also copies its build request into read-only Element/a/c
 fields, rather than leaving stale preset defaults. Those fields do not override
 the full POSCAR snapshot used for cutting. File sources clear the preset fields;
 returning to Metal preset restores the user's cached preset entries.
+
+
+### Periodic element editor (2026-11-25)
+
+ModelsApplet/models.glade still hosts the lazy ElementTable page through the
+GTK3 adapter. ElementTable now presents 118 colored buttons in periodic positions,
+with group/period headers and detached f-block rows, rather than a TreeView.
+PERIODS is shared from element_data.py with the unchanged SingleAtomPage layout.
+Tile CSS uses effective catalog RGB with contrasting text; missing colors have a
+neutral display fallback only. Clicking opens a compact, scrollable ElementEditor
+with mass/radius/RGB/Magmom/U/J, a ColorButton and a dialog Save action. Cancel
+writes nothing. Validation/conflict detection/atomic backups remain in ElementData
+and ResourceStore; no new persistence format or dependency. Save refreshes tile
+colors in place, preserving scroll, and restart applies cached structure defaults.
+No top-level spreadsheet Save/dirty state remains. Tests exercise real dialogs,
+color picker, unknowns, cancel, per-user reopen and external-write conflicts.

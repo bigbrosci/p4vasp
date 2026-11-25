@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## p4vasp data彩色周期表及元素属性弹窗（2026-11-25）
+
+- Models → p4vasp data的ElementTable从TreeView换成118个元素按钮周期表，显示族/周期、分开f区；默认/个人有效RGB着色并按亮度选文字色，无颜色资料仅中性灰显示，不补写科学数据。元素布局PERIODS移至element_data.py共用，single_atom仍保持原布局/入口；ModelsApplet/models.glade/工具栏不变，页面仍惰性创建。
+- 点击元素弹出紧凑可滚动ElementEditor，符号/Z只读，可改质量、显示半径、0–255 RGB/颜色选择器、Magmom、U/J。弹窗Save校验后调用原ElementData/ResourceStore个人覆盖/备份/冲突检测/失败回滚，立即刷新格子颜色、不重建网格/跳滚动；Cancel或关闭不写。旧整表Save/dirty/内联编辑代码删除，Reload读已保存数据，已有结构默认缓存仍需重启。未改变持久化格式/参考值/原生或科学算法。
+- 本机Linux/WSL真实GTK通过118格/实际CSS颜色、身份/单位/Save显示、RGB校验及picker、修改半径/Magmom/U/J、个人保存/新建页读取、取消无写、未知颜色不回填及外部修改冲突；测试用户目录全部在临时路径，自带periodic/incar/XML哈希未变。实际截图/tmp/p4vasp-data-periodic-default.png、p4vasp-data-periodic.png及p4vasp-element-properties.png已查看；截图关闭动画以消除过渡帧。1 Models惰性加载/ResourceHub集成/SingleAtom真实界面通过，9元素数据+1个人覆盖+5资源后端、10 GTK、33面板及58基础通过，日志/tmp/periodic-editor-{gtk,lazy,hub,single,data,personal,resource,adapter,smoke,base}.log。初轮smoke旧model断言失败，更新至新buttons/data接口后33通过；既有Vector析构/GTK弃用提示仍在，不记作修复。
+- 用法/资料README/架构及双语记录同步，修正旧资料README仍宣称直接改仓库的过时说明。无依赖/环境变化/快照、原生重编或Windows打包，Mac/Windows未验收，本轮不访问私有example。源码版重启后使用，当前任务完成。
+
 ## 每日一句日期词库（2026-11-25）
 
 - 主窗口空闲底栏从 `data/quotes/daily.sqlite3` 只读加载 1000 条排期，按本机日期选择（2026-11-25 至 2029-08-20）；悬停查看日期、出处和思考问题。无当日排期或数据库不可用时使用原中英文词库，任务/错误优先。

@@ -66,38 +66,32 @@ with tempfile.TemporaryDirectory() as temporary:
     notebook.set_current_page(4)
     while Gtk.events_pending(): Gtk.main_iteration()
     table=models.element_table
-    table.edited(None,'0','1.02',2)
-    table.edited(None,'0','2.5',7)
-    table.save()
-    assert table.model[0][2]=='1.02' and table.model[0][7]=='2.5'
-    assert not table.dirty
-    with patch.object(table, 'show_error') as error:
-        table.edited(None,'0','256',4)
-        assert error.called
-    assert table.model[0][4]!='256'
-    import time
+    properties=table.open_element('H')
+    properties.fields[2].set_text('1.02');properties.fields[7].set_text('2.5')
+    properties.save_button.clicked()
+    assert table.data.rows[0][2]=='1.02' and table.data.rows[0][7]=='2.5'
+    properties=table.open_element('H');properties.fields[4].set_text('256')
+    properties.save_button.clicked();assert '255' in properties.error.get_text()
+    properties.response(Gtk.ResponseType.CANCEL)
+    assert table.data.rows[0][4]!='256'
     for _ in range(20):
-        while Gtk.events_pending(): Gtk.main_iteration()
-        time.sleep(0.01)
-    assert notebook.get_current_page()==4
-    assert table.view.get_allocation().height>100
-    adjustment=table.view.get_parent().get_hadjustment()
+        while Gtk.events_pending():Gtk.main_iteration()
+        time.sleep(.01)
+    assert notebook.get_current_page()==4 and len(table.buttons)==118
+    assert table.grid.get_allocation().height>100
+    adjustment=table.scroll.get_hadjustment()
     assert adjustment.get_upper()>adjustment.get_page_size()
     adjustment.set_value(adjustment.get_upper()-adjustment.get_page_size())
     assert adjustment.get_value()>0
     adjustment.set_value(0)
-    window.get_pixbuf().savev('/tmp/p4vasp-element-table.png', 'png', [], [])
-    assert table.model[117][0]=='Og' and table.model[117][3:7]==['']*4
+    window.get_pixbuf().savev('/tmp/p4vasp-element-table.png','png',[],[])
+    assert table.data.rows[117][0]=='Og' and table.data.rows[117][3:7]==['']*4
     window.set_size_request(1100,480)
-    table.view.scroll_to_cell(Gtk.TreePath.new_from_indices([117]),None,True,1.0,0.0)
     for _ in range(20):
-        while Gtk.events_pending(): Gtk.main_iteration()
-        time.sleep(0.01)
-    vertical=table.view.get_parent().get_vadjustment()
+        while Gtk.events_pending():Gtk.main_iteration()
+        time.sleep(.01)
+    vertical=table.scroll.get_vadjustment()
     vertical.set_value(vertical.get_upper()-vertical.get_page_size())
-    for _ in range(20):
-        while Gtk.events_pending(): Gtk.main_iteration()
-        time.sleep(0.01)
     window.get_pixbuf().savev('/tmp/p4vasp-periodic-bottom.png','png',[],[])
     editor = ResourceEditor(None, applet.store, 'websites', 'Website catalog', 'name', lambda key: applet.refresh())
     for key in ('elements', 'incar'):
@@ -120,4 +114,4 @@ with tempfile.TemporaryDirectory() as temporary:
         assert error.called
     assert applet.store.read('websites')[1] != b'invalid json'
     editor.destroy(); window.destroy()
-print('PASS: four-column displayed grid, element table, clipboard copy and URL display, editor save/validation/backup')
+print('PASS: four-column displayed grid, periodic element editor, clipboard copy and URL display, editor save/validation/backup')

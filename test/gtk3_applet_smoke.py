@@ -62,7 +62,7 @@ try:
    content=applet._page_contents.get(index,page)
    if index==3: assert applet.surface_page.result is None and not applet.surface_page.save_button.get_sensitive()
    elif index==2: assert applet.bulk_page.result is None and not applet.bulk_page.save_button.get_sensitive()
-   elif index==4: assert len(content.model)==118
+   elif index==4: assert len(content.buttons)==118 and len(content.data.rows)==118
    elif index==1: assert hasattr(content,'refresh_button')
    else: assert len(page.buttons)==118 and page.symbol is None and not page.generate.get_sensitive()
   notebook.set_current_page(0)

@@ -60,8 +60,9 @@ class ModelsLazyTest(unittest.TestCase):
                         bulk.name.set_text('Si')
                         tabs.set_current_page(4)
                         table = applet.element_table
-                        table.edited(None, '0', '1.02', 2)
-                        self.assertTrue(table.dirty)
+                        editor=table.open_element('H')
+                        editor.fields[2].set_text('1.02');editor.save_button.clicked()
+                        self.assertIsNone(table.editor)
                         tabs.set_current_page(3)
                         self.assertIsNone(applet.surface_page.result)
                         surface=applet.surface_page
@@ -83,8 +84,8 @@ class ModelsLazyTest(unittest.TestCase):
                         window.get_pixbuf().savev('/tmp/p4vasp-models-lazy-bulk.png', 'png', [], [])
                         tabs.set_current_page(4)
                         self.assertIs(applet.element_table, table)
-                        self.assertTrue(table.dirty)
-                        self.assertEqual(table.model[0][2], '1.02')
+                        self.assertIsNone(table.editor)
+                        self.assertEqual(table.data.rows[0][2], '1.02')
                         self.assertEqual([gas_factory.call_count, bulk_factory.call_count, table_factory.call_count], [1, 1, 1])
                         tabs.set_current_page(3)
                         self.assertIs(applet.surface_page,surface)
