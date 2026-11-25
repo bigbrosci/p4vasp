@@ -44,3 +44,11 @@ GTK 原生结构显示和图片导出均读取新资料。为让未知资料的�
 工具`tools/import_atomic_reference.py`从捕获文本重建，LS多重度按已指认项符号提取；仅J指认、jj耦合及快照外条目不猜S。
 这不是完整离子态数据库，重元素LS指认/部分配置有近似或估计，不能直接当作POTCAR价电子配置或DFT固定占据。
 详见[单原子使用说明](../../doc/single-atom-zh.md)和[NIST数据说明](https://www.nist.gov/pml/ground-levels-and-ionization-energies-neutral-atoms)。
+
+## 固相结构参考（只读）
+
+`crystal_states.json`为2026-11-25人工整理的83元素固相参考，每项独立记录常温相态、固相结构、温压条件、注释及来源URL。
+常温约298 K/1 bar，气体/液体采用明确限定的低温固相；氦注明必须加压，未核验项Unknown。
+用户的periodictable.com索引仅为起点，结合AFLOW原型及NIST氢/氦文献处理多晶型与复杂基元；不是从ASE默认晶型推定热力学稳定相。
+维护者须逐项核验条件及来源，不把generic hexagonal/fcc Bravais标签当成完整结构，不把原型中列出的高压相当常温相。
+只供Single atom参考显示，不参与输入生成或个人元素覆盖。详见[使用说明](../../doc/single-atom-zh.md#固相结构参考)。

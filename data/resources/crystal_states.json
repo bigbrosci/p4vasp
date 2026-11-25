@@ -1,0 +1,593 @@
+{
+  "reviewed": "2026-11-25",
+  "scope": "Selected stable ambient bulk phases (~298 K, ~1 bar); gases/liquids use explicitly qualified solid references. Unknown for unreviewed elements. Not a full phase diagram or structure generator.",
+  "overview": "https://periodictable.com/Properties/A/CrystalStructure.html",
+  "sources": [
+    "https://aflow.org/p/struk_A.html",
+    "https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nbsmonograph168.pdf",
+    "https://doi.org/10.1103/RevModPhys.84.759"
+  ],
+  "elements": {
+    "Al": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ca": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ni": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Cu": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Sr": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Rh": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Pd": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ag": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ce": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Yb": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ir": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Pt": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Au": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Pb": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Th": {
+      "ambient_phase": "Solid",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Li": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Na": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "K": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "V": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Cr": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Fe": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Rb": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Nb": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Mo": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Cs": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Ba": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Eu": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Ta": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "W": {
+      "ambient_phase": "Solid",
+      "structure": "bcc (body-centered cubic)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cI2_229_a-001/"
+    },
+    "Be": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Mg": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Sc": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Ti": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Co": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Zn": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Y": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Zr": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Tc": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Ru": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Cd": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Gd": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Tb": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Dy": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Ho": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Er": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Tm": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Lu": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Hf": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Re": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Os": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Tl": {
+      "ambient_phase": "Solid",
+      "structure": "hcp (hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP2_194_c-001/"
+    },
+    "Si": {
+      "ambient_phase": "Solid",
+      "structure": "Diamond cubic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF8_227_a-001/"
+    },
+    "Ge": {
+      "ambient_phase": "Solid",
+      "structure": "Diamond cubic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cF8_227_a-001/"
+    },
+    "C": {
+      "ambient_phase": "Solid",
+      "structure": "Hexagonal graphite",
+      "conditions": "~298 K, ~1 bar",
+      "note": "Graphite reference; diamond is a different allotrope. Hexagonal does not mean hcp.",
+      "url": "https://aflow.org/p/A_hP4_194_bc-001/"
+    },
+    "Mn": {
+      "ambient_phase": "Solid",
+      "structure": "α-Mn: complex cubic (cI58)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "58-atom conventional cell, not the simple bcc atomic structure.",
+      "url": "https://aflow.org/p/A_cI58_217_ac2g-001/"
+    },
+    "As": {
+      "ambient_phase": "Solid",
+      "structure": "Rhombohedral (A7)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hR2_166_c-001/"
+    },
+    "Sb": {
+      "ambient_phase": "Solid",
+      "structure": "Rhombohedral (A7)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hR2_166_c-001/"
+    },
+    "Bi": {
+      "ambient_phase": "Solid",
+      "structure": "Rhombohedral (A7)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hR2_166_c-001/"
+    },
+    "Se": {
+      "ambient_phase": "Solid",
+      "structure": "Gray selenium: trigonal chains",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP3_152_a-001/"
+    },
+    "Ga": {
+      "ambient_phase": "Solid",
+      "structure": "α-Ga: orthorhombic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oC8_64_f-001/"
+    },
+    "P": {
+      "ambient_phase": "Solid",
+      "structure": "Black phosphorus: orthorhombic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "Bulk stable allotrope reference; white/red phosphorus differ.",
+      "url": "https://aflow.org/p/A_oC8_64_f-002/"
+    },
+    "S": {
+      "ambient_phase": "Solid",
+      "structure": "α-S: orthorhombic molecular S8",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oF128_70_4h-001/"
+    },
+    "I": {
+      "ambient_phase": "Solid",
+      "structure": "Orthorhombic molecular I2",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oC8_64_f-003/"
+    },
+    "In": {
+      "ambient_phase": "Solid",
+      "structure": "Body-centered tetragonal (A6)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_tI2_139_a-001/"
+    },
+    "Sn": {
+      "ambient_phase": "Solid",
+      "structure": "β-Sn: body-centered tetragonal",
+      "conditions": "~298 K, ~1 bar",
+      "note": "Room-temperature β-Sn; low-temperature α-Sn is diamond cubic.",
+      "url": "https://aflow.org/p/A_tI4_141_a-001/"
+    },
+    "La": {
+      "ambient_phase": "Solid",
+      "structure": "dhcp (double hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP4_194_ac-001/"
+    },
+    "Pr": {
+      "ambient_phase": "Solid",
+      "structure": "dhcp (double hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP4_194_ac-001/"
+    },
+    "Nd": {
+      "ambient_phase": "Solid",
+      "structure": "dhcp (double hexagonal close-packed)",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hP4_194_ac-001/"
+    },
+    "Po": {
+      "ambient_phase": "Solid",
+      "structure": "α-Po: simple cubic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_cP1_221_a-001/"
+    },
+    "U": {
+      "ambient_phase": "Solid",
+      "structure": "α-U: orthorhombic",
+      "conditions": "~298 K, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oC4_63_c-001/"
+    },
+    "Ne": {
+      "ambient_phase": "Gas",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "Solid reference only; gas at ~298 K, ~1 bar.",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Ar": {
+      "ambient_phase": "Gas",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "Solid reference only; gas at ~298 K, ~1 bar.",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Kr": {
+      "ambient_phase": "Gas",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "Solid reference only; gas at ~298 K, ~1 bar.",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "Xe": {
+      "ambient_phase": "Gas",
+      "structure": "fcc (face-centered cubic)",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "Solid reference only; gas at ~298 K, ~1 bar.",
+      "url": "https://aflow.org/p/A_cF4_225_a-001/"
+    },
+    "N": {
+      "ambient_phase": "Gas",
+      "structure": "α-N2: molecular cubic (Pa-3 reference)",
+      "conditions": "Below 35.6 K, ~1 bar",
+      "note": "β-N2 is hexagonal at higher solid temperatures; Pa-3 is the reference assignment.",
+      "url": "https://aflow.org/p/A_cP8_205_c-001/"
+    },
+    "O": {
+      "ambient_phase": "Gas",
+      "structure": "α-O2: molecular monoclinic",
+      "conditions": "Low-temperature α solid, ~1 bar",
+      "note": "Other solid phases occur at higher temperatures.",
+      "url": "https://aflow.org/p/A_mC4_12_i-001/"
+    },
+    "F": {
+      "ambient_phase": "Gas",
+      "structure": "α-F2: molecular monoclinic",
+      "conditions": "Low-temperature α solid, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_mC8_15_f-001/"
+    },
+    "Cl": {
+      "ambient_phase": "Gas",
+      "structure": "Orthorhombic molecular Cl2",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oC8_64_f-003/"
+    },
+    "Br": {
+      "ambient_phase": "Liquid",
+      "structure": "Orthorhombic molecular Br2",
+      "conditions": "Low-temperature solid, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_oC8_64_f-003/"
+    },
+    "Hg": {
+      "ambient_phase": "Liquid",
+      "structure": "α-Hg: rhombohedral",
+      "conditions": "Low-temperature α solid, ~1 bar",
+      "note": "",
+      "url": "https://aflow.org/p/A_hR1_166_a-002/"
+    },
+    "H": {
+      "ambient_phase": "Gas",
+      "structure": "Molecular H2: hcp reference",
+      "conditions": "Low-temperature solid, low pressure",
+      "note": "Molecular centers, not atomic hcp. Ortho/para composition and temperature affect ordering.",
+      "url": "https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nbsmonograph168.pdf"
+    },
+    "He": {
+      "ambient_phase": "Gas",
+      "structure": "No ambient-pressure solid",
+      "conditions": "4He: low-temperature hcp solid requires ~25 bar or more",
+      "note": "Cooling alone at ambient pressure does not solidify helium. Isotope and pressure matter.",
+      "url": "https://doi.org/10.1103/RevModPhys.84.759"
+    },
+    "Rn": {
+      "ambient_phase": "Gas",
+      "structure": "Unknown",
+      "conditions": "Low-temperature solid: structure not verified here",
+      "note": "",
+      "url": "https://periodictable.com/Properties/A/CrystalStructure.html"
+    }
+  }
+}

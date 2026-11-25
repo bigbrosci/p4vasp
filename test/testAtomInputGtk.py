@@ -20,6 +20,10 @@ with tempfile.TemporaryDirectory() as name:
     parent=Path(name)
     page.buttons['Cu'].clicked();dialog=page.atom_dialog;pump()
     assert dialog.reference['multiplicity']==2 and '3d^10' in dialog.reference['configuration']
+    assert 'fcc' in dialog.reference_labels['Solid structure'].get_text()
+    assert dialog.reference_labels['Phase (~298 K, ~1 bar)'].get_text()=='Solid'
+    assert '~298 K' in dialog.reference_labels['Structure conditions'].get_text()
+    assert dialog.crystal_link.get_uri().startswith('https://aflow.org/')
     assert dialog.ispin.get_active()==1 and dialog.magmom.get_text()==''
     assert 'MAGMOM' not in parse_custom(preview(dialog)) and not dialog.constrain.get_active()
     assert dialog.generate.get_mapped()
@@ -52,11 +56,20 @@ with tempfile.TemporaryDirectory() as name:
     dialog.response(Gtk.ResponseType.CANCEL)
     page.buttons['Og'].clicked();dialog=page.atom_dialog
     assert dialog.reference_labels['Neutral ground configuration'].get_text()=='Unknown'
+    assert dialog.reference_labels['Solid structure'].get_text()=='Unknown'
     assert not dialog.use_reference.get_sensitive() and dialog.generate.get_sensitive()
     dialog.response(Gtk.ResponseType.CANCEL)
     page.buttons['O'].clicked();dialog=page.atom_dialog
     dialog.constrain.set_active(True);assert dialog.nupdown.get_text()=='2'
     assert parse_custom(preview(dialog))['MAGMOM']=='2'
+    dialog.response(Gtk.ResponseType.CANCEL)
+    page.buttons['He'].clicked();dialog=page.atom_dialog;pump()
+    assert '25 bar' in dialog.reference_labels['Structure conditions'].get_text()
+    assert 'No ambient-pressure solid' in dialog.reference_labels['Solid structure'].get_text()
+    assert dialog.generate.get_mapped() and dialog.generate.get_sensitive()
+    import cairo
+    surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,dialog.get_allocated_width(),dialog.get_allocated_height())
+    dialog.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-atomic-crystal-reference.png')
     dialog.response(Gtk.ResponseType.CANCEL)
 window.destroy()
 print('PASS atomic reference/settings, explicit spin/charge, exact preview/export, reopen, missing data and cancellation')

@@ -728,3 +728,12 @@ missing assignments remain Unknown and LS labels are not orbital constraints.
 No scientific dependency is imported in GTK, no global element data is edited,
 and ModelsApplet/models.glade wiring stays unchanged. The reference importer,
 source capture and usage guide document provenance and known limitations.
+
+### Qualified crystal references (2026-11-25)
+
+The existing ModelsApplet/models.glade host and toolbar remain unchanged.
+AtomInputDialog adds read-only ambient phase, solid structure and conditions rows
+inside its existing scrollable settings page, with a separate crystal source link.
+atomic_reference.crystal_reference reads the offline crystal_states.json independently
+of NIST atomic states. Unknown entries stay Unknown; phase references never drive
+single_atom_inputs or spin settings. No new dependency or native renderer change.

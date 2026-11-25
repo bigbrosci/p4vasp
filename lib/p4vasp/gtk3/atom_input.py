@@ -4,7 +4,7 @@ import re
 from p4vasp.gtk3 import Gtk
 from gi.repository import Pango
 from p4vasp.gtk3.file_dialogs import entry, fit_dialog, error_label
-from p4vasp.atomic_reference import reference
+from p4vasp.atomic_reference import reference, crystal_reference
 from p4vasp.element_data import ElementData, NUMBERS
 from p4vasp.resource_data import ResourceStore
 from p4vasp.incar_generator import load_presets
@@ -26,11 +26,15 @@ class AtomInputDialog(Gtk.Dialog):
         info=Gtk.Grid(column_spacing=12,row_spacing=5)
         mass=ElementData(ResourceStore()).rows[NUMBERS[self.symbol]-1][2]
         ref=self.reference;mult=ref.get('multiplicity');spin=ref.get('spin')
+        crystal=crystal_reference(self.symbol)
         self.reference_labels={}
         for row,(label,value) in enumerate((('Element',ref.get('name',self.symbol)),('Symbol / atomic number',self.symbol+' / '+str(NUMBERS[self.symbol])),
                 ('Mass (u)',mass or 'Unknown'),('Neutral ground configuration',ref.get('configuration','Unknown')),
                 ('Ground level',ref.get('term','Unknown')),('S from LS label','Unknown' if spin is None else '%g'%spin),
-                ('Multiplicity (2S + 1)','Unknown' if mult is None else str(mult)))):
+                ('Multiplicity (2S + 1)','Unknown' if mult is None else str(mult)),
+                ('Phase (~298 K, ~1 bar)',crystal.get('ambient_phase','Unknown')),
+                ('Solid structure',crystal.get('structure','Unknown')),
+                ('Structure conditions',crystal.get('conditions','Not verified')))):
             info.attach(Gtk.Label(label=label,xalign=0),0,row,1,1)
             text=value
             value=Gtk.Label(label=text,xalign=0);value.set_selectable(True);value.set_line_wrap(True)
@@ -46,6 +50,10 @@ class AtomInputDialog(Gtk.Dialog):
         link.set_halign(Gtk.Align.START);box.pack_start(link,False,False,0)
         note=Gtk.Label(label='Neutral free-atom reference, not imposed orbital occupations. Charged and DFT states may differ; LS labels can be approximate.',xalign=0)
         note.set_line_wrap(True);note.set_max_width_chars(60);box.pack_start(note,False,False,0)
+        self.crystal_link=Gtk.LinkButton.new_with_label(crystal.get('url','https://aflow.org/p/struk_A.html'),'Crystal structure reference')
+        self.crystal_link.set_halign(Gtk.Align.START);box.pack_start(self.crystal_link,False,False,0)
+        crystal_note=Gtk.Label(label=crystal.get('note','') or 'Solid-phase reference only; isolated-atom inputs remain unchanged.',xalign=0)
+        crystal_note.set_line_wrap(True);crystal_note.set_max_width_chars(60);box.pack_start(crystal_note,False,False,0)
         box.pack_start(Gtk.Separator(),False,False,0)
         saved=page.input_settings.get(self.symbol,{})
         grid=Gtk.Grid(column_spacing=10,row_spacing=5);box.pack_start(grid,False,False,0)

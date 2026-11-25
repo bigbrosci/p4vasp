@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 单原子固相结构参考（2026-11-25）
+
+- 用户要求补充常温稳定晶型、气体低温固相。AtomInputDialog增加Phase (~298 K, ~1 bar)、Solid structure、Structure conditions只读行及独立晶体来源链接；现有滚动设置/底部Generate保留，ModelsApplet/models.glade/工具栏无改动。atomic_reference.crystal_reference独立缓存data/resources/crystal_states.json，83元素条目逐项保存相态/结构/条件/注释/URL，未审阅元素Unknown，不猜超重元素。默认单原子/自旋及输入生成不受晶型驱动。
+- 以用户periodictable.com索引为起点，结合AFLOW原型/文献、NIST氢及氦综述区分graphite/diamond、hcp/dhcp、复杂α-Mn、低温分子固相；N采用35.6 K以下α-N2 Pa-3参考，He注明常压不凝固、4He低温hcp需约25 bar或更高压力。不是完整相图或体相生成器；来源链接和用途见doc/single-atom-zh.md及资源README。
+- Linux/WSL本次3固相数据/坏文件/输入隔离测试、8原单原子输入及真实AtomInputDialog Cu/He/Og参考/自旋/电荷/预览=导出/取消/重开回归通过，10 GTK适配器及语法/diff通过。实际截图/tmp/p4vasp-atomic-crystal-reference.png已查看，长条件换行、底部按钮可见，更多设置在原滚动区；日志/tmp/crystal-reference-{core,inputs,gtk,adapter}.log。无新依赖/环境快照/原生重编/Windows包，Mac/Windows未验收，私有example未访问。当前任务完成，源码重启生效。
+
 ## 单原子参考与计算设置弹窗（2026-11-25）
 
 - 用户批准选择元素后弹出基本资料/电子组态及自旋设置。SingleAtomPage.choose自动打开gtk3/atom_input.py的AtomInputDialog，主Generate可重开；只读名称/Z/当前质量/NIST中性组态/能级/LS对应S和多重度，设置Charge、ISPIN、可选MAGMOM、默认关闭NUPDOWN约束、可选POTCAR ZVAL及盒子。INCAR preview与导出同一快照，成功后记住该元素本会话设置，Cancel不写全局元素资料/文件；内容可滚动，底部操作始终可见。

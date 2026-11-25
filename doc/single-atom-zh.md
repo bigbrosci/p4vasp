@@ -35,3 +35,14 @@
 弹窗、目录窗口及主页面均提示待完成NELECT；不能从NIST全电子组态擅自推算POTCAR价电子数。参见[NELECT](https://vasp.at/wiki/NELECT)。
 
 该弹窗的设置用于当前原子输入，不改p4vasp data中的质量、颜色、Magmom/U/J默认资料；不会运行VASP或生成POTCAR。
+
+## 固相结构参考
+
+弹窗同时显示 **Phase (~298 K, ~1 bar)**、**Solid structure** 和 **Structure conditions**，并提供独立的 **Crystal structure reference** 来源链接。
+常温固体给出相应体相结构，例如Cu为fcc、Fe为bcc、Mg为hcp；Si/Ge标为金刚石结构，石墨不混同hcp，α-Mn不混同简单bcc。
+气体和液体给出明确标注条件的低温固相参考，例如α-N₂采用35.6 K以下的分子立方相参考，而不是把氮气称为六方晶体。
+氢的hcp描述分子中心排布，取向与正/仲氢组成有关；氦是例外，常压降温不会凝固，⁴He低温hcp固相需要约25 bar或更高压力。
+
+离线`data/resources/crystal_states.json`首版收录83个元素的审阅条目，未核验结构显示Unknown，不推测超重元素结构。室温参考取约298 K、1 bar，不能作为完整温压相图。
+依据[用户提供的结构索引](https://periodictable.com/Properties/A/CrystalStructure.html)，结合[AFLOW原型及文献](https://aflow.org/p/struk_A.html)、[NIST氢资料](https://nvlpubs.nist.gov/nistpubs/Legacy/MONO/nbsmonograph168.pdf)与[氦综述](https://doi.org/10.1103/RevModPhys.84.759)区分晶格、原子基元及相条件。
+这些内容只读，不改ISPIN/MAGMOM或自动生成bulk；Single atom仍生成盒子中心的单个孤立原子。
