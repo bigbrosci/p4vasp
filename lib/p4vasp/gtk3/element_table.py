@@ -4,6 +4,39 @@ from p4vasp.element_data import ElementData, COLUMNS, NUMBERS, PERIODS, check_va
 from p4vasp.gtk3.file_dialogs import fit_dialog, entry, error_label
 
 
+class FittedPeriodicGrid(Gtk.Grid):
+    """Keep all groups and periods visible instead of requesting a fixed canvas."""
+    def __init__(self):
+        super().__init__(column_spacing=2,row_spacing=2,column_homogeneous=True,row_homogeneous=True)
+        self.sizing=Gtk.CssProvider();self.font_size=None
+        self.set_hexpand(True);self.set_vexpand(True)
+
+    def do_get_preferred_width(self):return 1,850
+
+    def do_get_preferred_height(self):return 1,460
+
+    def do_get_request_mode(self):return Gtk.SizeRequestMode.CONSTANT_SIZE
+
+    def do_size_allocate(self,allocation):
+        self.fit(self,allocation)
+        Gtk.Grid.do_size_allocate(self,allocation)
+
+    def track(self,widget):
+        context=widget.get_style_context();context.add_class('periodic-fit-text')
+        context.add_provider(self.sizing,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION+1)
+
+    def fit(self,widget,allocation):
+        # Period labels plus 18 groups; header, seven periods, gap and two f rows.
+        width=max(1,(allocation.width-36)/19)
+        height=max(1,(allocation.height-20)/11)
+        size=max(1,min(14,width*.46,height*.36))
+        size=int(size*4)/4
+        if size==self.font_size:return
+        self.font_size=size
+        self.sizing.load_from_data(('.periodic-fit-text { font-size: %.2fpx; }\n'
+                                   '.element-tile { padding: 0; min-width: 0; min-height: 0; }'%size).encode())
+
+
 def tile_color(record):
     """Neutral display fallback only; never populate missing reference colors."""
     values=[record[field] for field in ('red','green','blue')]
@@ -97,21 +130,22 @@ class ElementTable(Gtk.Box):
         actions=Gtk.Box(spacing=6)
         self.reload_button=Gtk.Button(label='Reload');self.reload_button.connect('clicked',lambda *_:self.load())
         actions.pack_start(self.reload_button,False,False,0);self.pack_start(actions,False,False,0)
-        self.grid=Gtk.Grid(column_spacing=3,row_spacing=4,column_homogeneous=True)
-        for group in range(1,19):self.grid.attach(Gtk.Label(label=str(group)),group,0,1,1)
+        self.grid=FittedPeriodicGrid()
+        def attach_label(text,column,row,span=1):
+            label=Gtk.Label(label=text);self.grid.track(label);self.grid.attach(label,column,row,span,1)
+        for group in range(1,19):attach_label(str(group),group,0)
         for period,elements in enumerate(PERIODS):
             row=period+1 if period<7 else period+2
-            if period<7:self.grid.attach(Gtk.Label(label=str(period+1)),0,row,1,1)
-            else:self.grid.attach(Gtk.Label(label='Ce–Lu' if period==7 else 'Th–Lr'),0,row,4,1)
+            if period<7:attach_label(str(period+1),0,row)
+            else:attach_label('Ce–Lu' if period==7 else 'Th–Lr',0,row,4)
             for symbol,column in elements:
                 button=Gtk.Button();label=Gtk.Label()
                 label.set_markup('<small>'+str(NUMBERS[symbol])+'</small>\n<b>'+symbol+'</b>')
-                button.add(label);button.set_size_request(40,44)
+                button.add(label);self.grid.track(button);self.grid.track(label)
                 button.get_style_context().add_class('element-tile')
                 button.connect('clicked',self.open_element,symbol)
                 self.grid.attach(button,column+1,row,1,1);self.buttons[symbol]=button
-        self.scroll=Gtk.ScrolledWindow();self.scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
-        self.scroll.add(self.grid);self.pack_start(self.scroll,True,True,0)
+        self.pack_start(self.grid,True,True,0)
         self.connect('destroy',self.closed)
         self.load()
 
@@ -126,7 +160,7 @@ class ElementTable(Gtk.Box):
                 rgb=','.join(str(round(value*255)) for value in color)
                 brightness=sum(value*weight for value,weight in zip(color,(.2126,.7152,.0722)))
                 foreground='#111111' if brightness>.45 else '#ffffff'
-                provider.load_from_data(('.element-tile { background-image: none; background-color: rgb('+rgb+'); color: '+foreground+'; border: 1px solid rgba(0,0,0,0.3); border-radius: 4px; padding: 2px; min-width: 24px; }').encode())
+                provider.load_from_data(('.element-tile { background-image: none; background-color: rgb('+rgb+'); color: '+foreground+'; border: 1px solid rgba(0,0,0,0.3); border-radius: 4px; }').encode())
                 context.add_provider(provider,Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
                 self._providers[symbol]=provider;button.set_sensitive(True)
                 missing=any(record[field] is None for field in ('red','green','blue'))

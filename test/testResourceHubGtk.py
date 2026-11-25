@@ -79,19 +79,17 @@ with tempfile.TemporaryDirectory() as temporary:
         time.sleep(.01)
     assert notebook.get_current_page()==4 and len(table.buttons)==118
     assert table.grid.get_allocation().height>100
-    adjustment=table.scroll.get_hadjustment()
-    assert adjustment.get_upper()>adjustment.get_page_size()
-    adjustment.set_value(adjustment.get_upper()-adjustment.get_page_size())
-    assert adjustment.get_value()>0
-    adjustment.set_value(0)
+    for button in table.buttons.values():
+        x,y=button.translate_coordinates(table.grid,0,0)
+        assert x>=0 and y>=0
+        assert x+button.get_allocated_width()<=table.grid.get_allocated_width()
+        assert y+button.get_allocated_height()<=table.grid.get_allocated_height()
     window.get_pixbuf().savev('/tmp/p4vasp-element-table.png','png',[],[])
     assert table.data.rows[117][0]=='Og' and table.data.rows[117][3:7]==['']*4
     window.set_size_request(1100,480)
     for _ in range(20):
         while Gtk.events_pending():Gtk.main_iteration()
         time.sleep(.01)
-    vertical=table.scroll.get_vadjustment()
-    vertical.set_value(vertical.get_upper()-vertical.get_page_size())
     window.get_pixbuf().savev('/tmp/p4vasp-periodic-bottom.png','png',[],[])
     editor = ResourceEditor(None, applet.store, 'websites', 'Website catalog', 'name', lambda key: applet.refresh())
     for key in ('elements', 'incar'):

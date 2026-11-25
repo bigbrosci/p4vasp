@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 周期表自动适配面板（2026-11-25）
+
+- 用户报告初次打开p4vasp data不完整，最大化才全。ElementTable移除40×44固定格子及表格ScrolledWindow，FittedPeriodicGrid提供较小最小请求、按可用宽高计算共用字号/零最小padding，调用原生Gtk.Grid分配；保留118按钮、族/周期/f区、焦点/悬停/属性及个人Save。窗体越小字号越小，无需周期表横纵滚动；主窗其他控件仍有自己的最小尺寸。
+- Linux/WSL实际完整p4v主窗首次进入、多个缩放、最大化/还原全部118格和网格均在面板内，Og可打开/取消，字号随大小变化；实际小独立面板及个人保存/颜色/取消/冲突、ResourceHub集成通过，截图/tmp/p4vasp-periodic-fit-{compact,maximized,small}.png已查看。10 GTK、1 Models惰性及33面板通过；日志/tmp/periodic-fit-{frame,editor,hub,lazy,adapter,smoke}.log，语法/diff通过。无科学/依赖/环境变更或Windows重打包，Mac/Windows未验收。
+- 最大化还原时曾见gtk_distribute_natural_allocation critical，使用HEAD原固定周期表复现同一提示（/tmp/periodic-fit-baseline.log），不归因/宣称修复此既有主窗状态切换问题；旧native析构/GTK弃用提示仍在。保留原生GTK分配，不引入自绘/手工子控件分配；用法/架构/中英同步，当前任务完成，源码重启生效。
+
 ## p4vasp data彩色周期表及元素属性弹窗（2026-11-25）
 
 - Models → p4vasp data的ElementTable从TreeView换成118个元素按钮周期表，显示族/周期、分开f区；默认/个人有效RGB着色并按亮度选文字色，无颜色资料仅中性灰显示，不补写科学数据。元素布局PERIODS移至element_data.py共用，single_atom仍保持原布局/入口；ModelsApplet/models.glade/工具栏不变，页面仍惰性创建。

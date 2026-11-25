@@ -80,5 +80,14 @@ with tempfile.TemporaryDirectory() as temporary:
     window.draw(cairo.Context(shot));shot.write_to_png('/tmp/p4vasp-data-periodic.png')
     assert all(hashlib.sha256((root/'data'/FILES[name]).read_bytes()).hexdigest()==digest for name,digest in originals.items())
     assert not errors
+    window.resize(420,320);pump();window.check_resize();pump()
+    for button in table.buttons.values():
+        x,y=button.translate_coordinates(table.grid,0,0)
+        assert x>=0 and y>=0
+        assert x+button.get_allocated_width()<=table.grid.get_allocated_width()
+        assert y+button.get_allocated_height()<=table.grid.get_allocated_height()
+    assert table.grid.font_size<14
+    small=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
+    window.draw(cairo.Context(small));small.write_to_png('/tmp/p4vasp-periodic-fit-small.png')
     window.destroy()
 print('PASS: 118 colored tiles, property dialog, validation, RGB picker, personal save/reopen, cancel, unknowns and conflict protection')

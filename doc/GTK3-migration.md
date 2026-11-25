@@ -684,3 +684,16 @@ and ResourceStore; no new persistence format or dependency. Save refreshes tile
 colors in place, preserving scroll, and restart applies cached structure defaults.
 No top-level spreadsheet Save/dirty state remains. Tests exercise real dialogs,
 color picker, unknowns, cancel, per-user reopen and external-write conflicts.
+
+
+### Periodic table fits its panel (2026-11-25)
+
+FittedPeriodicGrid replaces the fixed-size grid/scrolled viewport in ElementTable.
+It advertises small minimum dimensions and applies a shared, bounded font size
+from the current width/height before native Gtk.Grid allocation. Buttons retain
+native focus, tooltips and property-dialog actions; only minimum tile padding/size
+and text sizing change. Group/period positions and f-block rows remain intact.
+There is no horizontal/vertical table scrollbar. testPeriodicFitGtk exercises the
+actual application frame at initial size, multiple resizes, maximize and restore,
+checking every tile's mapped bounds and opening Og. Other app controls retain
+their own minimum window size; tiny panels trade text size for a complete table.
