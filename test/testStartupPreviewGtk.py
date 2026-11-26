@@ -80,5 +80,7 @@ with tempfile.TemporaryDirectory() as name:
     systemlist().activate(natives[0].system if natives[0].system is not empty else ns['getSystem'](str(poscar)));pump()
     assert preview.view.data and len(preview.view.data['positions'])==3
     assert poscar.read_bytes()==original
+    from testEmbeddedStructureEditing import exercise
+    exercise(frame,preview,folder,pump)
     print('PASS CLI embedded preview, unchanged inputs, Show/Control native handoff, Info preservation and empty/system refresh',flush=True)
 os._exit(0)

@@ -126,19 +126,22 @@ class ModeView(Gtk.DrawingArea):
         self.zoom=math.exp(max(math.log(.1),min(math.log(10.),math.log(self.zoom)-amount*math.log(1.12))))
         self.queue_draw();return True
 
+    def projection_scale(self):
+        return min(self.get_allocated_width(),self.get_allocated_height())*.75/self.extent*self.zoom
+
+    def project(self,p):
+        factor=self.projection_scale();r=self.rotation
+        offset=[p[j]-self.center[j] for j in range(3)]
+        x,y,z=[sum(r[i][j]*offset[j] for j in range(3)) for i in range(3)]
+        return (self.get_allocated_width()/2+self.pan[0]+factor*x,
+                self.get_allocated_height()/2-self.pan[1]-factor*y,z)
+
     def on_draw(self,widget,cr):
         w=self.get_allocated_width();h=self.get_allocated_height()
         cr.set_source_rgb(1,1,1);cr.paint()
         if not self.data:
             cr.set_source_rgb(.35,.35,.35);cr.move_to(18,35);cr.show_text('Open a frequency OUTCAR to preview modes.');return False
-        factor=min(w,h)*.75/self.extent*self.zoom
-        r=self.rotation
-        def project(p):
-            a,b,c=p[0]-self.center[0],p[1]-self.center[1],p[2]-self.center[2]
-            x=r[0][0]*a+r[0][1]*b+r[0][2]*c
-            y=r[1][0]*a+r[1][1]*b+r[1][2]*c
-            z=r[2][0]*a+r[2][1]*b+r[2][2]*c
-            return (w/2+self.pan[0]+factor*x,h/2-self.pan[1]-factor*y,z)
+        factor=self.projection_scale();project=self.project
         points=[project(p) for p in self.display_positions()]
         # Draw the lattice behind atoms/bonds so the frame cannot hide a mode.
         if self.show_cell:

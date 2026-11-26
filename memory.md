@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## 内嵌结构键鼠编辑与File保存（2026-11-26）
+
+- 用户要求启动主区域与Show保持选择/编辑一致并能File保存。新增gtk3/structure_view.py的StructureView，仅Startup启用：空格拾取鼠标下最前原子，Shift左框逐个toggle、Esc取消框/清空选择、Delete、当前视角方向键移动0.1 Å、Shift方向键质心旋转5°；鼠标进入获取键盘焦点，失焦/改窗口取消框，Ctrl/Alt/Meta不触发编辑。蓝圈高亮，顶部Selection与底部Selected同步，共用SelectionListener，原导航保留。
+- StructurePreviewApplet.edit直接调用atom_movement三函数写INITIAL_STRUCTURE，刷新同体系所有面板；File原Save回调无需修改，保存当前真实结构。相同source刷新保留相机，换source清空选择；图像位置副本不再被误当可保存编辑副本。ModeView只抽共享project/projection_scale，振动仍只读。Show/Control转换/Glade/toolbar及Build不改；使用说明与架构同步，新记录update_2026_11_26.md双语。
+- Linux/WSL本次实际GTK空格/框toggle/重复框取消/Esc/失焦与resize取消、顶栏/计数、箭头/旋转/Delete及修饰键防误删、相机保持/约束/删除至空、实际File菜单/保存chooser OK和POSCAR坐标/顺序/约束回读通过/tmp/embedded-edit-gtk.log；原CLI/尺度/Show-Control新原生窗/Info/系统刷新也通过。7移动科学/6导航/10 GTK/34默认面板启动及语法/diff通过，日志/tmp/embedded-edit-{movement,navigation,adapter,smoke}.log，截图/tmp/p4vasp-embedded-selection.png已查看并修复初轮蓝圈路径连线。既有SWIG泄漏/析构/弃用提示未修复；未访问私有example，无依赖/快照/原生重编/Windows包，Mac/Windows未验收。任务完成，源码重启生效。
 
 ## 启动主区域结构预览（2026-11-25）
 

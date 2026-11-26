@@ -776,3 +776,23 @@ Run test/testStartupPreviewGtk.py with the documented GTK environment: actual CL
 POSCAR startup, positive/negative-volume/three-axis scales, source immutability,
 Show/Control toolbar handoff including a fresh native window, explicit Info and
 empty/system refresh. Linux/WSL checked; Windows/macOS not checked in this update.
+
+
+### Editable embedded initial structure (2026-11-26)
+
+StructurePreviewApplet now uses StructureView, a ModeView subclass confined to
+the startup canvas. ModeView exposes its existing projection math for drawing and
+picking; vibration previews retain their display-only selection behavior.
+StructureView handles GTK focus/pointer Space picking, native-style toggle box
+selection, Escape, Delete and arrows/Shift-arrows. Cancel incomplete boxes on
+focus loss or size mismatch. Draw selection outlines and synchronize with the
+shared Selection singleton/listeners, including the top Selection entry.
+
+Edits call the same atom_movement delete/move/rotation helpers as native Show,
+modify the current INITIAL_STRUCTURE and refresh applets for that system.
+Preserve the camera on same-source refresh, clear selection on source changes,
+and retain the existing File/Save callback (no separate preview export copy).
+The frame/Glade/adapter/Show-Control transition remains unchanged. No new
+scientific/runtime dependencies. testStartupPreviewGtk.py additionally calls
+exercise in testEmbeddedStructureEditing.py: actual GTK events and File menu,
+chooser OK, POSCAR re-read, coordinate/constraint checks and deletion to empty.
