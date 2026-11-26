@@ -141,10 +141,15 @@ and lattice callbacks. The applet smoke runner uses a synthetic structure and an
 empty in-memory database; it tests initialization, not scientific result accuracy
 or database connectivity. It does not write user calculation files.
 
-The optional `--include-glut` check also opens the separate k-point viewer. In the
-current desktop test environment it fails in PyOpenGL with “Attempt to retrieve
-context when no valid context”. This is an unresolved GLUT/OpenGL context issue,
-not a GTK2 dependency. The default GTK smoke suite excludes this renderer explicitly.
+The optional `--include-glut` check also opens the separate k-point viewer.
+As of 2026-11-25, the Linux/WSL XWayland context mismatch is repaired: this GLUT
+renderer selects GLX when DISPLAY exists, unless PYOPENGL_PLATFORM is explicitly
+set. This does not change GTK's backend or the native Show renderer. The default
+smoke suite still excludes GLUT so that it does not require optional GLUT/GLU.
+Run test/testKpointsViewerGtk.py in the same environment for real X11
+WM_DELETE_WINDOW, Escape, reopen and GTK responsiveness checks; it uses a
+synthetic cell and requires libX11. It does not validate scientific k-point paths.
+macOS and Windows closure behavior remains unverified for this change.
 
 Migration reference: [GTK's GTK2-to-GTK3 migration guide](https://docs.gtk.org/gtk3/migrating-2to3.html).
 
@@ -737,3 +742,15 @@ inside its existing scrollable settings page, with a separate crystal source lin
 atomic_reference.crystal_reference reads the offline crystal_states.json independently
 of NIST atomic states. Unknown entries stay Unknown; phase references never drive
 single_atom_inputs or spin settings. No new dependency or native renderer change.
+
+
+### K-point viewer lifecycle (2026-11-25)
+
+Electronic → View k-points remains an external GLUT window, without Glade/GTK
+layout changes. A 16 ms GLib timeout pumps its events independently of the task
+scheduler. Window-manager close and Escape destroy only the viewer, remove its
+Dyna listener/menu/timer, and permit reopening. Two deferred GTK turns finish
+freeglut's close notification/native destruction, without recursive GLUT event
+processing. Use the raw destroy call and retain PyOpenGL context callback storage
+until destruction finishes: the convenience wrapper releases callbacks too early
+for freeglut's deferred close. The previous hide-window workaround is removed.

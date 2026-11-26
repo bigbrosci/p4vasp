@@ -29,8 +29,10 @@ from p4vasp.ConvexShape import *
 import p4vasp.Structure
 import p4vasp.cStructure
 from OpenGL.GLUT import *
+from OpenGL.raw.GLUT import glutDestroyWindow as destroy_glut_window
+from OpenGL import contextdata
 from p4vasp.Dyna import DynaListener,dynaPublisher
-import time
+from p4vasp.gtk3 import GLib
 
 class KpointsViewerApplet(Applet,DynaListener):
     menupath=["Electronic","View k-points"]
@@ -43,6 +45,10 @@ class KpointsViewerApplet(Applet,DynaListener):
         Applet.__init__(self)
         self.celltype=self.PRIMITIVE_CELL
         self.dyna=None
+        self._event_source=None
+        self._destroyed=False
+        self._context=None
+        self._menu=None
         dynaPublisher().addListener(self)
     def dynaUpdated(self,dyna):
         self.dyna=dyna
@@ -66,35 +72,68 @@ class KpointsViewerApplet(Applet,DynaListener):
         if self.paint is None:
             paint = GLUTPaint3D()
             paint.zoom=0.1
-            paint.glutinit()
-            glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION)
-            glutSetOption(GLUT_ACTION_GLUTMAINLOOP_RETURNS,GLUT_ACTION_CONTINUE_EXECUTION)
+            try:
+                paint.glutinit('p4vasp — K-points')
+            except Exception:
+                if paint.window:
+                    destroy_glut_window(paint.window)
+                    glutMainLoopEvent()
+                raise
 
-            glutCreateMenu(self.dmenu)
+            self._menu=glutCreateMenu(self.dmenu)
             glutAddMenuEntry("Supercell", self.SUPERCELL)
             glutAddMenuEntry("Primitive cell", self.PRIMITIVE_CELL)
             glutAttachMenu(GLUT_RIGHT_BUTTON)
 
             self.paint=paint
+            self._context=contextdata.getContext()
+            paint.on_close=self.destroyApplet
             glutCloseFunc(self.glutclose)
-            schedule(self.mainloop())
+            self._event_source=GLib.timeout_add(16,self.mainloop)
+        glutSetWindow(self.paint.window)
         self.paint.reset()
         return self.paint
 
     def mainloop(self):
-        while self.paint is not None:
-            self.paint.mainloopevent()
-            scheduler().firstTaskToBack()
-            time.sleep(0.001)
-            yield 1
+        if self.paint is None:return False
+        self.paint.mainloopevent()
+        return self.paint is not None
 
-
-        self.destroyApplet()
     def glutclose(self):
+        # freeglut owns destruction after a window-manager close callback.
+        # Never re-enter its event loop or hide/destroy that same window here.
+        if self.paint is not None:self.paint.window=None
         self.paint=None
-        #glutDestroyWindow(glutGetWindow())  # This destroys the window, but it as well kills the applictation.
-        glutHideWindow(glutGetWindow())      # Dirty hack - window is not destroyed, only hidden. I could not find a better solution :-(
+        self.destroyApplet()
+
+    def destroy(self):
+        if self._destroyed:return
+        self._destroyed=True
+        if self._event_source is not None:
+            GLib.source_remove(self._event_source);self._event_source=None
+        if self._menu is not None:
+            glutDestroyMenu(self._menu);self._menu=None
+        paint=self.paint;self.paint=None
+        if paint is not None and paint.window:
+            window=paint.window;paint.window=None
+            # The PyOpenGL convenience wrapper drops callback references before
+            # freeglut's deferred close callback has run. Keep them alive until
+            # the native destruction pass below to avoid a dangling C callback.
+            destroy_glut_window(window)
+        # freeglut defers native destruction. Drain it on the next GTK turn,
+        # outside any GLUT callback; stopping the pump immediately leaves an
+        # unresponsive native window until another viewer is opened.
+        GLib.idle_add(self._finish_close,self._context)
+        if self in dynaPublisher().listeners:dynaPublisher().removeListener(self)
+
+    @staticmethod
+    def _finish_close(context,remaining=1):
         glutMainLoopEvent()
+        # Explicit destruction queues the close notification first, then native
+        # release. Use separate GTK turns for both, never recursive GLUT calls.
+        if remaining:GLib.idle_add(KpointsViewerApplet._finish_close,context,remaining-1)
+        elif context:contextdata.cleanupContext(context)
+        return False
 
     def updateSystem(self,x=None):
         if self.celltype == self.SUPERCELL:

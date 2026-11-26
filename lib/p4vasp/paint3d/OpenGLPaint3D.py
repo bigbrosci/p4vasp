@@ -1,3 +1,12 @@
+import os
+import sys
+
+# This renderer uses freeglut's X11/GLX window on Linux, including XWayland.
+# PyOpenGL otherwise guesses EGL from WAYLAND_DISPLAY, missing GLUT's context.
+# Preserve an explicit user backend choice and other platforms.
+if sys.platform.startswith('linux') and os.environ.get('DISPLAY'):
+    os.environ.setdefault('PYOPENGL_PLATFORM', 'glx')
+
 from p4vasp.matrix import Vector
 from p4vasp.paint3d.Paint3DInterface import *
 from p4vasp.paint3d.data import Frame
@@ -159,6 +168,8 @@ class GLUTPaint3D(OpenGLPaint3DRecorder):
         self.lastx=0
         self.lasty=0
         self.zoom=1.0
+        self.window=None
+        self.on_close=None
     def mouseFunc(self,button,state,x,y):
         if button==3 and state==1:
             self.zoom*=1.1
@@ -198,13 +209,17 @@ class GLUTPaint3D(OpenGLPaint3DRecorder):
                 command.call(painter)
         glutSwapBuffers ()
     def keyPressed(self,*args):
-        if args[0] == '\033':
-            sys.exit()
-        if args[0] == '+':
+        key=args[0].decode('ascii',errors='ignore') if isinstance(args[0],bytes) else args[0]
+        if key == '\033':
+            if self.on_close:self.on_close()
+            elif self.window:
+                glutDestroyWindow(self.window);self.window=None
+            return
+        if key == '+':
             self.showframe+=1
             if self.showframe>=len(self.frames):
                 self.showframe=0
-        if args[0] == '-':
+        if key == '-':
             self.showframe-=1
             if self.showframe<0:
                 self.showframe=len(self.frames)-1
@@ -222,12 +237,13 @@ class GLUTPaint3D(OpenGLPaint3DRecorder):
 
     def glutinit(self,name="Paint 3D",width=640,height=400):
         glutInit(sys.argv)
+        glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION)
         self.width=width
         self.height=height
         glutInitWindowSize(width, height)
 
         glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE)
-        glutCreateWindow(name)
+        self.window=glutCreateWindow(name)
         glClearDepth (1.0)
         glEnable (GL_DEPTH_TEST)
         glEnable(GL_MULTISAMPLE)

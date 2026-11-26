@@ -664,3 +664,9 @@ Surface新增 **Center／Bottom**：Center几何居中，Bottom将最低原子�
 DOS分析顶部显示实际pymatgen版本；摘要只保留原子、轨道、自旋和范围，细节见悬浮提示/CSV。Energy Range (eV)下用Emin/Emax手填相对EF范围；Use last DOS line继续保留。Export scripts可同时导出独立Python快照脚本和重新读源文件的Bash命令行脚本；参数变化仍自动取消计算。脚本用法见[分析说明](dos-analysis-zh.md#导出python和bash脚本)。
 
 Orbital分s/p、d、f三排按钮；各总壳层与自身分量互斥，分量及不同壳层可组合求和；Spin置于三排之后。新增无界面命令：`p4v DOSCAR 1-3 dxy,dyz both -6 0 result.csv`，完整参数说明见[常用命令](../usage_commands.md)。
+
+
+## k点查看窗口
+
+从 **Electronic → View k-points** 打开独立窗口。点标题栏关闭按钮或按 **Esc** 仅关闭k点窗口，p4vasp主窗口继续运行，可再次打开。右键仍可切换Primitive cell/Supercell，拖动及滚轮操作保留。
+Linux/WSL的该窗口通过GLUT使用X11/GLX，需要有效DISPLAY及GLUT/GLU；不改变GTK或Show的显示后端。macOS/Windows本次未验收。

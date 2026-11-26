@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## k点窗口关闭与上下文修复（2026-11-25）
+
+- 用户报告Electronic → View k-points窗口无法关闭。本机先复现GLUT创建窗口后PyOpenGL因Wayland自动选EGL而注册callback失败（/tmp/kpoints-before.log），未完成初始化的窗口无事件处理；OpenGLPaint3D在Linux有DISPLAY且未显式指定后端时选GLX，保留其他平台/用户选择，不改GTK/原生Show后端或依赖。
+- KpointsViewerApplet改用16 ms GLib定时器，不依赖任务队列；X关闭/字节Esc及销毁移除timer/menu/Dyna listener，freeglut continue不退出主程序，可重新打开。删除隐藏窗口/回调中递归事件处理，用两个后续GTK轮次完成关闭通知/原生释放；raw GLUT destroy避免PyOpenGL便利包装过早清理C callback，最终再清context缓存。期间诊断捕获过悬空窗口及回调释放导致的崩溃，已修正后完整重验，未把失败记通过。Models/Glade/菜单入口未改。
+- Linux/WSL本次实际X11 WM_DELETE、Esc、连续重开、重复销毁、原生窗口消失及GTK idle响应通过，/tmp/kpoints-lifecycle.log；原先失败独立启动现通过/tmp/kpoints-after.log，10 GTK适配器和含GLUT的34面板启动通过/tmp/kpoints-{adapter,smoke}.log，语法/diff通过。人工结构仅验生命周期和回调执行，不作为科研路径准确性/渲染画质验收；原有native析构警告仍在。架构/用法/双语同步，无新依赖/快照/原生重编或Windows包，Mac/Windows未验收，私有example未访问。当前任务完成，源码重启生效。
+
 ## 数据库新增periodic table（2026-11-25）
 
 - data/resources/websites.json新增第19张periodic table卡片，URL https://periodictable.com/，沿用Database → Resources → Databases四列导航、点击下方显示网址并自动复制。无Applet/Glade/适配器改动。
