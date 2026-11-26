@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 收工接手检查点（2026-11-26）
+
+- 今日已完成：内嵌结构选择/编辑/File保存、普通Show共用Cairo、Gas Build 3D默认Charge=0/Multiplicity=1，以及最新Windows成品；详细证据见下方条目及[当日双语记录](update_history/update_2026_11_26.md)。
+- Windows有效包为p4vasp-20261126-021129-b448be94-oavti_ej，冻结源码b448be94；最终交付说明/环境快照已推送至21b4189，JSON权限已规范为非可执行。EXE/ZIP/SHA及runtime/gui/models通过记录见[Windows交付指南](doc/windows-update-workflow-zh.md)；333c69a首轮失败产物不交付。
+- 本次收尾仅核对Git状态/既有记录和文档差异，没有重跑或新增应用验收。Windows干净机器及macOS仍未验收，等值面/透视仍用专用native后端，不能据普通Show迁移删除依赖。
+- 用户明确收工，当前任务全部结束，无后台构建/待自动执行任务。下次仅“开工”时按AGENTS做有限只读接手检查，等待用户指定下一项；不要自动重建Windows、重跑已通过检查或继续扩大渲染迁移范围。
+
 ## Windows新版交付完成（2026-11-26）
 
 - 用户要求最新EXE。冻结源码b448be94bf82d9d3d91b1b58973810b1d517dbd4；EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261126-021129-b448be94-oavti_ej\p4vasp.exe，同级ZIP/.zip.sha256，199347597字节，SHA256=d9ed308e8612dfb1a68cd968bc20567d477154697fa0d7912a8af68eb8c0a1d8。保留完整_internal/model-worker，旧版保留，未另复制桌面/上传Release附件；源码b448be94不随后续文档提交改变。
