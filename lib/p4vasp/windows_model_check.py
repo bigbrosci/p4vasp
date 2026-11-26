@@ -105,13 +105,16 @@ def main(args):
         gas.smiles_entry.set_text('CCO');gas.build_button.clicked();pump(lambda:gas.task is None,90)
         assert gas.generated is not None,gas.status.get_text()
         assert len(gas.generated.symbols)==9 and gas.charge.get_text()=='0'
-        assert gas.multiplicity.get_text()=='','Multiplicity must remain a user confirmation'
-        gas.multiplicity.set_text('1');gas.preview_button.clicked();pump()
+        assert gas.multiplicity.get_text()=='1','Build 3D must default to singlet multiplicity'
+        gas.charge.set_text('');gas.multiplicity.set_text('')
+        gas.preview_button.clicked();pump()
         assert gas.preview_window is not None and len(gas.preview_window.structure)==9
         with patch.object(gas_module,'InputFolderDialog',side_effect=auto_dialog(gas_module.InputFolderDialog,'ethanol_gas')):
             gas.generate_button.clicked()
         structure=Structure();structure.read(str(out/'ethanol_gas/POSCAR'));assert len(structure)==9
         assert {p.name for p in (out/'ethanol_gas').iterdir()}=={'INCAR','KPOINTS','POSCAR'}
+        assert 'charge=0; multiplicity=1' in (out/'ethanol_gas/INCAR').read_text()
+        assert gas.charge.get_text()=='0' and gas.multiplicity.get_text()=='1'
         screenshot('smiles.png');gas.close_preview()
         report['checks'].append('actual SMILES GUI -> bundled RDKit ethanol optimization -> native preview -> three-file export')
         bad=subprocess.run([str(worker),'--smiles'],input=json.dumps({'smiles':'[Na+].[Cl-]'}),capture_output=True,

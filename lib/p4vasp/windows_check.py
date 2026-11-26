@@ -157,6 +157,34 @@ def prepare_gui_check(args):
             w, h = window.get_allocated_width(), window.get_allocated_height()
             assert w > 300 and h > 200
             Gdk.pixbuf_get_from_window(window.get_window(), 0, 0, w, h).savev(str(out/'main.png'), 'png', [], [])
+            from p4vasp.applet import getAppletFrame,applets
+            from p4vasp.applet.StructurePreviewApplet import StructurePreviewApplet
+            from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
+            from p4vasp.gtk3.structure_window import CairoStructureWindow
+            frame=getAppletFrame()
+            assert isinstance(frame.embedded_applet,StructurePreviewApplet)
+            assert frame.embedded_applet.view.data['symbols']==['H']
+            frame.xml.get_widget('astart p4vasp.applet.StructureWindowApplet.StructureWindowApplet').emit('clicked')
+            for _ in range(15):
+                for _ in range(20):
+                    if not Gtk.events_pending():break
+                    Gtk.main_iteration_do(False)
+                time.sleep(.02)
+            owner=next(a for a in applets() if isinstance(a,StructureWindowApplet))
+            assert isinstance(owner.swin,CairoStructureWindow) and owner.swin._legacy is None
+            assert owner.swin.view.data['symbols']==['H']
+            import cairo
+            widget=owner.swin.widget
+            surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
+            widget.draw(cairo.Context(surface));surface.write_to_png(str(out/'cairo-show.png'))
+            owner.swin.widget.close()
+            for _ in range(15):
+                for _ in range(20):
+                    if not Gtk.events_pending():break
+                    Gtk.main_iteration_do(False)
+                time.sleep(.02)
+            assert owner.swin is None
+            result['checks']=['embedded startup structure','Cairo Show opens without native render window','Cairo Show closes without exiting main application']
             result.update(ok=True, width=w, height=h)
             status = 0
         except BaseException:

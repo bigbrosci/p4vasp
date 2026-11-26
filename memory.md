@@ -2,6 +2,13 @@
 
 Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Windows发布进行中：诊断跟随新界面（2026-11-26）
+
+- 用户要求最新EXE。首轮333c69a在Windows独立checkout完成native/GUI/worker冻结，runtime/gui ok，但models被旧multiplicity空白断言拒绝，失败产物p4vasp-20261126-020443-333c69a5-oqkrtslg不交付/不打ZIP。日志/tmp/p4vasp-windows-20261126.log，Windows build/windows-update/333c69a5-lj4y3is0；应用实际已正确用1。
+- windows_model_check改验默认1及清空字段0/1导出；windows_check补实际内嵌启动/Cairo Show无native打开及异步关闭，使用有界GTK事件处理。Linux源--check-gui已通过/tmp/p4vasp-release-gui-20261126-r3/report.json，非冻结验收；初轮无界处理及未等待异步close的诊断尝试已更正，不记通过。
+- 另首轮Windows源Cairo完整controls测试在临时runner适配启动等待、/tmp路径和退出cwd后通过/tmp/p4vasp-windows-20261126-cairo.log，截图C:/msys64/tmp/p4vasp-cairo-show-20261126.png已查看；这些是Windows源界面证据，不冒充冻结新版专项。首次环境采样12/48分发版本同11月24，失败构建的未提交快照不作最终基线。
+- 下一步已获授权：推送诊断更新后正常updater重建，全冻结runtime/gui/models通过再验ZIP/SHA/SOURCE、采最终目标解释器基线、写交付目录并推送文档。保留旧成品，不需再询问；最终包尚未完成。
+
 ## Gas Build 3D默认Charge/Multiplicity（2026-11-26）
 
 - 按用户要求，gtk3/gas_phase.py中SMILES Build 3D计算字段默认0/1；构建开始捕获现有值，空白补0/1，成功后保留，重新构建不覆盖用户修改。生成输入时SMILES空白也补默认并回显；显式非法值仍按原校验拒绝。RDKit形式电荷/未知自旋元数据不改，不自动覆盖用户计算设置；原XYZ元数据和未知必填逻辑保持，placeholder按来源显示Default或Required。Glade/入口不改。
