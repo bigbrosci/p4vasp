@@ -1,10 +1,36 @@
 # Linux 更新后构建 Windows 版本：操作流程
 
-更新日期：2026-11-24。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
+更新日期：2026-11-26。本文保存在同一 Git 仓库，Linux checkout 中也可查阅。
 前提：Windows 已安装 MSYS2 UCRT64 和项目构建依赖，且已建立独立 Git checkout。
 首次安装、依赖和构建细节见 [安装指南](../install.md#windows-native-build--windows-原生构建试验)。
 
-## 当前交付（2026-11-24）
+## 当前交付（2026-11-26）
+
+冻结源码`b448be94bf82d9d3d91b1b58973810b1d517dbd4`，包含近期Cairo Show/可编辑启动结构、元素周期表及单原子参考/晶型、数据库链接和Gas Build 3D默认Charge=0、Multiplicity=1等更新。ASE、RDKit、pymatgen继续随包，无需另配Python/PATH。
+
+EXE完整路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261126-021129-b448be94-oavti_ej\p4vasp.exe
+```
+
+ZIP完整路径：
+
+```text
+C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261126-021129-b448be94-oavti_ej.zip
+```
+
+ZIP 199347597字节，SHA256：`d9ed308e8612dfb1a68cd968bc20567d477154697fa0d7912a8af68eb8c0a1d8`，同级有`.zip.sha256`。
+完整解压并保留整个`_internal`与`model-worker`，双击p4vasp.exe。旧版保留；未另复制桌面或上传GitHub Release附件。
+
+本机Windows原生编译、GUI/科学worker冻结和runtime/gui/models均通过；成品GUI新增验证启动结构及Cairo Show打开/关闭（普通Show不创建原生渲染窗），models验证清空字段后以0/1导出气相输入，并保留Bulk/Surface、s/p/d/f DOSCAR/XML、导出/CLI/取消等既有检查。成品main/Cairo截图已查看。
+额外Windows源码Cairo控制/编辑/快照/透视与等值面切换/关闭重开测试通过，临时runner仅适配测试启动等待、截图路径及cwd清理；此为源码专项，未冒充成品全部科研场景或另一台干净Windows验收。
+
+首轮333c69a产物因过时的空Multiplicity断言失败，不交付且无ZIP；修正诊断后完整重建为本版。独立ZIP CRC/SHA、SOURCE、科学worker及私有例子排除检查通过。
+两目标解释器基线见[依赖记录](dependencies/README.md)，版本与11月24相同。日志`build/windows-update/b448be94-9tl65s9x`，报告`dist/windows-releases/p4vasp-20261126-021129-b448be94-oavti_ej-checks`，Linux启动日志`/tmp/p4vasp-windows-20261126-r2.log`。
+后续交付说明提交不改变成品SOURCE-COMMIT，不为纯文档重复打包。
+
+## 历史交付（2026-11-24）
 
 冻结源码`42b9802aa894d8d3068e8684b92d9d95f58f6f54`，包含Surface三个来源按钮及Bulk晶格参数只读显示修复。
 

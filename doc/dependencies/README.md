@@ -138,3 +138,8 @@ Surface首版复用现有ASE环境及隔离worker，不新增库或改变版本�
 
 
 2026-11-26：普通Show已迁移至与内嵌结构/频率共用的GTK/Cairo组件。FLTK/OpenGL仍用于体数据等值面、透视专用窗口、STM及其他模型预览，GLUT仍用于k点查看；不能据普通Show迁移删除这些依赖。没有新增或升级包，环境未变，不为此次代码迁移重复采集依赖快照。
+
+
+## 2026-11-26 Windows发布基线
+
+[GUI基线](snapshots/2026-11-26-windows-gui-b448be94.json)和[科学worker基线](snapshots/2026-11-26-windows-model-b448be94.json)由实际Windows目标解释器采集，来源b448be94，GUI Python3.14.9/UCRT与worker CPython3.13.17分开；12/48项分发元数据与11月24一致。目录/工具摘要及来源核对通过，无新包/环境升级，旧记录保留。快照不是冻结DLL清单或锁文件，实际成品检查见[交付记录](../windows-update-workflow-zh.md)。

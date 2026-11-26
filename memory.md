@@ -2,12 +2,20 @@
 
 Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
-## Windows发布进行中：诊断跟随新界面（2026-11-26）
+## Windows新版交付完成（2026-11-26）
+
+- 用户要求最新EXE。冻结源码b448be94bf82d9d3d91b1b58973810b1d517dbd4；EXE：C:\msys64\home\lqlhz\p4vasp-checkout\dist\windows-releases\p4vasp-20261126-021129-b448be94-oavti_ej\p4vasp.exe，同级ZIP/.zip.sha256，199347597字节，SHA256=d9ed308e8612dfb1a68cd968bc20567d477154697fa0d7912a8af68eb8c0a1d8。保留完整_internal/model-worker，旧版保留，未另复制桌面/上传Release附件；源码b448be94不随后续文档提交改变。
+- Windows目标原生编译/GUI及ASE/RDKit/pymatgen worker冻结完成，updater SUCCESS/wrapper零退出，runtime/gui/models均ok/frozen。成品GUI新增真实启动结构及Cairo Show无native窗口打开/关闭，models新增默认1及空白0/1导出，含Bulk/Surface/DOSCAR/XML s/p/d/f/重放/取消既有验收。成品main/Cairo截图已查看；未冒充另一干净Windows或全部科学场景测试。
+- 额外Windows源码Cairo controls/初始编辑/最终只读/相机快照/CHGCAR及透视返回/关闭重开通过/tmp/p4vasp-windows-20261126-cairo.log，临时runner只适配等待/截图路径/cwd；源码与冻结专项范围分开。首轮333c69a被旧默认断言拒绝，保留FAILED标志，无ZIP；诊断修正后全量重建，不把首轮失败写成通过。
+- 独立最终ZIP CRC/SHA256/SOURCE/worker及源归档私有Cu3Ru1排除通过。最终目标GUI/worker基线doc/dependencies/snapshots/2026-11-26-windows-{gui,model}-b448be94.json，12/48项版本与11月24完全一致，来源/工具/目录hash核对通过；3依赖测试/目录check/diff通过，无新包或环境变化，不覆写旧快照。
+- Windows日志build/windows-update/b448be94-9tl65s9x，成品报告dist/windows-releases/p4vasp-20261126-021129-b448be94-oavti_ej-checks，Linux启动/tmp/p4vasp-windows-20261126-r2.log。交付指南/依赖索引/双语同步，当前任务完成，无待自动构建任务。
+
+## Windows发布诊断修正（已完成后续重建）：诊断跟随新界面（2026-11-26）
 
 - 用户要求最新EXE。首轮333c69a在Windows独立checkout完成native/GUI/worker冻结，runtime/gui ok，但models被旧multiplicity空白断言拒绝，失败产物p4vasp-20261126-020443-333c69a5-oqkrtslg不交付/不打ZIP。日志/tmp/p4vasp-windows-20261126.log，Windows build/windows-update/333c69a5-lj4y3is0；应用实际已正确用1。
 - windows_model_check改验默认1及清空字段0/1导出；windows_check补实际内嵌启动/Cairo Show无native打开及异步关闭，使用有界GTK事件处理。Linux源--check-gui已通过/tmp/p4vasp-release-gui-20261126-r3/report.json，非冻结验收；初轮无界处理及未等待异步close的诊断尝试已更正，不记通过。
 - 另首轮Windows源Cairo完整controls测试在临时runner适配启动等待、/tmp路径和退出cwd后通过/tmp/p4vasp-windows-20261126-cairo.log，截图C:/msys64/tmp/p4vasp-cairo-show-20261126.png已查看；这些是Windows源界面证据，不冒充冻结新版专项。首次环境采样12/48分发版本同11月24，失败构建的未提交快照不作最终基线。
-- 下一步已获授权：推送诊断更新后正常updater重建，全冻结runtime/gui/models通过再验ZIP/SHA/SOURCE、采最终目标解释器基线、写交付目录并推送文档。保留旧成品，不需再询问；最终包尚未完成。
+- 后续重建已完成，最终b448be94成品/证据见顶部Windows发布完成记录；333c69a失败产物不交付。
 
 ## Gas Build 3D默认Charge/Multiplicity（2026-11-26）
 
