@@ -754,3 +754,25 @@ freeglut's close notification/native destruction, without recursive GLUT event
 processing. Use the raw destroy call and retain PyOpenGL context callback storage
 until destruction finishes: the convenience wrapper releases callbacks too early
 for freeglut's deferred close. The previous hide-window workaround is removed.
+
+
+### Embedded startup structure preview (2026-11-25)
+
+p4v.init now activates StructurePreviewApplet instead of InfoApplet; Edit → Info
+is retained. The new embedded-only applet builds a ModeView programmatically
+inside the existing frame.glade applet_box. No Glade/adapter/toolbar labels change.
+It uses a display copy of INITIAL_STRUCTURE, converts POSCAR scalar/volume/axis
+scales, and shares the vibration renderer's colors/radii/bonds/cell/navigation.
+No ASE or extra native context is required. Invalid/empty/oversized structures
+produce a placeholder; source coordinates and files stay unchanged.
+
+Frame.showApplet switches the startup preview to the existing native-window
+Control applet when Show is activated; Control directly replaces it normally.
+The panel-is-present guard avoids recursion while Control initializes its native
+Show applet. Show over another panel preserves existing behavior. The existing
+Info menu, native editing, selections and trajectory controls remain available.
+
+Run test/testStartupPreviewGtk.py with the documented GTK environment: actual CLI
+POSCAR startup, positive/negative-volume/three-axis scales, source immutability,
+Show/Control toolbar handoff including a fresh native window, explicit Info and
+empty/system refresh. Linux/WSL checked; Windows/macOS not checked in this update.

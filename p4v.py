@@ -723,6 +723,13 @@ class Frame(SystemListListener):
                 self.embedded_applet=applet
             applet.show()
         self.updateContextControls()
+        # Show normally opens an external native window. On the startup preview
+        # only, replace the read-only canvas with its existing control panel too.
+        from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
+        if (isinstance(applet,StructureWindowApplet)
+                and getattr(self.embedded_applet,'startup_preview',False)
+                and self.embedded_applet.panel is not None):
+            startApplet(None,'p4vasp.applet.StructureWindowControlApplet.StructureWindowControlApplet',self)
 
     def quickCommit(self,*arg):
         import p4vasp.db as db
@@ -912,7 +919,7 @@ def init():
             traceback.print_exc()
             msg().error("Can not load %s: %s"%(s,error))
 
-    applets().activate(applets().factory.create("p4vasp.applet.InfoApplet.InfoApplet"))
+    applets().activate(applets().factory.create("p4vasp.applet.StructurePreviewApplet.StructurePreviewApplet"))
     if os.path.isfile("setup.xml"):
         try:
             msg().status("loading setup")

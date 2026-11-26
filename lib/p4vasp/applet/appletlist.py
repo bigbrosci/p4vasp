@@ -14,6 +14,7 @@ def appletlist():
     'p4vasp.applet.GraphWindowApplet.GraphWindowApplet',
     'p4vasp.applet.KpointsViewerApplet.KpointsViewerApplet',
     'p4vasp.applet.InfoApplet.InfoApplet',
+    'p4vasp.applet.StructurePreviewApplet.StructurePreviewApplet',
     'p4vasp.applet.MeasureApplet.MeasureApplet',
     'p4vasp.applet.SelectionApplet.SelectionApplet',
     'p4vasp.applet.RotateApplet.RotateApplet',

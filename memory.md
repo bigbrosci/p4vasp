@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 启动主区域结构预览（2026-11-25）
+
+- 用户希望p4v POSCAR启动后主区域显示结构，Show/Control替换内嵌预览且仍弹独立窗口。新增StructurePreviewApplet并注册，init默认改用它；复用ModeView只读Cairo预览/Show共用样式及导航，无ASE/额外原生窗口。显示INITIAL_STRUCTURE副本、晶胞及元素数量，换算正/负体积/三轴POSCAR尺度，保留原坐标/文件；空/无效/超限提示，沿用12000显示原子保护。
+- Frame.showApplet仅Show遇到仍有panel的startup_preview时切换原Control，Control直接切换；panel存在判断防Control创建原生Show时递归，其他面板的Show行为不变。Edit → Info仍保留，frame.glade/工具栏/adapter/原生编辑及轨迹未改；预览无选择/删除，独立视角不传Show，指南明确展示不替代科学输入。
+- Linux/WSL本次实际CLI启动、预览显示、源文件/结构不变、三种尺度/坐标、实际Show/Control工具栏（含Control新建原生窗口）、Info保留、空/切换系统通过/tmp/startup-preview-gtk.log；截图/tmp/p4vasp-startup-preview.png已查看。10 GTK及34默认面板启动（含新预览，不含GLUT）通过/tmp/startup-preview-{adapter,smoke}.log，语法/diff通过。初轮用纯Python Structure不存在的clone失败，改setStructure副本后通过，不把初轮记通过。无新依赖/快照/原生重编/Windows包，Mac/Windows未验收，私有example未访问。任务完成，源码重启生效。
+
 ## k点窗口关闭与上下文修复（2026-11-25）
 
 - 用户报告Electronic → View k-points窗口无法关闭。本机先复现GLUT创建窗口后PyOpenGL因Wayland自动选EGL而注册callback失败（/tmp/kpoints-before.log），未完成初始化的窗口无事件处理；OpenGLPaint3D在Linux有DISPLAY且未显式指定后端时选GLX，保留其他平台/用户选择，不改GTK/原生Show后端或依赖。
