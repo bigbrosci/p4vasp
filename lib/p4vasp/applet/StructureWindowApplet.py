@@ -56,6 +56,8 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
     def notifyAtomSelection(self, sel,origin):
 #    self.atom_selection.set_text(sel.encode(self.structure))
         sel=p4vasp.Selection.selection()
+        if self.swin is None:return
+        if hasattr(self.swin,'controller'):self.swin.controller.notifyAtomSelection(sel,origin)
         self.swin.removeSelectedAll()
         for i,nx,ny,nz in sel:
             self.swin.selectAtom(i,nx,ny,nz)
@@ -113,7 +115,9 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
                 xx=0
             else:
                 yy=0
-            self.swin=StructureWindow(x=xx,y=yy,w=500,h=400,title="p4vasp Structure",atomtypes=covalent_atomtypes())
+            from p4vasp.gtk3.structure_window import CairoStructureWindow
+            self.swin=CairoStructureWindow(self,x=xx,y=yy,w=500,h=400,title="p4vasp Structure",atomtypes=covalent_atomtypes())
+            self._cairo_window=self.swin
             self.swin.setRadiusFactor(0.5*self.radius_factor)
             self.swin.structure_drawer.setBondFactor(BOND_FACTOR)
             self.swin.structure_drawer.setBondColor(*BOND_COLOR)
@@ -243,6 +247,15 @@ class StructureWindowApplet(Applet,p4vasp.Selection.SelectionListener):
     def setArrowsType(self,atype):
         self.arrowstype=atype
         self.updateSeq()
+
+    def destroy(self):
+        for applet in list(applets()):
+            if getattr(applet,'system',None) is self.system and getattr(applet,'play_flag',0):
+                applet.on_stop_clicked_handler(None)
+        if self.swin is not None:
+            if hasattr(self,'_cairo_window'):self._cairo_window.destroy()
+            else:self.swin.hide()
+            self.swin=None
 
     def getWindowPtr(self):
         if self.swin is not None:

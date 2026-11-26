@@ -28,8 +28,9 @@ GTK3-supported deprecated widgets such as GtkTable are still accepted by this
 loader. This is a GTK3 runtime migration, not a GTK4 port or a wholesale UI redesign.
 Historical generated documentation is not rewritten.
 
-The native FLTK/OpenGL structure windows and GLUT k-point viewer are separate
-renderers. This change does not replace their graphics APIs with GTK widgets.
+Ordinary Show now uses the shared GTK/Cairo structure canvas (2026-11-26).
+FLTK/OpenGL remains for dedicated volume/perspective, STM and model previews;
+the separate GLUT k-point viewer also remains. Native dependencies are retained.
 
 ### macOS Quartz event ownership (2026-11-03)
 
@@ -796,3 +797,36 @@ The frame/Glade/adapter/Show-Control transition remains unchanged. No new
 scientific/runtime dependencies. testStartupPreviewGtk.py additionally calls
 exercise in testEmbeddedStructureEditing.py: actual GTK events and File menu,
 chooser OK, POSCAR re-read, coordinate/constraint checks and deletion to empty.
+
+
+### Cairo Show with compatible Control (2026-11-26)
+
+StructureWindowApplet creates gtk3.structure_window.CairoStructureWindow for
+ordinary Show. It adapts the existing Control/sequence interface, reusing
+StructureView/ModeView and the startup editor's controller hooks. Preserve
+selection, initial-only scientific edits, current-system File Save, per-frame
+camera state, constraints and an independent display copy. Window close destroys
+the GTK canvas; focus restoration must not replace an embedded editor.
+
+The adapter implements Control navigation, replication (1–10 per axis within
+12000 display atoms), radii/bonds, hidden atoms, cell/background, projected arrows,
+TGA/PNG screenshots and native-camera-compatible export snapshots. Native
+structure normalization retains original Direct/Cartesian convention and handles
+empty input. periodic_preview.geometry gains opt-in centered images/unwrapped
+positions for native-compatible Show replication/export; vibration defaults stay
+unchanged. Camera translation includes zoom and pan, matching render_cli.
+
+Volume/perspective switches to a lazily created native StructureWindow and hands
+its complete existing interface to Control. None/orthographic returns to Cairo;
+ordinary Show never creates that native render window. This is not a Cairo
+isosurface implementation or removal of native dependencies. Other FLTK model
+previews/STM and GLUT remain separate. Existing info/menu/Glade/toolbar resources
+and file-save routes are retained.
+
+Checks: testCairoShowGtk.py covers shared appearance data, Control, hidden/cell/
+radius/arrows, snapshot/replica/camera equivalence, initial editing/final-frame
+protection, synthetic CHGCAR/perspective return and GTK close/reopen.
+testXdatcarGtk.py checks Control first/middle/last and timed playback with Cairo;
+testStartupPreviewGtk.py covers embedded edits and File Save; existing vibration,
+navigation/geometry/GTK/applet/base regressions cover shared components.
+Linux/WSL verified; macOS/Windows and frozen packaging unverified for this update.

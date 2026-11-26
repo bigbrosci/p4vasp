@@ -36,11 +36,12 @@ def main():
         drain();frame=getAppletFrame()
         assert isinstance(systemlist()[0],XdatcarSystemPM)
         frame.xml.get_widget('astart p4vasp.applet.StructureWindowControlApplet.StructureWindowControlApplet').emit('clicked');drain()
-        assert cp4vasp.getDefaultPrimitivesResolution()==22
         from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
         from p4vasp.applet.StructureWindowControlApplet import StructureWindowControlApplet
         owner=next(a for a in applets() if isinstance(a,StructureWindowApplet))
         control=next(a for a in applets() if isinstance(a,StructureWindowControlApplet))
+        from p4vasp.gtk3.structure_window import CairoStructureWindow
+        assert isinstance(owner.swin,CairoStructureWindow)
         def check(index):
             drain(.06);assert owner.index==index,(owner.index,index)
             actual=owner.swin.structure
@@ -67,7 +68,7 @@ def main():
         widget=frame.root_window;widget.check_resize();drain(.1)
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
         widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-xdatcar-control.png')
-        # User trajectory is read only: verify actual first/middle/last in the native viewer.
+        # User trajectory is read only: verify actual first/middle/last in the Cairo viewer.
         real=root/'XDATCAR'
         if real.is_file():
             from p4vasp.SystemPM import getSystem
@@ -90,7 +91,7 @@ def main():
         owner.setSystem(getSystem(poscar));control.setSystem(owner.system)
         assert owner.sequencetype==owner.INITIAL_SEQUENCE
         assert not errors,errors
-        print('PASS CLI XDATCAR / native Control first-last-step / timed playback-stop-restart / actual trajectory samples',flush=True)
+        print('PASS CLI XDATCAR / Cairo Control first-last-step / timed playback-stop-restart / actual trajectory samples',flush=True)
 
 if __name__=='__main__':
     try:main()

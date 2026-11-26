@@ -77,5 +77,5 @@ def exercise(frame,preview,folder,pump):
     chooser.destroy()
     key('Delete');assert len(source)==2
     selection().setSelection([0,1]);selection().notify(None);key('Delete')
-    assert len(source)==0 and view.data is None and not selection()
+    assert len(source)==0 and view.data is None and not selection(), (len(source),view.data is None,list(selection()),view.box,preview.editable_source() is source)
     print('PASS embedded Space/Shift-box/Escape, shared selection, arrows/rotation/Delete, camera/flags and real File/Save POSCAR',flush=True)

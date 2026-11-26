@@ -44,8 +44,8 @@ class StructurePreviewApplet(Applet,SelectionListener):
         from p4vasp.applet import applets
         from p4vasp import msg
         if self.panel is None or self.system is None or self.view.data is None:return
-        source=self.system.INITIAL_STRUCTURE
-        if source is not self._source:return
+        source=self.editable_source()
+        if source is None:return
         indices=selection().getAtoms()
         try:
             if operation=='delete':changed=delete_selected(source,indices,len(source))
@@ -60,13 +60,20 @@ class StructurePreviewApplet(Applet,SelectionListener):
         self.notifyAtomSelection(selection(),self)
         msg().status('Structure edited. Use File → Save to save the current structure.')
 
+    def editable_source(self):
+        source=self.system.INITIAL_STRUCTURE
+        return source if source is self._source else None
+
+    def display_source(self):
+        return self.system.INITIAL_STRUCTURE
+
     def updateSystem(self,*_):
         if self.panel is None:return
         self.view.data=None;self.view.queue_draw()
         self.summary.set_text('Open a structure to preview it here.')
         if self.system is None:return
         try:
-            source=self.system.INITIAL_STRUCTURE
+            source=self.display_source()
             same=source is self._source
             camera=(self.view.rotation,self.view.pan,self.view.zoom,getattr(self.view,'center',None),getattr(self.view,'extent',None))
             if not same:

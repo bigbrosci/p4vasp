@@ -2,6 +2,14 @@
 
 Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 普通Show统一Cairo（2026-11-26）
+
+- 用户决定将普通Show改为与主区域/频率相同Cairo，而不是嵌入FLTK。StructureWindowApplet创建gtk3/structure_window.py的CairoStructureWindow，兼容原Control/序列接口；ShowController复用StructurePreviewApplet显示/编辑钩子，StructureView/ModeView共用球棍/颜色/半径/导航/选区，初始结构才可编辑，File原保存路线不改。恢复焦点不自动替换内嵌编辑器，关闭释放Gtk并停止同体系播放，允许重开。
+- 兼容六视角（与native矩阵逐一比较）、Home/缩放、半径/键、隐藏/晶胞/背景、投影箭头、各轴1–10扩展（总显示12000保护）、TGA/PNG截图与透明图片导出快照。显示副本保留Direct/Cartesian，native数值归一化尺度后转Python副本；空结构绕开native空指针。periodic_preview.geometry新增可选centered/wrap/max_repeat，Show使用居中重复及显式单位胞副本以保持导出一致，频率默认不变。快照平移含zoom/pan，并验证与render_cli像素投影/重复坐标一致；同源轨迹/重复刷新保留相机。
+- 体数据等值面和Perspective仍需专用FLTK/OpenGL，首次使用才创建并把完整Control接口转交给旧后端；None/Orthographic条件满足后回Cairo，转接保留半径/重复/隐藏/晶胞/背景/箭头及相机。不是Cairo体绘制实现，其他模型/STM及GLUT不迁移，不能删native依赖。Glade/adapter/菜单/工具栏未改。
+- 本次Linux/WSL实际Cairo Show外观数据/正负体积三轴尺度/六视角/Control/隐藏/重复/半径/箭头/截图与导出相机/初始编辑及final保护/人工CHGCAR与透视返回/关闭播放和重开通过/tmp/cairo-show-controls.log，截图/tmp/p4vasp-cairo-show.png已查看；原启动编辑/File Save、XDATCAR切帧/定时播放、频率实界面通过/tmp/cairo-show-{startup,trajectory,vibrations}.log。6导航/3显示几何/10 GTK/34默认面板/58基础/3依赖工具及目录check/语法/diff通过，对应/tmp/cairo-show-{navigation,geometry,adapter,smoke,base,dependencies}.log。诊断中的空结构native异常、坐标表示、选择/焦点及导出位移问题修正后重验；仍见旧GTK/GDK/SWIG析构/弃用提示，不宣称修复。
+- 当前任务完成，使用/架构/依赖用途与当日双语同步；无新依赖/版本或环境变化，不采新快照/原生重编/Windows包，Mac/Windows未验收，私有Cu3Ru1未访问。源码版重启生效。
+
 ## 内嵌结构键鼠编辑与File保存（2026-11-26）
 
 - 用户要求启动主区域与Show保持选择/编辑一致并能File保存。新增gtk3/structure_view.py的StructureView，仅Startup启用：空格拾取鼠标下最前原子，Shift左框逐个toggle、Esc取消框/清空选择、Delete、当前视角方向键移动0.1 Å、Shift方向键质心旋转5°；鼠标进入获取键盘焦点，失焦/改窗口取消框，Ctrl/Alt/Meta不触发编辑。蓝圈高亮，顶部Selection与底部Selected同步，共用SelectionListener，原导航保留。

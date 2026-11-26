@@ -31,6 +31,9 @@ class ModeView(Gtk.DrawingArea):
         super().__init__()
         self.set_size_request(250,230)
         self.data=None;self.positions=[];self.bonds=[]
+        self.hidden=set();self.background=(1.,1.,1.);self.cell_color=(0.,0.,0.)
+        self.radius_factor=RADIUS_FACTOR;self.bond_factor=BOND_FACTOR;self.bond_color=BOND_COLOR;self.bond_radius=BOND_RADIUS
+        self.repeat_limit=5;self.centered_images=False;self.wrap_positions=True
         self.repeats=(1,1,1);self.show_cell=True;self.indices=[];self.offsets=[];self.cell_edges=[]
         self.rotation=_multiply(_show_rotation(.3,0),_show_rotation(0,-.4))
         self.pan=(0.,0.,0.);self.zoom=1.;self.drag=None
@@ -51,9 +54,9 @@ class ModeView(Gtk.DrawingArea):
         self.set_repeats((1,1,1))
 
     def set_repeats(self,repeats):
-        indices,offsets,points,edges=geometry(self.data['positions'],self.data['cell'],repeats)
+        indices,offsets,points,edges=geometry(self.data['positions'],self.data['cell'],repeats,max_repeat=self.repeat_limit,centered=self.centered_images,wrap=self.wrap_positions)
         self.repeats=tuple(repeats);self.indices=indices;self.offsets=offsets;self.cell_edges=edges
-        self.bonds=bonds(points,[self.radii[i] for i in indices],BOND_FACTOR)
+        self.bonds=bonds(points,[self.radii[i] for i in indices],self.bond_factor)
         self.fit(points);self.queue_draw()
 
     def fit(self,points=None):
@@ -138,25 +141,25 @@ class ModeView(Gtk.DrawingArea):
 
     def on_draw(self,widget,cr):
         w=self.get_allocated_width();h=self.get_allocated_height()
-        cr.set_source_rgb(1,1,1);cr.paint()
+        cr.set_source_rgb(*self.background);cr.paint()
         if not self.data:
             cr.set_source_rgb(.35,.35,.35);cr.move_to(18,35);cr.show_text('Open a frequency OUTCAR to preview modes.');return False
         factor=self.projection_scale();project=self.project
         points=[project(p) for p in self.display_positions()]
         # Draw the lattice behind atoms/bonds so the frame cannot hide a mode.
         if self.show_cell:
-            cr.set_source_rgb(0,0,0);cr.set_line_width(CELL_LINE_WIDTH)
+            cr.set_source_rgb(*self.cell_color);cr.set_line_width(CELL_LINE_WIDTH)
             for a,b in self.cell_edges:
                 cr.move_to(*project(a)[:2]);cr.line_to(*project(b)[:2])
             cr.stroke()
-        objects=[((points[i][2]+points[j][2])/2,'bond',(i,j)) for i,j in self.bonds]
-        objects.extend((p[2],'atom',i) for i,p in enumerate(points))
+        objects=[((points[i][2]+points[j][2])/2,'bond',(i,j)) for i,j in self.bonds if self.indices[i] not in self.hidden and self.indices[j] not in self.hidden]
+        objects.extend((p[2],'atom',i) for i,p in enumerate(points) if self.indices[i] not in self.hidden)
         for _,kind,item in sorted(objects,key=lambda obj:obj[0]):
             if kind=='bond':
-                i,j=item;cr.set_source_rgb(*BOND_COLOR);cr.set_line_width(max(2.,factor*2*BOND_RADIUS))
+                i,j=item;cr.set_source_rgb(*self.bond_color);cr.set_line_width(max(2.,factor*2*self.bond_radius))
                 cr.move_to(*points[i][:2]);cr.line_to(*points[j][:2]);cr.stroke()
             else:
-                x,y,_=points[item];radius=max(2.,factor*max(.15,self.ball_radii[self.indices[item]]*RADIUS_FACTOR))
+                x,y,_=points[item];radius=max(2.,factor*max(.15,self.ball_radii[self.indices[item]]*self.radius_factor))
                 red,green,blue=self.colors[self.indices[item]]
                 gradient=cairo.RadialGradient(x-radius*.3,y-radius*.3,radius*.05,x,y,radius)
                 gradient.add_color_stop_rgb(0,min(1,red*.6+.4),min(1,green*.6+.4),min(1,blue*.6+.4))

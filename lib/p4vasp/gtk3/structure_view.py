@@ -55,7 +55,7 @@ class StructureView(ModeView):
                 picked=[]
                 for i,point in zip(self.indices,self.display_positions()):
                     x,y,z=self.project(point)
-                    if 0<=x<=w and 0<=y<=h and left<=x<=right and top<=y<=bottom:picked.append(i)
+                    if i not in self.hidden and 0<=x<=w and 0<=y<=h and left<=x<=right and top<=y<=bottom:picked.append(i)
                 self.toggle(picked)
             self.queue_draw();return True
         return super().release(widget,event)
@@ -80,8 +80,8 @@ class StructureView(ModeView):
             px,py=self.pointer;hits=[]
             for n,p in enumerate(self.display_positions()):
                 x,y,z=self.project(p);i=self.indices[n]
-                radius=max(2.,self.projection_scale()*max(.15,self.ball_radii[i]*RADIUS_FACTOR))
-                if (px-x)**2+(py-y)**2<=radius**2:hits.append((z,i))
+                radius=max(2.,self.projection_scale()*max(.15,self.ball_radii[i]*self.radius_factor))
+                if i not in self.hidden and (px-x)**2+(py-y)**2<=radius**2:hits.append((z,i))
             if hits:self.toggle([max(hits)[1]])
             return True
         shift=bool(event.state&Gdk.ModifierType.SHIFT_MASK)
@@ -97,14 +97,14 @@ class StructureView(ModeView):
 
     def on_draw(self,widget,cr):
         if not self.data:
-            cr.set_source_rgb(1,1,1);cr.paint();return False
+            cr.set_source_rgb(*self.background);cr.paint();return False
         super().on_draw(widget,cr)
         chosen=set(selection().getAtoms())
         cr.set_source_rgb(.1,.65,1.);cr.set_line_width(2.)
         for i,p in zip(self.indices,self.display_positions()):
-            if i in chosen:
+            if i in chosen and i not in self.hidden:
                 x,y,z=self.project(p)
-                radius=max(2.,self.projection_scale()*max(.15,self.ball_radii[i]*RADIUS_FACTOR))+3
+                radius=max(2.,self.projection_scale()*max(.15,self.ball_radii[i]*self.radius_factor))+3
                 cr.new_sub_path();cr.arc(x,y,radius,0,2*math.pi);cr.stroke()
         if self.box is not None:
             x,y,x1,y1,w,h=self.box
