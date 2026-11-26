@@ -32,7 +32,7 @@ def main():
         assert ticks,'GUI stopped servicing timers'
         assert page.molecule is page.generated and page.molecule.path is None,page.status.get_text()
         assert len(page.molecule.symbols)==9 and page.charge.get_text()=='0'
-        assert page.multiplicity.get_text()==''
+        assert page.multiplicity.get_text()=='1'
         assert page.preview_window is not None and len(page.preview_window.structure)==9
         import math
         drawer=page.preview_window.structure_drawer
@@ -47,8 +47,7 @@ def main():
         assert sum(set(pair)=={'C','H'} for pair in bonds)==5,bonds
         for _ in range(12):cp4vasp.VisCheck();time.sleep(.02)
         page.preview_window.win.saveScreenshot('/tmp/p4vasp-ethanol-bonds.tga')
-        page.generate_button.clicked();assert 'integer' in page.status.get_text()
-        page.multiplicity.set_text('1')
+        page.charge.set_text(' ');page.multiplicity.set_text('')
         def choose_folder(*args,**kwargs):
             dialog=InputFolderDialog(None,*args[1:],**kwargs)
             dialog.folder.set_text(str(root));dialog.name.set_text('ethanol')
@@ -57,8 +56,11 @@ def main():
         with patch('p4vasp.gtk3.gas_phase.InputFolderDialog',side_effect=choose_folder):page.generate_button.clicked()
         assert (root/'ethanol/POSCAR').exists(),page.status.get_text()
         assert 'SMILES=CCO' in (root/'ethanol/INCAR').read_text()
+        assert 'charge=0; multiplicity=1' in (root/'ethanol/INCAR').read_text()
+        assert page.charge.get_text()=='0' and page.multiplicity.get_text()=='1'
+        page.charge.set_text('-1');page.multiplicity.set_text('2')
         page.build_button.clicked();pump_until(lambda:page.task is None)
-        assert page.molecule is page.generated and page.multiplicity.get_text()==''
+        assert page.molecule is page.generated and page.charge.get_text()=='-1' and page.multiplicity.get_text()=='2'
         page.multiplicity.set_text('1')
         selected=page.molecule;page.refresh()
         assert page.molecule is selected and page.multiplicity.get_text()=='1'

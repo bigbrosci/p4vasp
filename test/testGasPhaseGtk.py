@@ -89,7 +89,7 @@ def main():
         with patch.object(Gio.AppInfo,'launch_default_for_uri') as opener:
             page.open_button.clicked();opener.assert_called_once_with(root.as_uri(),None)
         import shlex
-        assert shlex.split(page.install_hint.command.get_text())[-1].endswith('/install/install-rdkit.sh')
+        assert shlex.split(page.install_hint.command.get_text())[-1].endswith('/install/install-science.sh')
         assert not page.install_hint.command.get_editable()
         page.close_preview()
         select('water.xyz')

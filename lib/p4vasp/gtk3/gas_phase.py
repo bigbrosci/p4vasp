@@ -94,8 +94,8 @@ class GasPhasePage(Gtk.Box):
         scroll=Gtk.ScrolledWindow();scroll.set_policy(Gtk.PolicyType.AUTOMATIC,Gtk.PolicyType.AUTOMATIC)
         scroll.add(self.tree);self.pack_start(scroll,True,True,0)
         fields=Gtk.Grid(column_spacing=6,row_spacing=6)
-        self.charge=entry('');self.multiplicity=entry('')
-        self.charge.set_placeholder_text('Required');self.multiplicity.set_placeholder_text('Required')
+        self.charge=entry('0');self.multiplicity=entry('1')
+        self.charge.set_placeholder_text('Default: 0');self.multiplicity.set_placeholder_text('Default: 1')
         self.cell=[entry('') for _ in range(3)]
         for row,items in enumerate((list(zip(('Charge','Multiplicity'),(self.charge,self.multiplicity))),list(zip(('Lx (Å)','Ly (Å)','Lz (Å)'),self.cell)))):
             for index,(title,widget) in enumerate(items):
@@ -147,11 +147,18 @@ class GasPhasePage(Gtk.Box):
         self.preview_button.set_sensitive(molecule is not None)
         self.generate_button.set_sensitive(molecule is not None)
         if molecule is None:
-            for field in (self.charge,self.multiplicity,*self.cell):field.set_text('')
+            self.charge.set_text('0');self.multiplicity.set_text('1')
+            self.charge.set_placeholder_text('Default: 0');self.multiplicity.set_placeholder_text('Default: 1')
+            for field in self.cell:field.set_text('')
             if iterator is not None:self.status.set_text(model[iterator][3])
             return
         self.charge.set_text('' if molecule.charge is None else str(molecule.charge))
         self.multiplicity.set_text('' if molecule.multiplicity is None else str(molecule.multiplicity))
+        self.charge.set_placeholder_text('Default: 0' if molecule.path is None else 'Required')
+        self.multiplicity.set_placeholder_text('Default: 1' if molecule.path is None else 'Required')
+        if molecule.path is None:
+            charge,multiplicity=getattr(self,'_smiles_settings',('0','1'))
+            self.charge.set_text(charge);self.multiplicity.set_text(multiplicity)
         for widget,length in zip(self.cell,suggested_cell(molecule)):widget.set_text(str(length))
         if molecule.path is None:
             self.status.set_text(self.generated_note+' Confirm charge / multiplicity before exporting.')
@@ -194,7 +201,10 @@ class GasPhasePage(Gtk.Box):
     def generate(self,*args):
         if self.molecule is None:return
         try:
-            molecule=self.molecule;charge=self.charge.get_text();multiplicity=self.multiplicity.get_text()
+            molecule=self.molecule;charge=self.charge.get_text().strip();multiplicity=self.multiplicity.get_text().strip()
+            if molecule.path is None:
+                charge=charge or '0';multiplicity=multiplicity or '1'
+                self.charge.set_text(charge);self.multiplicity.set_text(multiplicity)
             cell=self.lengths()
             input_contents(molecule,charge,multiplicity,cell)
             stem=re.sub(r'[^A-Za-z0-9_-]+','_',molecule.path.stem if molecule.path is not None else 'smiles_molecule').strip('_') or 'molecule'
@@ -219,6 +229,7 @@ class GasPhasePage(Gtk.Box):
         if self.task is not None:return
         text=self.smiles_entry.get_text().strip()
         if not text:self.status.set_text('Enter a SMILES string, for example CCO.');return
+        self._smiles_settings=(self.charge.get_text().strip() or '0',self.multiplicity.get_text().strip() or '1')
         task=SmilesTask(text,lambda result,error:GLib.idle_add(self.smiles_finished,task,result,error))
         self.task=task;self.set_busy(True)
         self.status.set_text('Building 3D conformers and optimizing...')

@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Gas Build 3D默认Charge/Multiplicity（2026-11-26）
+
+- 按用户要求，gtk3/gas_phase.py中SMILES Build 3D计算字段默认0/1；构建开始捕获现有值，空白补0/1，成功后保留，重新构建不覆盖用户修改。生成输入时SMILES空白也补默认并回显；显式非法值仍按原校验拒绝。RDKit形式电荷/未知自旋元数据不改，不自动覆盖用户计算设置；原XYZ元数据和未知必填逻辑保持，placeholder按来源显示Default或Required。Glade/入口不改。
+- 本机Linux/WSL真实SmilesGtk构建/优化/空白导出0/1/用户-1与2重建保留/刷新/预览/错误/取消通过/tmp/gas-spin-default-smiles.log；XYZ实界面/元数据/带电模板/保存取消通过/tmp/gas-spin-default-xyz.log，5气相输入及语法/diff通过/tmp/gas-spin-default-inputs.log。XYZ测试旧install-rdkit.sh断言已改为现行install-science.sh后重验，非本次安装逻辑改动。使用指南/分子库README及双语同步，无依赖/环境/Windows包，Mac/Windows未验收。
+
 ## 普通Show统一Cairo（2026-11-26）
 
 - 用户决定将普通Show改为与主区域/频率相同Cairo，而不是嵌入FLTK。StructureWindowApplet创建gtk3/structure_window.py的CairoStructureWindow，兼容原Control/序列接口；ShowController复用StructurePreviewApplet显示/编辑钩子，StructureView/ModeView共用球棍/颜色/半径/导航/选区，初始结构才可编辑，File原保存路线不改。恢复焦点不自动替换内嵌编辑器，关闭释放Gtk并停止同体系播放，允许重开。

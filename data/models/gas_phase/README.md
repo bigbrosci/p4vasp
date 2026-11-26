@@ -50,7 +50,7 @@ NELECT = SET_AFTER_POTCAR
 
 ## 从 SMILES 新建结构
 
-同一 gas phase 页面可输入 SMILES，点 Build 3D + optimize 补氢、生成三维构象并初步优化，随后复用预览及导出按钮。新结构只暂存内存，不自动改写此目录；需导出后再离开 Models。形式电荷自动填入，自旋多重度需确认；盐、多片段、金属等仍使用本目录的 XYZ 接口。
+同一 gas phase 页面可输入 SMILES，点 Build 3D + optimize 补氢、生成三维构象并初步优化，随后复用预览及导出按钮。新结构只暂存内存，不自动改写此目录；需导出后再离开 Models。Build 3D计算Charge默认0、Multiplicity默认1，空白按0/1处理，用户可编辑且重建保留；SMILES解析出的形式电荷仍作为结构元数据保留，不覆盖计算设置，自旋初值不是自动判定的基态；盐、多片段、金属等仍使用本目录的 XYZ 接口。
 
 这是可选 RDKit 功能，安装、优化方法与限制见 [SMILES 建模说明](../../../doc/smiles-gas-phase-zh.md)。
 

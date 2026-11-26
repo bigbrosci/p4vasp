@@ -554,7 +554,7 @@ INCAR 以内部 Standard 预设为基础，设置 `ISPIN=2`、`ISMEAR=0`、`SIGM
 
 在 gas phase 的 **SMILES** 栏输入例如 `CCO`，点击 **Build 3D + optimize**。生成时补氢，用 ETKDGv3 生成候选、MMFF94s／UFF 初步优化并选已收敛候选中力场能量最低的一份，自动打开三维预览。列表显示 `[SMILES]`；随后继续用 Preview 3D／Generate inputs，输出文件沿用现有气相流程。
 
-Charge 从 SMILES 的形式电荷填入，Multiplicity 留空需确认。结构只是力场初始几何，不是 DFT 结果；盐、多片段及金属等继续导入 XYZ。生成结构只暂存当前页面，离开 Models 前需导出 POSCAR；不会自动写入原 XYZ 库。
+Build 3D 的计算Charge默认0，Multiplicity默认1；留空时也使用0/1，用户可修改，重新构建保留已填值。这是可编辑的计算初值，不由RDKit推断自旋，也不自动用SMILES形式电荷覆盖用户设置。结构只是力场初始几何，不是 DFT 结果；盐、多片段及金属等继续导入 XYZ。生成结构只暂存当前页面，离开 Models 前需导出 POSCAR；不会自动写入原 XYZ 库。
 
 本机可选依赖已装入独立 `.venv-science`；其他设备需执行 `bash install/install-science.sh`，或设置 P4VASP_SMILES_PYTHON 指向装有 RDKit 的 Python。生成任务可取消、60 秒超时终止，不启动常驻计算进程。完整方法、支持范围、依赖与测试说明见 [SMILES 气相建模](smiles-gas-phase-zh.md)。
 
