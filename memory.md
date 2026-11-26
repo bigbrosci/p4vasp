@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-25. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 数据库新增periodic table（2026-11-25）
+
+- data/resources/websites.json新增第19张periodic table卡片，URL https://periodictable.com/，沿用Database → Resources → Databases四列导航、点击下方显示网址并自动复制。无Applet/Glade/适配器改动。
+- Linux/WSL本次5资源测试、实际ResourceHub含新卡片标签/位置/网址/剪贴板及原导航/编辑集成通过，/tmp/periodic-link-{data,gtk}.log；/tmp/p4vasp-online-links.png已查看。初轮测试误用Button.get_label，改读已有卡片child Label后通过；旧析构提示仍在。diff通过，资源说明/双语同步，无依赖或Windows包，Mac/Windows未验收。
+
 ## 单原子磁矩来源说明（2026-11-25）
 
 - 用户指出Fe原子参考4与p4vasp data预设3不一致。AtomInputDialog把Use reference改名Use atomic 2S，在设置区明确显示NIST中性自由原子LS的2S估计及当前个人/默认Magmom预设，说明均非最终DFT磁矩；Fe S=2/多重度5→4 μB，预设3是独立可编辑初始化，不宣称实验体相值。按钮逻辑/全局数据/默认空MAGMOM不变，原Models资源/入口不变。

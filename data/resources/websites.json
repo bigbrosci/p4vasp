@@ -88,5 +88,10 @@
     "name": "The Cambridge Cluster Database",
     "url": "http://www-wales.ch.cam.ac.uk/CCD.html",
     "description": "Cluster structures · global optimization and energy landscapes"
+  },
+  {
+    "name": "periodic table",
+    "url": "https://periodictable.com/",
+    "description": "Interactive periodic table and element properties"
   }
 ]
