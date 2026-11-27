@@ -843,3 +843,19 @@ pass. The full Bulk GTK test still fails its pre-existing 480×320 compact-windo
 assertion, also reproduced with HEAD's unchanged implementation/test; this update
 does not claim to fix that separate layout issue. Windows/macOS not checked and
 the existing Windows release has not been rebuilt for this patch.
+
+
+### PNG graph export (2026-11-27)
+
+GraphCanvas.Export appends PNG at index 7, preserving existing format indices;
+.png/.PNG selects it through the shared export dialog. GraphWindowApplet and
+standalone GraphCanvas use the same Export class and existing graphwindow.glade
+resource/GTK3 adapter; no Glade or menu wiring changes are needed.
+Render a cloned World with BasicCanvas's existing Cairo/Pango backend, add room
+past the nominal bottom/right page edges for axis labels, and write PNG through
+a Python binary stream for Unicode paths. Disconnect temporary canvas handlers
+on completion. No new dependency or changed DOS data.
+Actual synthetic DOS dialog Export checks all eight formats plus uppercase PNG,
+decodes PNG and verifies dimensions/content, and independently reads SVG/AGR,
+DATA and PDF. Seven vector serialization tests pass. Dialog/PNG screenshots
+inspected on Linux/WSL; Windows/macOS and frozen packaging not checked here.

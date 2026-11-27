@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-27. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## DOS/Graph导出PNG（2026-11-27）
+
+- 用户报告DOS → Graph → Export无PNG。GraphCanvas.Export在原七格式后追加PNG(index7)，扩展名识别改大小写不敏感；GraphWindowApplet和独立GraphCanvas共用此入口，graphwindow.glade/adapter/菜单不改。用已有BasicCanvas Cairo/Pango重绘World副本，PNG底/右32像素边距避免轴标签裁剪，Python二进制流写出支持中文路径，finally断开临时canvas信号；不改DOS值，不加依赖。
+- Linux/WSL实际DOS导出窗口八格式及大写PNG/中文路径点击导出通过，PNG解码/尺寸/非空图像、旧SVG/AGR/DATA/PDF回读及原DOS不变通过/tmp/dos-png-gtk-20261127.log；7矢量序列化回归通过/tmp/dos-png-vector-20261127.log，语法/diff通过。窗口/tmp/p4vasp-vector-export-dialog.png与图片/tmp/p4vasp-exported-dos-png.png已查看，轴标题完整。
+- 使用/架构/当日中英记录同步，任务完成；未重编/采依赖快照或生成Windows包，Windows/macOS未验收，11月26 EXE仍不含11月27的Bulk晶胞及PNG导出补丁。下一步仅按用户新指令，不自动重建Windows或扩展图片参数UI。
+
 ## Bulk Preview 3D晶胞边框（2026-11-27）
 
 - 用户报告Models → bulk → Build → Preview 3D没有晶胞线。gtk3/bulk.py.preview原调用共享show_model_preview默认show_cell=False；现显式True，并fitToStructure(include_cell=True)+redraw，完整晶胞进入视野。只改Bulk调用，不改气相默认、共享helper/Cairo/科学结果；ModelsApplet/models.glade/adapter/工具栏未改。

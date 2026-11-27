@@ -37,16 +37,25 @@ def main():
         applet=frame.embedded_applet;original=[list(row) for row in applet.total_dos]
         applet.show_export_handler();drain()
         export=applet.export
-        for suffix in ('dat','agr','fig','svg','ps','eps','pdf'):
+        assert export.options[7]=='Portable Network Graphics (.png)'
+        for suffix in ('dat','agr','fig','svg','ps','eps','pdf','png','PNG'):
             path=Path(folder)/("DOS 图 ' & %."+suffix)
             export.file_entry.set_text(str(path));drain()
-            assert export.type=={'dat':0,'agr':1,'ps':2,'eps':3,'pdf':4,'fig':5,'svg':6}[suffix]
+            assert export.type=={'dat':0,'agr':1,'ps':2,'eps':3,'pdf':4,'fig':5,'svg':6,'png':7}[suffix.lower()]
             export.xml.get_widget('export_button').clicked();drain()
 
             if not path.exists():
                 for error in errors:traceback.print_exception(*error)
             data=path.read_bytes();assert len(data)>50
-            if suffix=='pdf':check_pdf(unittest.TestCase(),data)
+            if suffix.lower()=='png':
+                assert data.startswith(b'\x89PNG\r\n\x1a\n')
+                image=cairo.ImageSurface.create_from_png(str(path))
+                assert (image.get_width(),image.get_height())==(824,644)
+                import numpy as np
+                pixels=np.frombuffer(image.get_data(),dtype=np.uint8).reshape(image.get_height(),image.get_stride())[:,:image.get_width()*4].reshape(image.get_height(),image.get_width(),4)
+                assert (pixels[:,:,:3].min(axis=2)<200).sum()>100
+                image.write_to_png('/tmp/p4vasp-exported-dos-png.png')
+            elif suffix=='pdf':check_pdf(unittest.TestCase(),data)
             elif suffix in ('ps','eps'):assert data.startswith(b'%!PS') and b'%%EOF' in data
             elif suffix=='fig':assert data.startswith(b'#FIG 3.2')
             elif suffix=='svg':
@@ -74,7 +83,7 @@ def main():
         widget=export.window;widget.check_resize();drain()
         surface=cairo.ImageSurface(cairo.FORMAT_ARGB32,widget.get_allocated_width(),widget.get_allocated_height())
         widget.draw(cairo.Context(surface));surface.write_to_png('/tmp/p4vasp-vector-export-dialog.png')
-        print('PASS DOS dialog export buttons -> Unicode all seven formats; parsed SVG/AGR, numeric DATA, PDF offsets; unchanged DOS',flush=True)
+        print('PASS DOS dialog export buttons -> Unicode eight formats and uppercase PNG; decoded PNG/SVG/AGR, numeric DATA, PDF offsets; unchanged DOS',flush=True)
 
 if __name__=='__main__':
     try:main()

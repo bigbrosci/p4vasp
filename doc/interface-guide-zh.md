@@ -613,6 +613,12 @@ Export Data原有七种格式均可按扩展名选择。DATA为数值文本，AG
 FIG修复RGB颜色转十六进制时的Python3类型错误，并接受常用字体名大小写。SVG修复默认字体只读属性错误，输出统一UTF-8、正确XML命名空间，文字中的&、<、>会转义，去掉旧外部DTD依赖。支持中文文件名；SVG文本编码支持不等于任意设备都有对应字体，FIG复杂字体/图片仍需实际检查。已通过系统GdkPixbuf加载器渲染一份导出的DOS SVG并查看结果。
 
 
+### DOS等曲线导出PNG（2026-11-27）
+
+在 **DOS → Graph → Export** 的Type中选择 **Portable Network Graphics (.png)**，填写保存路径后点击Export；文件名以`.png`或`.PNG`结尾也会自动选中PNG。该公共导出入口同时用于其他曲线及独立图形窗口，原七种格式保留。
+PNG用现有Cairo/Pango图形后端重新绘制当前曲线，白色背景，并给底部/右侧轴标签留边距；不是截取整个程序界面。支持中文文件名，不修改DOS数值。Windows EXE需重新打包后包含此功能。
+
+
 ### 复制结构摘要用于ChatGPT问答
 
 打开 **Edit → Copy for ChatGPT...**，预览后点击 **Copy**，再手动粘贴到ChatGPT并写下问题。

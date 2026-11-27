@@ -45,7 +45,8 @@ class Export:
                       "Encapsulated Postscript (.eps)",
                       "Portable Document Format (.pdf)",
                       "XFig (.fig)",
-                      "Scalable Vector Graphics (.svg)"
+                      "Scalable Vector Graphics (.svg)",
+                      "Portable Network Graphics (.png)"
                       ]
         self.option_extensions={".data" :0,
                                 ".dat"  :0,
@@ -55,7 +56,8 @@ class Export:
                                 ".eps"  :3,
                                 ".pdf"  :4,
                                 ".fig"  :5,
-                                ".svg"  :6
+                                ".svg"  :6,
+                                ".png"  :7
                                 }
 
     def show(self):
@@ -99,7 +101,7 @@ class Export:
     def _on_file_entry_changed(self,*arg):
         self.file=self.file_entry.get_text()
         for k,v in list(self.option_extensions.items()):
-            if self.file[-len(k):]==k:
+            if self.file.lower().endswith(k):
                 self.type_options.set_history(v)
                 self.type=v
 
@@ -160,6 +162,20 @@ class Export:
                 self.exportFIG(w,self.data)
             elif self.type==6:
                 self.exportSVG(w,self.data)
+            elif self.type==7:
+                self.exportPNG(w,self.data)
+
+    def exportPNG(self,w,data=None):
+        canvas=piddleGTK3.BasicCanvas()
+        try:
+            # Grace axis labels can extend past the nominal bottom/right edge.
+            canvas.size=(w.page_size_x+32,w.page_size_y+32)
+            canvas.ensure_size(*canvas.size)
+            w.render(canvas,data)
+            with open(self.file,'wb') as stream:
+                canvas.drawable.write_to_png(stream)
+        finally:
+            canvas.close()
 
     def exportPS(self,w,data=None):
         import p4vasp.piddle.piddlePS as piddlePS
