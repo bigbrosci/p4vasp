@@ -830,3 +830,16 @@ testXdatcarGtk.py checks Control first/middle/last and timed playback with Cairo
 testStartupPreviewGtk.py covers embedded edits and File Save; existing vibration,
 navigation/geometry/GTK/applet/base regressions cover shared components.
 Linux/WSL verified; macOS/Windows and frozen packaging unverified for this update.
+
+
+### Bulk preview cell outline (2026-11-27)
+
+ModelsApplet/models.glade still hosts the programmatic BulkPage. Bulk preview
+now explicitly requests show_cell=True from the shared model helper, then fits
+including the cell and redraws. Keep the helper's gas default unchanged; no
+scientific structure, Glade, adapter, toolbar or Cairo Show change.
+Actual Linux/WSL Bulk render/cell screenshot and focused build/save/cancel checks
+pass. The full Bulk GTK test still fails its pre-existing 480×320 compact-window
+assertion, also reproduced with HEAD's unchanged implementation/test; this update
+does not claim to fix that separate layout issue. Windows/macOS not checked and
+the existing Windows release has not been rebuilt for this patch.

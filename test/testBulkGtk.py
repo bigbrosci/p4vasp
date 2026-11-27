@@ -51,6 +51,10 @@ page.preview_button.clicked();spin(.3)
 assert page.preview_window is not None,page.status.get_text()
 assert 'Bulk preview' in page.preview_window.win.getTitle()
 assert len(page.preview_window.structure)==32
+assert page.preview_window.structure_drawer.showcellflag
+page.preview_window.win.saveScreenshot('/tmp/p4vasp-bulk-cell.tga');cp4vasp.VisSync()
+from gi.repository import GdkPixbuf
+GdkPixbuf.Pixbuf.new_from_file('/tmp/p4vasp-bulk-cell.tga').savev('/tmp/p4vasp-bulk-cell.png','png',[],[])
 from p4vasp.gtk3.gas_phase import handle_preview_event
 from types import SimpleNamespace
 assert handle_preview_event(SimpleNamespace(type=cp4vasp.BE_ATOM_MOVE,getWindow=lambda:page.preview_window.win))

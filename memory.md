@@ -1,6 +1,12 @@
 # p4vasp maintenance memory
 
-Last updated: 2026-11-26. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+Last updated: 2026-11-27. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
+
+## Bulk Preview 3D晶胞边框（2026-11-27）
+
+- 用户报告Models → bulk → Build → Preview 3D没有晶胞线。gtk3/bulk.py.preview原调用共享show_model_preview默认show_cell=False；现显式True，并fitToStructure(include_cell=True)+redraw，完整晶胞进入视野。只改Bulk调用，不改气相默认、共享helper/Cairo/科学结果；ModelsApplet/models.glade/adapter/工具栏未改。
+- Linux/WSL实际32 Cu预览showcellflag及截图/tmp/p4vasp-bulk-cell.png已查看，边框可见；聚焦真实ASE构建/响应/预览/保存/取消/几何/失效流程通过/tmp/bulk-cell-focused-20261127.log。完整testBulkGtk仍在原480×320小窗口断言失败，使用HEAD原实现/原测试同点复现/tmp/bulk-cell-baseline-20261127.log，不记作本次通过或修复。语法/diff通过，Bulk用法/架构及当日双语同步。
+- 当前任务完成。既有compact布局问题保留，未扩展修复；未改依赖/环境/重编原生或构建Windows，11月26 EXE不含本补丁，Windows/macOS未验收。不要自动重建Windows，除非用户后续要求。
 
 ## 收工接手检查点（2026-11-26）
 

@@ -145,7 +145,9 @@ class BulkPage(Gtk.Box):
             from p4vasp.gtk3.gas_phase import show_model_preview
             structure = Structure()
             structure.read(StringIO(self.result['poscar']))
-            self.preview_window = show_model_preview(structure, 'Bulk preview — '+self.result['formula'])
+            self.preview_window = show_model_preview(structure, 'Bulk preview — '+self.result['formula'],show_cell=True)
+            self.preview_window.fitToStructure(include_cell=True)
+            self.preview_window.redraw()
         except Exception as error: self.status.set_text(str(error))
 
     def parent_window(self):
