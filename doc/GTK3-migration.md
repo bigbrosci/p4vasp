@@ -879,3 +879,7 @@ The existing selection rings in editable views still indicate selection.
 The marker follows the stored selective dynamics flags, with no change to
 those flags or to Surface save/replay. The specialized OpenGL views retain
 their existing rendering.
+
+In the shared Cairo renderer, bonds now draw at 70% of their former width at
+every zoom level, including the minimum stroke. This applies to the startup
+view, ordinary Show, Surface preview, and vibration preview.

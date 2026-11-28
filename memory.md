@@ -2,6 +2,10 @@
 
 Last updated: 2026-11-28. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## Cairo 键线缩细（2026-11-28）
+
+- `gtk3/mode_view.py` 的键线在旧投影宽度与最小宽度取最大值后乘 0.7。适用于 Surface、启动结构预览、普通 Show 和振动预览，保持原键连接和约束标记。macOS arm64 实际 Surface/Show、10 GTK、58 基础及语法/diff 通过，已查看 /tmp/p4vasp-bond-width-comparison.png。Windows 包未重建。
+
 ## 结构预览固定原子 X 标记（2026-11-28）
 
 - Surface Preview 3D 改用共享 Cairo 绘制的只读窗口，完整晶胞侧视。它与启动结构预览、普通 Show 根据 POSCAR selective flags 给部分或完全固定原子画 X；所有坐标自由时无 X。标记与球体一起按深度绘制，选择圈仍表示选择。保留 Surface 的生成、保存和重放；专用原生 OpenGL 视图未改。

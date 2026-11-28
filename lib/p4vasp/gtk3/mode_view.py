@@ -146,6 +146,7 @@ class ModeView(Gtk.DrawingArea):
         if not self.data:
             cr.set_source_rgb(.35,.35,.35);cr.move_to(18,35);cr.show_text('Open a frequency OUTCAR to preview modes.');return False
         factor=self.projection_scale();project=self.project
+        bond_width=.7*max(2.,factor*2*self.bond_radius)
         points=[project(p) for p in self.display_positions()]
         # Draw the lattice behind atoms/bonds so the frame cannot hide a mode.
         if self.show_cell:
@@ -157,7 +158,7 @@ class ModeView(Gtk.DrawingArea):
         objects.extend((p[2],'atom',i) for i,p in enumerate(points) if self.indices[i] not in self.hidden)
         for _,kind,item in sorted(objects,key=lambda obj:obj[0]):
             if kind=='bond':
-                i,j=item;cr.set_source_rgb(*self.bond_color);cr.set_line_width(max(2.,factor*2*self.bond_radius))
+                i,j=item;cr.set_source_rgb(*self.bond_color);cr.set_line_width(bond_width)
                 cr.move_to(*points[i][:2]);cr.line_to(*points[j][:2]);cr.stroke()
             else:
                 index=self.indices[item]
