@@ -883,3 +883,7 @@ their existing rendering.
 In the shared Cairo renderer, bonds now draw at 70% of their former width at
 every zoom level, including the minimum stroke. This applies to the startup
 view, ordinary Show, Surface preview, and vibration preview.
+
+The shared startup/Show footer groups selected zero-based structure atom
+indices by element, with ascending indices and periodic image duplicates
+collapsed to the original atom. Overall element counts remain visible.

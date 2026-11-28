@@ -54,6 +54,11 @@ with tempfile.TemporaryDirectory() as directory:
     for field in ('symbols','radii','colors','cell'):assert window.view.data[field]==expected[field]
     for a,b in zip(window.view.data['positions'],expected['positions']):assert all(abs(x-y)<1e-12 for x,y in zip(a,b))
     assert window.getRadiusFactor()==.5 and window.view.radius_factor==.5
+    selection().setSelection([(2,0,0,0),(1,1,0,0),(0,0,0,0),(1,0,0,0)])
+    selection().notify(None);pump()
+    assert window.controller.summary.get_text().endswith('Selected: O: 0 | H: 1, 2')
+    selection().setSelection([]);selection().notify(None)
+    assert window.controller.summary.get_text().endswith('Selected: 0')
     source=owner.system.INITIAL_STRUCTURE
     for scales,expected_cell in (([2.],[14.,14.,14.]),([-2744.],[14.,14.,14.]),([2.,3.,4.],[14.,21.,28.])):
         source.scaling=scales;owner.updateSeq()

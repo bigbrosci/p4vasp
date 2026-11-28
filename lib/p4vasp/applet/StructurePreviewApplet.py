@@ -31,9 +31,13 @@ class StructurePreviewApplet(Applet,SelectionListener):
         self.view.queue_draw()
         if self.view.data:
             symbols=self.view.data['symbols']
-            selected=Counter(symbols[i] for i in set(sel.getAtoms()) if 0<=i<len(symbols))
+            selected={}
+            for index in sorted(set(sel.getAtoms())):
+                if 0<=index<len(symbols):
+                    selected.setdefault(symbols[index],[]).append(str(index))
+            indices=' | '.join(f"{symbol}: {', '.join(atoms)}" for symbol,atoms in selected.items())
             self.summary.set_text('  '.join('%s: %d'%item for item in Counter(symbols).items())+
-                                 '     Selected: '+('  '.join('%s: %d'%item for item in selected.items()) or '0'))
+                                 '     Selected: '+(indices or '0'))
 
     def edit(self,operation,direction=None):
         from p4vasp.atom_movement import delete_selected,move_selected,rotate_selected

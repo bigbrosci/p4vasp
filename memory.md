@@ -2,6 +2,10 @@
 
 Last updated: 2026-11-28. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 选中原子显示零基索引（2026-11-28）
+
+- 启动结构预览和普通 Show 共用的 `StructurePreviewApplet` 底栏按元素显示零基原子索引，例如 `Selected: Cu: 34, 35 | Cr: 41`，组内升序，同一原子的周期副本去重。总元素数保持显示。macOS arm64 实际启动预览/框选和 Show/重复副本/清除验证通过，10 GTK、58 基础及语法/diff 通过。专用 OpenGL 视图及 Windows 包未改。
+
 ## Cairo 键线缩细（2026-11-28）
 
 - `gtk3/mode_view.py` 的键线在旧投影宽度与最小宽度取最大值后乘 0.7。适用于 Surface、启动结构预览、普通 Show 和振动预览，保持原键连接和约束标记。macOS arm64 实际 Surface/Show、10 GTK、58 基础及语法/diff 通过，已查看 /tmp/p4vasp-bond-width-comparison.png。Windows 包未重建。

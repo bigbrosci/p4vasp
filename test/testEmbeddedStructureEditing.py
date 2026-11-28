@@ -28,6 +28,7 @@ def exercise(frame,preview,folder,pump):
     key('space');assert not selection()
     rotation=view.rotation
     box();assert set(selection().getAtoms())=={0,1,2} and view.rotation==rotation
+    assert preview.summary.get_text().endswith('Selected: O: 0 | H: 1, 2')
     box();assert not selection()
     # Escape cancels an unfinished box without clearing the previous selection.
     selection().setSelection([0]);selection().notify(None)
