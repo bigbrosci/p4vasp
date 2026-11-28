@@ -197,18 +197,34 @@ class SurfacePage(Gtk.Box):
     def preview(self,*_):
         if self.result is None:return
         try:
+            from math import pi
             from p4vasp.Structure import Structure
-            from p4vasp.gtk3.gas_phase import show_model_preview
+            from p4vasp.gtk3.mode_view import ModeView, _show_rotation
+            from p4vasp.gtk3.structure_view import structure_data
             structure=Structure();structure.read(StringIO(self.result['poscar']))
-            self.preview_window=show_model_preview(structure,'Surface preview — '+self.result['formula'],show_cell=True)
-            # View along -Y so +Z is upward; fit the cell to expose vacuum.
-            self.preview_window.navigator.setBottomView()
-            self.preview_window.fitToStructure(include_cell=True)
-            for index,layer in enumerate(self.result['layer_numbers']):
-                if layer<=self.result['request']['fixed_layers']:self.preview_window.selectAtom(index)
-            self.preview_window.redraw()
-            self.status.set_text('Preview rings mark fixed bottom atoms. Source geometry and saved flags are unchanged.')
+            data=structure_data(structure)
+            if self.preview_window is None:
+                window=Gtk.Window(transient_for=self.parent_window(), destroy_with_parent=True)
+                window.set_default_size(600,500)
+                window.connect('destroy',self.preview_closed)
+                view=ModeView()
+                view.wrap_positions=False
+                view.radius_factor=.5
+                window.add(view)
+                self.preview_window=window
+            window=self.preview_window
+            window.set_title('Surface preview — '+self.result['formula'])
+            view=window.get_child()
+            # View along -Y so +Z is upward; ModeView fits the full cell.
+            view.rotation=_show_rotation(pi/2,0)
+            view.set_data(data)
+            window.show_all()
+            window.present()
+            self.status.set_text('X marks atoms with one or more fixed coordinates.')
         except Exception as error:self.status.set_text(str(error))
+
+    def preview_closed(self,*_):
+        self.preview_window=None
 
     def parent_window(self):
         window=self.get_toplevel();return window if isinstance(window,Gtk.Window) else None
@@ -226,10 +242,7 @@ class SurfacePage(Gtk.Box):
 
     def close_preview(self):
         if self.preview_window is not None:
-            if self.preview_window.win.getTitle().startswith('Surface preview'):
-                import cp4vasp
-                self.preview_window.win.hide();cp4vasp.VisSync()
-            self.preview_window=None
+            self.preview_window.destroy()
 
     def destroyed(self,*_):
         self.alive=False

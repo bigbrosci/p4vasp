@@ -655,7 +655,7 @@ Show、振动预览及使用同一分子样式的气相预览中，H球半径在
 
 Models → surface顶部用Metal preset、Use bulk result、Open POSCAR / CIF三个按钮选择及读取来源；支持fcc/bcc常用金属面和hcp基面，也可从Bulk结果快照或POSCAR/CIF按(h k l)切面。取消选文件或无Bulk结果保留原来源。
 设置层数、面内超胞、每侧真空和固定底层，Build后预览，Save POSCAR保存POSCAR、参数/层编号JSON及Python/Bash重建脚本。
-预览标记圈出固定原子；导出F/T按底部几何层生成。自定义指数以输入晶胞为准，不自动换成常规胞；
+Surface 预览、启动结构预览和普通 Show 都用 X 标记具有至少一个 F 的原子。全部 T 的原子保持原有外观。导出F/T按底部几何层生成。自定义指数以输入晶胞为准，不自动换成常规胞；
 复杂终止面和吸附物放置不在本版。参数含义、示例和限制见[ASE表面建模](ase-surface-zh.md)。
 
 

@@ -2,8 +2,33 @@
 import math
 from p4vasp.gtk3 import Gtk,Gdk
 from p4vasp.gtk3.mode_view import ModeView
-from p4vasp.viewer_style import RADIUS_FACTOR
 from p4vasp.Selection import selection
+
+
+def structure_data(source):
+    """Make a Cartesian rendering copy and retain its selective dynamics flags."""
+    from p4vasp.Structure import Structure
+    from p4vasp.util import getAtomtypes
+    from p4vasp.viewer_style import display_radius
+
+    structure=Structure();structure.setStructure(source);structure.setCarthesian()
+    scale=list(structure.scaling)
+    if len(scale)==1 and math.isfinite(scale[0]) and scale[0]!=0:
+        factor=scale[0] if scale[0]>0 else (abs(scale[0])/structure.getCellVolume())**(1./3.)
+        scale=[factor]*3
+    if len(scale)!=3 or any(not math.isfinite(s) or s<=0 for s in scale):
+        raise ValueError('Invalid POSCAR scale')
+    positions=[[p[j]*scale[j] for j in range(3)] for p in structure]
+    cell=[[v[j]*scale[j] for j in range(3)] for v in structure.basis]
+    symbols=[str(structure.info.getRecordForAtom(i).element).strip() for i in range(len(structure))]
+    table=getAtomtypes();radii=[];colors=[]
+    for symbol in symbols:
+        record=table.getRecordForElement(symbol)
+        radii.append(display_radius(record) if record is not None else .7)
+        colors.append([record.red,record.green,record.blue] if record is not None else [1.,1.,1.])
+    constrained = {i for i, flags in enumerate(structure.selective) if not all(flags)} if structure.isSelective() else set()
+    return dict(symbols=symbols, positions=positions, cell=cell, radii=radii,
+                colors=colors, constrained=constrained)
 
 
 class StructureView(ModeView):
@@ -16,7 +41,7 @@ class StructureView(ModeView):
         self.connect('leave-notify-event',self.leave)
         self.connect('key-press-event',self.key)
         self.connect('focus-out-event',self.cancel_drag)
-        self.set_tooltip_text('Show controls: Space toggles the atom under the pointer; Shift + left drag toggles atoms in a box; Esc clears. Delete removes selected atoms. Arrows move; Shift + arrows rotate. Left drag rotates, Ctrl + left spins, middle pans, right drag/scroll zooms.')
+        self.set_tooltip_text('X marks atoms with one or more fixed coordinates. Space toggles the atom under the pointer; Shift + left drag toggles atoms in a box; Esc clears. Delete removes selected atoms. Arrows move; Shift + arrows rotate. Left drag rotates, Ctrl + left spins, middle pans, right drag/scroll zooms.')
 
     def enter(self,widget,event):
         self.grab_focus();self.pointer=(event.x,event.y);return False

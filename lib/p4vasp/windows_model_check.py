@@ -87,7 +87,7 @@ def main(args):
         surface.bottom_button.set_active(True);pump()
         assert abs(surface.result['vacuum_bottom']-.1)<1e-10
         surface.preview_button.clicked();pump()
-        assert surface.preview_window.getSelectedCount()==8
+        assert surface.preview_window.get_visible() and len(surface.preview_window.get_child().constrained)==8
         with patch.object(surface_module,'InputFolderDialog',side_effect=auto_dialog(surface_module.InputFolderDialog,'Cu_surface')):
             surface.save_button.clicked()
         saved=Structure(str(out/'Cu_surface/POSCAR'))

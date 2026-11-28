@@ -1,4 +1,4 @@
-"""Actual Models tabs, ASE subprocess, native slab preview and save dialogs."""
+"""Actual Models tabs, ASE subprocess, Cairo slab preview and save dialogs."""
 from io import StringIO
 import json
 import os
@@ -7,6 +7,7 @@ import sys
 import tempfile
 import time
 import traceback
+import cairo
 from unittest.mock import patch
 from p4vasp.gtk3 import Gtk, GLib
 from p4vasp.applet.ModelsApplet import ModelsApplet
@@ -31,6 +32,10 @@ def main():
     assert [w.get_text() for w in page.indices]==['1','0','0']
     page.preset.set_active(0)
     errors=[];old=sys.excepthook;sys.excepthook=lambda *args:errors.append(args)
+    def screenshot(view, name):
+        view.get_toplevel().check_resize()
+        image=cairo.ImageSurface(cairo.FORMAT_ARGB32,view.get_allocated_width(),view.get_allocated_height())
+        view.draw(cairo.Context(image));image.write_to_png('/tmp/p4vasp-surface-'+name+'.png')
     def pump(until=lambda:True,timeout=30):
         end=time.monotonic()+timeout
         while time.monotonic()<end:
@@ -59,10 +64,13 @@ def main():
         result=page.result;source=result['poscar']
         page.preview_button.clicked();pump()
         preview=page.preview_window
-        assert preview is not None and len(preview.structure)==16
-        assert preview.getSelectedCount()==8
+        assert preview is not None and preview.get_visible()
+        view=preview.get_child()
+        assert len(view.positions)==16 and view.show_cell
+        assert view.constrained=={i for i,layer in enumerate(result['layer_numbers']) if layer<=2}
+        assert 'X marks' in page.status.get_text()
         for _ in range(15):pump();time.sleep(.01)
-        preview.win.saveScreenshot('/tmp/p4vasp-surface-preview.tga')
+        screenshot(view,'constraints')
         assert page.result['poscar']==source
         cell=page.result['cell']
         page.bottom_button.set_active(True);pump()
@@ -72,14 +80,19 @@ def main():
         shifted=Structure();shifted.read(StringIO(page.result['poscar']));shifted.setCartesian()
         assert abs(min(p[2] for p in shifted)-.1)<1e-10
         assert abs(page.result['vacuum_top']-19.9)<1e-10
-        assert page.preview_window is preview and preview.getSelectedCount()==8
+        assert page.preview_window is preview and len(view.constrained)==8
         for _ in range(15):pump();time.sleep(.01)
-        preview.win.saveScreenshot('/tmp/p4vasp-surface-bottom.tga')
+        screenshot(view,'bottom')
         page.center_button.set_active(True);pump()
         assert abs(page.result['vacuum_bottom']-10)<1e-10
         assert 'EACH side' in page.vacuum_title.get_text()
         for _ in range(15):pump();time.sleep(.01)
-        preview.win.saveScreenshot('/tmp/p4vasp-surface-center.tga')
+        screenshot(view,'center')
+        preview.close()
+        pump(lambda: page.preview_window is None)
+        page.preview_button.clicked();pump()
+        assert page.preview_window is not preview
+        assert len(page.preview_window.get_child().constrained)==8
         page.bottom_button.set_active(True);source=page.result['poscar']
 
         with tempfile.TemporaryDirectory(prefix='surface UI ') as temporary:
@@ -112,7 +125,6 @@ def main():
             assert page.a.get_text()=='3.6345' and page.symbol.get_text()=='Cu'
             assert not page.a.get_sensitive()
             assert 'a' not in page.request() and page.request()['poscar']==original
-            import cairo
             window.check_resize();pump()
             shot=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
             window.draw(cairo.Context(shot));shot.write_to_png('/tmp/p4vasp-surface-bulk-lattice.png')
@@ -159,14 +171,13 @@ def main():
         page.build_button.clicked();pump(lambda:page.task is None)
         assert page.result is not None,page.status.get_text()
         for _ in range(15):pump();time.sleep(.01)
-        import cairo
         window.check_resize()
         image=cairo.ImageSurface(cairo.FORMAT_ARGB32,window.get_allocated_width(),window.get_allocated_height())
         window.draw(cairo.Context(image));image.write_to_png('/tmp/p4vasp-surface-page.png')
         assert not errors,errors
         page.destroy();assert not page.alive
         window.destroy()
-        print('PASS real lazy Surface/ASE responsiveness, preset/bulk/file sources, fixed-layer native preview, POSCAR/metadata save, invalidation/cancel/destroy',flush=True)
+        print('PASS real lazy Surface/ASE responsiveness, preset/bulk/file sources, constraint-marked Cairo preview, POSCAR/metadata save, invalidation/cancel/destroy',flush=True)
     finally:
         sys.excepthook=old
 

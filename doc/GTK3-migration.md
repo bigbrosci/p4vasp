@@ -868,3 +868,14 @@ construction to the worker and the exported standalone Python script.
 The Bash script calls `p4v bulk`, which dispatches to the ASE worker before GTK
 or viewer imports and writes a single new POSCAR. The Windows spec includes
 the source used to produce the standalone script.
+
+### Selective dynamics markers (2026-11-28)
+
+Surface Preview 3D uses a read-only Cairo view fitted to the full slab cell.
+It shares structure display data and atom drawing with the startup preview
+and ordinary Show. Atoms with at least one fixed coordinate carry an X
+drawn with the sphere in depth order. Fully relaxed atoms have no mark.
+The existing selection rings in editable views still indicate selection.
+The marker follows the stored selective dynamics flags, with no change to
+those flags or to Surface save/replay. The specialized OpenGL views retain
+their existing rendering.

@@ -31,7 +31,7 @@ class ModeView(Gtk.DrawingArea):
         super().__init__()
         self.set_size_request(250,230)
         self.data=None;self.positions=[];self.bonds=[]
-        self.hidden=set();self.background=(1.,1.,1.);self.cell_color=(0.,0.,0.)
+        self.hidden=set();self.constrained=set();self.background=(1.,1.,1.);self.cell_color=(0.,0.,0.)
         self.radius_factor=RADIUS_FACTOR;self.bond_factor=BOND_FACTOR;self.bond_color=BOND_COLOR;self.bond_radius=BOND_RADIUS
         self.repeat_limit=5;self.centered_images=False;self.wrap_positions=True
         self.repeats=(1,1,1);self.show_cell=True;self.indices=[];self.offsets=[];self.cell_edges=[]
@@ -49,6 +49,7 @@ class ModeView(Gtk.DrawingArea):
 
     def set_data(self,data):
         self.data=data;self.positions=data['positions'];self.zoom=1.
+        self.constrained=set(data.get('constrained', ()))
         self.radii,self.colors=display_values(data['symbols'],data['radii'],data['colors'])
         self.ball_radii=[ball_radius(symbol,radius) for symbol,radius in zip(data['symbols'],self.radii)]
         self.set_repeats((1,1,1))
@@ -159,13 +160,22 @@ class ModeView(Gtk.DrawingArea):
                 i,j=item;cr.set_source_rgb(*self.bond_color);cr.set_line_width(max(2.,factor*2*self.bond_radius))
                 cr.move_to(*points[i][:2]);cr.line_to(*points[j][:2]);cr.stroke()
             else:
-                x,y,_=points[item];radius=max(2.,factor*max(.15,self.ball_radii[self.indices[item]]*self.radius_factor))
-                red,green,blue=self.colors[self.indices[item]]
+                index=self.indices[item]
+                x,y,_=points[item];radius=max(2.,factor*max(.15,self.ball_radii[index]*self.radius_factor))
+                red,green,blue=self.colors[index]
                 gradient=cairo.RadialGradient(x-radius*.3,y-radius*.3,radius*.05,x,y,radius)
                 gradient.add_color_stop_rgb(0,min(1,red*.6+.4),min(1,green*.6+.4),min(1,blue*.6+.4))
                 gradient.add_color_stop_rgb(.65,red,green,blue)
                 gradient.add_color_stop_rgb(1,red*.45,green*.45,blue*.45)
                 cr.set_source(gradient);cr.arc(x,y,radius,0,2*math.pi);cr.fill()
+                if index in self.constrained:
+                    # Paint with the sphere so foreground atoms occlude the mark.
+                    size=radius*.48
+                    width=max(.8,min(2.,radius*.14))
+                    cr.move_to(x-size,y-size);cr.line_to(x+size,y+size)
+                    cr.move_to(x-size,y+size);cr.line_to(x+size,y-size)
+                    cr.set_source_rgb(.08,.08,.08);cr.set_line_width(width*2);cr.stroke_preserve()
+                    cr.set_source_rgb(1.,1.,1.);cr.set_line_width(width);cr.stroke()
         cr.set_source_rgb(.3,.3,.3);cr.move_to(10,h-12)
         cr.show_text('%d atoms | %d displayed | %d x %d x %d'%(len(self.positions),len(points),*self.repeats))
         return False

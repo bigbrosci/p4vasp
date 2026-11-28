@@ -2,6 +2,11 @@
 
 Last updated: 2026-11-28. This is a repository navigation and handoff document. Verify the current source and Git state before acting; historical test results are not current guarantees.
 
+## 结构预览固定原子 X 标记（2026-11-28）
+
+- Surface Preview 3D 改用共享 Cairo 绘制的只读窗口，完整晶胞侧视。它与启动结构预览、普通 Show 根据 POSCAR selective flags 给部分或完全固定原子画 X；所有坐标自由时无 X。标记与球体一起按深度绘制，选择圈仍表示选择。保留 Surface 的生成、保存和重放；专用原生 OpenGL 视图未改。
+- 本机 macOS arm64 实际 Surface、启动到 Show 及其 Control 回归通过，查看了 /tmp/p4vasp-surface-constraints.png 和 /tmp/p4vasp-cairo-show.png。Surface 16 原子/8 固定、Center/Bottom、关闭重开、四文件保存通过；Show 测试含 FFF/FTF/TTT、选择/隐藏、截图及原生后端往返。10 GTK、58 基础及语法/diff 通过。同步 Windows 成品诊断断言，未重新打包 Windows 或验收 Linux/Windows。
+
 ## Bulk 保存与命令行重建（2026-11-28）
 
 - Models → bulk 的 Save POSCAR 同目录写入 POSCAR、rebuild_bulk.py、rebuild_bulk.sh。Python 只需 ASE，嵌入共享 bulk_geometry 和生成时请求；Bash 保存可编辑的无界面 `p4v bulk Cu fcc cubic --a 3.615 -o POSCAR`，保留重复数和适用晶格参数。两种重建独占创建输出。Windows spec 收录构建核心源码；无依赖版本变化。

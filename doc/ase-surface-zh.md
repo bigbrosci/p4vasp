@@ -10,7 +10,7 @@
 3. Atomic layers填4，In-plane repeat填2、2。
 4. Vacuum EACH side填10 Å，Fix bottom geometric layers填2，Layer tolerance保留0.3 Å。
 5. 点击 **Build surface**，得到16原子、4几何层，其中底部8原子固定。
-6. 默认选中 **Center**。可点 **Bottom** 将最低原子移到z=0.1 Å，或点Center恢复居中。**Preview 3D**以完整晶胞侧视图显示真空，标记圈表示固定原子，可旋转观察。
+6. 默认选中 **Center**。可点 **Bottom** 将最低原子移到z=0.1 Å，或点Center恢复居中。**Preview 3D**以完整晶胞侧视图显示真空，可旋转观察。有一个或多个固定坐标的原子会显示 X。
 7. **Save POSCAR** 选择父目录及新文件夹名，自动保存POSCAR、surface.json、rebuild_surface.py和rebuild_surface.sh；已有文件夹不覆盖。
 
 改变参数或输入来源后，旧结果和保存按钮失效，需重新Build。生成在独立进程运行，可Cancel，默认60秒超时。

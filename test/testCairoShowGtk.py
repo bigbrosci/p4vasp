@@ -16,7 +16,12 @@ assert Gtk.init_check()[0]
 Gtk.Settings.get_default().set_property('gtk-enable-animations',False)
 with tempfile.TemporaryDirectory() as directory:
     folder=Path(directory);os.chdir(folder)
-    path=folder/'POSCAR';path.write_text('Water\n1\n7 0 0\n0 7 0\n0 0 7\nO H\n1 2\nCartesian\n3.5 3.5 3.5\n4.46 3.5 3.5\n3.26 4.43 3.5\n')
+    geometry='Water\n1\n7 0 0\n0 7 0\n0 0 7\nO H\n1 2\nCartesian\n3.5 3.5 3.5\n4.46 3.5 3.5\n3.26 4.43 3.5\n'
+    path=folder/'POSCAR'
+    path.write_text(geometry.replace('Cartesian\n','Selective dynamics\nCartesian\n')
+                    .replace('3.5 3.5 3.5\n','3.5 3.5 3.5 F F F\n')
+                    .replace('4.46 3.5 3.5\n','4.46 3.5 3.5 F T F\n')
+                    .replace('3.26 4.43 3.5\n','3.26 4.43 3.5 T T T\n'))
     (folder/'CONTCAR').write_bytes(path.read_bytes())
     sys.argv=['p4v.py',str(path)];namespace={'__name__':'cairo_show_regression'}
     exec(compile((ROOT/'p4v.py').read_text().split('\nschedule(init())')[0],str(ROOT/'p4v.py'),'exec'),namespace)
@@ -29,7 +34,14 @@ with tempfile.TemporaryDirectory() as directory:
                 if not Gtk.events_pending():break
                 Gtk.main_iteration_do(False)
             time.sleep(.004)
-    pump(1);frame=getAppletFrame();initial=frame.embedded_applet
+    deadline=time.monotonic()+10
+    while time.monotonic()<deadline:
+        pump(.15)
+        frame=getAppletFrame()
+        if frame is not None and frame.embedded_applet is not None and frame.embedded_applet.view.data:
+            break
+    assert frame is not None and frame.embedded_applet is not None, 'startup preview did not open'
+    initial=frame.embedded_applet
     expected=initial.view.data.copy();expected_radii=initial.view.ball_radii[:]
     frame.xml.get_widget('astart p4vasp.applet.StructureWindowApplet.StructureWindowApplet').emit('clicked');pump()
     from p4vasp.applet.StructureWindowApplet import StructureWindowApplet
@@ -37,6 +49,7 @@ with tempfile.TemporaryDirectory() as directory:
     window=owner.swin;control=frame.embedded_applet
     assert isinstance(window,CairoStructureWindow) and window._legacy is None
     assert window.view.data is not None,window.controller.summary.get_text()
+    assert initial.view.constrained==window.view.constrained=={0,1}
     assert window.view.ball_radii==expected_radii
     for field in ('symbols','radii','colors','cell'):assert window.view.data[field]==expected[field]
     for a,b in zip(window.view.data['positions'],expected['positions']):assert all(abs(x-y)<1e-12 for x,y in zip(a,b))
@@ -96,7 +109,7 @@ with tempfile.TemporaryDirectory() as directory:
     assert owner.swin is window._legacy and window._legacy_visible
     owner.swin.navigator.setFrontView();owner.swin.navigator.setPerspective(0);pump()
     assert owner.swin is window and not window._legacy_visible and window.widget.get_visible()
-    volume=folder/'CHGCAR';volume.write_text(path.read_text()+'\n2 2 2\n0 0.2 0.4 0.6 0.8 1.0 1.2 1.4\n')
+    volume=folder/'CHGCAR';volume.write_text(geometry+'\n2 2 2\n0 0.2 0.4 0.6 0.8 1.0 1.2 1.4\n')
     window.setChgcar(str(volume));pump()
     assert owner.swin is window._legacy and owner.swin.chgcar is not None
     owner.swin.setIsosurfaceLevel(.3);owner.swin.win.redraw();pump()

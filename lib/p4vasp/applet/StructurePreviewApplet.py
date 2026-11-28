@@ -1,13 +1,9 @@
 """Embedded initial-structure viewer sharing selection and scientific edit helpers."""
 from collections import Counter
-import math
 from p4vasp.applet.Applet import Applet
 from p4vasp.gtk3 import Gtk
-from p4vasp.gtk3.structure_view import StructureView
+from p4vasp.gtk3.structure_view import StructureView, structure_data
 from p4vasp.Selection import SelectionListener,selection
-from p4vasp.util import getAtomtypes
-from p4vasp.viewer_style import display_radius
-from p4vasp.Structure import Structure
 
 
 class StructurePreviewApplet(Applet,SelectionListener):
@@ -81,23 +77,7 @@ class StructurePreviewApplet(Applet,SelectionListener):
             self._source=source
             self.view.box=None;self.view.drag=None
             if source is None or not len(source):return
-            structure=Structure();structure.setStructure(source);structure.setCarthesian()
-            scale=list(structure.scaling)
-            if len(scale)==1 and math.isfinite(scale[0]) and scale[0]!=0:
-                factor=scale[0] if scale[0]>0 else (abs(scale[0])/structure.getCellVolume())**(1./3.)
-                scale=[factor]*3
-            if len(scale)!=3 or any(not math.isfinite(s) or s<=0 for s in scale):
-                raise ValueError('Invalid POSCAR scale')
-            positions=[[p[j]*scale[j] for j in range(3)] for p in structure]
-            cell=[[v[j]*scale[j] for j in range(3)] for v in structure.basis]
-            symbols=[str(structure.info.getRecordForAtom(i).element).strip() for i in range(len(structure))]
-            table=getAtomtypes();radii=[];colors=[]
-            for symbol in symbols:
-                record=table.getRecordForElement(symbol)
-                radii.append(display_radius(record) if record is not None else .7)
-                colors.append([record.red,record.green,record.blue] if record is not None else [1.,1.,1.])
-            self.view.set_data(dict(symbols=symbols,positions=positions,
-                                    cell=cell,radii=radii,colors=colors))
+            self.view.set_data(structure_data(source))
             if same and camera[3] is not None:
                 self.view.rotation,self.view.pan,self.view.zoom,self.view.center,self.view.extent=camera
             self.notifyAtomSelection(selection(),self)
