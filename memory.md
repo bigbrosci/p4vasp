@@ -6,6 +6,7 @@ Last updated: 2026-11-28. This is a repository navigation and handoff document. 
 
 - Models → bulk 的 Save POSCAR 同目录写入 POSCAR、rebuild_bulk.py、rebuild_bulk.sh。Python 只需 ASE，嵌入共享 bulk_geometry 和生成时请求；Bash 保存可编辑的无界面 `p4v bulk Cu fcc cubic --a 3.615 -o POSCAR`，保留重复数和适用晶格参数。两种重建独占创建输出。Windows spec 收录构建核心源码；无依赖版本变化。
 - 本机 macOS arm64 实际 GTK 完整 Bulk 测试通过，确认 32 原子预览、保存三文件、取消、防覆盖及小窗，已查看 /tmp/p4vasp-bulk-replay-dialog.png。9 Bulk/worker、8 ASE Surface、3 Surface replay、10 GTK、1 Models、58 基础、3 依赖工具及清单/语法/diff 通过。额外 ASE 全组有 1 项旧导入测试使用 macOS 不存在的 /bin/false；未改该测试。未重建 Windows 包或验收 Linux/Windows。详见 [11 月 28 日更新](update_history/update_2026_11_28.md)。
+- 同日核实 Surface 的 Save POSCAR 已保存 POSCAR、surface.json、rebuild_surface.py 和 rebuild_surface.sh。macOS arm64 实际 GTK 保存和 3 项重放测试通过，GTK 日志 /tmp/p4vasp-surface-save-20261128.log；无实现变更。
 
 ## DOS/Graph导出PNG（2026-11-27）
 
