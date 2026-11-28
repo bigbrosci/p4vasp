@@ -70,12 +70,23 @@ with tempfile.TemporaryDirectory() as temporary:
         dialog=InputFolderDialog(*args,**kwargs)
         dialog.folder.set_text(temporary)
         assert dialog.dialog.get_widget_for_response(Gtk.ResponseType.OK).get_label()=='Save POSCAR'
-        GLib.timeout_add(80,lambda:(dialog.dialog.response(Gtk.ResponseType.OK),False)[1])
+        def confirm():
+            widget=dialog.dialog
+            image=Gdk.pixbuf_get_from_window(widget.get_window(),0,0,
+                                             widget.get_allocated_width(),widget.get_allocated_height())
+            if image is not None:
+                image.savev('/tmp/p4vasp-bulk-replay-dialog.png','png',[],[])
+            widget.response(Gtk.ResponseType.OK)
+            return False
+        GLib.timeout_add(150,confirm)
         return dialog
     with patch('p4vasp.gtk3.bulk.InputFolderDialog',side_effect=actual_dialog):page.save_button.clicked()
     saved=Path(temporary)/'copper-test/POSCAR'
     assert saved.read_text()==page.result['poscar']
-    assert [p.name for p in saved.parent.iterdir()]==['POSCAR']
+    assert {p.name for p in saved.parent.iterdir()}=={'POSCAR','rebuild_bulk.py','rebuild_bulk.sh'}
+    assert 'p4v bulk Cu fcc cubic --a 3.615 --repeat 2 2 2' in (saved.parent/'rebuild_bulk.sh').read_text()
+    compile((saved.parent/'rebuild_bulk.py').read_text(),'rebuild_bulk.py','exec')
+    assert 'Saved POSCAR and replay scripts' in page.status.get_text()
     structure=Structure();structure.read(StringIO(saved.read_text()));assert len(structure)==32
     # Existing-folder protection and cancellation use the same real dialog writer.
     before=saved.read_bytes()

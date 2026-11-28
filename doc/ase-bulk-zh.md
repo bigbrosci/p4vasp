@@ -53,11 +53,21 @@ hcp、bct、wurtzite需要a和c；orthorhombic需要a、b和c；rhombohedral需�
 
 改变任何设置都会使旧结果失效，并禁用预览／保存，需重新Build bulk，避免把新参数与旧结构混淆。
 
-## 4. 保存POSCAR
+## 4. 保存与重建 POSCAR
 
-点击 **Save POSCAR**，填写新文件夹名称与父目录，确认后在新文件夹写入 `POSCAR`。不覆盖已有文件夹，取消不写文件，保存失败显示错误。
+点击 **Save POSCAR**，填写新文件夹名称与父目录。新文件夹包含 `POSCAR`、`rebuild_bulk.py` 和 `rebuild_bulk.sh`。不覆盖已有文件夹，取消不写文件，保存失败显示错误。两个脚本保留成功生成时的晶体原型、晶胞形式、晶格参数和全部重复数。
 
-本页只生成结构文件，不生成INCAR、KPOINTS或POTCAR，不设置磁矩、自旋、U／J或计算任务。POSCAR按元素分组、使用Direct坐标；没有额外添加固定原子约束。保存后使用Open打开该POSCAR，即可进入现有Show／Build／Move等编辑流程。
+```bash
+p4v bulk Cu fcc cubic --a 3.615 --repeat 2 2 2 -o POSCAR
+python rebuild_bulk.py -o POSCAR.python
+bash rebuild_bulk.sh POSCAR.command
+```
+
+新命令在无界面模式下通过同一 ASE worker 生成一个 POSCAR。`--repeat` 默认 `1 1 1`；其他晶型按需使用 `--b`、`--c`、`--alpha` 或 `--u`。运行 `p4v bulk --help` 查看选项，源码版也可用 `bash p4v.sh bulk ...`。已有输出文件不会被覆盖。
+
+Python 脚本只需 ASE，可编辑其中的 `REQUEST`，建议使用保存时标注的 ASE 版本。Bash 脚本内含可复制编辑的 `p4v bulk` 命令，使用 PATH 上的 `p4v`，也可回退到导出机器的启动器。两个脚本未指定输出时都在当前目录创建 `POSCAR.rebuilt`。
+
+本页生成结构和重建脚本，不生成INCAR、KPOINTS或POTCAR，不设置磁矩、自旋、U／J或计算任务。POSCAR按元素分组、使用Direct坐标；没有额外添加固定原子约束。保存后使用Open打开该POSCAR，即可进入现有Show／Build／Move等编辑流程。
 
 预览和保存读取同一份生成结果，不根据当前表单再次偷偷计算。会话结果只暂存于页面内存，离开Models前请先保存。
 

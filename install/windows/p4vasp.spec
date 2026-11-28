@@ -10,6 +10,8 @@ hidden += ['numpy', 'cairo', 'gi.repository.PangoCairo', 'gi.repository.GdkPixbu
 a = Analysis(
     [str(root / 'p4v.py')], pathex=[str(root / 'lib')],
     binaries=[], datas=[(str(root / 'data'), 'data'), (str(root / 'figures'), 'figures'), (str(root / 'LICENSE'), '.'),
+                       (str(root / 'lib/p4vasp/ase_bulk.py'), 'p4vasp'),
+                       (str(root / 'lib/p4vasp/bulk_geometry.py'), 'p4vasp'),
                        (str(root / 'lib/p4vasp/surface_geometry.py'), 'p4vasp'),
                        (str(root / 'lib/p4vasp/dos_metrics.py'), 'p4vasp'),
                        (str(root / 'test/dos_projected_fixtures.py'), 'diagnostic-fixtures'),

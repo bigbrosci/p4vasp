@@ -55,6 +55,18 @@ p4v --dos-analysis --help
 单参数`p4v DOSCAR`仍打开界面。Export scripts生成Python快照脚本和调用该入口的Bash脚本，详见[分析与脚本说明](doc/dos-analysis-zh.md)。
 
 
+## 无界面 Bulk 生成与重建
+
+```bash
+p4v bulk Cu fcc cubic --a 3.615 -o POSCAR
+p4v bulk Ti hcp primitive --a 2.95 --c 4.68 --repeat 2 2 1 -o POSCAR.Ti
+p4v bulk --help
+```
+
+Bulk 的 **Save POSCAR** 同时保存 `rebuild_bulk.py` 和 `rebuild_bulk.sh`。可运行
+`python rebuild_bulk.py -o POSCAR.python` 或 `bash rebuild_bulk.sh POSCAR.command`。
+已有输出文件不会被覆盖。用法与依赖见 [Bulk 保存与重建](doc/ase-bulk-zh.md#4-保存与重建-poscar)。
+
 ## 重建已保存的Surface
 
 Surface保存时自动生成两个脚本和surface.json；以下命令不打开GUI，输出目录必须不存在：

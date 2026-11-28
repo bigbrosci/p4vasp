@@ -522,7 +522,7 @@ INCAR 复用当前 **INCAR generator** 的全部 Standard 基础预设，覆盖 
 
 ### ASE体相建模
 
-在 **Models → bulk** 选择化学式和晶体原型，填写晶格参数、晶胞形式与超胞重复数，点击 **Build bulk**。完成后可查看原子数／晶胞／体积，使用 **Preview 3D** 预览，或 **Save POSCAR** 将结构写入新文件夹。保存后Open打开POSCAR可继续编辑；本页只生成POSCAR。
+在 **Models → bulk** 选择化学式和晶体原型，填写晶格参数、晶胞形式与超胞重复数，点击 **Build bulk**。完成后可查看原子数／晶胞／体积，使用 **Preview 3D** 预览，或 **Save POSCAR** 将 `POSCAR`、独立 Python 脚本 `rebuild_bulk.py` 和含 `p4v bulk` 命令的 `rebuild_bulk.sh` 写入新文件夹。保存后Open打开POSCAR可继续编辑。
 
 首次使用在项目目录执行 `bash install/install-science.sh`；当前维护设备已安装独立ASE环境。参数变化后必须重新生成；surface首版现可切面、加真空、固定底层并保存。详细范围、示例、晶胞选择和限制见 [ASE体相建模说明](ase-bulk-zh.md)。本轮未更新Windows便携包。
 

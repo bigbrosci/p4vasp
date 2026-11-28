@@ -1,8 +1,15 @@
 """Actual ASE geometries and input validation, independent of GTK/native code."""
 from io import StringIO
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
 import unittest
 from ase.io import read
 from p4vasp.ase_bulk import build_bulk
+from p4vasp.bulk_replay import bulk_contents
+from p4vasp.single_atom_inputs import write_contents
 
 
 def request(**kwargs):
@@ -10,6 +17,44 @@ def request(**kwargs):
 
 
 class AseBulkTest(unittest.TestCase):
+    def test_exported_bulk_replays_and_cli(self):
+        root = Path(__file__).resolve().parents[1]
+        env = dict(os.environ, P4VASP_HOME=str(root), P4VASP_ASE_PYTHON=sys.executable,
+                   PYTHONPATH=str(root/'lib'), PYTHON=sys.executable, PATH=os.defpath)
+        for key in ('DISPLAY', 'WAYLAND_DISPLAY'):
+            env.pop(key, None)
+        bulk_request = request()
+        bulk_request.update(name='ZnS', crystal='wurtzite', a='3.82', c='6.26',
+                            u='0.38', repeat=[2, 1, 3])
+        result = build_bulk(bulk_request)
+        with tempfile.TemporaryDirectory(prefix='bulk replay ') as temporary:
+            directory = write_contents(bulk_contents(result), Path(temporary), 'exported bulk')
+            for command, target in [
+                ([sys.executable, '-I', str(directory/'rebuild_bulk.py'), '-o'], 'Python output'),
+                (['bash', str(directory/'rebuild_bulk.sh')], 'Bash output'),
+            ]:
+                with self.subTest(target=target):
+                    run = subprocess.run(command + [target], cwd=temporary, env=env,
+                                         text=True, capture_output=True, timeout=40)
+                    self.assertEqual(run.returncode, 0, run.stderr)
+                    rebuilt = Path(temporary)/target
+                    self.assertEqual(rebuilt.read_bytes(), (directory/'POSCAR').read_bytes())
+                    run = subprocess.run(command + [target], cwd=temporary, env=env,
+                                         text=True, capture_output=True, timeout=40)
+                    self.assertNotEqual(run.returncode, 0)
+                    self.assertEqual(rebuilt.read_bytes(), (directory/'POSCAR').read_bytes())
+            cli = [sys.executable, str(root/'p4v.py'), 'bulk', 'Cu', 'fcc', 'cubic']
+            run = subprocess.run(cli + ['--a', '3.615', '-o', 'POSCAR'], cwd=temporary,
+                                 env=env, text=True, capture_output=True, timeout=40)
+            self.assertEqual(run.returncode, 0, run.stderr)
+            atoms = read(Path(temporary)/'POSCAR', format='vasp')
+            self.assertEqual(len(atoms), 4)
+            self.assertAlmostEqual(atoms.cell.lengths()[0], 3.615)
+            run = subprocess.run(cli + ['--a', 'nan', '-o', 'invalid'], cwd=temporary,
+                                 env=env, text=True, capture_output=True, timeout=40)
+            self.assertNotEqual(run.returncode, 0)
+            self.assertFalse((Path(temporary)/'invalid').exists())
+
     def test_fcc_cells_and_supercell_geometry(self):
         for mode, count in [('primitive',1),('orthorhombic',2),('cubic',4)]:
             q=request();q.update(mode=mode,repeat=[2,3,1])

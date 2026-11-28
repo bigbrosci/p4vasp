@@ -859,3 +859,12 @@ Actual synthetic DOS dialog Export checks all eight formats plus uppercase PNG,
 decodes PNG and verifies dimensions/content, and independently reads SVG/AGR,
 DATA and PDF. Seven vector serialization tests pass. Dialog/PNG screenshots
 inspected on Linux/WSL; Windows/macOS and frozen packaging not checked here.
+
+### Bulk replay export (2026-11-28)
+
+The Bulk page's existing Save POSCAR dialog writes POSCAR and both replay
+scripts to one new output folder. `bulk_geometry.py` supplies the same ASE
+construction to the worker and the exported standalone Python script.
+The Bash script calls `p4v bulk`, which dispatches to the ASE worker before GTK
+or viewer imports and writes a single new POSCAR. The Windows spec includes
+the source used to produce the standalone script.

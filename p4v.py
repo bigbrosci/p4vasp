@@ -4,10 +4,13 @@
 
 
 
-# Handle PNG export before importing any GTK/FLTK UI modules.
+# Dispatch headless commands before importing any GTK/FLTK UI modules.
 import sys
 if __name__ == "__main__":
     cli_args = sys.argv[1:]
+    if cli_args and cli_args[0] == 'bulk':
+        from p4vasp.bulk_cli import main as bulk_main
+        raise SystemExit(bulk_main(cli_args[1:]))
     if cli_args and cli_args[0]=='--surface-replay':
         from p4vasp.surface_cli import main as surface_main
         raise SystemExit(surface_main(cli_args[1:]))

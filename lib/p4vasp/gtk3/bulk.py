@@ -1,4 +1,4 @@
-"""ASE-backed bulk settings inside Models; output is POSCAR only."""
+"""ASE-backed bulk settings, structure preview and portable replay export."""
 from io import StringIO
 import re
 from p4vasp.gtk3 import Gtk, GLib
@@ -156,17 +156,18 @@ class BulkPage(Gtk.Box):
 
     def save(self, *_):
         if self.result is None: return
+        from p4vasp.bulk_replay import bulk_contents
         from p4vasp.single_atom_inputs import write_contents
         result = self.result
         name = re.sub('[^A-Za-z0-9_-]', '_', result['formula'])+'_bulk'
         output = InputFolderDialog(self.parent_window(), result['formula'], self.directory,
             title='Save bulk POSCAR', folder_name=name,
-            summary='Creates a new folder containing POSCAR only. Existing folders are not overwritten.',
-            writer=lambda parent, name: write_contents({'POSCAR': result['poscar']}, parent, name),
+            summary='Creates a new folder with POSCAR, rebuild_bulk.py and rebuild_bulk.sh.',
+            writer=lambda parent, name: write_contents(bulk_contents(result), parent, name),
             action_label='Save POSCAR').run()
         if output is not None:
             self.directory = output.parent
-            self.status.set_text('Saved '+str(output/'POSCAR'))
+            self.status.set_text('Saved POSCAR and replay scripts in '+str(output))
 
     def close_preview(self):
         if self.preview_window is not None:
